@@ -142,9 +142,11 @@ export function checkDraft(draft: string, template: string, plan: PlanFacts, kno
       return from >= 0 && to > from && hasAmount(sentence, amount)
     })
     if (!keptIn.length) reasons.push(`It changes or leaves out the move of up to ${amount} capsules from ${move.fromName} to ${move.toName}.`)
-    // A move is a suggestion for the MHO, never an order: its sentence keeps
-    // the MHO's decision ("for the MHO to decide", "if the MHO approves").
-    else if (!keptIn.some(leftToTheMho)) {
+    // A move is a suggestion for the MHO, never an order: when the plan says
+    // so (the laptop template's "for the MHO to decide"), the move's sentence
+    // keeps the MHO's decision ("for the MHO to decide", "if the MHO approves").
+    // Phase 2's alert templates (server/luna) word moves their own way.
+    else if (leftToTheMho(template) && !keptIn.some(leftToTheMho)) {
       reasons.push(`It turns the move of up to ${amount} capsules from ${move.fromName} to ${move.toName} into an order; keep "for the MHO to decide".`)
     }
   }
