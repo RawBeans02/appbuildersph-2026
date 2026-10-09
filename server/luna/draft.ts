@@ -21,6 +21,9 @@ export const DRAFT_LIMITS = {
   // or 5xx, waiting 0.5 s then 1.5 s.
   retries: 2,
   backoffMs: [500, 1500],
+  // No retry starts unless a full try still fits in this, so a draft request
+  // ends well inside the route's 60 s (vercel.json).
+  budgetMs: 45_000,
 } as const
 
 export const SYSTEM_PROMPT = [
@@ -56,6 +59,8 @@ export type DraftOptions = {
   fetch?: Fetcher
   sleep?: (ms: number) => Promise<void>
   timeoutMs?: number
+  // Milliseconds now, for the time budget (tests pass their own clock).
+  clock?: () => number
 }
 
 // Parameters a model may refuse (OpenAI answers 400 naming the param): dropped,
@@ -90,6 +95,8 @@ export async function requestWording(candidate: AlertCandidate, options: DraftOp
     reasoning_effort: 'none',
     temperature: DRAFT_LIMITS.temperature,
   }
+  const clock = options.clock ?? Date.now
+  const started = clock()
   let attempts = 0
   let retried = 0
   let adjusted = 0
@@ -124,7 +131,9 @@ export async function requestWording(candidate: AlertCandidate, options: DraftOp
       failure = error instanceof DOMException && (error.name === 'TimeoutError' || error.name === 'AbortError') ? 'timeout' : 'unreachable'
     }
     if (retried >= DRAFT_LIMITS.retries) return { ok: false, reason: failure, attempts }
-    await sleep(DRAFT_LIMITS.backoffMs[retried])
+    const backoff = DRAFT_LIMITS.backoffMs[retried]
+    if (clock() - started + backoff + timeoutMs > DRAFT_LIMITS.budgetMs) return { ok: false, reason: failure, attempts }
+    await sleep(backoff)
     retried += 1
   }
 }

@@ -72,6 +72,18 @@ describe('requestWording (GPT-6 Luna, mocked)', () => {
     expect(mock.calls[0].init.signal).toBeInstanceOf(AbortSignal)
   })
 
+  it("doesn't start a retry that couldn't finish inside the 45 s budget", async () => {
+    // Each try takes 20 s on this clock: after the first, a second still fits
+    // (20 + 0.5 + 20 ≤ 45); after the second, a third wouldn't.
+    let now = 0
+    const slow: Fetcher = async () => {
+      now += 20_000
+      return status(503)
+    }
+    const { options } = base(slow)
+    expect(await requestWording(candidate, { ...options, clock: () => now })).toEqual({ ok: false, reason: 'unreachable', attempts: 2 })
+  })
+
   it("doesn't retry a refused key or a rejected request", async () => {
     const auth = mockFetch(status(401))
     expect(await requestWording(candidate, base(auth.fetcher).options)).toEqual({ ok: false, reason: 'auth', attempts: 1 })
