@@ -1,5 +1,7 @@
 import 'fake-indexeddb/auto'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import { currentFlood, groupHouseholds, markHouseholdExposed } from '../../features/flood/flood'
+import { watchedCount, watchList } from '../../rules/watch'
 import { openAppDb } from '../db/appDb'
 import type { ExposureKind, HingaOutcome, SeedData } from '../db/types'
 import { generateSeed } from './generate'
@@ -7,6 +9,7 @@ import { generateSeed } from './generate'
 // Fri Oct 9 2026, 9:30 in the morning, local time.
 const TODAY = new Date(2026, 9, 9, 9, 30)
 const seed = generateSeed(TODAY)
+const FLOODED_PUROKS = ['Purok 1', 'Purok 2', 'Purok 3']
 
 // Calendar helpers written apart from the generator's, so the tests check it.
 const dayIndex = (day: string) => Date.parse(`${day}T00:00:00Z`) / 86_400_000
@@ -120,12 +123,12 @@ describe('the demo story', () => {
     )
   })
 
-  it('places them in 15 households across Purok 1 to 5', () => {
+  it('places them in 16 households across Purok 1 to 5', () => {
     const households = new Map<string, Set<string>>()
     for (const r of seed.residents) {
       households.set(r.householdId, (households.get(r.householdId) ?? new Set()).add(r.purok))
     }
-    expect(households.size).toBe(15)
+    expect(households.size).toBe(16)
     // A household lives in one purok.
     for (const puroks of households.values()) expect(puroks.size).toBe(1)
     expect(new Set(seed.residents.map((r) => r.purok))).toEqual(
@@ -144,8 +147,8 @@ describe('the demo story', () => {
       '2–12 months': 2,
       '1–5 years': 4,
       '5–17 years': 18,
-      '18–59 years': 26,
-      '60+ years': 8,
+      '18–59 years': 25,
+      '60+ years': 9,
     })
   })
 
@@ -161,8 +164,40 @@ describe('the demo story', () => {
     expect(exposures.every((e) => e.exposedOn === '2026-10-03')).toBe(true)
     const kinds = new Set(exposures.flatMap((e) => e.kinds))
     expect(kinds).toEqual(new Set<ExposureKind>(['waded', 'open-wound', 'repeated']))
-    // Room for the presenter to tap 3 more residents during the demo.
-    expect(seed.residents.length - exposures.length).toBeGreaterThanOrEqual(3)
+  })
+
+  it('exposes whole households, as the watch screen marks them, all in the flooded puroks', () => {
+    const exposed = new Set((seed.exposures ?? []).map((e) => e.residentId))
+    const exposedResidents = seed.residents.filter((r) => exposed.has(r.id))
+    const households = new Set(exposedResidents.map((r) => r.householdId))
+    expect(households.size).toBe(3)
+    for (const r of seed.residents) expect(exposed.has(r.id)).toBe(households.has(r.householdId))
+    for (const r of exposedResidents) expect(FLOODED_PUROKS).toContain(r.purok)
+  })
+
+  it('puts all 9 on the app’s watch list, inside the window today', () => {
+    const exposures = (seed.exposures ?? []).map((e) => ({ ...e, sample: true }))
+    const entries = watchList(exposures, '2026-10-09')
+    expect(entries).toHaveLength(9)
+    expect(entries.every((entry) => entry.phase === 'active')).toBe(true)
+    expect(watchedCount(entries)).toBe(9)
+  })
+
+  it('reaches 12 exposed when the presenter taps the three one-person households on the watch screen', async () => {
+    const db = await openAppDb('seed-demo-taps', async () => seed)
+    const residents = await db.residents.list({ limit: 1000 })
+    const exposed = new Set((await db.exposures.list({ limit: 1000 })).map((e) => e.residentId))
+    const toTap = groupHouseholds(residents).filter(
+      (h) => FLOODED_PUROKS.includes(h.purok) && h.members.length === 1 && !exposed.has(h.members[0].id),
+    )
+    expect(toTap.map((h) => h.id)).toEqual(['HH-03', 'HH-07', 'HH-10'])
+
+    const flood = currentFlood(await db.floodEvents.list())!
+    for (const household of toTap) {
+      await markHouseholdExposed(db, { floodEventId: flood.id, household, exposedOn: '2026-10-09', kinds: ['waded'] }, TODAY)
+    }
+    expect(watchedCount(watchList(await db.exposures.list({ limit: 1000 }), '2026-10-09'))).toBe(12)
+    db.close()
   })
 
   it('stocks doxycycline 100 mg in DEMO-LOT-24A (30, expiring in 6 weeks) and DEMO-LOT-25B (10, 9 months out)', () => {

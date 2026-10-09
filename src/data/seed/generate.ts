@@ -8,9 +8,10 @@ import type { ExposureKind, SeedData } from '../db/types'
 // Deterministic: one seeded PRNG (never Math.random), and every date counts
 // back or forward from `today`'s local calendar day. The same day always gives
 // the same seed, and the demo story stays current whenever the seed first loads:
-// - 60 residents in 15 households, 3 per purok, every age band, 8 under 5;
-// - one active flood event that started 6 days ago, with 9 residents exposed
-//   that day (inside the day 5–15 leptospirosis watch window);
+// - 60 residents in 16 households across Purok 1–5, every age band, 8 under 5;
+// - one active flood event that started 6 days ago, with 9 residents (three
+//   whole households) exposed that day, inside the day 5–15 leptospirosis
+//   watch window, and three one-person households left for the demo's taps;
 // - doxycycline 100 mg: 30 capsules in a lot expiring the month 6 weeks from
 //   today, 10 in a lot expiring 9 months out; and other station stock;
 // - 3 past Hinga checks (one fast, two not fast).
@@ -107,38 +108,35 @@ const AGE_IN_DAYS: Record<Band, readonly [min: number, max: number]> = {
   '60+ years': [years(60.2), years(84)],
 }
 
-// Who lives in each household, by age band: three households per purok, in order.
-const HOUSEHOLDS: readonly (readonly Band[])[] = [
-  // Purok 1
-  ['18–59 years', '18–59 years', '5–17 years', '5–17 years', 'under 2 months'],
-  ['60+ years', '18–59 years', '18–59 years', '5–17 years'],
-  ['18–59 years', '18–59 years', '5–17 years', '5–17 years', '5–17 years', '1–5 years'],
-  // Purok 2
-  ['60+ years', '60+ years'],
-  ['18–59 years', '18–59 years', '2–12 months', '5–17 years'],
-  ['18–59 years', '18–59 years', '5–17 years', '5–17 years', '1–5 years'],
-  // Purok 3
-  ['18–59 years', '18–59 years', '5–17 years'],
-  ['60+ years', '18–59 years', '18–59 years', '5–17 years', '5–17 years', 'under 2 months'],
-  ['18–59 years', '18–59 years', '5–17 years', '1–5 years'],
-  // Purok 4
-  ['18–59 years', '18–59 years', '5–17 years', '2–12 months'],
-  ['60+ years', '60+ years', '18–59 years'],
-  ['18–59 years', '18–59 years', '5–17 years', '5–17 years', '1–5 years'],
-  // Purok 5
-  ['18–59 years', '5–17 years', '5–17 years'],
-  ['60+ years', '18–59 years', '18–59 years'],
-  ['60+ years', '18–59 years', '18–59 years'],
+// Who lives in each household, by age band, and in which purok. The flood
+// reached Purok 1–3: everyone in the three households marked `exposed` waded
+// through it on its first day (9 residents). Three one-person households there
+// are not exposed yet: the presenter taps them on the watch screen (a tap marks
+// a whole household), which makes 12 exposed.
+type HouseholdPlan = { purok: number; members: readonly Band[]; exposed?: true }
+
+const HOUSEHOLDS: readonly HouseholdPlan[] = [
+  { purok: 1, members: ['18–59 years', '18–59 years', '5–17 years', '5–17 years'], exposed: true },
+  { purok: 1, members: ['18–59 years', '18–59 years', '5–17 years', '5–17 years', '5–17 years', '1–5 years'] },
+  { purok: 1, members: ['60+ years'] },
+  { purok: 1, members: ['18–59 years', '18–59 years', '5–17 years', '5–17 years', 'under 2 months'] },
+  { purok: 2, members: ['60+ years', '18–59 years', '18–59 years'], exposed: true },
+  { purok: 2, members: ['18–59 years', '18–59 years', '2–12 months', '5–17 years'] },
+  { purok: 2, members: ['60+ years'] },
+  { purok: 3, members: ['18–59 years', '5–17 years'], exposed: true },
+  { purok: 3, members: ['60+ years', '18–59 years', '18–59 years', '5–17 years', '5–17 years', 'under 2 months'] },
+  { purok: 3, members: ['18–59 years'] },
+  { purok: 3, members: ['18–59 years', '18–59 years', '5–17 years', '1–5 years'] },
+  { purok: 4, members: ['18–59 years', '18–59 years', '5–17 years', '5–17 years', '2–12 months'] },
+  { purok: 4, members: ['60+ years', '60+ years', '18–59 years'] },
+  { purok: 4, members: ['18–59 years', '18–59 years', '5–17 years', '5–17 years', '1–5 years'] },
+  { purok: 5, members: ['60+ years', '18–59 years', '18–59 years', '5–17 years', '5–17 years', '1–5 years'] },
+  { purok: 5, members: ['60+ years', '60+ years', '18–59 years', '18–59 years'] },
 ]
 
-const HOUSEHOLDS_PER_PUROK = 3
-// The flood reached the low puroks.
-const FLOODED_PUROKS = ['Purok 1', 'Purok 2', 'Purok 3']
 const FLOOD_DAYS_AGO = 6
-// Only residents this old are picked as having waded through floodwater.
-const MIN_EXPOSED_AGE_DAYS = years(12)
 
-// The exposure details for the 9 residents exposed on the flood's first day.
+// The exposure details of the 9 exposed residents, dealt out at random.
 const EXPOSURE_KINDS: readonly ExposureKind[][] = [
   ['waded'],
   ['waded'],
@@ -155,21 +153,20 @@ export function generateSeed(today: Date): SeedData {
   const rng = mulberry32(PRNG_SEED)
   const day = localDay(today)
 
-  const people: { resident: SeedResident; band: Band; ageInDays: number }[] = []
-  HOUSEHOLDS.forEach((members, h) => {
-    for (const band of members) {
+  const people: { resident: SeedResident; band: Band; exposed: boolean }[] = []
+  HOUSEHOLDS.forEach((household, h) => {
+    for (const band of household.members) {
       const number = String(people.length + 1).padStart(3, '0')
       const [min, max] = AGE_IN_DAYS[band]
-      const ageInDays = randomInt(rng, min, max)
       const resident: SeedResident = {
         id: `res-${number}`,
         name: `Residente ${number}`,
         householdId: `HH-${pad(h + 1)}`,
-        purok: `Purok ${Math.floor(h / HOUSEHOLDS_PER_PUROK) + 1}`,
+        purok: `Purok ${household.purok}`,
         sex: rng() < 0.5 ? 'F' : 'M',
-        birthDate: addDays(day, -ageInDays),
+        birthDate: addDays(day, -randomInt(rng, min, max)),
       }
-      people.push({ resident, band, ageInDays })
+      people.push({ resident, band, exposed: household.exposed === true })
     }
   })
 
@@ -182,21 +179,17 @@ export function generateSeed(today: Date): SeedData {
     createdAt: at(floodDay, 7, 30),
   }
 
-  const canBeExposed = people.filter(
-    (p) => FLOODED_PUROKS.includes(p.resident.purok) && p.ageInDays >= MIN_EXPOSED_AGE_DAYS,
-  )
-  const exposed = shuffled(rng, canBeExposed)
-    .slice(0, EXPOSURE_KINDS.length)
-    .sort((a, b) => (a.resident.id < b.resident.id ? -1 : 1))
   const kinds = shuffled(rng, EXPOSURE_KINDS)
-  const exposures: SeedExposure[] = exposed.map((p, i) => ({
-    id: `exp-${String(i + 1).padStart(3, '0')}`,
-    floodEventId: flood.id,
-    residentId: p.resident.id,
-    exposedOn: floodDay,
-    kinds: [...kinds[i]],
-    createdAt: at(floodDay, 18, 5 + i * 4),
-  }))
+  const exposures: SeedExposure[] = people
+    .filter((p) => p.exposed)
+    .map((p, i) => ({
+      id: `exp-${String(i + 1).padStart(3, '0')}`,
+      floodEventId: flood.id,
+      residentId: p.resident.id,
+      exposedOn: floodDay,
+      kinds: [...kinds[i]],
+      createdAt: at(floodDay, 18, 5 + i * 4),
+    }))
 
   // Past Hinga checks in the evacuation center, after the flood. Each draws
   // its rate from a range that sits on one side of the WHO IMCI cut-off for
