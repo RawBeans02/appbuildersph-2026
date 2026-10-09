@@ -96,7 +96,16 @@ test('no camera: 45 breaths counted by hand are fast for 1 to 4 years and saved 
         }
       }),
   )
-  expect(checks.filter((check) => !check.sample)).toEqual([
-    expect.objectContaining({ method: 'hand', breathsPerMinute: 45, outcome: 'fast', dangerSigns: [], refusal: null }),
-  ])
+  const saved = checks.filter((check) => !check.sample)
+  if ((await page.locator('html').getAttribute('data-lock-status')) === 'unlocked') {
+    // Phase 2: the health fields are sealed at rest (src/data/db/vault.ts), so
+    // the stored row has a sealed box and none of them in the clear.
+    expect(saved).toHaveLength(1)
+    expect(saved[0]).toHaveProperty('sealed')
+    expect(Object.keys(saved[0]).sort()).toEqual(['checkedAt', 'id', 'residentId', 'sample', 'sealed'])
+  } else {
+    expect(saved).toEqual([
+      expect.objectContaining({ method: 'hand', breathsPerMinute: 45, outcome: 'fast', dangerSigns: [], refusal: null }),
+    ])
+  }
 })
