@@ -21,7 +21,12 @@ export type ModelSpec = {
   files: ModelFile[]
 }
 
-export type DownloadProgress = { loadedBytes: number; totalBytes: number }
+export type DownloadProgress = {
+  loadedBytes: number
+  totalBytes: number
+  // The file being downloaded (index among spec.files); null before the first byte.
+  file: { url: string; index: number; count: number } | null
+}
 
 export type ModelCacheErrorCode =
   // No Cache API (old browser, or the page isn't on HTTPS).
@@ -178,7 +183,9 @@ export async function ensureModelCached(spec: ModelSpec, options: ModelCacheOpti
   const storage = getCacheStorage(options)
   const cache = await storage.open(cacheNameFor(spec.id, spec.version))
   const totalBytes = spec.files.reduce((sum, file) => sum + file.bytes, 0)
-  const report = (loadedBytes: number) => options.onProgress?.({ loadedBytes, totalBytes })
+  const count = spec.files.length
+  const report = (loadedBytes: number, file: DownloadProgress['file']) =>
+    options.onProgress?.({ loadedBytes, totalBytes, file })
 
   let doneBytes = 0
   const missing: ModelFile[] = []
@@ -186,10 +193,11 @@ export async function ensureModelCached(spec: ModelSpec, options: ModelCacheOpti
     if (await isFileCached(cache, file)) doneBytes += file.bytes
     else missing.push(file)
   }
-  report(doneBytes)
+  report(doneBytes, null)
 
   for (const file of missing) {
-    await downloadFile(cache, file, options, (loaded) => report(doneBytes + loaded))
+    const current = { url: file.url, index: spec.files.indexOf(file), count }
+    await downloadFile(cache, file, options, (loaded) => report(doneBytes + loaded, current))
     doneBytes += file.bytes
   }
 }

@@ -94,8 +94,13 @@ describe('ensureModelCached', () => {
     await ensureModelCached(spec, { caches, fetch, onProgress: (p) => progress.push(p) })
 
     expect(fetch).toHaveBeenCalledTimes(2)
-    expect(progress[0]).toEqual({ loadedBytes: 0, totalBytes: 16 })
-    expect(progress.at(-1)).toEqual({ loadedBytes: 16, totalBytes: 16 })
+    expect(progress[0]).toEqual({ loadedBytes: 0, totalBytes: 16, file: null })
+    expect(progress.at(-1)).toEqual({
+      loadedBytes: 16,
+      totalBytes: 16,
+      file: { url: tokenizer.url, index: 1, count: 2 },
+    })
+    expect(progress.find((p) => p.file?.index === 0)?.file?.url).toBe(weights.url)
     const loaded = progress.map((p) => p.loadedBytes)
     expect(loaded).toEqual([...loaded].sort((a, b) => a - b))
 
@@ -121,8 +126,8 @@ describe('ensureModelCached', () => {
 
     expect(fetch).toHaveBeenCalledOnce()
     expect(fetch).toHaveBeenCalledWith(tokenizer.url, expect.anything())
-    expect(progress[0]).toEqual({ loadedBytes: 10, totalBytes: 16 })
-    expect(progress.at(-1)).toEqual({ loadedBytes: 16, totalBytes: 16 })
+    expect(progress[0]).toEqual({ loadedBytes: 10, totalBytes: 16, file: null })
+    expect(progress.at(-1)).toMatchObject({ loadedBytes: 16, file: { index: 1, count: 2 } })
   })
 
   it('rejects a file that is too short or too long and stores nothing for it', async () => {
