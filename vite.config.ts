@@ -36,6 +36,9 @@ export default defineConfig({
         // downloaded by the "Prepare for offline" step into the model caches
         // (src/lib/modelCache.ts), not here, so the first visit stays light.
         globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
+        // The Tesseract.js worker and core are model files (prepared on
+        // demand when that engine is on), not app shell.
+        globIgnores: ['**/worker.min-*.js', '**/tesseract-core-*.js'],
         runtimeCaching: [
           {
             // Serve model and .wasm files from whichever model cache holds them,

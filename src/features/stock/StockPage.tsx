@@ -4,7 +4,6 @@ import { getDb } from '../../data/db/appDb'
 import type { AgapayDb } from '../../data/db/db'
 import { useDbQuery } from '../../data/db/useDbQuery'
 import { readBox } from '../../inference/ocr/ocrClient'
-import { imageToPixels } from '../../lib/image'
 import { CHECK_BELOW, parseLabel, type LabelField, type LabelReading } from '../../rules/label'
 import { draftFromReading, saveStockLot, UNITS, validateDraft, type StockDraft } from './stock'
 
@@ -43,16 +42,15 @@ export default function StockPage() {
     setStep({ name: 'reading', photoUrl: url })
     try {
       const start = performance.now()
-      const pixels = await imageToPixels(file)
-      const result = await readBox(pixels)
-      const reading = parseLabel(result.lines)
+      const lines = await readBox(file)
+      const reading = parseLabel(lines)
       setDraft(draftFromReading(reading))
       setProblems([])
       setStep({
         name: 'review',
         photoUrl: url,
         reading,
-        lines: result.lines.map((line) => line.text),
+        lines: lines.map((line) => line.text),
         ms: performance.now() - start,
       })
     } catch (cause) {

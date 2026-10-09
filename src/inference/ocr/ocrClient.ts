@@ -1,6 +1,9 @@
 import type { Backend } from '../../lib/backend'
+import { downscaleImage, imageToPixels } from '../../lib/image'
 import { createInferenceClient, createInferenceWorker, type InferenceClient } from '../client'
-import type { OcrInput, OcrOutput } from './runtime'
+import { OCR_ENGINE } from './engine'
+import type { OcrLine } from './pipeline'
+import type { OcrOutput } from './runtime'
 
 // The app's one OCR worker, started on first use and kept, since loading the
 // models takes a few seconds. WASM, single-threaded, on every device: the
@@ -36,7 +39,16 @@ export function getOcrClient(): Promise<InferenceClient> {
   return ready
 }
 
-export async function readBox(pixels: OcrInput, signal?: AbortSignal): Promise<OcrOutput> {
+// Reads a photo of a medicine box with this device's engine (engine.ts).
+export async function readBox(photo: Blob, signal?: AbortSignal): Promise<OcrLine[]> {
+  if (OCR_ENGINE === 'tesseract') {
+    const [{ readWithTesseract }, small] = await Promise.all([
+      import('../tesseract/reader'),
+      downscaleImage(photo, { type: 'image/png' }),
+    ])
+    return readWithTesseract(small.blob)
+  }
+  const pixels = await imageToPixels(photo)
   const client = await getOcrClient()
-  return client.run<OcrOutput>(pixels, { signal })
+  return (await client.run<OcrOutput>(pixels, { signal })).lines
 }

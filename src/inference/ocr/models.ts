@@ -1,5 +1,6 @@
 import ortWasmUrl from 'onnxruntime-web/ort-wasm-simd-threaded.wasm?url'
 import type { OfflineModel } from '../../lib/offlineModels'
+import { OCR_ENGINE } from './engine'
 
 // The medicine-box reader's files, downloaded by "Prepare for offline".
 // Sizes are exact; models.node.test.ts checks them against the files.
@@ -24,4 +25,5 @@ export const PP_OCR: OfflineModel = {
   ],
 }
 
-export const models: OfflineModel[] = [ORT_WASM, PP_OCR]
+// Downloaded only on devices that read boxes with PP-OCR (see engine.ts).
+export const models: OfflineModel[] = OCR_ENGINE === 'pp-ocr' ? [ORT_WASM, PP_OCR] : []
