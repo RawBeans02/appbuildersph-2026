@@ -104,7 +104,8 @@ export default function WatchPage() {
               {households.map((household) => (
                 <li key={household.id}>
                   <button type="button" aria-pressed={exposedHere.has(household.id)} onClick={() => void toggle(household)}>
-                    {household.id}, {household.purok}, {household.members.length} people
+                    {household.id}, {household.purok}, {household.members.length}{' '}
+                    {household.members.length === 1 ? 'person' : 'people'}
                     {exposedHere.has(household.id) ? ': exposed' : ''}
                   </button>{' '}
                   {!exposedHere.has(household.id) && (

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { DEMO_SCAN_LABEL } from '../data/seed/demoLabel'
 import { parseExpiryDate, parseLabel, type OcrLineInput } from './label'
 
 const lines = (...texts: (string | [string, number])[]): OcrLineInput[] =>
@@ -13,6 +14,16 @@ describe('parseLabel', () => {
     expect(reading.strength).toMatchObject({ value: '100 mg', line: 2 })
     expect(reading.lot).toMatchObject({ value: 'DEMO-LOT-0421', line: 3 })
     expect(reading.expiry).toMatchObject({ value: '2027-03', line: 4, confidence: expect.closeTo(0.95, 5) })
+  })
+
+  it("reads the demo box's printed label as the seed expects it", () => {
+    const reading = parseLabel(
+      lines('DEMO · NOT A REAL MEDICINE · SAMPLE DATA', 'Doxycycline 100 mg capsules', 'LOT: DEMO-LOT-24A', 'EXP: 11/2026'),
+    )
+    expect(reading.drug?.value).toBe(DEMO_SCAN_LABEL.drug)
+    expect(reading.strength?.value).toBe(DEMO_SCAN_LABEL.strength)
+    expect(reading.lot?.value).toBe(DEMO_SCAN_LABEL.lot)
+    expect(reading.expiry?.value).toBe(DEMO_SCAN_LABEL.expiry)
   })
 
   it('reads the synthetic test label', () => {
