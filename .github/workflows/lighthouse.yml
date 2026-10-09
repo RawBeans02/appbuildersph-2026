@@ -1,7 +1,8 @@
 # Lighthouse (the lab test behind PageSpeed Insights) against a URL, on
-# demand: mobile emulation, the four categories the README reports. Runs on
-# GitHub's runner, not the 8 GB laptop. Scores are written to the job summary
-# and the full reports are kept as an artifact.
+# demand: mobile emulation, the four categories the README reports. One run
+# is noisy on shared runners, so it runs several times and reports every run
+# plus the median (the run with the median Performance score). Runs on
+# GitHub's runner, not the 8 GB laptop. Full reports are kept as an artifact.
 name: Lighthouse
 
 on:
@@ -11,6 +12,10 @@ on:
         description: URL to test
         default: https://appbuildersph-2026.vercel.app/
         required: true
+      runs:
+        description: Number of runs (the median is reported)
+        default: '3'
+        required: true
 
 permissions:
   contents: read
@@ -18,7 +23,7 @@ permissions:
 jobs:
   lighthouse:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - uses: actions/setup-node@v4
         with:
@@ -26,25 +31,35 @@ jobs:
       - name: Run Lighthouse (mobile)
         env:
           TARGET: ${{ inputs.url }}
+          RUNS: ${{ inputs.runs }}
         run: |
-          npx -y lighthouse@12 "$TARGET" \
-            --only-categories=performance,accessibility,best-practices,seo \
-            --form-factor=mobile --throttling-method=simulate \
-            --output=json --output=html --output-path=./lighthouse \
-            --chrome-flags="--headless=new --no-sandbox" --quiet
+          for i in $(seq 1 "$RUNS"); do
+            npx -y lighthouse@12 "$TARGET" \
+              --only-categories=performance,accessibility,best-practices,seo \
+              --form-factor=mobile --throttling-method=simulate \
+              --output=json --output=html --output-path="./lighthouse-$i" \
+              --chrome-flags="--headless=new --no-sandbox" --quiet
+          done
       - name: Scores to the job summary
         run: |
           node -e '
-            const r = require("./lighthouse.report.json");
-            const lines = ["## Lighthouse (mobile)", "", "URL: " + r.finalDisplayedUrl, "Lighthouse " + r.lighthouseVersion + ", " + r.fetchTime, "", "| Category | Score |", "|---|---|"];
-            for (const c of Object.values(r.categories)) lines.push("| " + c.title + " | " + Math.round(c.score * 100) + " |");
-            lines.push("", "| Metric | Value |", "|---|---|");
-            for (const id of ["first-contentful-paint","largest-contentful-paint","total-blocking-time","cumulative-layout-shift","speed-index"]) lines.push("| " + r.audits[id].title + " | " + r.audits[id].displayValue + " |");
-            require("fs").appendFileSync(process.env.GITHUB_STEP_SUMMARY, lines.join("\n") + "\n");
+            const fs = require("fs");
+            const files = fs.readdirSync(".").filter(f => /^lighthouse-\d+\.report\.json$/.test(f)).sort();
+            const runs = files.map(f => require("./" + f));
+            const score = (r, k) => Math.round(r.categories[k].score * 100);
+            const sorted = [...runs].sort((a, b) => score(a, "performance") - score(b, "performance"));
+            const median = sorted[Math.floor((sorted.length - 1) / 2)];
+            const lines = ["## Lighthouse (mobile), " + runs.length + " runs", "", "URL: " + runs[0].finalDisplayedUrl, "Lighthouse " + runs[0].lighthouseVersion, "",
+              "| Run | Performance | Accessibility | Best Practices | SEO | TBT | LCP | SI |", "|---|---|---|---|---|---|---|---|"];
+            const row = (label, r) => "| " + label + " | " + ["performance","accessibility","best-practices","seo"].map(k => score(r, k)).join(" | ") + " | " +
+              ["total-blocking-time","largest-contentful-paint","speed-index"].map(id => r.audits[id].displayValue).join(" | ") + " |";
+            runs.forEach((r, i) => lines.push(row(String(i + 1) + " (" + r.fetchTime + ")", r)));
+            lines.push(row("**Median**", median));
+            fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, lines.join("\n") + "\n");
             console.log(lines.join("\n"));
           '
       - uses: actions/upload-artifact@v4
         with:
-          name: lighthouse-report
-          path: lighthouse.report.*
+          name: lighthouse-reports
+          path: lighthouse-*.report.*
           retention-days: 7
