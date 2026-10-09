@@ -13,7 +13,7 @@ Context: DOH reported 12,654 leptospirosis cases as of Sept 30, 2026, 49% higher
 **Our solution (one sentence):** AgapayMo is an offline web app. On the BHW's phone, it checks a child's breathing rate with the camera (Hinga), turns a logged flood event into a leptospirosis watch list, and reads medicine-box lot and expiry dates to compare stock against need. It then passes only de-identified counts to the MHO's laptop by QR code, where a rule-based plan, optionally drafted by a local language model, waits for the officer's approval.
 
 **The wow flow, step by step (the ~1-minute video and the 5-minute live demo; airplane mode on from second one, "Runs on this phone" visible):**
-1. **Hinga** (live only if the phone trials pass; otherwise the guided hand count, said to be the fallback): the presenter breathes to a 45/min metronome as a "2-year-old"; the result is "Fast breathing for age: refer to the midwife or RHU now". Moving the phone makes it refuse to count.
+1. **Hinga** (live only if the phone trials pass; otherwise the guided hand count, said to be the fallback): the presenter breathes to a 45/min metronome as a "2-year-old"; the result is "Fast breathing for age: refer to the midwife or RHU today". Moving the phone makes it refuse to count.
 2. **Flood event:** log the flood and tap 3 households as exposed, which opens the day-5–15 watch window.
 3. **Stock:** scan a mock "DEMO" doxycycline box. The lot and expiry are read on the phone; the BHW confirms them.
 4. **Exposure × stock:** "12 exposed · 40 capsules · 30 expire in 6 weeks → flag for clinician review." Never a dose.

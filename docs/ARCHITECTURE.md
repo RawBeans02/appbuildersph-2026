@@ -28,7 +28,7 @@ flowchart LR
 
   subgraph LAPTOP["Officer's laptop: works offline after setup"]
     SCAN["Scan: BarcodeDetector or bundled jsQR"]
-    VERIFY["Verify signature with the paired key"]
+    VERIFY["Verify signature with the paired key; refuse a week that isn't this week or the last 8"]
     MERGE["Merge: latest export per barangay"]
     PLAN["Rule-based plan: doctor-team priority, doxycycline moves"]
     LLM["Optional wording: Qwen2.5-0.5B on WebLLM, WebGPU worker, then checkDraft"]
@@ -252,5 +252,5 @@ Optional, after a sync. The DOH or regional officer drafts alerts on `/doh`; a p
 - **Storage**: if the browser refuses persistent storage, it may clear the models under storage pressure. The Prepare for offline screen then offers the download again.
 - **Phase 2 sync**: one enroll code for every laptop, so anyone who learns it can enroll a key (rotate it in the Vercel settings; enrolled laptops keep working). A laptop's vouch for a phone key is trusted as given; two laptops of one municipality that disagree overwrite each other's vouch. The DOH view code is shared, not per person and not per municipality (a decision names its municipality, checked against the alert's); it must be at least 16 characters, and each address gets 10 wrong tries per 10 minutes, but someone with many addresses can still try more. A laptop whose clock is more than 5 minutes off can't sync until it's corrected.
 - **Pairing**: trust rests on the officer comparing fingerprints. A lost phone's key stays trusted until the laptop pairs a new one ("Reset sample data and pairing" forgets keys on a device).
-- **Hinga**: the pose model's own card says it isn't intended for life-critical decisions, and it isn't tested on children; we test only on ourselves, breathing to a metronome. The head and both shoulders must be in view. Camera breath counts are least reliable with movement, crying and young infants, which is why it refuses rather than guesses. All thresholds are untuned until the phone trials.
+- **Hinga**: the pose model's own card says it isn't intended for life-critical decisions, and it isn't tested on children; its phone trials (adults breathing to a metronome) are not yet recorded. The head and both shoulders must be in view. Camera breath counts are least reliable with movement, crying and young infants, which is why it refuses rather than guesses. All thresholds are untuned until the phone trials.
 - **Data and clinical use**: synthetic data only, never real patients. AgapayMo is a research prototype and screening aid, not a registered medical device: it never diagnoses or doses, and its output is "refer". The watch window and medical sources are cited in the README (Medical sources).

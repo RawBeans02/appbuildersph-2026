@@ -1,14 +1,15 @@
 # Final device and submission checklist
 
-Branch: `codex/offline-return-qr`, based on reviewed `main` at `ddc193e`.
+Written for PR #7 (branch `codex/offline-return-qr`, based on `ddc193e`, merged in 57cd84a); the device and rehearsal tables below are still the team's to fill.
 This sheet separates automated desktop evidence from real-device evidence.
 No iPhone/Android measurement, deployment, rehearsal or human contribution is
 claimed until the team records it.
 
 ## Automated local checks completed
 
-Build and lint pass; 831 unit tests pass (3 existing skips); the default-core
-production browser suite passes 26 tests (4 phase-2 checks skipped). The full
+On the PR #7 branch (Windows desktop, local, Oct 9 22:43 PH): build and lint pass;
+831 unit tests pass (3 existing skips); the default-core production browser suite
+passes 26 tests (4 phase-2 checks skipped). The full
 offline response loop passed across independent browser contexts, including
 QR image receipt, duplicate/stale/key-change handling and offline persistence.
 Actual local browser screenshots and the one-minute narration are prepared;
