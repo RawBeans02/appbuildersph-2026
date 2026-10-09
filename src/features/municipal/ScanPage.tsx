@@ -1,5 +1,6 @@
 import {
   CameraIcon,
+  CameraSlashIcon,
   CircleNotchIcon,
   ClockIcon,
   InfoIcon,
@@ -7,6 +8,7 @@ import {
   SealCheckIcon,
   TableIcon,
   WarningCircleIcon,
+  type Icon,
 } from '@phosphor-icons/react'
 import { useCallback, useState, type ReactNode } from 'react'
 import { Button, ButtonLink, Pill, StateBlock } from '../../components'
@@ -37,7 +39,8 @@ const readScanScreen = async (db: AgapayDb) => {
   return readHandoff(db)
 }
 
-// The camera states that aren't designed get the blocked banner's look.
+// 17f, the camera blocked: a neutral banner with Try again in it. The camera
+// states that aren't designed get the same look.
 // NEEDS DESIGN (TASKS.md B5-UI): no camera, no camera API, other errors.
 const CAMERA_PROBLEM: Partial<Record<ScannerState['status'], { title: string; body: string }>> = {
   denied: { title: 'The camera is blocked', body: 'Allow the camera for this site in the browser settings, then try again.' },
@@ -140,7 +143,14 @@ export default function ScanPage() {
           {pairing ? (
             <PairingConfirm outcome={pairing} onConfirm={() => void confirmPairing(pairing)} onCancel={() => setPairing(null)} />
           ) : problem ? (
-            <Banner tone="bad" title={problem.title} body={problem.body} />
+            <Banner
+              tone="info"
+              icon={CameraSlashIcon}
+              alert
+              title={problem.title}
+              body={problem.body}
+              action={<Button onClick={() => void start()}>Try again</Button>}
+            />
           ) : (
             banner && <Banner tone={banner.tone} title={banner.title} body={banner.body} />
           )}
@@ -149,10 +159,7 @@ export default function ScanPage() {
             <div className={cx(styles.target, success && styles.targetOk)} aria-hidden />
           </div>
           {problem ? (
-            <div className={cx(styles.controls, styles.controlsRow)}>
-              <Button variant="secondary" onClick={() => void start()}>
-                Try again
-              </Button>
+            <div className={styles.controls}>
               <Button variant="text" onClick={stop}>
                 Cancel
               </Button>
@@ -274,16 +281,38 @@ function ScanSlots({ slots, justNow }: { slots: Slots; justNow?: string }) {
 
 const BANNER_ICON = { ok: SealCheckIcon, info: InfoIcon, bad: WarningCircleIcon } as const
 
-function Banner({ tone, title, body, children }: { tone: ScanBanner['tone']; title: string; body: ReactNode; children?: ReactNode }) {
-  const BannerIcon = BANNER_ICON[tone]
+function Banner({
+  tone,
+  icon,
+  alert,
+  title,
+  body,
+  action,
+  children,
+}: {
+  tone: ScanBanner['tone']
+  // The tone's icon unless given (17f: camera-slash).
+  icon?: Icon
+  alert?: boolean
+  title: string
+  body: ReactNode
+  // One button at the banner's right edge (17f: Try again).
+  action?: ReactNode
+  children?: ReactNode
+}) {
+  const BannerIcon = icon ?? BANNER_ICON[tone]
   return (
-    <div role={tone === 'bad' ? 'alert' : 'status'} className={cx(styles.banner, styles[`banner-${tone}`])}>
+    <div
+      role={alert || tone === 'bad' ? 'alert' : 'status'}
+      className={cx(styles.banner, styles[`banner-${tone}`], action !== undefined && styles.bannerWithAction)}
+    >
       <BannerIcon size={26} weight="bold" className={styles.bannerIcon} aria-hidden />
-      <div>
+      <div className={styles.bannerText}>
         <p className={styles.bannerTitle}>{title}</p>
         <p className={styles.bannerBody}>{body}</p>
         {children}
       </div>
+      {action && <div className={styles.bannerAction}>{action}</div>}
     </div>
   )
 }

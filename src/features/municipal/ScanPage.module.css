@@ -137,6 +137,19 @@
   flex: none;
 }
 
+.bannerText {
+  flex: 1;
+  min-width: 0;
+}
+
+.bannerWithAction {
+  align-items: center;
+}
+
+.bannerAction {
+  flex: none;
+}
+
 .bannerTitle {
   font: var(--type-body-lg);
   font-weight: 800;
@@ -241,12 +254,6 @@
 .controls {
   margin-top: 18px;
   width: max-content;
-}
-
-.controlsRow {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
 }
 
 .listNarrow {
