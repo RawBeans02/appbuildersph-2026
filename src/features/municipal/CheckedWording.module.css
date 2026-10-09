@@ -45,6 +45,15 @@
   caret-color: var(--ink);
 }
 
+/* 19g: approved, the box reads as settled text on paper. */
+.field:read-only {
+  border-color: var(--line);
+}
+
+.box:has(.field:read-only) {
+  background: var(--paper);
+}
+
 .field:focus-visible {
   border-color: var(--ink);
   outline: 3px solid var(--ink);

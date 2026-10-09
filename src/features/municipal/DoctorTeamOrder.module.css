@@ -9,7 +9,7 @@
 }
 
 .heading {
-  font: var(--type-heading);
+  font: var(--type-heading-lg);
 }
 
 .lead {

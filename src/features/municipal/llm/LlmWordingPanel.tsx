@@ -157,7 +157,6 @@ export function LlmWordingPanel({ plan, draft, onUse, children }: LlmWordingPane
           <LaptopIcon size={16} weight="bold" aria-hidden />
           Written on this laptop · {WORDING_MODEL_NAME} · {(state.ms / 1000).toFixed(1)} s
         </p>
-        {state.check.ok && <p className={styles.body}>Check this short action summary against the full plan before approving.</p>}
         {!state.check.ok && (
           <div role="alert">
             <p className={styles.checkWarn}>

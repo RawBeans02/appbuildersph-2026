@@ -1,12 +1,12 @@
 /* Screens 16–17 (design/AgapayMo Laptop.dc.html). Tokens only. */
 
 .heading {
-  font: var(--type-heading);
+  font: var(--type-heading-lg);
 }
 
 .lead {
   margin-top: 6px;
-  font: var(--type-body);
+  font: var(--type-body-md);
   color: var(--ink-2);
 }
 
@@ -61,6 +61,17 @@
   flex-direction: column;
 }
 
+/* 16b: the meter sits above "Received this week" (the list under it says the
+   same in words, so DOM order keeps the heading first). */
+.received > .meter {
+  order: -1;
+  margin-top: 0;
+}
+
+.received > .receivedHead {
+  margin-top: 14px;
+}
+
 .receivedHead {
   display: flex;
   align-items: baseline;
@@ -87,14 +98,14 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  padding: 14px 0;
+  padding: var(--space-2) 0;
   border-bottom: 1px solid var(--line);
 }
 
 /* 16b: the newest report scanned this session, for the visit. */
 .rowNow {
   margin: 0 calc(-1 * var(--space-2));
-  padding: 14px var(--space-2);
+  padding: var(--space-2);
   border-radius: var(--r-sm);
   background: var(--ok-tint);
 }
@@ -140,6 +151,10 @@
   font-weight: 400;
   color: var(--ink-2);
   overflow-wrap: anywhere;
+}
+
+.meterWaiting + .meterName {
+  font-weight: 600;
 }
 
 .rowText {
@@ -254,10 +269,11 @@
 /* 17g/17h: a scan's result, the checks this laptop ran. */
 .result {
   margin-bottom: 14px;
-  padding: var(--space-4) var(--space-5);
+  padding: var(--space-5);
   border: 1px solid var(--line);
-  border-radius: var(--r-md);
+  border-radius: var(--r-lg);
   background: var(--surface);
+  box-shadow: var(--shadow-1);
 }
 
 .resultTitle {
@@ -265,7 +281,7 @@
   align-items: center;
   gap: 10px;
   margin-bottom: var(--space-3);
-  font: var(--type-heading);
+  font: var(--type-heading-lg);
 }
 
 .resultTitle svg {
@@ -294,6 +310,15 @@
   margin-top: var(--space-3);
   font: var(--type-body);
   font-weight: 600;
+}
+
+/* 17g at 5 of 5: "All 5 barangays are in." under a --line rule. */
+.resultAllIn {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+  font: var(--type-body-md);
+  font-weight: 700;
 }
 
 .camera[hidden] {

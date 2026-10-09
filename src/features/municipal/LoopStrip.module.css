@@ -49,6 +49,14 @@
   transform-origin: left center;
 }
 
+/* Not reached yet: the connector is dashed. */
+.waiting .line {
+  height: 0;
+  border-top: 2px dashed currentColor;
+  border-radius: 0;
+  background: none;
+}
+
 .arrow {
   flex: none;
   margin-left: -5px;
@@ -61,7 +69,7 @@
 
 /* On approval, the connector to step 5 draws (scaleX, from the left). */
 .drawLine {
-  animation: draw-across var(--dur-draw) var(--ease-in-out) backwards;
+  animation: draw-across var(--dur-quick) var(--ease-out) backwards;
 }
 
 @keyframes draw-across {
@@ -116,8 +124,8 @@
   color: var(--ink-3);
 }
 
-/* The current screen: the label at 700, with a 32 × 4 ink bar under it, as in
-   the nav. */
+/* The current screen: the label at 700, with a 32 × 4 ink bar under the
+   icon, as in the nav. */
 .current .label {
   font-weight: 700;
   color: var(--ink);
@@ -126,7 +134,7 @@
 .current .body::after {
   content: '';
   position: absolute;
-  left: 30px;
+  left: 0;
   bottom: 0;
   width: 32px;
   height: 4px;
@@ -143,7 +151,7 @@
 .seg {
   width: 24px;
   height: 6px;
-  border-radius: 1px;
+  border-radius: 2px;
 }
 
 .segIn {

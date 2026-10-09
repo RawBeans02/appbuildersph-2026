@@ -55,7 +55,7 @@ describe('loopModel', () => {
     expect(model.steps.map(({ status, state }) => [status, state])).toEqual([
       ['0 of 5', 'waiting'],
       ['Waiting for reports', 'waiting'],
-      ['Waiting for reports', 'waiting'],
+      ['No reports yet', 'waiting'],
       ['Not yet', 'waiting'],
       ['After approval', 'waiting'],
     ])

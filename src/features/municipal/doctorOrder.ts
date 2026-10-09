@@ -45,8 +45,6 @@ export function doctorOrder(priority: readonly PriorityEntry[], maxWidth = BAR_M
       solid: px(part.points.min),
       dashed: px(part.points.max - part.points.min),
     })),
-    label: `score ${formatRange(entry.score)} = ${entry.components
-      .map((part) => `${WORDS[part.key]} ${part.shown} × ${part.weight}`)
-      .join(' + ')}`,
+    label: `score ${formatRange(entry.score)}. ${entry.components.map((part) => `${WORDS[part.key]} ${formatRange(part.count)}`).join(', ')}.`,
   }))
 }

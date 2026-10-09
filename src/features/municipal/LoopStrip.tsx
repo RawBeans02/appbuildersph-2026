@@ -57,7 +57,7 @@ export function LoopStrip({ current }: { current: LoopStepId | null }) {
   return (
     <div className={styles.band}>
       {model && (
-        <ol className={styles.steps}>
+        <ol className={styles.steps} aria-label="This week's reports">
           {model.steps.map((step, i) => {
             const StepIcon = step.state === 'done' ? CheckCircleIcon : ICONS[step.id]
             const isCurrent = step.id === current

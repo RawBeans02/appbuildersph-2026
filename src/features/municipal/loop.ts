@@ -65,7 +65,7 @@ export function loopModel({
       : { id: 'merged', label: 'Merged', status: 'Waiting for reports', state: 'waiting' },
     stepCount > 0
       ? { id: 'plan', label: 'Plan', status: plural(stepCount, 'step'), state: 'done' }
-      : { id: 'plan', label: 'Plan', status: 'Waiting for reports', state: 'waiting' },
+      : { id: 'plan', label: 'Plan', status: 'No reports yet', state: 'waiting' },
     approval
       ? { id: 'approved', label: 'Approved', status: formatTime(approval.approval.approvedAt), state: 'done' }
       : { id: 'approved', label: 'Approved', status: 'Not yet', state: 'waiting' },

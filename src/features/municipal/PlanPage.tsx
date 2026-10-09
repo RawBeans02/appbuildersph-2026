@@ -56,10 +56,10 @@ export default function PlanPage() {
 
   const { plan, handoff } = data.data
   if (!plan) {
-    // NEEDS DESIGN (TASKS.md B5-UI): the plan with no barangay QR yet.
+    // B24: the plan with no reports yet.
     return (
       <LaptopFrame active="plan" title="Plan">
-        <StateBlock icon={ListNumbersIcon} title="No barangay QR codes yet">
+        <StateBlock icon={ListNumbersIcon} title="No reports yet" body="The plan appears when the first barangay QR comes in.">
           <ButtonLink to="/municipal" icon={<ScanIcon size={22} weight="bold" aria-hidden />}>
             Scan a barangay QR
           </ButtonLink>

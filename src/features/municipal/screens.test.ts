@@ -41,7 +41,7 @@ describe('laptop screens', () => {
       'Doctor-team order Made by fixed rules from the counts: URGENT referrals count 3 times, fast-breathing referrals 2 times, people in the watch window once.',
     )
     expect(panel).toContain('URGENT referrals × 3 Fast-breathing referrals × 2 In the watch window × 1')
-    expect(panel).toMatch(/^.* × 1 Bagong Silang-D Priority \S+ score \S+ = URGENT referrals \S+ × 3 \+ fast-breathing referrals \S+ × 2 \+ in the watch window \S+ × 1/)
+    expect(panel).toMatch(/^.* × 1 Bagong Silang-D Priority \S+ score \S+\. URGENT referrals \S+, fast-breathing referrals \S+, in the watch window \S+\./)
     expect(html.match(/<li class="[^"]*row/g)).toHaveLength(plan!.priority.length)
     expect(html).not.toContain('<tr') // never table rows: the merged table's rows keep their names
     expect(html).not.toContain('fill"') // nothing just landed: static bars

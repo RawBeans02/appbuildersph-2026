@@ -204,7 +204,7 @@ export default function ScanPage() {
           {pairing ? (
             <PairingConfirm outcome={pairing} onConfirm={() => void confirmPairing(pairing)} onCancel={() => setPairing(null)} />
           ) : banner ? (
-            <ResultPanel key={shown} banner={banner} next={next} />
+            <ResultPanel key={shown} banner={banner} next={next} allIn={success && allIn} />
           ) : (
             problem && (
               <Banner
@@ -240,7 +240,8 @@ export default function ScanPage() {
             </div>
           ) : (
             <>
-              {/* After a received QR, the panel says "Ready for the next barangay." */}
+              {/* After a received QR (17g): this line under the webcam, and the panel says "Ready for the next barangay." */}
+              {success && <p className={styles.hint}>The camera stays on. Hold the next phone's QR inside the corners.</p>}
               {!success && state.status === 'scanning' && (
                 <>
                   <p role="status" className={styles.looking}>
@@ -395,7 +396,7 @@ const RESULT_ICON = { ok: CheckCircleIcon, info: InfoIcon, bad: WarningCircleIco
 
 // 17g/17h: one scan's result. The checks show the moment they exist, with no
 // wait; the panel rises and the check icons stamp together, once.
-function ResultPanel({ banner, next }: { banner: ScanBanner; next?: string }) {
+function ResultPanel({ banner, next, allIn }: { banner: ScanBanner; next?: string; allIn?: boolean }) {
   const TitleIcon = RESULT_ICON[banner.tone]
   return (
     <section className={cx(styles.result, 'rise')} aria-labelledby="result-heading">
@@ -405,7 +406,7 @@ function ResultPanel({ banner, next }: { banner: ScanBanner; next?: string }) {
       </h2>
       {banner.lines.length > 0 && <CheckLines lines={banner.lines} animate />}
       {banner.body && <p className={styles.resultBody}>{banner.body}</p>}
-      {next && <p className={styles.resultNext}>{next}</p>}
+      {next && <p className={cx(styles.resultNext, allIn && styles.resultAllIn)}>{next}</p>}
     </section>
   )
 }

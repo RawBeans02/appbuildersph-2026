@@ -42,7 +42,7 @@ describe('18d doctor-team order bars', () => {
     expect(urgent.solid).toBeCloseTo((3 / 17) * 360)
     expect(urgent.dashed).toBeCloseTo((9 / 17) * 360)
     expect(row.segments.reduce((sum, segment) => sum + segment.solid + segment.dashed, 0)).toBeCloseTo(360)
-    expect(row.label).toBe('score 8–17 = URGENT referrals <5 × 3 + fast-breathing referrals 0 × 2 + in the watch window 5 × 1')
+    expect(row.label).toBe('score 8–17. URGENT referrals 1–4, fast-breathing referrals 0, in the watch window 5.')
   })
 
   it('draws nothing when every score is 0, and takes a narrower track', () => {

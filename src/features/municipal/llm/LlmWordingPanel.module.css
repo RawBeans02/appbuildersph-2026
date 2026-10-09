@@ -114,6 +114,11 @@
   margin-top: var(--space-2);
 }
 
+/* 19g: once approved (the wording box is read-only), no "Write it again". */
+.panel:has(textarea:read-only) .again {
+  display: none;
+}
+
 /* 19h: no writing AI on this laptop, one row. */
 .offRow {
   display: flex;
