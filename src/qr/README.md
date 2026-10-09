@@ -2,6 +2,8 @@
 
 Turns a barangay's counts into signed QR **text** on the phone, and back into verified, merged counts on the municipal laptop. Pure TypeScript, Web Crypto only (no library), runs in browsers and in Node 20+ (Vitest). No UI, no QR image rendering (the Send screen's QR library draws the text), no camera scanning (the municipal view's scanner hands over the text).
 
+The phase 2 sync server (`server/`, `api/`) verifies every uploaded QR with this same `decodeQr`. Vercel runs it as plain ES modules in Node, so every relative import here ends in `.js` (`./schema.js` for `schema.ts`); `server/imports.test.ts` fails on one that doesn't.
+
 Import everything from `src/qr` (`index.ts`).
 
 ## What leaves the phone
