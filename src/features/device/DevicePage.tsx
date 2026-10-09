@@ -10,6 +10,7 @@ import { detectPlatform, pickBackend, type Backend } from '../../lib/backend'
 import type { ShellStatus } from '../../lib/pwa'
 import { useOnlineStatus } from '../../lib/useOnlineStatus'
 import { DemoTools } from './DemoTools'
+import { MeasureDevice } from './MeasureDevice'
 
 // /device: a plain developer page, not part of the designed app and not in the
 // nav. It lists what this device supports, so we can check phones and laptops
@@ -118,6 +119,7 @@ export default function DevicePage() {
           <dd>{caps.crossOriginIsolated ? 'Yes' : 'No'}</dd>
         </dl>
       )}
+      <MeasureDevice />
       <DemoTools />
     </>
   )
