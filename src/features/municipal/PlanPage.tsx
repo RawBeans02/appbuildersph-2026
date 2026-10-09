@@ -11,6 +11,7 @@ import { barangayCodes } from './counts'
 import { LaptopFrame } from './LaptopFrame'
 import { LlmWordingPanel } from './llm'
 import { APPROVER, approvePlan, readMunicipalScreen } from './municipal'
+import { checkNumbers } from './numberCheck'
 import { useLaptopPlace } from './place'
 import styles from './PlanPage.module.css'
 import { planSteps, planStepsText } from './steps'
@@ -118,6 +119,9 @@ export function PlanBody({ plan, wordingPanel: Wording }: { plan: MunicipalPlan;
   const [problem, setProblem] = useState<string | null>(null)
   // A new deploy waits while the officer has unapproved text in the editor.
   useHoldReload(text !== '' && approvedText === null)
+  // 19e: a number the plan doesn't have keeps Approve off until it's fixed
+  // or the draft is written again.
+  const mismatch = useMemo(() => checkNumbers(text, reference).mismatched.length > 0, [text, reference])
 
   function takeDraft(wording: string) {
     setText(wording)
@@ -143,8 +147,16 @@ export function PlanBody({ plan, wordingPanel: Wording }: { plan: MunicipalPlan;
     }
   }
 
-  // The one check line is the box's own, under the text.
-  const box = <CheckedWording value={text} onChange={setText} reference={reference} placeholder="Write the wording (optional)" />
+  // The one check line is the box's own, under the text. Until an AI draft
+  // fills it, the box has its label, "Wording (optional)" (19d).
+  const box =
+    aiDraft === null ? (
+      <Field label="Wording" optional>
+        {(input) => <CheckedWording id={input.id} value={text} onChange={setText} reference={reference} />}
+      </Field>
+    ) : (
+      <CheckedWording value={text} onChange={setText} reference={reference} />
+    )
   return (
     <>
       <div className={styles.columns}>
@@ -175,11 +187,12 @@ export function PlanBody({ plan, wordingPanel: Wording }: { plan: MunicipalPlan;
             )}
           </Field>
         </div>
+        {mismatch && <p className={styles.approveHint}>Fix the number to approve.</p>}
         <div className={styles.approve}>
           <Button
             icon={<CheckIcon size={22} weight="bold" aria-hidden />}
             onClick={() => void onApprove()}
-            disabled={saving || approvedText === text}
+            disabled={saving || approvedText === text || mismatch}
           >
             Approve plan
           </Button>

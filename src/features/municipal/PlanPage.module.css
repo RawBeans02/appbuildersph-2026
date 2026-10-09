@@ -90,6 +90,12 @@
   color: var(--bad);
 }
 
+.approveHint {
+  align-self: center;
+  font: var(--type-body-dense);
+  color: var(--ink-2);
+}
+
 .approver {
   width: 300px;
 }

@@ -43,7 +43,10 @@ describe('laptop screens', () => {
     }
     const body = renderToStaticMarkup(createElement(PlanBody, { plan, wordingPanel: FakePanel }))
     // The officer's box sits inside the panel's card.
-    expect(body).toMatch(/<section data-panel="">Wording panel here<div[^>]*>.*<textarea[^>]*placeholder="Write the wording \(optional\)".*<\/section>/)
+    expect(body).toMatch(/<section data-panel="">Wording panel here<div[^>]*>.*<textarea[^>]*>.*<\/section>/)
+    // Before an AI draft, the box has its visible label (19d).
+    expect(text(body)).toContain('Wording (optional)')
+    expect(body).toMatch(/<label for="([^"]+)"[^>]*>Wording.*<textarea id="\1"/)
     expect(text(body)).toContain('Approved by Municipal health officer')
     expect(text(body)).toContain('Approve plan')
     expect(seen.plan).toBe(plan)
@@ -51,7 +54,7 @@ describe('laptop screens', () => {
 
     // Without the AI panel the box is there on its own, and the plan is complete.
     const alone = renderToStaticMarkup(createElement(PlanBody, { plan }))
-    expect(alone).toContain('placeholder="Write the wording (optional)"')
+    expect(text(alone)).toContain('Wording (optional)')
     expect(text(alone)).toContain('Approve plan')
   })
 

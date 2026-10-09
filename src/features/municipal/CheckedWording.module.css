@@ -45,10 +45,6 @@
   caret-color: var(--ink);
 }
 
-.field::placeholder {
-  color: var(--ink-3);
-}
-
 .field:focus-visible {
   border-color: var(--ink);
   outline: 3px solid var(--ink);
@@ -61,13 +57,15 @@
   pointer-events: none;
 }
 
+/* 19e: a dashed amber outline on a --warn-tint fill. Outline and fill only,
+   so the number keeps the textarea's exact metrics. */
 .new {
   position: relative;
-  background: none;
-  color: var(--warn);
+  background: var(--warn-tint);
+  color: var(--ink);
   font-weight: 400;
   border-radius: 4px;
-  outline: 2px solid var(--warn);
+  outline: 2px dashed var(--warn);
   outline-offset: 1px;
 }
 
@@ -91,17 +89,27 @@
 .lineInfo,
 .lineWarn {
   display: flex;
-  align-items: center;
-  gap: 6px;
+  align-items: flex-start;
+  gap: var(--space-2);
   margin-top: var(--space-3);
   font: var(--type-body-dense);
   font-weight: 700;
+}
+
+.lineInfo svg,
+.lineWarn svg {
+  flex: none;
+  margin-top: 2px;
 }
 
 .lineInfo {
   color: var(--ink-2);
 }
 
+/* 19e: the amber line sits on a --warn-tint box. */
 .lineWarn {
+  padding: var(--space-3) 14px;
+  border-radius: var(--r-md);
+  background: var(--warn-tint);
   color: var(--warn);
 }
