@@ -117,6 +117,9 @@ export function MarkExposed({
   const [confirming, setConfirming] = useState(false)
   const [saving, setSaving] = useState(false)
   const [saveFailed, setSaveFailed] = useState(false)
+  // Household taps on this screen: the footer's count is keyed by it, so it
+  // plays `tick` again on every tap (8d), and never on load.
+  const [taps, setTaps] = useState(0)
   const closeSheet = useCallback(() => setConfirming(false), [])
 
   const ready = data.status === 'ready' ? data : null
@@ -130,6 +133,7 @@ export function MarkExposed({
     }),
   )
   const marked = households.filter((household) => after.has(household.id))
+  const people = marked.reduce((sum, household) => sum + household.members.length, 0)
   const plan = planMarks(before, after)
   const changed = plan.add.length + plan.update.length + plan.remove.length > 0
   const byId = new Map(households.map((household) => [household.id, household]))
@@ -141,6 +145,7 @@ export function MarkExposed({
     if (current(household.id)) next.set(household.id, null)
     else next.set(household.id, before.get(household.id) ?? (ready?.earlier.has(household.id) ? ['waded', 'repeated'] : ['waded']))
     onEdit(next)
+    setTaps((n) => n + 1)
   }
   const toggleKind = (household: Household, kind: ExposureKind) => {
     const kinds = current(household.id) ?? ['waded']
@@ -201,9 +206,14 @@ export function MarkExposed({
         <div className={cx(styles.footer, styles.flowFooter)}>
           <p className={styles.summary} aria-live="polite">
             <span className={styles.summaryStrong}>
-              {peopleWords(marked.reduce((sum, household) => sum + household.members.length, 0))} marked
+              <span className={styles.tickBox}>
+                <span key={taps} className={cx(taps > 0 && 'tick')}>
+                  {people}
+                </span>
+              </span>{' '}
+              {people === 1 ? 'person' : 'people'} marked
             </span>
-            <span className={styles.summaryMeta}>{householdWords(marked.length)}</span>
+            <span className={styles.summaryMeta}> · {householdWords(marked.length)}</span>
           </p>
           <Button
             disabled={!changed || saving}

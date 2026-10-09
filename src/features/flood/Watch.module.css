@@ -538,11 +538,15 @@ button.detailOn:hover {
 }
 
 .summary {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--space-3);
   margin-bottom: 10px;
   font: var(--type-body);
+}
+
+/* 8d: the clipped box the people count ticks in. */
+.tickBox {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
 }
 
 .summaryStrong {
