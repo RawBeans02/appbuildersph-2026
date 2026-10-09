@@ -12,11 +12,12 @@ import type { ExposureKind, SeedData } from '../db/types'
 // - one active flood event that started 6 days ago, with 9 residents (three
 //   whole households) exposed that day, inside the day 5–15 leptospirosis
 //   watch window, and three one-person households left for the demo's taps;
-// - doxycycline 100 mg: 30 capsules in a lot expiring the month 6 weeks from
-//   today, 10 in a lot expiring 9 months out; and other station stock;
+// - doxycycline 100 mg: 10 capsules in a lot expiring 9 months out; the 30
+//   expiring soon come from the box the presenter scans (./demoLabel.ts);
+//   and other station stock, none of it expiring within 6 weeks;
 // - 3 past Hinga checks (one fast, two not fast).
 
-export const SEED_VERSION = 'maligaya-d-1'
+export const SEED_VERSION = 'maligaya-d-2'
 export const MUNICIPALITY = 'San Isidro Demo'
 export const BARANGAY = 'Maligaya-D'
 
@@ -226,16 +227,9 @@ export function generateSeed(today: Date): SeedData {
     confirmedAt: at(addDays(day, -confirmedDaysAgo), 9, 0),
   })
   const stockLots: SeedStockLot[] = [
+    // DEMO-LOT-24A (30 capsules, EXP 11/2026) is not here: the presenter scans
+    // its printed label live (./demoLabel.ts).
     lot(1, {
-      drug: 'Doxycycline',
-      strength: '100 mg',
-      lot: 'DEMO-LOT-24A',
-      // The month 6 weeks from today.
-      expiry: addDays(day, 42).slice(0, 7),
-      quantity: 30,
-      unit: 'capsule',
-    }, 12),
-    lot(2, {
       drug: 'Doxycycline',
       strength: '100 mg',
       lot: 'DEMO-LOT-25B',
@@ -243,7 +237,7 @@ export function generateSeed(today: Date): SeedData {
       quantity: 10,
       unit: 'capsule',
     }, 2),
-    lot(3, {
+    lot(2, {
       drug: 'Paracetamol',
       strength: '500 mg',
       lot: 'DEMO-LOT-26C',
@@ -251,7 +245,7 @@ export function generateSeed(today: Date): SeedData {
       quantity: 200,
       unit: 'tablet',
     }, 12),
-    lot(4, {
+    lot(3, {
       drug: 'Amoxicillin',
       strength: '500 mg',
       lot: 'DEMO-LOT-23D',
@@ -259,7 +253,7 @@ export function generateSeed(today: Date): SeedData {
       quantity: 100,
       unit: 'capsule',
     }, 12),
-    lot(5, {
+    lot(4, {
       drug: 'Oral rehydration salts',
       strength: '20.5 g',
       lot: 'DEMO-LOT-27E',

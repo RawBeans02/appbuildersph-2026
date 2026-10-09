@@ -1,11 +1,13 @@
 import 'fake-indexeddb/auto'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { currentFlood, groupHouseholds, markHouseholdExposed } from '../../features/flood/flood'
-import { UNITS, validateDraft } from '../../features/stock/stock'
+import { saveStockLot, UNITS, validateDraft } from '../../features/stock/stock'
 import { KNOWN_DRUGS } from '../../rules/label'
+import { lotStatus, reviewExposureStock, summarizeDoxycycline } from '../../rules/stock'
 import { watchedCount, watchList } from '../../rules/watch'
 import { openAppDb } from '../db/appDb'
-import type { ExposureKind, HingaOutcome, SeedData } from '../db/types'
+import type { ExposureKind, HingaOutcome, SeedData, StockLot } from '../db/types'
+import { DEMO_SCAN_LABEL } from './demoLabel'
 import { generateSeed } from './generate'
 
 // Fri Oct 9 2026, 9:30 in the morning, local time.
@@ -16,8 +18,6 @@ const FLOODED_PUROKS = ['Purok 1', 'Purok 2', 'Purok 3']
 // Calendar helpers written apart from the generator's, so the tests check it.
 const dayIndex = (day: string) => Date.parse(`${day}T00:00:00Z`) / 86_400_000
 const daysFrom = (from: string, to: string) => dayIndex(to) - dayIndex(from)
-const plusDays = (day: string, days: number) =>
-  new Date((dayIndex(day) + days) * 86_400_000).toISOString().slice(0, 10)
 const localDay = (date: Date) =>
   `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
 
@@ -49,24 +49,34 @@ const inWatchWindow = (exposedOn: string, today: string) => {
   return day >= 5 && day <= 15
 }
 
-// Expiry is a month (YYYY-MM). A lot expires within 6 weeks when its expiry
-// month is this month or later, and no later than the month 6 weeks from today.
-const expiresWithin6Weeks = (expiry: string, today: string) =>
-  expiry >= today.slice(0, 7) && expiry <= plusDays(today, 42).slice(0, 7)
-
 // WHO IMCI 2014 fast-breathing cut-offs, breaths per minute.
 const fastBreathingCutoff = (ageMonths: number) => (ageMonths < 2 ? 60 : ageMonths < 12 ? 50 : 40)
 
+// Seeded lots as the loader stores them.
+const storedLots = (data: SeedData): StockLot[] => (data.stockLots ?? []).map((lot) => ({ ...lot, sample: true }))
+
+// The scanned box, as the stock screen saves it once confirmed.
+const scannedLot: StockLot = {
+  id: 'scanned',
+  ...DEMO_SCAN_LABEL,
+  source: 'ocr',
+  ocrConfidence: { drug: 0.9, lot: 0.9, expiry: 0.9 },
+  confirmedAt: '2026-10-09T02:00:00.000Z',
+  sample: false,
+}
+
+// Doxycycline counts by A5's rules (src/rules/stock.ts).
+function doxycyclineCounts(lots: StockLot[], today: string) {
+  const { capsulesOnHand, capsulesExpiringSoon, capsulesExpired } = summarizeDoxycycline(lots, today)
+  return { capsulesOnHand, capsulesExpiringSoon, capsulesExpired }
+}
+
 function storyCounts(data: SeedData, today: string) {
-  const doxycycline = (data.stockLots ?? []).filter((lot) => lot.drug === 'Doxycycline')
   return {
     exposedInWindow: new Set(
       (data.exposures ?? []).filter((e) => inWatchWindow(e.exposedOn, today)).map((e) => e.residentId),
     ).size,
-    capsulesOnHand: doxycycline.reduce((sum, lot) => sum + lot.quantity, 0),
-    capsulesExpiringIn6Weeks: doxycycline
-      .filter((lot) => expiresWithin6Weeks(lot.expiry, today))
-      .reduce((sum, lot) => sum + lot.quantity, 0),
+    ...doxycyclineCounts(storedLots(data), today),
   }
 }
 
@@ -109,12 +119,16 @@ describe('the demo story', () => {
     ['the turn of the year', new Date(2026, 11, 30, 21, 0)],
     ['the end of February', new Date(2027, 1, 28, 6, 0)],
     ['a leap day', new Date(2028, 1, 29, 12, 0)],
-  ])('holds on %s: 9 exposed in the watch window, 40 capsules, 30 expiring within 6 weeks', (_, today) => {
-    expect(storyCounts(generateSeed(today), localDay(today))).toEqual({
+  ])('holds on %s: 9 exposed in the watch window, 10 doxycycline capsules, none expiring soon', (_, today) => {
+    const data = generateSeed(today)
+    expect(storyCounts(data, localDay(today))).toEqual({
       exposedInWindow: 9,
-      capsulesOnHand: 40,
-      capsulesExpiringIn6Weeks: 30,
+      capsulesOnHand: 10,
+      capsulesExpiringSoon: 0,
+      capsulesExpired: 0,
     })
+    // No seeded lot of anything is expiring or expired: only the scanned box is.
+    for (const lot of data.stockLots ?? []) expect(lotStatus(lot.expiry, localDay(today))).toBe('ok')
   })
 
   it('names residents only "Residente 001", "Residente 002", …', () => {
@@ -202,17 +216,13 @@ describe('the demo story', () => {
     db.close()
   })
 
-  it('stocks doxycycline 100 mg in DEMO-LOT-24A (30, expiring in 6 weeks) and DEMO-LOT-25B (10, 9 months out)', () => {
+  it('stocks doxycycline 100 mg in DEMO-LOT-25B only (10, 9 months out), plus other station stock', () => {
     const doxycycline = (seed.stockLots ?? []).filter((lot) => lot.drug === 'Doxycycline')
     expect(doxycycline.map(({ lot, strength, quantity, unit, expiry }) => ({ lot, strength, quantity, unit, expiry })))
-      .toEqual([
-        { lot: 'DEMO-LOT-24A', strength: '100 mg', quantity: 30, unit: 'capsule', expiry: '2026-11' },
-        { lot: 'DEMO-LOT-25B', strength: '100 mg', quantity: 10, unit: 'capsule', expiry: '2027-07' },
-      ])
-    // Other station stock, none of it expiring within 6 weeks.
-    const others = (seed.stockLots ?? []).filter((lot) => lot.drug !== 'Doxycycline')
-    expect(others.length).toBeGreaterThanOrEqual(2)
-    for (const lot of others) expect(expiresWithin6Weeks(lot.expiry, '2026-10-09')).toBe(false)
+      .toEqual([{ lot: 'DEMO-LOT-25B', strength: '100 mg', quantity: 10, unit: 'capsule', expiry: '2027-07' }])
+    // The presenter scans DEMO-LOT-24A live, so it isn't seeded.
+    expect((seed.stockLots ?? []).map((lot) => lot.lot)).not.toContain(DEMO_SCAN_LABEL.lot)
+    expect((seed.stockLots ?? []).filter((lot) => lot.drug !== 'Doxycycline').length).toBeGreaterThanOrEqual(2)
   })
 
   it('records stock the way the stock screen would: known drug names, its units, valid drafts', () => {
@@ -240,6 +250,49 @@ describe('the demo story', () => {
       expect(check.breathsPerMinute).toBeGreaterThanOrEqual(30)
       expect(check.breathsPerMinute).toBeLessThanOrEqual(60)
     }
+  })
+})
+
+describe('the live stock scan (DEMO-LOT-24A)', () => {
+  const DEMO_DAYS: [string, Date][] = [
+    ['the video day (Oct 9)', new Date(2026, 9, 9, 9, 30)],
+    ['Demo Day (Oct 10)', new Date(2026, 9, 10, 13, 0)],
+  ]
+
+  it('is a draft the stock screen accepts, for a drug the label reader knows', () => {
+    expect(KNOWN_DRUGS).toContain(DEMO_SCAN_LABEL.drug)
+    expect(validateDraft({ ...DEMO_SCAN_LABEL })).toEqual([])
+  })
+
+  it.each(DEMO_DAYS)('with the seed, makes 40 capsules on hand and 30 expiring soon on %s', (_, today) => {
+    const day = localDay(today)
+    expect(lotStatus(DEMO_SCAN_LABEL.expiry, day)).toBe('expiring')
+    expect(doxycyclineCounts([...storedLots(generateSeed(today)), scannedLot], day)).toEqual({
+      capsulesOnHand: 40,
+      capsulesExpiringSoon: 30,
+      capsulesExpired: 0,
+    })
+  })
+
+  it.each(DEMO_DAYS)('runs the demo on %s: 3 household taps and the scan give 12 exposed, 40 capsules, 30 expiring, review', async (_, today) => {
+    const day = localDay(today)
+    const db = await openAppDb(`seed-demo-${day}`, async () => generateSeed(today))
+    const households = groupHouseholds(await db.residents.list({ limit: 1000 }))
+    const flood = currentFlood(await db.floodEvents.list())!
+    for (const id of ['HH-03', 'HH-07', 'HH-10']) {
+      const household = households.find((h) => h.id === id)!
+      await markHouseholdExposed(db, { floodEventId: flood.id, household, exposedOn: day, kinds: ['waded'] }, today)
+    }
+    await saveStockLot(db, { ...DEMO_SCAN_LABEL }, null, today)
+
+    const watch = watchList(await db.exposures.list({ limit: 1000 }), day)
+    const review = reviewExposureStock(watch, await db.stockLots.list({ limit: 1000 }), day)
+    expect(review).toMatchObject({
+      exposed: 12,
+      needsReview: true,
+      stock: { capsulesOnHand: 40, capsulesExpiringSoon: 30, capsulesExpired: 0 },
+    })
+    db.close()
   })
 })
 
