@@ -223,7 +223,7 @@ describe('inbox client (laptop)', () => {
     const drafted = (await draftResponse.json()) as DraftAlertsResponse
     expect(drafted.alerts.length).toBeGreaterThan(0)
     const first = drafted.alerts[0]
-    const approve = post('/api/alerts-approve', JSON.stringify({ id: first.id, approverRole: 'Provincial health officer' }), view)
+    const approve = post('/api/alerts-approve', JSON.stringify({ id: first.id, municipality: 'SID', approverRole: 'Provincial health officer' }), view)
     expect((await handleAlertsApprove(approve, deps(server))).status).toBe(200)
 
     const inbox = await fetchInbox(identity, fetcherFor(server), new Date(NOW.getTime() + 1000))
@@ -242,7 +242,7 @@ describe('inbox client (laptop)', () => {
     const view = { [VIEW_CODE_HEADER]: VIEW_CODE }
     const drafted = (await (await handleAlertsDraft(post('/api/alerts-draft', JSON.stringify({ municipality: 'SID' }), view), deps(server))).json()) as DraftAlertsResponse
     for (const alert of drafted.alerts) {
-      const approve = post('/api/alerts-approve', JSON.stringify({ id: alert.id, approverRole: 'Provincial health officer' }), view)
+      const approve = post('/api/alerts-approve', JSON.stringify({ id: alert.id, municipality: 'SID', approverRole: 'Provincial health officer' }), view)
       expect((await handleAlertsApprove(approve, deps(server))).status).toBe(200)
     }
     const later = new Date(NOW.getTime() + 1000)

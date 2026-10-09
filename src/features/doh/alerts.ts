@@ -14,14 +14,23 @@ export const alertsApi = {
     callApi(fetcher, `/api/alerts?municipality=${encodeURIComponent(municipality)}`, { method: 'GET', headers: { [VIEW_CODE_HEADER]: code } }),
   draft: (code: string, municipality: string, fetcher: Fetcher = fetch): Promise<ApiResult<DraftAlertsResponse>> =>
     callApi(fetcher, '/api/alerts-draft', { method: 'POST', headers: viewHeaders(code), body: JSON.stringify({ municipality }) }),
-  approve: (code: string, id: string, approverRole: string, text: string | null, fetcher: Fetcher = fetch): Promise<ApiResult<DecideResponse>> =>
+  // A decision names the municipality the officer is viewing; the server
+  // checks the alert is that municipality's.
+  approve: (
+    code: string,
+    municipality: string,
+    id: string,
+    approverRole: string,
+    text: string | null,
+    fetcher: Fetcher = fetch,
+  ): Promise<ApiResult<DecideResponse>> =>
     callApi(fetcher, '/api/alerts-approve', {
       method: 'POST',
       headers: viewHeaders(code),
-      body: JSON.stringify(text === null ? { id, approverRole } : { id, approverRole, text }),
+      body: JSON.stringify(text === null ? { id, municipality, approverRole } : { id, municipality, approverRole, text }),
     }),
-  reject: (code: string, id: string, role: string, fetcher: Fetcher = fetch): Promise<ApiResult<DecideResponse>> =>
-    callApi(fetcher, '/api/alerts-reject', { method: 'POST', headers: viewHeaders(code), body: JSON.stringify({ id, role }) }),
+  reject: (code: string, municipality: string, id: string, role: string, fetcher: Fetcher = fetch): Promise<ApiResult<DecideResponse>> =>
+    callApi(fetcher, '/api/alerts-reject', { method: 'POST', headers: viewHeaders(code), body: JSON.stringify({ id, municipality, role }) }),
 }
 
 // The same rule as the server (server/protocol.ts ROLE_PATTERN).

@@ -211,8 +211,8 @@ export type AuditView = { at: string; actor: string; action: string; detail: Rec
 // GET /api/alerts?municipality=SID (view code).
 export type AlertsResponse = { ok: true; ai: AiStatus; drafts: AlertView[]; decided: AlertView[]; audit: AuditView[] }
 
-// POST /api/alerts-approve { id, approverRole, text? } and
-// POST /api/alerts-reject { id, role } (view code).
+// POST /api/alerts-approve { id, municipality, approverRole, text? } and
+// POST /api/alerts-reject { id, municipality, role } (view code).
 export type DecideResponse = { ok: true; alert: AlertView }
 
 // POST /api/inbox, signed like a sync (data: {}), by an enrolled laptop key

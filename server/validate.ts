@@ -119,10 +119,12 @@ export function validateDraftBody(value: unknown): { municipality: string } {
   return { municipality: municipalityOf(body.municipality) }
 }
 
-export function validateApproveBody(value: unknown): { id: string; role: string; text?: string } {
+// A decision names the municipality it's made for: the alert must be that
+// municipality's (the view code is one per deployment, not per municipality).
+export function validateApproveBody(value: unknown): { id: string; municipality: string; role: string; text?: string } {
   const withText = isPlainObject(value) && Object.hasOwn(value, 'text')
-  const body = object(value, withText ? ['id', 'approverRole', 'text'] : ['id', 'approverRole'], 'The body')
-  const result = { id: alertId(body.id), role: role(body.approverRole, 'approverRole') }
+  const body = object(value, withText ? ['id', 'municipality', 'approverRole', 'text'] : ['id', 'municipality', 'approverRole'], 'The body')
+  const result = { id: alertId(body.id), municipality: municipalityOf(body.municipality), role: role(body.approverRole, 'approverRole') }
   if (!withText) return result
   const { text } = body
   if (typeof text !== 'string' || text.trim().length === 0 || text.length > MAX_ALERT_TEXT || !isPlainText(text)) {
@@ -131,9 +133,9 @@ export function validateApproveBody(value: unknown): { id: string; role: string;
   return { ...result, text }
 }
 
-export function validateRejectBody(value: unknown): { id: string; role: string } {
-  const body = object(value, ['id', 'role'], 'The body')
-  return { id: alertId(body.id), role: role(body.role, 'role') }
+export function validateRejectBody(value: unknown): { id: string; municipality: string; role: string } {
+  const body = object(value, ['id', 'municipality', 'role'], 'The body')
+  return { id: alertId(body.id), municipality: municipalityOf(body.municipality), role: role(body.role, 'role') }
 }
 
 // The inbox asks for nothing: who it's for comes from the signing key.

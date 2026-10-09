@@ -174,9 +174,11 @@ const notOpen = (status: AlertRecord['status'] | undefined) =>
     ? new HttpError('superseded', 'A newer draft replaced this alert. Decide on the newer one.')
     : new HttpError('already-decided', 'This alert was already approved or rejected.')
 
-async function draftOf(store: Store, id: string, municipality?: string): Promise<AlertRecord> {
+// The alert, when it's this municipality's and still a draft. Another
+// municipality's alert answers as if there were none.
+async function draftOf(store: Store, id: string, municipality: string): Promise<AlertRecord> {
   const alert = await store.getAlert(id)
-  if (!alert || (municipality !== undefined && alert.municipality !== municipality)) throw new HttpError('not-found', 'No such alert.')
+  if (!alert || alert.municipality !== municipality) throw new HttpError('not-found', 'No such alert.')
   if (alert.status !== 'draft') throw notOpen(alert.status)
   return alert
 }
@@ -192,7 +194,7 @@ async function lostRace(store: Store, id: string): Promise<never> {
 // approved.
 export async function approveAlert(
   store: Store,
-  input: { id: string; municipality?: string; role: string; text?: string },
+  input: { id: string; municipality: string; role: string; text?: string },
   now: Date,
 ): Promise<DecideResponse> {
   const alert = await draftOf(store, input.id, input.municipality)
@@ -213,7 +215,7 @@ export async function approveAlert(
 }
 
 // POST /api/alerts-reject.
-export async function rejectAlert(store: Store, input: { id: string; municipality?: string; role: string }, now: Date): Promise<DecideResponse> {
+export async function rejectAlert(store: Store, input: { id: string; municipality: string; role: string }, now: Date): Promise<DecideResponse> {
   const alert = await draftOf(store, input.id, input.municipality)
   const decided = (await store.decideAlert(alert.id, { status: 'rejected', role: input.role, at: now, text: alert.text })) ?? (await lostRace(store, alert.id))
   await store.audit({

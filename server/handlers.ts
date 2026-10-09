@@ -167,7 +167,7 @@ export function handleAlerts(request: Request, deps: Deps): Promise<Response> {
   })
 }
 
-// POST /api/alerts-approve { id, approverRole, text? }.
+// POST /api/alerts-approve { id, municipality, approverRole, text? }.
 export function handleAlertsApprove(request: Request, deps: Deps): Promise<Response> {
   return viewRoute(request, deps, 'alerts-decide', async (store, now) => {
     const body = validateApproveBody(parseJson(await readBody(request)))
@@ -175,7 +175,7 @@ export function handleAlertsApprove(request: Request, deps: Deps): Promise<Respo
   })
 }
 
-// POST /api/alerts-reject { id, role }.
+// POST /api/alerts-reject { id, municipality, role }.
 export function handleAlertsReject(request: Request, deps: Deps): Promise<Response> {
   return viewRoute(request, deps, 'alerts-decide', async (store, now) => {
     const body = validateRejectBody(parseJson(await readBody(request)))

@@ -89,7 +89,7 @@ export function AlertsPanel({ code }: { code: string }) {
           ) : (
             <ol className={styles.list}>
               {load.data.drafts.map((alert) => (
-                <DraftCard key={alert.id} alert={alert} code={code} role={role} onDone={reload} />
+                <DraftCard key={alert.id} alert={alert} code={code} municipality={DEMO_MUNICIPALITY.code} role={role} onDone={reload} />
               ))}
             </ol>
           )}
@@ -140,7 +140,19 @@ function ProblemLine({ problem }: { problem: SyncProblem }) {
   )
 }
 
-export function DraftCard({ alert, code, role, onDone }: { alert: AlertView; code: string; role: string; onDone: () => void }) {
+export function DraftCard({
+  alert,
+  code,
+  municipality,
+  role,
+  onDone,
+}: {
+  alert: AlertView
+  code: string
+  municipality: string
+  role: string
+  onDone: () => void
+}) {
   const [text, setText] = useState(alert.text)
   const [busy, setBusy] = useState(false)
   const [problem, setProblem] = useState<SyncProblem | null>(null)
@@ -152,8 +164,8 @@ export function DraftCard({ alert, code, role, onDone }: { alert: AlertView; cod
     setProblem(null)
     const edited = text.trim() !== alert.text.trim()
     const result = approve
-      ? await alertsApi.approve(code, alert.id, role.trim(), edited ? text.trim() : null)
-      : await alertsApi.reject(code, alert.id, role.trim())
+      ? await alertsApi.approve(code, municipality, alert.id, role.trim(), edited ? text.trim() : null)
+      : await alertsApi.reject(code, municipality, alert.id, role.trim())
     setBusy(false)
     if (result.ok || result.problem.kind === 'already-decided' || result.problem.kind === 'superseded') onDone()
     else setProblem(result.problem)

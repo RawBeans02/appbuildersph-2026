@@ -119,17 +119,17 @@ describe('alerts on Postgres', () => {
     // An edited wording with a new number is refused; the alert stays a draft.
     const move = drafted.alerts[1]
     const refused = await handleAlertsApprove(
-      viewPost('/api/alerts-approve', { id: move.id, approverRole: 'Provincial health officer', text: `${move.text} Also 75 more.` }),
+      viewPost('/api/alerts-approve', { id: move.id, municipality: 'SID', approverRole: 'Provincial health officer', text: `${move.text} Also 75 more.` }),
       realDeps(),
     )
     expect(refused.status).toBe(422)
     expect((await body<ErrorResponse>(refused)).reasons?.join(' ')).toMatch(/75/)
 
     for (const alert of drafted.alerts.slice(0, 3)) {
-      const response = await handleAlertsApprove(viewPost('/api/alerts-approve', { id: alert.id, approverRole: 'Provincial health officer' }), realDeps())
+      const response = await handleAlertsApprove(viewPost('/api/alerts-approve', { id: alert.id, municipality: 'SID', approverRole: 'Provincial health officer' }), realDeps())
       expect(response.status).toBe(200)
     }
-    expect((await handleAlertsReject(viewPost('/api/alerts-reject', { id: drafted.alerts[3].id, role: 'Regional officer' }), realDeps())).status).toBe(200)
+    expect((await handleAlertsReject(viewPost('/api/alerts-reject', { id: drafted.alerts[3].id, municipality: 'SID', role: 'Regional officer' }), realDeps())).status).toBe(200)
 
     const stored = await getPool(databaseUrl).query<{ status: string; approved_by_role: string | null; approved_at: Date | null; decided_by_role: string }>(
       'SELECT status, approved_by_role, approved_at, decided_by_role FROM alerts ORDER BY id',
@@ -178,7 +178,7 @@ describe('alerts on Postgres', () => {
     const watch = drafted.alerts.find((alert) => alert.barangay === 'SID-RIV')!
     const edited = watch.text.replace(WATCH_CAVEAT, '').trim()
     const approved = await handleAlertsApprove(
-      viewPost('/api/alerts-approve', { id: watch.id, approverRole: 'Provincial health officer', text: edited }),
+      viewPost('/api/alerts-approve', { id: watch.id, municipality: 'SID', approverRole: 'Provincial health officer', text: edited }),
       realDeps(),
     )
     expect(approved.status).toBe(200)
@@ -208,12 +208,15 @@ describe('alerts on Postgres', () => {
 
   it('a new draft batch supersedes the undecided drafts, which then answer 409', async () => {
     const first = await body<DraftAlertsResponse>(await handleAlertsDraft(viewPost('/api/alerts-draft', { municipality: 'SID' }), realDeps()))
-    expect((await handleAlertsApprove(viewPost('/api/alerts-approve', { id: first.alerts[0].id, approverRole: 'Regional officer' }), realDeps())).status).toBe(200)
+    expect((await handleAlertsApprove(viewPost('/api/alerts-approve', { id: first.alerts[0].id, municipality: 'SID', approverRole: 'Regional officer' }), realDeps())).status).toBe(200)
     const second = await body<DraftAlertsResponse>(await handleAlertsDraft(viewPost('/api/alerts-draft', { municipality: 'SID' }), realDeps()))
     const statuses = await getPool(databaseUrl).query<{ id: string; status: string }>('SELECT id::text, status FROM alerts ORDER BY id')
     expect(statuses.rows.map((row) => row.status)).toEqual(['approved', 'superseded', 'superseded', 'superseded', 'draft', 'draft', 'draft', 'draft'])
     expect(second.alerts.map((alert) => alert.id)).toEqual(statuses.rows.slice(4).map((row) => row.id))
-    const refused = await handleAlertsApprove(viewPost('/api/alerts-approve', { id: first.alerts[1].id, approverRole: 'Regional officer' }), realDeps())
+    // Named for another municipality: not found.
+    const elsewhere = await handleAlertsApprove(viewPost('/api/alerts-approve', { id: second.alerts[0].id, municipality: 'ABC', approverRole: 'Regional officer' }), realDeps())
+    expect(elsewhere.status).toBe(404)
+    const refused = await handleAlertsApprove(viewPost('/api/alerts-approve', { id: first.alerts[1].id, municipality: 'SID', approverRole: 'Regional officer' }), realDeps())
     expect(refused.status).toBe(409)
     expect((await body<ErrorResponse>(refused)).error).toBe('superseded')
     // The CHECK still refuses any other status.

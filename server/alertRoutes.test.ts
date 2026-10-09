@@ -114,7 +114,7 @@ describe('deciding through the routes', () => {
     const { alerts } = await draft()
     const move = alerts[1]
     const wrong = await handleAlertsApprove(
-      viewPost('/api/alerts-approve', { id: move.id, approverRole: 'Provincial health officer', text: move.text.replace('up to 30', 'up to 45') }),
+      viewPost('/api/alerts-approve', { id: move.id, municipality: 'SID', approverRole: 'Provincial health officer', text: move.text.replace('up to 30', 'up to 45') }),
       deps(store),
     )
     expect(wrong.status).toBe(422)
@@ -122,34 +122,48 @@ describe('deciding through the routes', () => {
     expect(problem).toMatchObject({ ok: false, error: 'check-failed' })
     expect(problem.reasons?.join(' ')).toMatch(/45/)
 
-    const ok = await handleAlertsApprove(viewPost('/api/alerts-approve', { id: move.id, approverRole: 'Provincial health officer' }), deps(store))
+    const ok = await handleAlertsApprove(viewPost('/api/alerts-approve', { id: move.id, municipality: 'SID', approverRole: 'Provincial health officer' }), deps(store))
     expect(ok.status).toBe(200)
     expect((await body<DecideResponse>(ok)).alert).toMatchObject({ status: 'approved', decidedByRole: 'Provincial health officer' })
-    const again = await handleAlertsApprove(viewPost('/api/alerts-approve', { id: move.id, approverRole: 'Provincial health officer' }), deps(store))
+    const again = await handleAlertsApprove(viewPost('/api/alerts-approve', { id: move.id, municipality: 'SID', approverRole: 'Provincial health officer' }), deps(store))
     expect(again.status).toBe(409)
   })
 
   it('answers 409 "superseded" for a draft a newer batch replaced', async () => {
     const old = (await draft()).alerts
     await draft()
-    const response = await handleAlertsApprove(viewPost('/api/alerts-approve', { id: old[0].id, approverRole: 'Provincial health officer' }), deps(store))
+    const response = await handleAlertsApprove(viewPost('/api/alerts-approve', { id: old[0].id, municipality: 'SID', approverRole: 'Provincial health officer' }), deps(store))
     expect(response.status).toBe(409)
     expect(await body<ErrorResponse>(response)).toMatchObject({ ok: false, error: 'superseded' })
-    const rejected = await handleAlertsReject(viewPost('/api/alerts-reject', { id: old[1].id, role: 'Regional officer' }), deps(store))
+    const rejected = await handleAlertsReject(viewPost('/api/alerts-reject', { id: old[1].id, municipality: 'SID', role: 'Regional officer' }), deps(store))
     expect(rejected.status).toBe(409)
+  })
+
+  it('scopes a decision to the municipality the request names', async () => {
+    const { alerts } = await draft()
+    const id = alerts[0].id
+    // Named for another municipality: as if there were no such alert.
+    expect((await handleAlertsApprove(viewPost('/api/alerts-approve', { id, municipality: 'ABC', approverRole: 'Regional officer' }), deps(store))).status).toBe(404)
+    expect((await handleAlertsReject(viewPost('/api/alerts-reject', { id, municipality: 'ABC', role: 'Regional officer' }), deps(store))).status).toBe(404)
+    // Not named at all, or not a code: refused.
+    expect((await handleAlertsApprove(viewPost('/api/alerts-approve', { id, approverRole: 'Regional officer' }), deps(store))).status).toBe(400)
+    expect((await handleAlertsReject(viewPost('/api/alerts-reject', { id, role: 'Regional officer' }), deps(store))).status).toBe(400)
+    expect((await handleAlertsReject(viewPost('/api/alerts-reject', { id, municipality: 'San Isidro', role: 'Regional officer' }), deps(store))).status).toBe(400)
+    expect(store.alerts.get(id)?.status).toBe('draft')
+    expect((await handleAlertsReject(viewPost('/api/alerts-reject', { id, municipality: 'SID', role: 'Regional officer' }), deps(store))).status).toBe(200)
   })
 
   it('takes a role, not anything else', async () => {
     const { alerts } = await draft()
     for (const approverRole of ['Dr. 12', 'x', '<b>officer</b>']) {
-      expect((await handleAlertsApprove(viewPost('/api/alerts-approve', { id: alerts[0].id, approverRole }), deps(store))).status).toBe(400)
+      expect((await handleAlertsApprove(viewPost('/api/alerts-approve', { id: alerts[0].id, municipality: 'SID', approverRole }), deps(store))).status).toBe(400)
     }
-    expect((await handleAlertsApprove(viewPost('/api/alerts-approve', { id: '999', approverRole: 'Regional officer' }), deps(store))).status).toBe(404)
+    expect((await handleAlertsApprove(viewPost('/api/alerts-approve', { id: '999', municipality: 'SID', approverRole: 'Regional officer' }), deps(store))).status).toBe(404)
   })
 
   it('rejects, and lists drafts, decided alerts and the audit trail', async () => {
     const { alerts } = await draft()
-    expect((await handleAlertsReject(viewPost('/api/alerts-reject', { id: alerts[3].id, role: 'Regional officer' }), deps(store))).status).toBe(200)
+    expect((await handleAlertsReject(viewPost('/api/alerts-reject', { id: alerts[3].id, municipality: 'SID', role: 'Regional officer' }), deps(store))).status).toBe(200)
     const list = await body<AlertsResponse>(await handleAlerts(viewGet('/api/alerts?municipality=SID'), deps(store)))
     expect(list.drafts).toHaveLength(3)
     expect(list.decided).toEqual([expect.objectContaining({ id: alerts[3].id, status: 'rejected', decidedByRole: 'Regional officer' })])
@@ -161,7 +175,7 @@ describe('inbox', () => {
   async function approveAll() {
     const { alerts } = await draft()
     for (const alert of alerts) {
-      expect((await handleAlertsApprove(viewPost('/api/alerts-approve', { id: alert.id, approverRole: 'Provincial health officer' }), deps(store))).status).toBe(200)
+      expect((await handleAlertsApprove(viewPost('/api/alerts-approve', { id: alert.id, municipality: 'SID', approverRole: 'Provincial health officer' }), deps(store))).status).toBe(200)
     }
     return alerts
   }

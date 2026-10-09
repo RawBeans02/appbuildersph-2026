@@ -58,7 +58,7 @@ describe('alerts panel words', () => {
 
   it('says when a newer draft replaced the alert', async () => {
     const superseded = async () => new Response(JSON.stringify({ ok: false, error: 'superseded', message: 'x' }), { status: 409 })
-    const result = await alertsApi.reject('code', '7', 'Regional officer', superseded)
+    const result = await alertsApi.reject('code', 'SID', '7', 'Regional officer', superseded)
     expect(result).toEqual({ ok: false, problem: { kind: 'superseded' } })
     if (!result.ok) expect(problemText(result.problem).title).toBe('A newer draft replaced this alert')
   })
@@ -97,7 +97,7 @@ describe('alerts panel words', () => {
   })
 
   it('renders a draft with its facts, its source and its check line, and Approve waits for a role', () => {
-    const html = renderToStaticMarkup(createElement(DraftCard, { alert: MOVE, code: 'x', role: '', onDone: () => undefined }))
+    const html = renderToStaticMarkup(createElement(DraftCard, { alert: MOVE, code: 'x', municipality: 'SID', role: '', onDone: () => undefined }))
     const shown = text(html)
     expect(shown).toContain('Stock move · Bagong Silang-D')
     expect(shown).toContain('Written by GPT-6 Luna')
