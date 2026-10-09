@@ -16,8 +16,8 @@ export function CheckedWording({
   onChange,
   reference,
 }: {
-  // The id a visible label points at; without one the box is named "Plan
-  // wording" for screen readers.
+  // The id a visible label points at (19d's "Wording (optional)"). The box's
+  // name stays "Plan wording" in every state, which holds the label's word.
   id?: string
   value: string
   onChange: (text: string) => void
@@ -39,7 +39,7 @@ export function CheckedWording({
           onScroll={(event) => {
             if (marks.current) marks.current.scrollTop = event.currentTarget.scrollTop
           }}
-          aria-label={id ? undefined : 'Plan wording'}
+          aria-label="Plan wording"
           aria-describedby={line ? 'wording-check' : undefined}
           spellCheck
         />
