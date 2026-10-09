@@ -261,3 +261,15 @@ Disclosure: the screens, tokens, copy, components and app icons in this folder w
 | B5-UI Laptop screens | LaptopNav · 16, 17a–17e, 18 (new route `/municipal/merged`), 19a–19d, 20 | [lead] |
 
 Build order: A7's theme and shared components land first, in small pushes; the screen tasks use them and never restyle them locally.
+
+## Pass 1 review decisions (Lead, Fri ~5 PM; these override the canvases)
+
+From a three-reviewer design review (visual tells, UX/accessibility, copy) and the code audits. COPY.md already has the copy changes.
+1. **Age bands** use the WHO IMCI wording: "Under 2 months", "2 up to 12 months", "12 months up to 5 years" (then "5 to 17 years", "18 to 59 years", "60 and over"). Exactly 12 months uses the 40 cut-off (`src/rules/imci.ts`).
+2. **Fast breathing (6a) says "Refer today"** ("I-refer ngayong araw"); only URGENT (6b) says "now". That follows IMCI 2014 (fast breathing alone isn't an urgent referral; a danger sign is).
+3. **Danger signs (6a/6b/7a)**: the four IMCI 2014 general danger signs (including "Vomits everything"), then chest indrawing and stridor in a calm child, then a separate "None of these" row. Save is enabled only after a tick or "None of these", and the list scrolls fully clear of the Save bar on an 812 px screen.
+4. **Refusals 5a–5d**: after the second refusal in a row, add a secondary button "Count by hand with a timer" (L8b).
+5. **Camera screens (3a/3b/4a, 10a)**: the top bar with LocalStatus sits on a solid --night bar (or a scrim of at least 0.8), never over the live image at 0.55.
+6. **Home 1a**: the primary button keeps clear of the raised Hinga tab (no overlap); the raised tab stays.
+7. **Laptop 19a**: also build the MISMATCH state: icon + outline on the number that doesn't match, an amber check line, and "Write it again". Never color only.
+8. **Accessibility**: LocalStatus is a button at least 48 px tall (it opens L5/L7); 8b chips are 48 px with an 8 px gap; one h1 per screen (6a/6b/7a included); rows that would open an undesigned screen aren't tappable.
