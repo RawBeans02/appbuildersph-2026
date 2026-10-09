@@ -39,6 +39,23 @@ export function getOcrClient(): Promise<InferenceClient> {
   return ready
 }
 
+let readerLoaded = false
+
+// Whether this device's reader is already loaded (its models in memory).
+export const isReaderLoaded = () => readerLoaded
+
+// Loads this device's reader without reading anything, so the screen can time
+// the model load and the reading separately.
+export async function warmUpReader(): Promise<void> {
+  if (OCR_ENGINE === 'tesseract') {
+    const { getTesseract } = await import('../tesseract/reader')
+    await getTesseract()
+  } else {
+    await getOcrClient()
+  }
+  readerLoaded = true
+}
+
 // Reads a photo of a medicine box with this device's engine (engine.ts).
 export async function readBox(photo: Blob, signal?: AbortSignal): Promise<OcrLine[]> {
   if (OCR_ENGINE === 'tesseract') {

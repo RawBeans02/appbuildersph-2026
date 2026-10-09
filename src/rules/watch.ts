@@ -2,8 +2,9 @@ import type { Exposure, ExposureKind } from '../data/db/types'
 import { addDays, daysBetween } from './dates'
 
 // The leptospirosis watch window after floodwater exposure: day 5 to day 15
-// after contact, inclusive (the window this team set from the incubation
-// period). A resident exposed on several days is watched from 5 days after the
+// after contact, inclusive. Source: DOH Usec. Balboa, symptoms show 5 to 15
+// days after flood exposure (Manila Times, Sept 3, 2026; link in the README,
+// "Medical sources"). A resident exposed on several days is watched from 5 days after the
 // first contact to 15 days after the last. This only says whom to watch and
 // when; it never diagnoses, and any symptoms go to the midwife or RHU.
 

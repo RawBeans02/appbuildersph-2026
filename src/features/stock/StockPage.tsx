@@ -4,7 +4,7 @@ import { getDb } from '../../data/db/appDb'
 import type { AgapayDb } from '../../data/db/db'
 import { useDbQuery } from '../../data/db/useDbQuery'
 import { OCR_ENGINE, OCR_ENGINE_LABEL, OCR_ENGINE_OVERRIDDEN } from '../../inference/ocr/engine'
-import { readBox } from '../../inference/ocr/ocrClient'
+import { isReaderLoaded, readBox, warmUpReader } from '../../inference/ocr/ocrClient'
 import { CHECK_BELOW, parseLabel, type LabelField, type LabelReading } from '../../rules/label'
 import { draftFromReading, saveStockLot, UNITS, validateDraft, type StockDraft } from './stock'
 
@@ -17,7 +17,15 @@ const readStock = (db: AgapayDb) => db.stockLots.list({ limit: 500 })
 type Step =
   | { name: 'list' }
   | { name: 'reading'; photoUrl: string }
-  | { name: 'review'; photoUrl: string | null; reading: LabelReading | null; lines: string[]; ms: number | null }
+  | {
+      name: 'review'
+      photoUrl: string | null
+      reading: LabelReading | null
+      lines: string[]
+      // Reading time, and the model load before it (null when it was loaded already).
+      ms: number | null
+      loadMs: number | null
+    }
 
 const EMPTY_DRAFT: StockDraft = { drug: '', strength: '', lot: '', expiry: '', quantity: 0, unit: 'capsule' }
 
@@ -42,6 +50,10 @@ export default function StockPage() {
     const url = URL.createObjectURL(file)
     setStep({ name: 'reading', photoUrl: url })
     try {
+      const wasLoaded = isReaderLoaded()
+      const loadStart = performance.now()
+      await warmUpReader()
+      const loadMs = wasLoaded ? null : performance.now() - loadStart
       const start = performance.now()
       const lines = await readBox(file)
       const reading = parseLabel(lines)
@@ -53,6 +65,7 @@ export default function StockPage() {
         reading,
         lines: lines.map((line) => line.text),
         ms: performance.now() - start,
+        loadMs,
       })
     } catch (cause) {
       setStep({ name: 'list' })
@@ -65,7 +78,7 @@ export default function StockPage() {
   function addManually() {
     setDraft(EMPTY_DRAFT)
     setProblems([])
-    setStep({ name: 'review', photoUrl: null, reading: null, lines: [], ms: null })
+    setStep({ name: 'review', photoUrl: null, reading: null, lines: [], ms: null, loadMs: null })
   }
 
   async function onConfirm(event: FormEvent) {
@@ -96,7 +109,15 @@ export default function StockPage() {
       <>
         <h1>{r ? 'Check what was read' : 'Add stock by hand'}</h1>
         {step.photoUrl && <img src={step.photoUrl} alt="The box you photographed" style={{ maxWidth: '100%' }} />}
-        {step.ms !== null && <p>Read on this phone in {(step.ms / 1000).toFixed(1)} s. Correct anything that's wrong.</p>}
+        {step.ms !== null && (
+          <p>
+            Read on this phone in {(step.ms / 1000).toFixed(1)} s
+            {step.loadMs === null
+              ? ' (the reader was already loaded)'
+              : `, after ${(step.loadMs / 1000).toFixed(1)} s loading the reader for the first time`}
+            . Correct anything that's wrong.
+          </p>
+        )}
         <form onSubmit={(event) => void onConfirm(event)}>
           <p>
             <label>

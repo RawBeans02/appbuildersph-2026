@@ -19,8 +19,8 @@ const readSendData = async (db: AgapayDb) => {
 
 const BAND_LABELS: Record<AgeBand, string> = {
   under2m: 'under 2 months',
-  m2to12: '2 to 11 months',
-  y1to5: '1 to 4 years',
+  m2to12: '2 up to 12 months',
+  y1to5: '12 months up to 5 years',
   y5to17: '5 to 17 years',
   y18to59: '18 to 59 years',
   y60plus: '60 and over',

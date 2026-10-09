@@ -1,7 +1,7 @@
-import { OCR_ENGINE, OCR_ENGINE_LABEL, OCR_ENGINE_OVERRIDDEN } from '../inference/ocr/engine'
-import { modelBytes, offlineModels } from '../lib/offlineModels'
-import type { ModelDownloadState } from '../lib/modelDownload'
-import { useModelDownload } from '../lib/useModelDownload'
+import { OCR_ENGINE, OCR_ENGINE_LABEL, OCR_ENGINE_OVERRIDDEN } from '../../inference/ocr/engine'
+import { modelBytes, offlineModels } from '../../lib/offlineModels'
+import type { ModelDownloadState } from '../../lib/modelDownload'
+import { useModelDownload } from '../../lib/useModelDownload'
 
 // "Prepare for offline": downloads every phone model once, so the app works
 // with no signal. Plain until design/ lands. NEEDS DESIGN.
@@ -49,7 +49,7 @@ export default function PreparePage() {
       <h1>Prepare for offline</h1>
       <p>
         Downloads the on-device AI once ({mb(modelBytes(phoneModels))}). After that, Agapay works with no signal, and
-        nothing you record leaves this phone.
+        nothing you record leaves this phone except the de-identified QR you choose to show.
       </p>
       <ul>
         {phoneModels.map((model) => (
