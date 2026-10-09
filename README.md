@@ -35,6 +35,7 @@ _TBD: the target user, the problem, and why it matters._
 | Part | Runs on | Model / runtime |
 |---|---|---|
 | App shell (HTML, JS, CSS), cached by a service worker | The user's browser | No model yet |
+| Records (residents, flood exposures, breathing checks, medicine stock, flags, approvals) | IndexedDB in the user's browser; they never leave the device except as the de-identified QR | No model |
 | OCR spike (`spike-ocr.html`, a test page not linked from the app): text detection and recognition on a photo | The user's browser, in a Web Worker, WebAssembly, single-threaded | PP-OCRv5 mobile detection + English recognition on ONNX Runtime Web 1.30 |
 | _TBD: the on-device AI_ | | |
 
@@ -107,6 +108,8 @@ A cloud "Jr. Builder" agent named in early commits was planned but never used.
 | [Playwright](https://playwright.dev) (`@playwright/test`) | End-to-end offline test in CI (Chromium) | Apache-2.0 |
 | [ESLint](https://eslint.org), `@eslint/js`, [typescript-eslint](https://typescript-eslint.io), `eslint-plugin-react-hooks`, `eslint-plugin-react-refresh`, `globals` | Linting | MIT |
 | `@types/react`, `@types/react-dom`, `@types/node` ([DefinitelyTyped](https://github.com/DefinitelyTyped/DefinitelyTyped)) | Type definitions | MIT |
+| [idb](https://github.com/jakearchibald/idb) | Promise wrapper for IndexedDB, the on-device records | ISC |
+| [fake-indexeddb](https://github.com/dumbmatter/fakeIndexedDB) | In-memory IndexedDB for unit tests (development only) | Apache-2.0 |
 | [ONNX Runtime Web](https://onnxruntime.ai) (`onnxruntime-web`) | On-device model inference (WebAssembly) for the OCR spike | MIT |
 | [Pillow](https://python-pillow.org) | Renders the synthetic test label (`spikes/ocr/fixtures/make_label.py`); a development tool, not shipped | MIT-CMU |
 
