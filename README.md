@@ -135,7 +135,7 @@ The diagram, the pipelines, the key decisions and the limitations are in [`docs/
 Self-hosted, unmodified: the OCR models in `public/models/ppocr/` and the pose model and YAMNet in `public/models/mediapipe/`, each with checksums, sources and the license text in a README there.
 
 ### Technologies and frameworks
-React + TypeScript, built with Vite as an installable web app (PWA: vite-plugin-pwa / Workbox service worker). On-device storage in IndexedDB (idb). Inference in Web Workers on WebAssembly (ONNX Runtime Web, MediaPipe Tasks, Tesseract.js) and, on the laptop only, WebGPU (WebLLM). Browser APIs: Cache Storage, Web Crypto (ECDSA P-256), camera (getUserMedia), BarcodeDetector. Tests: Vitest and Playwright in GitHub Actions. Small build scripts in Python with Pillow (synthetic labels). Every library and its license is in the table below.
+React + TypeScript, built with Vite as an installable web app (PWA: vite-plugin-pwa / Workbox service worker). On-device storage in IndexedDB (idb). Inference in Web Workers on WebAssembly (ONNX Runtime Web, MediaPipe Tasks, Tesseract.js) and, on the laptop only, WebGPU (WebLLM). Browser APIs: Cache Storage, Web Crypto (ECDSA P-256), camera (getUserMedia), BarcodeDetector. Tests: Vitest and Playwright in GitHub Actions, with axe-core for automated accessibility checks. Small build scripts in Python with Pillow (synthetic labels). Every library and its license is in the table below.
 
 ### APIs and cloud services
 - **Vercel:** static hosting of the app and the self-hosted model files. No server code, no API routes.
@@ -181,6 +181,7 @@ A cloud "Jr. Builder" agent named in early commits was planned but never used.
 | [TypeScript](https://www.typescriptlang.org) | Type checking | Apache-2.0 |
 | [Vitest](https://vitest.dev) | Unit tests | MIT |
 | [Playwright](https://playwright.dev) (`@playwright/test`) | End-to-end offline test in CI (Chromium) | Apache-2.0 |
+| [axe-core](https://github.com/dequelabs/axe-core) with [`@axe-core/playwright`](https://github.com/dequelabs/axe-core-npm) (4.13.0) | Automated accessibility check (WCAG 2.0/2.1 A and AA rules) of every screen in the CI end-to-end tests (`e2e/a11y.spec.ts`); development only, not shipped | MPL-2.0 |
 | [ESLint](https://eslint.org), `@eslint/js`, [typescript-eslint](https://typescript-eslint.io), `eslint-plugin-react-hooks`, `eslint-plugin-react-refresh`, `globals` | Linting | MIT |
 | `@types/react`, `@types/react-dom`, `@types/node` ([DefinitelyTyped](https://github.com/DefinitelyTyped/DefinitelyTyped)) | Type definitions | MIT |
 | [WebLLM](https://github.com/mlc-ai/web-llm) (`@mlc-ai/web-llm`) | Runs the optional AI wording model on the laptop's GPU (WebGPU), in a worker | Apache-2.0 |
