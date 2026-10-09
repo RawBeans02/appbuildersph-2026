@@ -3,6 +3,7 @@ import { useMemo, useState, type ComponentType } from 'react'
 import { Button, ButtonLink, Field, StateBlock, useToast } from '../../components'
 import { getDb } from '../../data/db/appDb'
 import { DEMO_MUNICIPALITY } from '../../data/places'
+import { useHoldReload } from '../../lib/useHoldReload'
 import { useDbQuery } from '../../data/db/useDbQuery'
 import { planTemplateText, type MunicipalPlan } from '../../rules/plan'
 import { CheckedWording } from './CheckedWording'
@@ -109,6 +110,8 @@ export function PlanBody({ plan, wordingPanel: Wording }: { plan: MunicipalPlan;
   const [saving, setSaving] = useState(false)
   const [approvedText, setApprovedText] = useState<string | null>(null)
   const [problem, setProblem] = useState<string | null>(null)
+  // A new deploy waits while the officer has unapproved text in the editor.
+  useHoldReload(text !== '' && approvedText === null)
 
   function takeDraft(wording: string) {
     setText(wording)

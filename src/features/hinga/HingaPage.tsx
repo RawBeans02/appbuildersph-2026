@@ -2,6 +2,7 @@ import { useEffect, useState, useSyncExternalStore } from 'react'
 import { useFlowMode } from '../../app/flow'
 import { navigate } from '../../app/router'
 import { detectPlatform } from '../../lib/backend'
+import { useHoldReload } from '../../lib/useHoldReload'
 import { AgeStep } from './AgeStep'
 import { CameraBlockedScreen, CameraScreen, PrePermissionScreen } from './CameraScreens'
 import { ageBand } from './copy'
@@ -94,6 +95,8 @@ function HingaFlow({ session }: { session: CountSession }) {
   // The camera runs only on the camera screens; it starts on its own there
   // (after 3c, Continue starts it with the microphone prompt).
   const cameraOn = screen === 'framing' || screen === 'counting' || screen === 'refused'
+  // A new deploy waits until the 60 s count is over.
+  useHoldReload(state.counting !== null)
   useEffect(() => {
     if (!cameraOn) session.stopCamera()
     else if (state.camera.status === 'off') void session.startCamera()

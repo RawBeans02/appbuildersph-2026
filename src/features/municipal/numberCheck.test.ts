@@ -40,7 +40,7 @@ describe('checkNumbers (screen 19a)', () => {
   it('never says every number matches: a number found in the plan may still be in the wrong place', () => {
     const swapped = checkNumbers('Move 9 capsules; 60 are in the watch window.', PLAN)
     expect(swapped.mismatched).toEqual([])
-    expect(checkLine(swapped)).toEqual({ tone: 'info', text: 'No new numbers found; check each number against the table above' })
+    expect(checkLine(swapped)).toEqual({ tone: 'info', text: 'No new numbers found; check each number against the plan steps' })
   })
 
   it('has no line for wording without numbers, or no wording', () => {

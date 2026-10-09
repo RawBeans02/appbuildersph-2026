@@ -56,7 +56,7 @@ export function checkNumbers(text: string, reference: string): NumberCheck {
 export function checkLine(check: NumberCheck): { tone: 'warn' | 'info'; text: string } | null {
   if (check.total === 0) return null
   const wrong = check.mismatched.length
-  if (wrong === 0) return { tone: 'info', text: 'No new numbers found; check each number against the table above' }
+  if (wrong === 0) return { tone: 'info', text: 'No new numbers found; check each number against the plan steps' }
   return {
     tone: 'warn',
     text: `${wrong} ${wrong === 1 ? "number doesn't" : "numbers don't"} match the plan: ${check.mismatched.join(', ')}`,
