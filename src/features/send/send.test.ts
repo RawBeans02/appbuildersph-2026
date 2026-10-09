@@ -123,6 +123,39 @@ describe('collectRawCounts', () => {
     })
   })
 
+  it('counts each linked child once a week, by their most severe result; unlinked checks count each', () => {
+    const referrals = (hingaChecks: HingaCheck[]) => {
+      const counts = collectRawCounts({ residents: [], exposures: [], hingaChecks, stockLots: [], flags: [] }, TODAY)
+      return { fast: counts.fastBreathing, urgent: counts.urgentReferrals }
+    }
+    const of = (residentId: string, id: string, outcome: HingaCheck['outcome'], checkedAt = '2026-10-09T02:00:00.000Z') => ({
+      ...check(id, 20, outcome, checkedAt),
+      residentId,
+    })
+    // Five fast checks of one child: one fast-breathing referral.
+    expect(referrals(['1', '2', '3', '4', '5'].map((n) => of('kid-a', `h${n}`, 'fast')))).toEqual({
+      fast: { under2m: 0, m2to12: 0, y1to5: 1 },
+      urgent: 0,
+    })
+    // Fast, then urgent, then fast again: urgent only.
+    expect(referrals([of('kid-a', 'h1', 'fast'), of('kid-a', 'h2', 'urgent'), of('kid-a', 'h3', 'fast'), of('kid-a', 'h4', 'not-fast')])).toEqual({
+      fast: { under2m: 0, m2to12: 0, y1to5: 0 },
+      urgent: 1,
+    })
+    // Two urgent checks of one child: one URGENT referral.
+    expect(referrals([of('kid-a', 'h1', 'urgent'), of('kid-a', 'h2', 'urgent')]).urgent).toBe(1)
+    // Two different children: two.
+    expect(referrals([of('kid-a', 'h1', 'fast'), of('kid-b', 'h2', 'fast'), of('kid-a', 'h3', 'fast')]).fast.y1to5).toBe(2)
+    // Not linked to a resident: each check counts, since they can't be told apart.
+    expect(referrals([check('u1', 20, 'fast', '2026-10-09T02:00:00.000Z'), check('u2', 20, 'fast', '2026-10-09T03:00:00.000Z')]).fast.y1to5).toBe(2)
+    expect(referrals([check('u1', 20, 'urgent', '2026-10-09T02:00:00.000Z'), check('u2', 20, 'urgent', '2026-10-09T03:00:00.000Z')]).urgent).toBe(2)
+    // Last week's checks of the same child don't count this week at all.
+    expect(referrals([of('kid-a', 'h1', 'urgent', '2026-09-30T02:00:00.000Z'), of('kid-a', 'h2', 'fast')])).toEqual({
+      fast: { under2m: 0, m2to12: 0, y1to5: 1 },
+      urgent: 0,
+    })
+  })
+
   it('never counts one resident both in an age band and in the watch window', () => {
     // Everyone in the window: if the bands counted them too, a "<5" band could
     // be worked out as inWatchWindow minus the exact bands.

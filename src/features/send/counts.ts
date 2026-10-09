@@ -1,4 +1,4 @@
-import type { Exposure, Flag, HingaCheck, Resident, StockLot } from '../../data/db/types'
+import type { Exposure, Flag, HingaCheck, HingaOutcome, Resident, StockLot } from '../../data/db/types'
 import { AGE_BANDS, HINGA_AGE_BANDS, isoWeek, type AgeBand, type HingaAgeBand, type RawCounts } from '../../qr'
 import { summarizeDoxycycline } from '../../rules/stock'
 import { watchList } from '../../rules/watch'
@@ -44,6 +44,27 @@ const localDate = (day: string) => {
   return new Date(y, m - 1, d)
 }
 
+const SEVERITY: Record<HingaOutcome, number> = { urgent: 3, fast: 2, 'not-fast': 1, refused: 0 }
+
+// One referral per child per week: a linked resident checked again and again
+// (5 fast checks of one child) counts once, by their most severe result that
+// week (urgent > fast > not fast), so repeat checks can't inflate the referrals
+// or change the municipal priority. A check with no linked resident can't be
+// matched to any other check, so it still counts once on its own.
+function referralsOf(checks: readonly HingaCheck[]): HingaCheck[] {
+  const byResident = new Map<string, HingaCheck>()
+  const unlinked: HingaCheck[] = []
+  for (const check of checks) {
+    if (!check.residentId) {
+      unlinked.push(check)
+      continue
+    }
+    const kept = byResident.get(check.residentId)
+    if (!kept || SEVERITY[check.outcome] > SEVERITY[kept.outcome]) byResident.set(check.residentId, check)
+  }
+  return [...byResident.values(), ...unlinked]
+}
+
 export function collectRawCounts(records: PhoneRecords, today: string): RawCounts {
   const residents = new Map(records.residents.map((resident) => [resident.id, resident]))
   const watch = watchList(records.exposures, today)
@@ -62,7 +83,7 @@ export function collectRawCounts(records: PhoneRecords, today: string): RawCount
   // Hinga referrals from this ISO week. A danger-sign result counts as URGENT
   // only; a plain fast result counts by age band.
   const week = isoWeek(localDate(today))
-  const thisWeek = records.hingaChecks.filter((check) => isoWeek(new Date(check.checkedAt)) === week)
+  const thisWeek = referralsOf(records.hingaChecks.filter((check) => isoWeek(new Date(check.checkedAt)) === week))
   const fastBreathing = zeroBands(HINGA_AGE_BANDS)
   for (const check of thisWeek) {
     const band = hingaBand(check.ageMonths)
