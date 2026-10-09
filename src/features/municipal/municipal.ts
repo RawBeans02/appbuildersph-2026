@@ -2,9 +2,10 @@ import type { AgapayDb } from '../../data/db/db'
 import type { Approval, PairedDevice, Plan, ReceivedPayload } from '../../data/db/types'
 import { DEMO_MUNICIPALITY } from '../../data/places'
 import { municipalSampleDevices, municipalSampleQrTexts } from '../../data/seed/municipal'
-import { decodeQr, formatCount, type QrPayloadV1 } from '../../qr'
+import { decodeQr, type QrPayloadV1 } from '../../qr'
 import type { MunicipalPlan } from '../../rules/plan'
 import { classifyScan, receivedPayloadId, registryOf, type ScanOutcome } from './scan/classify'
+import { planShortSummary, planStepsText } from './steps'
 
 // The municipal laptop's records: paired phones, received QRs, plans and
 // approvals, all in this browser's IndexedDB. Nothing here goes online.
@@ -125,23 +126,10 @@ export async function readPlanInputs(db: AgapayDb): Promise<PlanInputs> {
   return { payloads, unverified, sampleBarangays }
 }
 
-// One line for the approval log, from the computed plan.
-export function planSummary(plan: MunicipalPlan, edited: boolean): string {
-  const order = plan.priority.map((entry) => `${entry.rank}. ${entry.name}`).join(', ')
-  const moves =
-    plan.moves.length > 0
-      ? plan.moves.map((move) => `${move.fromName} to ${move.toName}, up to ${formatCount(move.capsulesUpTo)} capsules`).join('; ')
-      : 'no move'
-  const samples = plan.rows.filter((row) => row.sample).length
-  return [
-    `Week ${plan.epiWeek}, ${plan.rows.length} barangay${plan.rows.length === 1 ? '' : 's'}.`,
-    `Doctor teams: ${order}.`,
-    `Doxycycline: ${moves}.`,
-    samples > 0 ? `Includes sample data (${samples} barangay${samples === 1 ? '' : 's'}).` : '',
-    edited ? 'Text edited by the officer.' : '',
-  ]
-    .filter(Boolean)
-    .join(' ')
+// One line for the approval log, from the computed plan (screen 20's Plan
+// column).
+export function planSummary(plan: MunicipalPlan): string {
+  return planShortSummary(plan)
 }
 
 export type ApproveInput = {
@@ -150,16 +138,19 @@ export type ApproveInput = {
   // Where the draft came from: the template (planTemplateText), or the optional
   // local model's rewording of it (B6).
   draftSource?: Plan['draftSource']
+  // The officer's wording. Empty approves the plan as listed: the steps are
+  // saved as the text ("Rules only" in the log).
   finalText: string
-  note: string
+  note?: string
   now?: Date
 }
 
 // Saves the approved plan (rules, draft and final text) and logs the
 // approval. The plan and its approval share one id. Returns it.
 export async function approvePlan(db: AgapayDb, input: ApproveInput): Promise<string> {
-  const finalText = input.finalText.trim()
-  if (!finalText) throw new Error('The plan text is empty.')
+  const wording = input.finalText.trim()
+  const finalText = wording || planStepsText(input.plan)
+  const draftSource = wording ? (input.draftSource ?? 'template') : 'template'
   const now = input.now ?? new Date()
   const at = now.toISOString()
   const id = `plan-${at}-${crypto.randomUUID().slice(0, 8)}`
@@ -168,8 +159,8 @@ export async function approvePlan(db: AgapayDb, input: ApproveInput): Promise<st
     epiWeek: input.plan.epiWeek,
     createdAt: at,
     rules: input.plan,
-    draftText: input.draftText,
-    draftSource: input.draftSource ?? 'template',
+    draftText: wording ? input.draftText : null,
+    draftSource,
     finalText,
     status: 'approved',
   }
@@ -177,8 +168,8 @@ export async function approvePlan(db: AgapayDb, input: ApproveInput): Promise<st
     id,
     approvedAt: at,
     approver: APPROVER,
-    planSummary: planSummary(input.plan, finalText !== input.draftText.trim()),
-    note: input.note.trim(),
+    planSummary: planSummary(input.plan),
+    note: (input.note ?? '').trim(),
     sample: false,
   }
   await db.plans.put(plan)

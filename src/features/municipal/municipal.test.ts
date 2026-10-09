@@ -14,6 +14,8 @@ import {
   readPlanInputs,
   receiveScan,
 } from './municipal'
+import { logRow } from './log'
+import { planStepsText } from './steps'
 
 let dbCount = 0
 const freshDb = () => openAgapayDb(`municipal-test-${++dbCount}`)
@@ -166,12 +168,30 @@ describe('approval', () => {
       sample: false,
       approvedAt: later.toISOString(),
     })
-    expect(log[0].approval.planSummary).toContain('Text edited by the officer.')
-    expect(log[1].approval.planSummary).not.toContain('edited')
+    expect(log[0].approval.planSummary).toBe(planSummary(plan))
     expect(log[0].plan).toMatchObject({ status: 'approved', finalText: 'Draft, edited', draftSource: 'llm', epiWeek: '2026-W41' })
     expect(log[1].plan?.draftSource).toBe('template')
+    expect(log.map((entry) => logRow(entry).wording)).toEqual(['AI draft, edited', 'Rules only'])
+    const third = await approvePlan(db, { plan, draftText: 'AI words', draftSource: 'llm', finalText: 'AI words', now: new Date(NOW.getTime() + 120_000) })
+    const newest = (await readApprovalLog(db))[0]
+    expect(newest.approval.id).toBe(third)
+    expect(logRow(newest)).toMatchObject({ wording: 'AI draft', approver: 'Municipal health officer', from: '4 of 5 barangays' })
+    expect(logRow(newest).plan).toBe(planSummary(plan))
     expect(log[0].plan?.rules).toEqual(plan)
-    await expect(approvePlan(db, { plan, draftText: 'Draft', finalText: '  ', note: '' })).rejects.toThrow('empty')
+    db.close()
+  })
+
+  it('approves the plan as listed when there is no wording: the steps are the text, "Rules only"', async () => {
+    const db = await freshDb()
+    await loadMunicipalSample(db, NOW)
+    const inputs = await readPlanInputs(db)
+    const result = buildPlan(inputs.payloads, { sampleBarangays: inputs.sampleBarangays })
+    if (!result.ok) throw new Error(result.code)
+    const id = await approvePlan(db, { plan: result.plan, draftText: 'AI text', draftSource: 'llm', finalText: '  ', now: NOW })
+    const [entry] = await readApprovalLog(db)
+    expect(entry.approval).toMatchObject({ id, note: '' })
+    expect(entry.plan).toMatchObject({ draftSource: 'template', draftText: null, finalText: planStepsText(result.plan) })
+    expect(logRow(entry)).toMatchObject({ approver: 'Municipal health officer', wording: 'Rules only', from: '4 of 5 barangays', week: '2026-W41' })
     db.close()
   })
 
@@ -181,9 +201,8 @@ describe('approval', () => {
     const inputs = await readPlanInputs(db)
     const result = buildPlan(inputs.payloads, { sampleBarangays: inputs.sampleBarangays })
     if (!result.ok) throw new Error(result.code)
-    expect(planSummary(result.plan, false)).toBe(
-      'Week 2026-W41, 4 barangays. Doctor teams: 1. Bagong Silang-D, 2. Santo Niño-D, 3. Mabini-D, 4. Riverside-D. ' +
-        'Doxycycline: Riverside-D to Bagong Silang-D, up to 30 capsules. Includes sample data (4 barangays).',
+    expect(planSummary(result.plan)).toBe(
+      '1. Doctor team to Bagong Silang-D first. 2. Move 30 capsules from Riverside-D to Bagong Silang-D. 3. Use the 30 expiring capsules first.',
     )
     db.close()
   })
