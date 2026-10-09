@@ -37,6 +37,12 @@ models; reset samples; set brightness; verify clock and camera permissions;
 turn Wi-Fi and data off; reload. Have the synthetic printed label and fallback
 QR text/images ready. App data must visibly be labelled Sample data.
 
+How the room sees both screens, with the network off on both:
+- **The phone's screen:** QuickTime Player on the Mac, File → New Movie Recording, choose the iPhone as the camera, over a Lightning-to-USB-C cable. It works in airplane mode; iPhone Mirroring and AirPlay need Wi-Fi or Bluetooth, so don't rely on them.
+- **The laptop's camera** for scanning the phone's QRs: the Mac's built-in FaceTime camera in Chrome. Allow camera access once before going offline.
+- **The deck:** present it from the .pptx file, offline.
+- **Backup:** a screen recording of one full rehearsal of the loop on these two devices, ready to play if anything fails live. Say it's a recording.
+
 Laptop AI wording, after the final deploy (the worker's file changes with each
 deploy, and offline drafting needs the current one cached): on the demo laptop,
 online, do a normal reload, run one draft on `/municipal/plan`, and check that
