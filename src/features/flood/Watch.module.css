@@ -395,12 +395,6 @@
   margin-top: var(--space-6);
 }
 
-.trailing {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-}
-
 .purok {
   margin: var(--space-4) var(--space-5) 6px;
   font: 700 15px/22px var(--font-ui);

@@ -30,6 +30,10 @@
   color: var(--ink-2);
 }
 
+.onTint {
+  background: var(--surface);
+}
+
 /* URGENT is the only solid pill. */
 .urgent {
   background: var(--bad-fill);

@@ -34,6 +34,26 @@
   font-weight: 500;
 }
 
+.control {
+  position: relative;
+  display: block;
+}
+
+.withTrailing {
+  padding-right: 48px;
+  appearance: none;
+}
+
+.trailing {
+  position: absolute;
+  top: 50%;
+  right: var(--space-4);
+  display: flex;
+  transform: translateY(-50%);
+  color: var(--ink-2);
+  pointer-events: none;
+}
+
 textarea.input {
   padding: var(--space-3) var(--space-4);
   min-height: 112px;

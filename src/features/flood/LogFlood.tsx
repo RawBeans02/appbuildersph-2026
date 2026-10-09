@@ -107,11 +107,8 @@ export function LogFlood({
         </div>
       </div>
       <div className={cx(styles.footer, styles.flowFooter, styles.plainFooter)}>
-        <Button onClick={onNext}>
-          <span className={styles.trailing}>
-            Next: mark who was exposed
-            <ArrowRightIcon size={22} weight="bold" aria-hidden />
-          </span>
+        <Button iconEnd={<ArrowRightIcon size={22} weight="bold" aria-hidden />} onClick={onNext}>
+          Next: mark who was exposed
         </Button>
       </div>
     </div>

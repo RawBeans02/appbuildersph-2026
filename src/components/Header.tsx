@@ -48,8 +48,10 @@ export function FlowTopBar({
   right,
 }: {
   onBack: () => void
-  backKind?: 'back' | 'close'
-  // Screen-reader label: "Back", "Close" or "Cancel the check".
+  // 'text': the label itself as a text button ("Cancel", "Stop").
+  backKind?: 'back' | 'close' | 'text'
+  // Screen-reader label: "Back", "Close" or "Cancel the check"; the visible
+  // word for 'text'.
   backLabel?: string
   step?: { text: ReactNode; current: number; total: number }
   dark?: boolean
@@ -60,14 +62,20 @@ export function FlowTopBar({
   return (
     <div className={cx(dark && styles.dark, dark && 'on-night')}>
       <div className={styles.topBar}>
-        <button
-          type="button"
-          className={styles.iconButton}
-          aria-label={backLabel ?? (backKind === 'close' ? 'Close' : 'Back')}
-          onClick={onBack}
-        >
-          <BackIcon size={24} weight="bold" aria-hidden />
-        </button>
+        {backKind === 'text' ? (
+          <button type="button" className={styles.textButton} onClick={onBack}>
+            {backLabel ?? 'Cancel'}
+          </button>
+        ) : (
+          <button
+            type="button"
+            className={styles.iconButton}
+            aria-label={backLabel ?? (backKind === 'close' ? 'Close' : 'Back')}
+            onClick={onBack}
+          >
+            <BackIcon size={24} weight="bold" aria-hidden />
+          </button>
+        )}
         {right ?? <LocalStatus dark={dark} />}
       </div>
       {step && (

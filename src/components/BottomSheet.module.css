@@ -28,6 +28,18 @@
   background: var(--line);
 }
 
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: var(--space-4);
+  border-radius: var(--r-full);
+  background: var(--sunken);
+  color: var(--ink);
+}
+
 .title {
   font: var(--type-heading);
 }

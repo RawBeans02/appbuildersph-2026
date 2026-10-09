@@ -14,7 +14,7 @@ export function StateBlock({
   children,
   footnote,
 }: {
-  tone?: 'empty' | 'error'
+  tone?: 'empty' | 'warn' | 'error'
   icon: Icon
   title: ReactNode
   body?: ReactNode
@@ -24,7 +24,7 @@ export function StateBlock({
   footnote?: ReactNode
 }) {
   return (
-    <section className={cx(styles.block, tone === 'error' && styles.error)} role={tone === 'error' ? 'alert' : undefined}>
+    <section className={cx(styles.block, tone === 'error' && styles.error, tone === 'warn' && styles.warn)} role={tone === 'error' ? 'alert' : undefined}>
       <span className={styles.icon} aria-hidden>
         <IconComponent size={32} weight="bold" />
       </span>

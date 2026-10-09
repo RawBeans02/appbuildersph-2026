@@ -15,11 +15,13 @@ type Look = {
   tagalog?: string
   // A Phosphor icon element, 22–24 px, Bold.
   icon?: ReactNode
+  // One after the words (e.g. ArrowRightIcon for "Next").
+  iconEnd?: ReactNode
   // Camera (dark) screens.
   onNight?: boolean
 }
 
-function Content({ icon, tagalog, children }: { icon?: ReactNode; tagalog?: string; children: ReactNode }) {
+function Content({ icon, iconEnd, tagalog, children }: { icon?: ReactNode; iconEnd?: ReactNode; tagalog?: string; children: ReactNode }) {
   return (
     <>
       {icon && <span className={styles.icon}>{icon}</span>}
@@ -27,6 +29,7 @@ function Content({ icon, tagalog, children }: { icon?: ReactNode; tagalog?: stri
         {children}
         {tagalog && <span className={styles.tagalog}> · {tagalog}</span>}
       </span>
+      {iconEnd && <span className={styles.icon}>{iconEnd}</span>}
     </>
   )
 }
@@ -38,6 +41,7 @@ export function Button({
   variant,
   tagalog,
   icon,
+  iconEnd,
   onNight,
   className,
   children,
@@ -46,7 +50,7 @@ export function Button({
 }: Look & ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
     <button type={type} className={classes({ variant, onNight }, className)} {...rest}>
-      <Content icon={icon} tagalog={tagalog}>
+      <Content icon={icon} iconEnd={iconEnd} tagalog={tagalog}>
         {children}
       </Content>
     </button>
@@ -58,6 +62,7 @@ export function ButtonLink({
   variant,
   tagalog,
   icon,
+  iconEnd,
   onNight,
   className,
   children,
@@ -65,7 +70,7 @@ export function ButtonLink({
 }: Look & AnchorHTMLAttributes<HTMLAnchorElement> & { to: string }) {
   return (
     <Link to={to} className={classes({ variant, onNight }, className)} {...rest}>
-      <Content icon={icon} tagalog={tagalog}>
+      <Content icon={icon} iconEnd={iconEnd} tagalog={tagalog}>
         {children}
       </Content>
     </Link>

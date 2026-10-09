@@ -8,11 +8,15 @@ export function BottomSheet({
   open,
   onClose,
   title,
+  icon,
   children,
 }: {
   open: boolean
   onClose: () => void
   title: ReactNode
+  // A Phosphor icon element (about 30 px, Bold), shown in a 56 px circle
+  // above the title.
+  icon?: ReactNode
   children: ReactNode
 }) {
   const titleId = useId()
@@ -47,6 +51,11 @@ export function BottomSheet({
         onClick={(event) => event.stopPropagation()}
       >
         <div className={styles.grabber} aria-hidden />
+        {icon && (
+          <span className={styles.icon} aria-hidden>
+            {icon}
+          </span>
+        )}
         <h2 id={titleId} className={styles.title}>
           {title}
         </h2>

@@ -28,6 +28,7 @@ export function Field({
   tag,
   helper,
   error,
+  trailingIcon,
   children,
 }: {
   label: ReactNode
@@ -36,6 +37,9 @@ export function Field({
   tag?: FieldTag
   helper?: ReactNode
   error?: string | null
+  // An icon at the input's right edge, e.g. a select's CaretDownIcon (20 px,
+  // Bold); the native arrow is hidden. Purely visual.
+  trailingIcon?: ReactNode
   children: (input: FieldInputProps) => ReactNode
 }) {
   const id = useId()
@@ -44,6 +48,12 @@ export function Field({
   const flagged = tag === 'check' || tag === 'not-read'
   const describedBy = [helper ? helperId : null, error ? errorId : null].filter(Boolean).join(' ')
   const tagInfo = tag ? TAGS[tag] : null
+  const inputProps: FieldInputProps = {
+    id,
+    className: cx(styles.input, flagged && styles.check, error && styles.invalid),
+    ...(error ? { 'aria-invalid': true as const } : {}),
+    ...(describedBy ? { 'aria-describedby': describedBy } : {}),
+  }
   return (
     <div className={styles.field}>
       <div className={styles.labelRow}>
@@ -58,12 +68,16 @@ export function Field({
           </span>
         )}
       </div>
-      {children({
-        id,
-        className: cx(styles.input, flagged && styles.check, error && styles.invalid),
-        ...(error ? { 'aria-invalid': true as const } : {}),
-        ...(describedBy ? { 'aria-describedby': describedBy } : {}),
-      })}
+      {trailingIcon ? (
+        <span className={styles.control}>
+          {children({ ...inputProps, className: cx(inputProps.className, styles.withTrailing) })}
+          <span className={styles.trailing} aria-hidden>
+            {trailingIcon}
+          </span>
+        </span>
+      ) : (
+        children(inputProps)
+      )}
       {helper && (
         <p id={helperId} className={cx(styles.helper, flagged && styles.helperCheck)}>
           {helper}

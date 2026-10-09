@@ -22,6 +22,11 @@
   color: var(--bad);
 }
 
+.warn .icon {
+  background: var(--warn-tint);
+  color: var(--warn);
+}
+
 .title {
   margin-top: var(--space-4);
   font: 800 22px/28px var(--font-ui);
