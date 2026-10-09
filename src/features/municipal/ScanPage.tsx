@@ -64,6 +64,13 @@ export default function ScanPage() {
     }
   }, [])
   const { state, videoRef, start, stop, decodeFile } = useQrScanner((text) => void onText(text))
+  // A fresh camera start clears the last result, so an old banner never hides
+  // why the camera didn't open.
+  const startCamera = () => {
+    setBanner(null)
+    setPairing(null)
+    void start()
+  }
   const cameraOn = state.status !== 'idle'
 
   async function confirmPairing(outcome: PairOutcome) {
@@ -109,7 +116,7 @@ export default function ScanPage() {
               <span>The camera is off</span>
             </div>
             <div className={styles.cardAction}>
-              <Button icon={<ScanIcon size={22} weight="bold" aria-hidden />} onClick={() => void start()}>
+              <Button icon={<ScanIcon size={22} weight="bold" aria-hidden />} onClick={startCamera}>
                 Scan a barangay QR
               </Button>
             </div>
@@ -132,6 +139,9 @@ export default function ScanPage() {
 
   const problem = CAMERA_PROBLEM[state.status]
   const success = banner?.tone === 'ok'
+  // One banner: the pairing prompt, else the last scan's result (a QR pasted
+  // or read from a photo while the camera is out), else the camera problem.
+  const problemShown = problem && !pairing && !banner
   return (
     <LaptopFrame
       active="scan"
@@ -142,24 +152,32 @@ export default function ScanPage() {
         <div>
           {pairing ? (
             <PairingConfirm outcome={pairing} onConfirm={() => void confirmPairing(pairing)} onCancel={() => setPairing(null)} />
-          ) : problem ? (
-            <Banner
-              tone="info"
-              icon={CameraSlashIcon}
-              alert
-              title={problem.title}
-              body={problem.body}
-              action={<Button onClick={() => void start()}>Try again</Button>}
-            />
+          ) : banner ? (
+            <Banner tone={banner.tone} title={banner.title} body={banner.body} />
           ) : (
-            banner && <Banner tone={banner.tone} title={banner.title} body={banner.body} />
+            problem && (
+              <Banner
+                tone="info"
+                icon={CameraSlashIcon}
+                alert
+                title={problem.title}
+                body={problem.body}
+                action={<Button onClick={startCamera}>Try again</Button>}
+              />
+            )
           )}
           <div className={cx(styles.camera, (banner || pairing || problem) && styles.cameraShort)} hidden={!!problem}>
             <video ref={videoRef} muted playsInline className={styles.video} aria-label="Camera preview" />
             <div className={cx(styles.target, success && styles.targetOk)} aria-hidden />
           </div>
           {problem ? (
-            <div className={styles.controls}>
+            <div className={cx(styles.controls, styles.controlsRow)}>
+              {/* The camera's Try again, while a result has the banner's place. */}
+              {!problemShown && (
+                <Button variant="secondary" onClick={startCamera}>
+                  Try again
+                </Button>
+              )}
               <Button variant="text" onClick={stop}>
                 Cancel
               </Button>
