@@ -16,8 +16,19 @@ Checks that the app shell keeps working with no network after one online visit. 
 3. Close the tab, then open the live URL again (or reload). Expected: the page renders and shows **Network: Offline**.
 4. Turn airplane mode off. Expected: **Network: Online**.
 
-## When the AI lands
-The wow flow adds to this test: load once and wait until the model shows as ready, go offline, reload, and run the core feature end to end. The model must load from the device's cache, and the Network tab must show no requests during inference.
+## Once a model runtime exists
+The runtime's `.wasm` / `.mjs` files and the model weights are not part of the app-shell check above. Each can fail offline on its own: Workbox's precache skips files over 2 MiB by default and doesn't list `.wasm` or `.mjs` unless told to, and the weights live in the Cache API or OPFS, not the precache. So check each one on its own.
+1. With internet on, clear site data (laptop) and load the live URL. Download the model and wait until it shows as ready.
+2. Laptop: in **Application** → **Cache storage**, find the runtime's `.wasm` (in the precache or a runtime cache) and the model files (for our model cache, a `model-cache:<id>@<version>` cache with one entry per file).
+3. Go offline (DevTools **Offline**, or airplane mode with Wi-Fi and data off on a phone) and reload.
+4. Run the core feature end to end. Expected:
+   - the runtime's `.wasm` loads from **(ServiceWorker)** or the cache, with no failed request in red;
+   - the model loads from the cache, with no download progress and no network error;
+   - the Network tab shows no new requests while inference runs.
+5. Write down the device, the browser and the backend the device check picked (WebGPU or WASM, and the thread count). On iPhone, also check the tab survives a few runs in a row: iOS can kill a tab that uses too much memory, with no error shown.
+
+## The full wow flow
+Load once and wait until the model shows as ready, go offline, reload, and run the wow flow end to end.
 
 ## Results
 | Date and time (PH) | Commit | Device and OS | Browser and version | Result | Notes |
