@@ -42,6 +42,7 @@ _TBD: the target user, the problem, and why it matters._
 | De-identified QR payload (`src/qr/`): small-cell suppression ("<5"), signing on the phone, verification and merge on the laptop, and the one-time pairing QR that carries a phone's public key (the officer compares its fingerprint) | The user's browser, with the built-in Web Crypto API (ECDSA P-256) | No model |
 | Municipal laptop (`/municipal`, `/municipal/plan`, `/municipal/log`): reads the barangay QR codes from the laptop camera (or a photo, or pasted text), checks each signature against the paired phone's key, merges the barangays, computes the plan by fixed rules (doctor-team priority, doxycycline stock moves for the officer to decide, never a dose), and logs the officer's approval; camera frames are never stored or sent | The user's browser: the browser's built-in BarcodeDetector where it reads QR codes, else the bundled jsQR decoder; records in IndexedDB | No model: the plan is rules (an optional local model to draft its wording is not built yet) |
 | Medicine-box reader (Stock screen; also the `spike-ocr.html` test page): reads text from a photo of the box, then drug, lot and expiry are parsed by rules for the health worker to confirm; the photo is never stored | The user's browser, in a Web Worker, WebAssembly, single-threaded | PP-OCRv5 mobile detection + English recognition on ONNX Runtime Web 1.30 |
+| Hinga breathing check (`/hinga`): finds the torso in the rear-camera video and counts breaths per minute (band-pass, FFT peak, zero crossings), then compares with the WHO IMCI 2014 cut-offs; during the 60 s count, YAMNet listens for crying and the count is refused if it hears enough. The video and the microphone audio are processed piece by piece and never stored or sent; only the count, the outcome and the danger signs are saved on the phone | The user's browser: the pose model and YAMNet in WebAssembly on the CPU, each in a Web Worker (where a worker can't start, the pose model runs on the page itself and the screen says so); the breath counting in plain TypeScript | MediaPipe Pose Landmarker lite on MediaPipe Tasks Vision 1.0.1; YAMNet on MediaPipe Tasks Audio 1.0.1 |
 | Hinga spike (`spike-hinga.html`, a test page not linked from the app): finds the torso in the rear-camera video, then counts breaths per minute from the torso's brightness and shoulder height (band-pass, FFT peak, zero crossings) and compares with the WHO IMCI 2014 cut-offs. The video is never stored or sent | The user's browser: the pose model in WebAssembly on the CPU, on the main thread (a spike shortcut); the breath counting in plain TypeScript | MediaPipe Pose Landmarker lite on MediaPipe Tasks Vision 1.0.1 |
 | _TBD: the on-device AI_ | | |
 
@@ -66,7 +67,15 @@ Offline health record systems also exist (iClinicSys and SHINE OS+ have offline 
 _TBD: a summary here; the diagram, decisions, the on-device AI pipeline and its limitations will be in `docs/ARCHITECTURE.md`._
 
 ## Responsible AI
-_TBD: what stays on the device, human review of AI output, limitations, how the AI can fail._
+_Draft, filled in as features land._
+
+### Hinga, the breathing check
+- **A screening aid, not a diagnosis.** Its only outputs are "fast breathing for age: refer" or "not fast breathing for age" against the WHO IMCI 2014 cut-offs, and "urgent" when the health worker ticks a danger sign (chest indrawing, stridor, unable to drink, convulsions, very sleepy or hard to wake). The screen says "Screening aid only. Not a diagnosis."
+- **It refuses rather than guesses:** when the child cries, the phone or child moves, the chest isn't visible, or its two ways of counting disagree, it shows the reason and offers one retry; after that it saves "not counted".
+- **The pose model's own limits:** its model card (MediaPipe BlazePose GHUM 3D) says it "is not intended for human life-critical decisions", and lists a head that isn't visible as out of scope. Hinga uses it only to find the torso; the count and the refusals come from our signal processing, and the health worker decides.
+- **Not tested on children.** The counting is tested on synthetic signals (unit tests); the phone trials, on adult team members only, are recorded in `docs/SPIKE-HINGA.md` as they happen. We don't claim any accuracy: none has been measured against a reference count.
+- **First settings, not measured:** the thresholds for refusing (signal clarity, agreement, movement, crying) were set against synthetic data; the cry check's were not measured on real crying.
+- **What stays on the phone:** the video and the microphone audio are processed piece by piece and dropped, never recorded, stored or sent. A saved check holds the age in months, the count (or the refusal), the outcome and the danger signs.
 
 ## Disclosures
 
