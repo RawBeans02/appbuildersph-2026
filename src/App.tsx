@@ -1,11 +1,12 @@
 import { lazy, Suspense, useEffect, type ReactElement } from 'react'
 import { featureRoutes } from './app/featureRoutes'
 import { Layout } from './app/Layout'
-import { NotFoundPage } from './app/NotFoundPage'
 import { PlaceholderPage } from './app/PlaceholderPage'
 import { usePath } from './app/router'
 import { resolveRoute } from './app/routes'
-import { ToastProvider } from './components'
+// Straight from the file, not the components barrel: the barrel would pull
+// every shared component into the first-load chunk.
+import { ToastProvider } from './components/Toast'
 
 // Each route's page element is made once, from a lazy component, so every
 // screen is its own chunk and React keeps its state across renders.
@@ -19,6 +20,14 @@ const pages = new Map<string, ReactElement>(
       </Suspense>,
     ]
   }),
+)
+
+// The 404 is its own chunk too: only a wrong address needs it.
+const NotFound = lazy(() => import('./app/NotFoundPage').then((module) => ({ default: module.NotFoundPage })))
+const notFoundPage = (
+  <Suspense fallback={<p>Loading…</p>}>
+    <NotFound />
+  </Suspense>
 )
 
 export default function App() {
@@ -38,7 +47,7 @@ export default function App() {
         ) : resolved.kind === 'planned' ? (
           <PlaceholderPage route={resolved.route} />
         ) : (
-          <NotFoundPage />
+          notFoundPage
         )}
       </Layout>
     </ToastProvider>

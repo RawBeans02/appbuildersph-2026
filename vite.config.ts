@@ -72,6 +72,8 @@ export default defineConfig({
           },
         ],
         navigateFallback: '/index.html',
+        // A real file, not an app route: opening /robots.txt shows the file.
+        navigateFallbackDenylist: [/^\/robots\.txt$/],
         cleanupOutdatedCaches: true,
       },
     }),

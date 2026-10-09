@@ -1,5 +1,5 @@
 import { useEffect, type ReactNode } from 'react'
-import { BottomNav, BOTTOM_NAV_HEIGHT } from '../components'
+import { BottomNav, BOTTOM_NAV_HEIGHT } from '../components/BottomNav'
 import { cx } from '../components/cx'
 import { useFlowActive } from './flow'
 import styles from './Layout.module.css'

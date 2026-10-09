@@ -1,5 +1,6 @@
 import { HouseIcon } from '@phosphor-icons/react'
-import { ButtonLink, LocalStatus } from '../components'
+import { ButtonLink } from '../components/Button'
+import { LocalStatus } from '../components/LocalStatus'
 import { cx } from '../components/cx'
 import { useFlowMode } from './flow'
 import styles from './NotFoundPage.module.css'
