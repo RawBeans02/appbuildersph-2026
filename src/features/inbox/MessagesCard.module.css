@@ -1,0 +1,49 @@
+/* Phase 2 messages card on the phone's Home (NEEDS DESIGN: TASKS.md P2-C).
+   Tokens only, on the Home card's pattern. */
+
+.card {
+  margin: var(--space-5) var(--space-5) 0;
+  padding: var(--space-4) 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-1);
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font: var(--type-body-dense);
+  font-weight: 700;
+  color: var(--ink-2);
+}
+
+.note {
+  margin-top: var(--space-2);
+  font: var(--type-body);
+  color: var(--ink-2);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+  padding: 0;
+  list-style: none;
+  font: var(--type-body);
+}
+
+.meta {
+  display: block;
+  margin-top: 2px;
+  font: var(--type-caption);
+  color: var(--ink-2);
+}
+
+.checked {
+  margin-top: var(--space-3);
+  font: var(--type-caption);
+  color: var(--ink-3);
+}

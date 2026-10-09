@@ -216,4 +216,29 @@ describe('inbox client (laptop)', () => {
     expect(inbox.value.scope).toEqual({ device: 'laptop', municipality: 'SID', barangays: null })
     expect(inbox.value.alerts).toEqual([expect.objectContaining({ id: first.id, text: first.text, approvedByRole: 'Provincial health officer' })])
   })
+
+  it("lets a phone read only its own barangay's messages, signed with its device key", async () => {
+    const store = await freshStore()
+    await registerLaptop(store, ENROLL_CODE, fetcherFor(server), NOW)
+    const identity = (await store.getIdentity())!
+    // Maligaya-D has 12 in the watch window (a watch alert); Riverside-D none.
+    const { handoff, keys } = await handoffOf({ barangay: 'SID-MAL', seq: 3 }, { barangay: 'SID-RIV', seq: 1 })
+    expect((await uploadSync(identity, buildSyncData(handoff).data, fetcherFor(server), NOW)).ok).toBe(true)
+    const view = { [VIEW_CODE_HEADER]: VIEW_CODE }
+    const drafted = (await (await handleAlertsDraft(post('/api/alerts-draft', JSON.stringify({ municipality: 'SID' }), view), deps(server))).json()) as DraftAlertsResponse
+    for (const alert of drafted.alerts) {
+      const approve = post('/api/alerts-approve', JSON.stringify({ id: alert.id, approverRole: 'Provincial health officer' }), view)
+      expect((await handleAlertsApprove(approve, deps(server))).status).toBe(200)
+    }
+    const later = new Date(NOW.getTime() + 1000)
+    const mal = await fetchInbox(keys.get('SID-MAL')!, fetcherFor(server), later)
+    const riv = await fetchInbox(keys.get('SID-RIV')!, fetcherFor(server), later)
+    if (!mal.ok || !riv.ok) throw new Error('expected both inboxes')
+    expect(mal.value.scope).toEqual({ device: 'phone', municipality: 'SID', barangays: ['SID-MAL'] })
+    expect(mal.value.alerts.length).toBeGreaterThan(0)
+    expect(mal.value.alerts.every((alert) => alert.barangay === 'SID-MAL' || alert.kind === 'move-stock')).toBe(true)
+    expect(riv.value.alerts.every((alert) => alert.barangay !== 'SID-MAL' || alert.kind === 'move-stock')).toBe(true)
+    // A phone the laptop never vouched for isn't linked.
+    expect(await fetchInbox(await makeDevice(), fetcherFor(server), later)).toEqual({ ok: false, problem: { kind: 'not-registered' } })
+  })
 })

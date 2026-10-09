@@ -195,6 +195,7 @@ Never on the offline demo path: the core works with no network, the offline e2e 
   · [lead] · owns: `server/luna/`, `api/alerts*`, `api/inbox*`, `src/features/doh/`, the inbox UI
   - NEEDS DESIGN: the DOH view's "Draft alerts with GPT-6 Luna" panel: the AI line (on with today's calls, or "AI off" and why), "Draft alerts", the role field (a role, not a name), each draft's card (kind and barangay, the facts, the source tag "Written by GPT-6 Luna" / "Template", the wording to edit, the check line, Approve and Reject, the check's reasons when an edit is refused), the decided list and the audit log. Built on tokens and shared components meanwhile
   - NEEDS DESIGN: the laptop's Inbox on the Sync screen (approved alerts as plain text, approved by which role and when, "Checked {time}", no alerts yet). Built on tokens meanwhile
+  - NEEDS DESIGN: the phone's "Messages from the municipality" card on Home (online only; messages as plain text with the approving role and time, "Checked {time}", not paired yet, not linked yet, couldn't check, no messages). Built on tokens meanwhile
 - [ ] todo · Owner: provision Neon via Vercel Storage and set the env vars (steps sent via Account Admin) · [human:Rovs]
 
 ## Scope (locked by the owner, Fri ~3:45 PM)

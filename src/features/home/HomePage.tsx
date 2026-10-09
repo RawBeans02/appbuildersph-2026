@@ -1,6 +1,7 @@
 import { ArrowRightIcon, CaretRightIcon, CircleNotchIcon, ClockIcon, DropIcon, FileTextIcon, WindIcon } from '@phosphor-icons/react'
-import { useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import { Link } from '../../app/Link'
+import { PHASE2 } from '../../lib/phase2'
 import { ButtonLink, RecordsError, ScreenHeader, StateBlock } from '../../components'
 import { cx } from '../../components/cx'
 import { placeLine, usePlace } from '../../data/db/usePlace'
@@ -10,6 +11,9 @@ import { WATCH_END_DAY } from '../../rules/watch'
 import type { HomeSummary } from './summary'
 import { useHomeSummary } from './useHomeSummary'
 import styles from './HomePage.module.css'
+
+// Phase 2 only (P2-C): approved messages from the municipality, its own chunk.
+const MessagesCard = lazy(() => import('../inbox/MessagesCard'))
 
 // Screen 1: Home (1a default, 1b loading, 1c empty, 1d error). Every number
 // comes from the records on this phone (useHomeSummary).
@@ -168,6 +172,11 @@ export default function HomePage() {
               <Rows summary={summary.data} />
             </>
           ))}
+        {PHASE2 && (
+          <Suspense fallback={null}>
+            <MessagesCard />
+          </Suspense>
+        )}
       </div>
       <div className={styles.footer}>
         {failed ? (

@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, test, type Page } from '@playwright/test'
+import { openPage } from './lock'
 
 // Phase 2's laptop Sync screen and DOH view (P2-B). Runs in both CI e2e
 // entries: with the flag off, both paths are the 404 and the laptop has no
@@ -32,6 +33,23 @@ test('phase 2 off: no Sync item, and /municipal/sync and /doh are the 404', asyn
     await page.goto(path)
     await expect(page.getByRole('heading', { level: 1, name: 'Walang ganitong page.' })).toBeVisible({ timeout: 30_000 })
   }
+  // P2-C: no messages card on the phone's Home.
+  await openPage(page, '/')
+  await expect(page.getByText('On the watch list', { exact: true })).toBeVisible({ timeout: 30_000 })
+  await expect(page.getByRole('heading', { name: 'Messages from the municipality' })).toHaveCount(0)
+})
+
+test("phase 2 on: the phone's Home shows the messages card online, and hides it offline", async ({ page, context }) => {
+  await openPage(page, '/')
+  test.skip(!(await phase2On(page)), 'phase 2 is off in this build')
+  await expect(page.locator('html')).toHaveAttribute('data-shell-status', 'ready', { timeout: 30_000 })
+  await page.waitForFunction(() => navigator.serviceWorker.controller !== null)
+  const card = page.getByRole('heading', { name: 'Messages from the municipality' })
+  await expect(card).toBeVisible({ timeout: 30_000 })
+  // The sample phone hasn't paired yet, and there's no server here.
+  await expect(page.getByText(/once this phone is paired|Couldn't check for messages/)).toBeVisible({ timeout: 30_000 })
+  await context.setOffline(true)
+  await expect(card).toHaveCount(0)
 })
 
 test('phase 2 on: the Sync screen asks to register, says when the server is unreachable, and waits offline', async ({ page, context }) => {
