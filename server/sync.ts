@@ -1,14 +1,16 @@
 import { decodeQr, importPublicKey, keyFingerprint, type KeyRegistry } from '../src/qr/index.js'
 import type { KeyResult, ReportResult, SyncData, SyncResponse } from './protocol.js'
 import type { DeviceRecord, Store } from './store.js'
+import { acceptedWeeks, weekAccepted, weekRefusal } from './weeks.js'
 
 // POST /api/sync, once the laptop is authenticated and the data's shape is
 // checked: in one transaction,
 // 1. store the barangay phone keys the laptop vouches for (its own
 //    municipality only);
 // 2. verify every counts QR again with src/qr's decodeQr against the vouched
-//    keys of the municipality, and store each verified payload, keeping the
-//    highest seq per barangay and week;
+//    keys of the municipality, refuse a week outside the accepted window
+//    (weeks.ts: not in the future, not more than 8 weeks old), and store each
+//    verified payload, keeping the highest seq per barangay and week;
 // 3. log the sync (counts of results only) in the audit log.
 // Each key and each report gets its own result; one bad item doesn't stop the
 // others.
@@ -45,6 +47,7 @@ export async function syncReports(store: Store, device: DeviceRecord, data: Sync
     const vouched = await tx.barangayKeys(device.municipality, MAX_REGISTRY)
     const registry: KeyRegistry = Object.fromEntries(vouched.map((key) => [key.barangay, key.publicJwk]))
 
+    const weeks = acceptedWeeks(now)
     const reports: ReportResult[] = []
     for (const [index, text] of data.reports.entries()) {
       const decoded = await decodeQr(text, registry)
@@ -58,6 +61,10 @@ export async function syncReports(store: Store, device: DeviceRecord, data: Sync
       const { payload } = decoded
       if (payload.municipality !== device.municipality) {
         reports.push({ index, ok: false, code: 'other-municipality', barangay: payload.barangay })
+        continue
+      }
+      if (!weekAccepted(payload.epiWeek, weeks)) {
+        reports.push({ index, ok: false, code: 'invalid-payload', barangay: payload.barangay, message: weekRefusal(weeks) })
         continue
       }
       const status = await tx.putReport({

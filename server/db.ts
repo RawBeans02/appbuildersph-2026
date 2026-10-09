@@ -1,6 +1,7 @@
 import pg from 'pg'
 import type { PublicJwk } from '../src/qr/index.js'
 import type { AlertRecord, AuditEntry, BarangayKeyRecord, ReportRecord, ReportWrite, Store } from './store.js'
+import { acceptedWeeks } from './weeks.js'
 
 // Postgres (Neon through Vercel in production, a postgres:16 container in CI)
 // through node-postgres. One small pool per function instance; the schema is
@@ -105,11 +106,27 @@ export const SCHEMA: readonly string[] = [
 // Postgres can fail on).
 const SCHEMA_LOCK = 20261010
 
-export async function applySchema(client: Queryable): Promise<void> {
+// Reports of a week that hasn't come yet (stored before the sync refused
+// them) would top the DOH view and drive the alerts until that week: deleted
+// on every schema pass, by the same window the sync uses (weeks.ts).
+// Idempotent; a deletion is logged with its count.
+export const DELETE_FUTURE_REPORTS = 'DELETE FROM reports WHERE epi_week > $1'
+
+export async function applySchema(client: Queryable, now: Date = new Date()): Promise<void> {
   await client.query('BEGIN')
   try {
     await client.query('SELECT pg_advisory_xact_lock($1)', [SCHEMA_LOCK])
     for (const statement of SCHEMA) await client.query(statement)
+    const latest = acceptedWeeks(now).latest
+    const removed = await client.query(DELETE_FUTURE_REPORTS, [latest])
+    if (removed.rowCount) {
+      await client.query('INSERT INTO audit_log (at, actor, action, detail) VALUES ($1, $2, $3, $4)', [
+        now,
+        'server',
+        'future-reports-deleted',
+        JSON.stringify({ rows: removed.rowCount, after: latest }),
+      ])
+    }
     await client.query('COMMIT')
   } catch (error) {
     await client.query('ROLLBACK').catch(() => undefined)
@@ -362,11 +379,15 @@ export function createPgStore(db: pg.Pool | pg.PoolClient, inTransaction = false
     },
 
     async latestReports(municipality, limit) {
+      // Only reports signed by the barangay's currently vouched phone key.
       const result = await db.query<ReportRow>(
-        `SELECT DISTINCT ON (barangay)
-           barangay, epi_week, seq, municipality, payload, phone_fingerprint, received_from, received_at
-         FROM reports WHERE municipality = $1
-         ORDER BY barangay, epi_week DESC
+        `SELECT DISTINCT ON (r.barangay)
+           r.barangay, r.epi_week, r.seq, r.municipality, r.payload, r.phone_fingerprint, r.received_from, r.received_at
+         FROM reports r
+         JOIN barangay_keys k
+           ON k.barangay = r.barangay AND k.fingerprint = r.phone_fingerprint AND k.municipality = r.municipality
+         WHERE r.municipality = $1
+         ORDER BY r.barangay, r.epi_week DESC
          LIMIT $2`,
         [municipality, limit],
       )

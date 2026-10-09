@@ -80,7 +80,9 @@ export type ReportResult =
       // same seq from the same phone.
       status: 'stored' | 'kept-newer' | 'unchanged'
     }
-  | { index: number; ok: false; code: QrErrorCode | 'other-municipality'; barangay?: string }
+  // `message`: why, when the code alone doesn't say (a week outside the
+  // accepted window is 'invalid-payload' with the window).
+  | { index: number; ok: false; code: QrErrorCode | 'other-municipality'; barangay?: string; message?: string }
 
 export type SyncResponse = {
   ok: true

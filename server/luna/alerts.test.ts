@@ -27,6 +27,15 @@ const ENV: ServerEnv = {
 beforeEach(async () => {
   store = createMemoryStore()
   for (const payload of scenarioPayloads()) {
+    // Vouched for its barangay: only reports signed by the vouched key are read.
+    store.keys.set(payload.barangay, {
+      barangay: payload.barangay,
+      municipality: 'SID',
+      publicJwk: { kty: 'EC', crv: 'P-256', x: 'x', y: 'y' },
+      fingerprint: 'AAAA-BBBB-CCCC-DDDD',
+      vouchedBy: LAPTOP,
+      updatedAt: NOW,
+    })
     await store.putReport({
       barangay: payload.barangay,
       epiWeek: payload.epiWeek,

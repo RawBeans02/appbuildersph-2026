@@ -5,6 +5,7 @@ import { handleEnroll, handleHealth, handleReports, handleSync, resetHealthCache
 import type { ReportsResponse, SyncData, SyncResponse } from '../protocol.js'
 import { LIMITS } from '../rateLimit.js'
 import { body, enrollRequest, makeDevice, NOW, qrText, reportsRequest, syncRequest, type TestDevice } from '../test/fixtures.js'
+import { manilaWeek } from '../weeks.js'
 
 // The handlers against a real Postgres (CI's postgres:16 service container):
 // the SQL in db.ts, its constraints and transactions, end to end. Needs
@@ -79,6 +80,30 @@ describe('schema', () => {
     }
   })
 
+  it('deletes reports of a future week on every schema pass, idempotently, and logs it', async () => {
+    const pool = getPool(databaseUrl)
+    const laptop = await makeDevice()
+    await enroll(laptop)
+    const thisWeek = manilaWeek(new Date())
+    for (const [barangay, week] of [
+      ['SID-MAL', thisWeek],
+      ['SID-BGS', '2099-W01'],
+    ]) {
+      await pool.query(`INSERT INTO reports VALUES ($1, $2, 1, 'SID', '{}'::jsonb, $3, $3, now())`, [barangay, week, laptop.fingerprint])
+    }
+    const client = await pool.connect()
+    try {
+      await applySchema(client)
+      await applySchema(client)
+    } finally {
+      client.release()
+    }
+    const rows = await pool.query<{ barangay: string; epi_week: string }>('SELECT barangay, epi_week FROM reports ORDER BY barangay')
+    expect(rows.rows).toEqual([{ barangay: 'SID-MAL', epi_week: thisWeek }])
+    const logged = await pool.query<{ actor: string; detail: { rows: number } }>(`SELECT actor, detail FROM audit_log WHERE action = 'future-reports-deleted'`)
+    expect(logged.rows).toEqual([{ actor: 'server', detail: { rows: 1, after: expect.stringMatching(/^20\d\d-W\d\d$/) } }])
+  })
+
   it('refuses text outside the code and week patterns', async () => {
     const pool = getPool(databaseUrl)
     const laptop = await makeDevice()
@@ -145,6 +170,32 @@ describe('enroll, sync and the DOH view on Postgres', () => {
     expect(result.reports[0]).toMatchObject({ ok: true, status: 'stored' })
     const row = await getPool(databaseUrl).query('SELECT seq, phone_fingerprint FROM reports')
     expect(row.rows).toEqual([{ seq: 1, phone_fingerprint: newPhone.fingerprint }])
+  })
+
+  it('refuses a future week or one more than 8 weeks old, and serves only the vouched phone key', async () => {
+    const [laptop, oldPhone, newPhone] = await Promise.all([makeDevice(), makeDevice(), makeDevice()])
+    await enroll(laptop)
+    const keyOf = (phone: TestDevice) => [{ barangay: 'SID-MAL', publicJwk: phone.publicJwk }]
+    const result = await sync(laptop, {
+      barangayKeys: keyOf(oldPhone),
+      reports: [
+        await qrText(oldPhone, { epiWeek: '2026-W43' }),
+        await qrText(oldPhone, { epiWeek: '2026-W32' }),
+        await qrText(oldPhone, { epiWeek: '2026-W40' }),
+      ],
+    })
+    expect(result.reports.map((item) => (item.ok ? item.status : item.code))).toEqual(['invalid-payload', 'invalid-payload', 'stored'])
+    expect(result.reports[0]).toMatchObject({ message: expect.stringContaining('2026-W33 to 2026-W42') })
+    const stored = await getPool(databaseUrl).query<{ epi_week: string }>('SELECT epi_week FROM reports')
+    expect(stored.rows).toEqual([{ epi_week: '2026-W40' }])
+
+    const view = async () => (await body<ReportsResponse>(await handleReports(reportsRequest('SID', viewCode), realDeps()))).rows
+    expect((await view()).map((row) => row.phoneFingerprint)).toEqual([oldPhone.fingerprint])
+    // A new phone is paired: the old phone's report stays stored but isn't served.
+    await sync(laptop, { barangayKeys: keyOf(newPhone), reports: [] })
+    expect(await view()).toEqual([])
+    await sync(laptop, { barangayKeys: [], reports: [await qrText(newPhone, { epiWeek: '2026-W41' })] })
+    expect((await view()).map((row) => [row.epiWeek, row.phoneFingerprint])).toEqual([['2026-W41', newPhone.fingerprint]])
   })
 
   it('refuses a cross-municipality vouch and report', async () => {

@@ -91,6 +91,9 @@ export function createMemoryStore(): MemoryStore {
       const newest = new Map<string, ReportRecord>()
       for (const report of reports.values()) {
         if (report.municipality !== municipality) continue
+        // Signed by the barangay's currently vouched key only (the SQL joins barangay_keys).
+        const key = keys.get(report.barangay)
+        if (!key || key.municipality !== municipality || key.fingerprint !== report.phoneFingerprint) continue
         const kept = newest.get(report.barangay)
         if (!kept || report.epiWeek > kept.epiWeek) newest.set(report.barangay, report)
       }

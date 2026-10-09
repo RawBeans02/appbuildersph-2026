@@ -144,6 +144,30 @@ describe('sync', () => {
     ])
   })
 
+  it('refuses a future week or one more than 8 weeks old, per item, with a clear message', async () => {
+    // NOW is Saturday 2026-W41 in Manila: W42 (2 days away) and W33 (8 weeks back) are accepted.
+    const result = await sync({
+      barangayKeys: [keyOf('SID-MAL', mal)],
+      reports: [
+        await qrText(mal, { epiWeek: '2026-W43', seq: 7 }),
+        await qrText(mal, { epiWeek: '2099-W01', seq: 8 }),
+        await qrText(mal, { epiWeek: '2026-W32', seq: 1 }),
+        await qrText(mal, { epiWeek: '2026-W42', seq: 3 }),
+        await qrText(mal, { epiWeek: '2026-W33', seq: 2 }),
+      ],
+    })
+    const message =
+      "The report's week is outside the weeks the server accepts (2026-W33 to 2026-W42): a future week, or one more than 8 weeks old. Check the phone's date."
+    expect(result.reports.slice(0, 3)).toEqual([
+      { index: 0, ok: false, code: 'invalid-payload', barangay: 'SID-MAL', message },
+      { index: 1, ok: false, code: 'invalid-payload', barangay: 'SID-MAL', message },
+      { index: 2, ok: false, code: 'invalid-payload', barangay: 'SID-MAL', message },
+    ])
+    expect(result.reports.slice(3).map((item) => item.ok && item.status)).toEqual(['stored', 'stored'])
+    expect([...store.reports.keys()].sort()).toEqual(['SID-MAL|2026-W33', 'SID-MAL|2026-W42'])
+    expect(store.auditLog.at(-1)?.detail).toEqual({ barangayKeys: { stored: 1 }, reports: { 'invalid-payload': 3, stored: 2 } })
+  })
+
   it('writes nothing when the transaction fails', async () => {
     const device = store.devices.get(laptop.fingerprint)!
     const failing = { ...store, audit: async () => Promise.reject(new Error('disk full')) }

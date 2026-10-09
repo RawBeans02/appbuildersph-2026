@@ -48,7 +48,38 @@ describe('reports (DOH view)', () => {
     expect(Object.keys(mali).sort()).toEqual(['barangay', 'counts', 'epiWeek', 'phoneFingerprint', 'receivedAt', 'receivedFrom', 'seq'])
   })
 
+  it("serves only reports signed by the barangay's currently vouched phone key", async () => {
+    const [oldPhone, newPhone] = await Promise.all([makeDevice(), makeDevice()])
+    const keyOf = (phone: TestDevice) => ({ barangay: 'SID-MAL', publicJwk: phone.publicJwk })
+    expect((await handleSync(await syncRequest(laptop, { barangayKeys: [keyOf(oldPhone)], reports: [await qrText(oldPhone, { epiWeek: '2026-W40' })] }, { now: NOW }), deps(store))).status).toBe(200)
+    const before = await body<ReportsResponse>(await handleReports(reportsRequest('SID'), deps(store)))
+    expect(before.rows.map((row) => [row.barangay, row.epiWeek, row.phoneFingerprint])).toEqual([['SID-MAL', '2026-W40', oldPhone.fingerprint]])
+
+    // The barangay pairs a new phone: the old phone's week 40 stays stored but isn't served.
+    const later = new Date(NOW.getTime() + 1000)
+    expect((await handleSync(await syncRequest(laptop, { barangayKeys: [keyOf(newPhone)], reports: [] }, { now: later }), deps(store, {}, later))).status).toBe(200)
+    expect(store.reports.has('SID-MAL|2026-W40')).toBe(true)
+    const between = await body<ReportsResponse>(await handleReports(reportsRequest('SID'), deps(store)))
+    expect(between.rows).toEqual([])
+    expect(between.totals).toBeNull()
+
+    // Once the new phone sends, its report is served.
+    const last = new Date(NOW.getTime() + 2000)
+    await handleSync(await syncRequest(laptop, { barangayKeys: [], reports: [await qrText(newPhone, { epiWeek: '2026-W41' })] }, { now: last }), deps(store, {}, last))
+    const after = await body<ReportsResponse>(await handleReports(reportsRequest('SID'), deps(store)))
+    expect(after.rows.map((row) => [row.epiWeek, row.phoneFingerprint])).toEqual([['2026-W41', newPhone.fingerprint]])
+  })
+
   it('leaves out a stored payload that no longer validates', async () => {
+    // Vouched, so it's the validation that leaves it out.
+    store.keys.set('SID-MAL', {
+      barangay: 'SID-MAL',
+      municipality: 'SID',
+      publicJwk: { kty: 'EC', crv: 'P-256', x: 'x', y: 'y' },
+      fingerprint: '0000-0000-0000-0000',
+      vouchedBy: laptop.fingerprint,
+      updatedAt: NOW,
+    })
     store.reports.set('SID-MAL|2026-W41', {
       barangay: 'SID-MAL',
       epiWeek: '2026-W41',

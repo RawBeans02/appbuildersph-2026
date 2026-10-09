@@ -107,7 +107,9 @@ export interface Store {
   // seq is higher, or when another phone signed it (the barangay's vouched
   // key changed: a new phone starts again from seq 1).
   putReport(report: ReportRecord): Promise<ReportWrite>
-  // The newest week's report for each barangay of the municipality.
+  // The newest week's report for each barangay of the municipality, among
+  // the reports signed by the barangay's currently vouched phone key (a
+  // replaced phone's reports are no longer served).
   latestReports(municipality: string, limit: number): Promise<ReportRecord[]>
 
   audit(entry: AuditEntry): Promise<void>

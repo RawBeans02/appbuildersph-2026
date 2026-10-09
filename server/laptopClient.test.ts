@@ -124,6 +124,21 @@ describe('register and sync against the server handlers', () => {
     expect(syncRows(sent, second.value)[0]).toMatchObject({ key: 'Already on the server', report: 'Week 2026-W41 #3 already on the server' })
   })
 
+  it('says when a report week is in the future (a phone clock ahead)', async () => {
+    const store = await freshStore()
+    await registerLaptop(store, ENROLL_CODE, fetcherFor(server), NOW)
+    const identity = (await store.getIdentity())!
+    const { handoff } = await handoffOf({ barangay: 'SID-MAL', seq: 3, epiWeek: '2026-W45' })
+    const { data, sent } = buildSyncData(handoff)
+    const result = await uploadSync(identity, data, fetcherFor(server), NOW)
+    if (!result.ok) throw new Error('expected the sync to answer')
+    expect(syncRows(sent, result.value)[0]).toMatchObject({
+      report: "Week 2026-W45 #3 not sent: its week is in the future or more than 8 weeks old. Check the phone's date.",
+      tone: 'bad',
+    })
+    expect(server.reports.size).toBe(0)
+  })
+
   it('maps the server answers to problems', async () => {
     const store = await freshStore()
     const identity = await store.ensureIdentity(NOW)

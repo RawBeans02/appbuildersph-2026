@@ -53,6 +53,12 @@ function reportWords(result: ReportResult | undefined, sent: SentReport | undefi
       return `${what} not sent: not signed by the paired phone`
     case 'other-municipality':
       return `${what} not sent: another municipality`
+    // The server says why when the QR itself is fine: its week is in the
+    // future or more than 8 weeks old.
+    case 'invalid-payload':
+      return result.message
+        ? `${what} not sent: its week is in the future or more than 8 weeks old. Check the phone's date.`
+        : `${what} not sent: not a valid barangay QR`
     default:
       return `${what} not sent: not a valid barangay QR`
   }
