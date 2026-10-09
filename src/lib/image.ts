@@ -16,6 +16,7 @@ type Context2DLike = {
   fillStyle: string | CanvasGradient | CanvasPattern
   fillRect(x: number, y: number, w: number, h: number): void
   drawImage(image: ImageBitmap, dx: number, dy: number, dw: number, dh: number): void
+  getImageData?(sx: number, sy: number, sw: number, sh: number): { data: Uint8ClampedArray }
 }
 
 // The parts of a canvas we use. OffscreenCanvas and an HTML canvas both fit; tests pass fakes.
@@ -112,6 +113,31 @@ export async function downscaleImage(
     return { blob, ...size }
   } finally {
     // Frees the decoded pixels now instead of waiting for garbage collection.
+    bitmap.close()
+  }
+}
+
+export type Pixels = FittedSize & { data: Uint8ClampedArray }
+
+// Decodes a photo straight to RGBA pixels, at most maxSide on its long side,
+// for a model that takes raw pixels (OCR). Skips the re-encode that
+// downscaleImage does, so it's faster when no file is needed.
+export async function imageToPixels(
+  source: Blob,
+  options: { maxSide?: number } = {},
+  deps: ImageDeps = {},
+): Promise<Pixels> {
+  const decode = deps.createImageBitmap ?? createImageBitmap
+  const createCanvas = deps.createCanvas ?? createDefaultCanvas
+  const bitmap = await decodeUpright(decode, source)
+  try {
+    const size = fitWithin(bitmap.width, bitmap.height, options.maxSide ?? MAX_IMAGE_SIDE)
+    const ctx = createCanvas(size.width, size.height).getContext('2d')
+    if (!ctx?.getImageData) throw new Error('Could not get a 2d canvas context to read the image')
+    ctx.imageSmoothingQuality = 'high'
+    ctx.drawImage(bitmap, 0, 0, size.width, size.height)
+    return { ...size, data: ctx.getImageData(0, 0, size.width, size.height).data }
+  } finally {
     bitmap.close()
   }
 }

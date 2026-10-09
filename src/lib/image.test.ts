@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { downscaleImage, fitWithin, MAX_IMAGE_SIDE, type CanvasLike } from './image'
+import { downscaleImage, fitWithin, imageToPixels, MAX_IMAGE_SIDE, type CanvasLike } from './image'
 
 const photo = new Blob(['photo bytes'], { type: 'image/jpeg' })
 
@@ -226,5 +226,33 @@ describe('downscaleImage', () => {
     expect(canvas).toMatchObject({ width: 960, height: 1280 })
     expect(toBlob).toHaveBeenCalledOnce()
     expect(result).toMatchObject({ width: 960, height: 1280, scaled: true })
+  })
+})
+
+describe('imageToPixels', () => {
+  it('draws the photo at the fitted size and returns its RGBA pixels', async () => {
+    const bitmap = fakeBitmap(4032, 3024)
+    const ctx = {
+      ...fakeContext(),
+      getImageData: vi.fn((_x: number, _y: number, w: number, h: number) => ({ data: new Uint8ClampedArray(w * h * 4) })),
+    }
+    const canvas = { getContext: () => ctx, convertToBlob: vi.fn() }
+    const createCanvas = vi.fn(() => canvas)
+    const pixels = await imageToPixels(photo, {}, { createImageBitmap: async () => bitmap, createCanvas })
+    expect(createCanvas).toHaveBeenCalledWith(1280, 960)
+    expect(ctx.drawImage).toHaveBeenCalledWith(bitmap, 0, 0, 1280, 960)
+    expect(pixels).toMatchObject({ width: 1280, height: 960, scaled: true })
+    expect(pixels.data).toHaveLength(1280 * 960 * 4)
+    expect(canvas.convertToBlob).not.toHaveBeenCalled()
+    expect(bitmap.close).toHaveBeenCalledOnce()
+  })
+
+  it('rejects, and frees the bitmap, without a readable 2d context', async () => {
+    const bitmap = fakeBitmap(100, 100)
+    const { canvas } = fakeOffscreenCanvas()
+    await expect(
+      imageToPixels(photo, {}, { createImageBitmap: async () => bitmap, createCanvas: () => canvas }),
+    ).rejects.toThrow('read the image')
+    expect(bitmap.close).toHaveBeenCalledOnce()
   })
 })
