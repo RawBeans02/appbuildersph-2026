@@ -1,10 +1,10 @@
-import { authenticate, checkViewCode, enroll, verifySigned } from './auth.js'
+import { authenticate, enroll, verifySigned, viewCodeMatches } from './auth.js'
 import { openStore } from './db.js'
 import { readEnv, type ServerEnv } from './env.js'
 import { checkDeclaredLength, clientIp, fail, HttpError, json, parseJson, readBody } from './http.js'
 import { approveAlert, draftAlerts, listAlerts, readInbox, rejectAlert, type AiDeps } from './luna/alerts.js'
 import { SIGNATURE_HEADER, VIEW_CODE_HEADER, type HealthResponse, type InboxResponse } from './protocol.js'
-import { enforceRateLimit, type Route } from './rateLimit.js'
+import { countWrongViewCode, enforceRateLimit, refuseViewCodeGuessing, type Route } from './rateLimit.js'
 import { readReports } from './reports.js'
 import type { Store } from './store.js'
 import { syncReports } from './sync.js'
@@ -76,6 +76,18 @@ export async function handleSync(request: Request, deps: Deps): Promise<Response
   })
 }
 
+// The DOH view code from its header. An address that sent 10 wrong codes in
+// 10 minutes gets 429 until the window ends, whatever it sends; each wrong code
+// is counted and logged (the route and the window's count, never the value).
+async function requireViewCode(store: Store, request: Request, viewCode: string, secret: string, now: Date, route: Route): Promise<void> {
+  const ip = clientIp(request)
+  await refuseViewCodeGuessing(store, ip, secret, now)
+  if (viewCodeMatches(request.headers.get(VIEW_CODE_HEADER), viewCode)) return
+  const wrongInWindow = await countWrongViewCode(store, ip, secret, now)
+  await store.audit({ at: now, actor: 'doh-view', action: 'view-code-refused', detail: { route, wrongInWindow } })
+  throw new HttpError('wrong-code', 'That view code is not right.')
+}
+
 // GET /api/reports?municipality=SID with the view code header.
 export async function handleReports(request: Request, deps: Deps): Promise<Response> {
   const { databaseUrl, viewCode } = deps.env
@@ -84,7 +96,7 @@ export async function handleReports(request: Request, deps: Deps): Promise<Respo
     const store = await deps.openStore(databaseUrl)
     const now = deps.now()
     await enforceRateLimit(store, 'reports', clientIp(request), databaseUrl, now)
-    checkViewCode(request.headers.get(VIEW_CODE_HEADER), viewCode)
+    await requireViewCode(store, request, viewCode, databaseUrl, now, 'reports')
     const municipality = municipalityOf(new URL(request.url).searchParams.get('municipality'), 'The municipality parameter')
     const result = await readReports(store, municipality)
     await store.audit({ at: now, actor: 'doh-view', action: 'view-reports', detail: { municipality, rows: result.rows.length } })
@@ -135,8 +147,8 @@ export async function handleHealth(_request: Request, deps: Deps): Promise<Respo
 
 // --- Phase 2 alerts (server/luna/) -------------------------------------------
 
-// A DOH view route: the database and the view code are set, the rate limit
-// allows it, and the view code matches.
+// A DOH view route: the database and the view code are set, the rate limits
+// allow it, and the view code matches.
 function viewRoute(
   request: Request,
   deps: Deps,
@@ -150,7 +162,7 @@ function viewRoute(
     const store = await deps.openStore(databaseUrl)
     const now = deps.now()
     await enforceRateLimit(store, route, clientIp(request), databaseUrl, now)
-    checkViewCode(request.headers.get(VIEW_CODE_HEADER), viewCode)
+    await requireViewCode(store, request, viewCode, databaseUrl, now, route)
     return work(store, now)
   })
 }

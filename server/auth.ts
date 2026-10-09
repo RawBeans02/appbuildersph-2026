@@ -92,7 +92,6 @@ export async function authenticate(
   return { device: key, envelope }
 }
 
-// The DOH view's code, from its header.
-export function checkViewCode(given: string | null, viewCode: string): void {
-  if (given === null || !sameSecret(given, viewCode)) throw new HttpError('wrong-code', 'That view code is not right.')
-}
+// The DOH view's code, from its header (handlers.ts limits and logs the
+// wrong ones per address).
+export const viewCodeMatches = (given: string | null, viewCode: string): boolean => given !== null && sameSecret(given, viewCode)

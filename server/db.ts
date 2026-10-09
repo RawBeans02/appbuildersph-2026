@@ -314,6 +314,11 @@ export function createPgStore(db: pg.Pool | pg.PoolClient, inTransaction = false
       return result.rows[0].count
     },
 
+    async rateLimitCount(key, windowStart) {
+      const result = await db.query<{ count: number }>('SELECT count FROM rate_limits WHERE key = $1 AND window_start = $2', [key, windowStart])
+      return result.rows[0]?.count ?? 0
+    },
+
     async claimNonce(nonce, now, purgeBefore) {
       const result = await db.query(
         `WITH purge AS (DELETE FROM nonces WHERE seen_at < $3)

@@ -47,6 +47,10 @@ export function createMemoryStore(): MemoryStore {
       return count
     },
 
+    async rateLimitCount(key, windowStart) {
+      return rateLimits.get(`${key}@${windowStart.getTime()}`) ?? 0
+    },
+
     async claimNonce(nonce, now, purgeBefore) {
       for (const [id, seenAt] of [...nonces]) if (seenAt < purgeBefore) nonces.delete(id)
       if (nonces.has(nonce)) return false

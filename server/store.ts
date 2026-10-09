@@ -95,6 +95,8 @@ export interface Store {
   // Adds one hit to `key`'s window starting at `windowStart` and returns the
   // window's count. Drops windows that started before `purgeBefore`.
   hitRateLimit(key: string, windowStart: Date, purgeBefore: Date): Promise<number>
+  // The window's count for `key` so far, without adding a hit.
+  rateLimitCount(key: string, windowStart: Date): Promise<number>
   // True the first time `nonce` is seen; false for a replay. Forgets nonces
   // seen before `purgeBefore`.
   claimNonce(nonce: string, now: Date, purgeBefore: Date): Promise<boolean>

@@ -237,6 +237,25 @@ describe('enroll, sync and the DOH view on Postgres', () => {
     expect(stored.rows.every((row) => /^enroll:[0-9a-f]{32}$/.test(row.key))).toBe(true)
   })
 
+  it('limits wrong view codes per address in the shared table, and logs each without the value', async () => {
+    const statuses: number[] = []
+    for (let i = 0; i < LIMITS['view-code-wrong'].max; i++) {
+      statuses.push((await handleReports(reportsRequest('SID', `wrong-view-code-${i}`), realDeps())).status)
+    }
+    expect(statuses).toEqual(Array(LIMITS['view-code-wrong'].max).fill(403))
+    // The right code waits for the window too.
+    const blocked = await handleReports(reportsRequest('SID', viewCode), realDeps())
+    expect(blocked.status).toBe(429)
+    expect(Number(blocked.headers.get('retry-after'))).toBeGreaterThan(0)
+    const audit = await getPool(databaseUrl).query<{ actor: string; detail: Record<string, unknown> }>(
+      `SELECT actor, detail FROM audit_log WHERE action = 'view-code-refused' ORDER BY id`,
+    )
+    expect(audit.rows.map((row) => row.detail)).toEqual(Array.from({ length: 10 }, (_, i) => ({ route: 'reports', wrongInWindow: i + 1 })))
+    expect(JSON.stringify(audit.rows)).not.toContain('wrong-view-code')
+    const later = new Date(clock + LIMITS['view-code-wrong'].windowMs)
+    expect((await handleReports(reportsRequest('SID', viewCode), realDeps(later))).status).toBe(200)
+  })
+
   it('rolls back everything a failed sync wrote', async () => {
     const [laptop, phone] = await Promise.all([makeDevice(), makeDevice()])
     await enroll(laptop)
