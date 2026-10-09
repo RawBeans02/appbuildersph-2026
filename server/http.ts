@@ -24,26 +24,32 @@ const STATUS: Record<ErrorCode, number> = {
   'bad-signature': 401,
   replayed: 409,
   'wrong-code': 403,
+  'not-found': 404,
+  'already-decided': 409,
+  'check-failed': 422,
   'server-error': 500,
 }
 
 // The error's message is fixed text: it never echoes the request.
-export function fail(error: ErrorCode, message: string, headers: Record<string, string> = {}): Response {
-  const body: ErrorResponse = { ok: false, error, message }
+export function fail(error: ErrorCode, message: string, headers: Record<string, string> = {}, reasons?: string[]): Response {
+  const body: ErrorResponse = reasons ? { ok: false, error, message, reasons } : { ok: false, error, message }
   return json(STATUS[error], body, headers)
 }
 
 export class HttpError extends Error {
   readonly code: ErrorCode
   readonly headers: Record<string, string>
-  constructor(code: ErrorCode, message: string, headers: Record<string, string> = {}) {
+  // The check's reasons, for check-failed: fixed sentences about the wording.
+  readonly reasons: string[] | undefined
+  constructor(code: ErrorCode, message: string, headers: Record<string, string> = {}, reasons?: string[]) {
     super(message)
     this.name = 'HttpError'
     this.code = code
     this.headers = headers
+    this.reasons = reasons
   }
   toResponse(): Response {
-    return fail(this.code, this.message, this.headers)
+    return fail(this.code, this.message, this.headers, this.reasons)
   }
 }
 

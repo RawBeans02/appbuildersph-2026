@@ -56,27 +56,40 @@ export async function enroll(
 
 export type Authenticated = { device: DeviceRecord; envelope: SignedEnvelope<unknown> }
 
-// Checks a signed request from an enrolled laptop: the envelope's shape, its
-// time, the device, the signature over the exact bytes, then the nonce (only
-// a correctly signed request can use one up).
+// Checks a signed request: the envelope's shape, its time, the key its
+// fingerprint resolves to, the signature over the exact bytes, then the nonce
+// (only a correctly signed request can use one up). The same rules for an
+// enrolled laptop and for a phone key a laptop vouched for.
+export async function verifySigned<K extends { publicJwk: JsonWebKey }>(
+  store: Store,
+  bytes: Uint8Array<ArrayBuffer>,
+  signatureHeader: string | null,
+  now: Date,
+  resolve: (fingerprint: string) => Promise<K | null>,
+): Promise<{ key: K; envelope: SignedEnvelope<unknown> }> {
+  const envelope = validateEnvelope(parseJson(bytes))
+  if (Math.abs(now.getTime() - envelope.ts) > MAX_CLOCK_SKEW_MS) {
+    throw new HttpError('stale-request', "The request's time is more than 5 minutes from the server's. Check this device's clock.")
+  }
+  const key = await resolve(envelope.fingerprint)
+  if (!key) throw new HttpError('unknown-device', 'This device is not registered or paired on the server.')
+  if (!(await verifySignature(key.publicJwk, bytes, signatureHeader))) {
+    throw new HttpError('bad-signature', "The signature doesn't match this device's registered key.")
+  }
+  const fresh = await store.claimNonce(`${envelope.fingerprint}:${envelope.nonce}`, now, new Date(now.getTime() - NONCE_TTL_MS))
+  if (!fresh) throw new HttpError('replayed', 'This request was already received.')
+  return { key, envelope }
+}
+
+// A signed request from an enrolled municipal laptop.
 export async function authenticate(
   store: Store,
   bytes: Uint8Array<ArrayBuffer>,
   signatureHeader: string | null,
   now: Date,
 ): Promise<Authenticated> {
-  const envelope = validateEnvelope(parseJson(bytes))
-  if (Math.abs(now.getTime() - envelope.ts) > MAX_CLOCK_SKEW_MS) {
-    throw new HttpError('stale-request', "The request's time is more than 5 minutes from the server's. Check this laptop's clock.")
-  }
-  const device = await store.getDevice(envelope.fingerprint)
-  if (!device) throw new HttpError('unknown-device', 'This laptop is not registered. Register it with the enroll code.')
-  if (!(await verifySignature(device.publicJwk, bytes, signatureHeader))) {
-    throw new HttpError('bad-signature', "The signature doesn't match this laptop's registered key.")
-  }
-  const fresh = await store.claimNonce(`${device.fingerprint}:${envelope.nonce}`, now, new Date(now.getTime() - NONCE_TTL_MS))
-  if (!fresh) throw new HttpError('replayed', 'This request was already received.')
-  return { device, envelope }
+  const { key, envelope } = await verifySigned(store, bytes, signatureHeader, now, (fingerprint) => store.getDevice(fingerprint))
+  return { device: key, envelope }
 }
 
 // The DOH view's code, from its header.

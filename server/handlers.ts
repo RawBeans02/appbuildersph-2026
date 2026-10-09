@@ -1,5 +1,6 @@
 import { authenticate, checkViewCode, enroll } from './auth.js'
 import { openStore } from './db.js'
+import type { AiDeps } from './luna/alerts.js'
 import { readEnv, type ServerEnv } from './env.js'
 import { checkDeclaredLength, clientIp, fail, HttpError, json, readBody } from './http.js'
 import { SIGNATURE_HEADER, VIEW_CODE_HEADER, type HealthResponse } from './protocol.js'
@@ -17,6 +18,8 @@ export type Deps = {
   env: ServerEnv
   openStore: (databaseUrl: string) => Promise<Store>
   now: () => Date
+  // How the alerts call OpenAI: the real fetch, or a test's stand-in.
+  ai?: AiDeps
 }
 
 export function defaultDeps(): Deps {

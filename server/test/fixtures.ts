@@ -37,11 +37,22 @@ export async function qrText(
   return encodeQr(createPayload({ municipality, barangay, epiWeek, seq, counts }), phone.privateKey)
 }
 
-export function deps(store: Store, overrides: Partial<Deps['env']> = {}, now: Date = NOW): Deps {
+export function deps(store: Store, overrides: Partial<Deps['env']> = {}, now: Date = NOW, ai: Deps['ai'] = undefined): Deps {
   return {
-    env: { databaseUrl: TEST_DATABASE_URL, enrollCode: ENROLL_CODE, viewCode: VIEW_CODE, ...overrides },
+    env: {
+      databaseUrl: TEST_DATABASE_URL,
+      enrollCode: ENROLL_CODE,
+      viewCode: VIEW_CODE,
+      // The AI is off unless a test turns it on, always with a mocked fetch.
+      openaiApiKey: null,
+      openaiModel: 'gpt-6-luna',
+      lunaEnabled: false,
+      lunaDailyLimit: 0,
+      ...overrides,
+    },
     openStore: async () => store,
     now: () => now,
+    ...(ai ? { ai } : {}),
   }
 }
 

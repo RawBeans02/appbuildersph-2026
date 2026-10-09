@@ -1,4 +1,4 @@
-import type { AuditEntry, BarangayKeyRecord, DeviceRecord, ReportRecord, Store } from '../store.js'
+import type { AlertRecord, AuditEntry, BarangayKeyRecord, DeviceRecord, ReportRecord, Store } from '../store.js'
 
 // An in-memory Store for unit tests: the same rules as the SQL in db.ts
 // (which the Postgres tests in server/integration/ check for real).
@@ -10,6 +10,8 @@ export type MemoryStore = Store & {
   nonces: Map<string, Date>
   rateLimits: Map<string, number>
   auditLog: AuditEntry[]
+  alerts: Map<string, AlertRecord>
+  lunaUsage: Map<string, number>
 }
 
 export function createMemoryStore(): MemoryStore {
@@ -19,6 +21,11 @@ export function createMemoryStore(): MemoryStore {
   const nonces = new Map<string, Date>()
   const rateLimits = new Map<string, number>()
   const auditLog: AuditEntry[] = []
+  const alerts = new Map<string, AlertRecord>()
+  const lunaUsage = new Map<string, number>()
+  let nextAlertId = 1
+  const newestFirst = (a: AlertRecord, b: AlertRecord) =>
+    b.createdAt.getTime() - a.createdAt.getTime() || Number(b.id) - Number(a.id)
 
   const store: MemoryStore = {
     devices,
@@ -27,6 +34,8 @@ export function createMemoryStore(): MemoryStore {
     nonces,
     rateLimits,
     auditLog,
+    alerts,
+    lunaUsage,
 
     async hitRateLimit(key, windowStart, purgeBefore) {
       for (const id of [...rateLimits.keys()]) {
@@ -90,6 +99,87 @@ export function createMemoryStore(): MemoryStore {
 
     async audit(entry) {
       auditLog.push(structuredClone(entry))
+    },
+
+    async auditTrail(municipality, actions, limit) {
+      return auditLog
+        .filter((entry) => actions.includes(entry.action) && entry.detail.municipality === municipality)
+        .reverse()
+        .slice(0, limit)
+    },
+
+    async takeLunaCall(day, limit) {
+      const calls = lunaUsage.get(day) ?? 0
+      if (limit < 1 || calls >= limit) return false
+      lunaUsage.set(day, calls + 1)
+      return true
+    },
+
+    async lunaCalls(day) {
+      return lunaUsage.get(day) ?? 0
+    },
+
+    async insertAlerts(rows) {
+      return rows.map((row) => {
+        const record: AlertRecord = {
+          ...structuredClone(row),
+          id: String(nextAlertId++),
+          status: 'draft',
+          approvedByRole: null,
+          approvedAt: null,
+          decidedByRole: null,
+          decidedAt: null,
+        }
+        alerts.set(record.id, record)
+        return structuredClone(record)
+      })
+    },
+
+    async getAlert(id) {
+      const alert = alerts.get(id)
+      return alert ? structuredClone(alert) : null
+    },
+
+    async decideAlert(id, decision) {
+      const alert = alerts.get(id)
+      if (!alert || alert.status !== 'draft') return null
+      const approved = decision.status === 'approved'
+      const updated: AlertRecord = {
+        ...alert,
+        status: decision.status,
+        text: decision.text,
+        decidedByRole: decision.role,
+        decidedAt: decision.at,
+        approvedByRole: approved ? decision.role : null,
+        approvedAt: approved ? decision.at : null,
+      }
+      alerts.set(id, updated)
+      return structuredClone(updated)
+    },
+
+    async listAlerts(municipality, statuses, limit) {
+      return [...alerts.values()]
+        .filter((alert) => alert.municipality === municipality && statuses.includes(alert.status))
+        .sort(newestFirst)
+        .slice(0, limit)
+        .map((alert) => structuredClone(alert))
+    },
+
+    async approvedAlerts(municipality, barangays, limit) {
+      return [...alerts.values()]
+        .filter(
+          (alert) =>
+            alert.municipality === municipality &&
+            alert.status === 'approved' &&
+            (barangays === null || alert.audience.some((code) => barangays.includes(code))),
+        )
+        .sort((a, b) => (b.approvedAt?.getTime() ?? 0) - (a.approvedAt?.getTime() ?? 0) || Number(b.id) - Number(a.id))
+        .slice(0, limit)
+        .map((alert) => structuredClone(alert))
+    },
+
+    async phoneKeys(fingerprint) {
+      return [...keys.values()].filter((key) => key.fingerprint === fingerprint).sort((a, b) => (a.barangay < b.barangay ? -1 : 1))
     },
 
     // All or nothing, like the SQL transaction: on a throw, every map goes

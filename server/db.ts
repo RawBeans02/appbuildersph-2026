@@ -1,6 +1,6 @@
 import pg from 'pg'
 import type { PublicJwk } from '../src/qr/index.js'
-import type { AuditEntry, BarangayKeyRecord, ReportRecord, ReportWrite, Store } from './store.js'
+import type { AlertRecord, AuditEntry, BarangayKeyRecord, ReportRecord, ReportWrite, Store } from './store.js'
 
 // Postgres (Neon through Vercel in production, a postgres:16 container in CI)
 // through node-postgres. One small pool per function instance; the schema is
@@ -81,6 +81,23 @@ export const SCHEMA: readonly string[] = [
     approved_at timestamptz
   )`,
   `CREATE INDEX IF NOT EXISTS alerts_municipality_status ON alerts (municipality, status)`,
+  // P2-C: what an alert is about, where its wording came from, who decided.
+  `ALTER TABLE alerts ADD COLUMN IF NOT EXISTS kind text NOT NULL DEFAULT 'watch'
+    CHECK (kind IN ('doctor-team', 'move-stock', 'watch'))`,
+  `ALTER TABLE alerts ADD COLUMN IF NOT EXISTS audience text[] NOT NULL DEFAULT '{}'`,
+  `ALTER TABLE alerts ADD COLUMN IF NOT EXISTS source text NOT NULL DEFAULT 'template' CHECK (source IN ('luna', 'template'))`,
+  `ALTER TABLE alerts ADD COLUMN IF NOT EXISTS template_text text NOT NULL DEFAULT ''`,
+  `ALTER TABLE alerts ADD COLUMN IF NOT EXISTS check_reasons jsonb NOT NULL DEFAULT '[]'::jsonb`,
+  `ALTER TABLE alerts ADD COLUMN IF NOT EXISTS ai_note text`,
+  `ALTER TABLE alerts ADD COLUMN IF NOT EXISTS batch text`,
+  `ALTER TABLE alerts ADD COLUMN IF NOT EXISTS decided_by_role text`,
+  `ALTER TABLE alerts ADD COLUMN IF NOT EXISTS decided_at timestamptz`,
+  // GPT-6 Luna calls per day, for LUNA_DAILY_LIMIT.
+  `CREATE TABLE IF NOT EXISTS luna_usage (
+    day date PRIMARY KEY,
+    calls integer NOT NULL CHECK (calls >= 0)
+  )`,
+  `CREATE INDEX IF NOT EXISTS barangay_keys_fingerprint ON barangay_keys (fingerprint)`,
 ]
 
 // Any fixed number: concurrent cold starts take this transaction lock, so two
@@ -177,6 +194,55 @@ type ReportRow = {
   received_from: string
   received_at: Date
 }
+
+type AlertRow = {
+  id: string
+  municipality: string
+  barangay: string
+  audience: string[]
+  epi_week: string
+  kind: AlertRecord['kind']
+  text: string
+  template_text: string
+  facts: unknown
+  source: AlertRecord['source']
+  check_reasons: string[]
+  ai_note: string | null
+  drafted_by: string
+  batch: string
+  created_at: Date
+  status: AlertRecord['status']
+  approved_by_role: string | null
+  approved_at: Date | null
+  decided_by_role: string | null
+  decided_at: Date | null
+}
+
+const ALERT_COLUMNS = `id, municipality, barangay, audience, epi_week, kind, text, template_text, facts, source,
+  check_reasons, ai_note, drafted_by, batch, created_at, status, approved_by_role, approved_at, decided_by_role, decided_at`
+
+const alertRecord = (row: AlertRow): AlertRecord => ({
+  id: String(row.id),
+  municipality: row.municipality,
+  barangay: row.barangay,
+  audience: row.audience,
+  epiWeek: row.epi_week,
+  kind: row.kind,
+  text: row.text,
+  templateText: row.template_text,
+  facts: row.facts,
+  source: row.source,
+  checkReasons: row.check_reasons,
+  aiNote: row.ai_note,
+  draftedBy: row.drafted_by,
+  batch: row.batch,
+  createdAt: row.created_at,
+  status: row.status,
+  approvedByRole: row.approved_by_role,
+  approvedAt: row.approved_at,
+  decidedByRole: row.decided_by_role,
+  decidedAt: row.decided_at,
+})
 
 const keyRecord = (row: KeyRow): BarangayKeyRecord => ({
   barangay: row.barangay,
@@ -314,6 +380,107 @@ export function createPgStore(db: pg.Pool | pg.PoolClient, inTransaction = false
         entry.action,
         JSON.stringify(entry.detail),
       ])
+    },
+
+    async auditTrail(municipality, actions, limit) {
+      const result = await db.query<{ at: Date; actor: string; action: string; detail: Record<string, unknown> }>(
+        `SELECT at, actor, action, detail FROM audit_log
+         WHERE action = ANY($2::text[]) AND detail->>'municipality' = $1
+         ORDER BY at DESC, id DESC LIMIT $3`,
+        [municipality, actions, limit],
+      )
+      return result.rows
+    },
+
+    async takeLunaCall(day, limit) {
+      if (limit < 1) return false
+      const result = await db.query(
+        `INSERT INTO luna_usage (day, calls) VALUES ($1, 1)
+         ON CONFLICT (day) DO UPDATE SET calls = luna_usage.calls + 1 WHERE luna_usage.calls < $2
+         RETURNING calls`,
+        [day, limit],
+      )
+      return result.rowCount === 1
+    },
+
+    async lunaCalls(day) {
+      const result = await db.query<{ calls: number }>('SELECT calls FROM luna_usage WHERE day = $1', [day])
+      return result.rows[0]?.calls ?? 0
+    },
+
+    async insertAlerts(alerts) {
+      const records: AlertRecord[] = []
+      for (const alert of alerts) {
+        const result = await db.query<AlertRow>(
+          `INSERT INTO alerts (municipality, barangay, audience, epi_week, kind, text, template_text, facts, source,
+             check_reasons, ai_note, drafted_by, batch, created_at, status)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, 'draft')
+           RETURNING ${ALERT_COLUMNS}`,
+          [
+            alert.municipality,
+            alert.barangay,
+            alert.audience,
+            alert.epiWeek,
+            alert.kind,
+            alert.text,
+            alert.templateText,
+            JSON.stringify(alert.facts),
+            alert.source,
+            JSON.stringify(alert.checkReasons),
+            alert.aiNote,
+            alert.draftedBy,
+            alert.batch,
+            alert.createdAt,
+          ],
+        )
+        records.push(alertRecord(result.rows[0]))
+      }
+      return records
+    },
+
+    async getAlert(id) {
+      const result = await db.query<AlertRow>(`SELECT ${ALERT_COLUMNS} FROM alerts WHERE id = $1`, [id])
+      return result.rows[0] ? alertRecord(result.rows[0]) : null
+    },
+
+    async decideAlert(id, decision) {
+      const approved = decision.status === 'approved'
+      const result = await db.query<AlertRow>(
+        `UPDATE alerts SET status = $2, text = $3, decided_by_role = $4, decided_at = $5,
+           approved_by_role = $6, approved_at = $7
+         WHERE id = $1 AND status = 'draft'
+         RETURNING ${ALERT_COLUMNS}`,
+        [id, decision.status, decision.text, decision.role, decision.at, approved ? decision.role : null, approved ? decision.at : null],
+      )
+      return result.rows[0] ? alertRecord(result.rows[0]) : null
+    },
+
+    async listAlerts(municipality, statuses, limit) {
+      const result = await db.query<AlertRow>(
+        `SELECT ${ALERT_COLUMNS} FROM alerts WHERE municipality = $1 AND status = ANY($2::text[])
+         ORDER BY created_at DESC, id DESC LIMIT $3`,
+        [municipality, statuses, limit],
+      )
+      return result.rows.map(alertRecord)
+    },
+
+    async approvedAlerts(municipality, barangays, limit) {
+      const result = await db.query<AlertRow>(
+        `SELECT ${ALERT_COLUMNS} FROM alerts
+         WHERE municipality = $1 AND status = 'approved' AND ($2::text[] IS NULL OR audience && $2::text[])
+         ORDER BY approved_at DESC, id DESC LIMIT $3`,
+        [municipality, barangays, limit],
+      )
+      return result.rows.map(alertRecord)
+    },
+
+    async phoneKeys(fingerprint) {
+      const result = await db.query<KeyRow>(
+        `SELECT barangay, municipality, public_jwk, fingerprint, vouched_by, updated_at
+         FROM barangay_keys WHERE fingerprint = $1 ORDER BY barangay LIMIT 10`,
+        [fingerprint],
+      )
+      return result.rows.map(keyRecord)
     },
 
     async transaction(work) {
