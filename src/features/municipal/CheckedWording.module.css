@@ -12,7 +12,7 @@
 .box {
   position: relative;
   flex: 1;
-  min-height: 260px;
+  min-height: 180px;
   border-radius: var(--r-md);
   background: var(--surface);
 }
