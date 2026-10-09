@@ -35,6 +35,7 @@ export const SYSTEM_PROMPT = [
   '- Add no dose, medicine amount per person, schedule, diagnosis or prescription.',
   '- Add no action, recommendation or advice that is not in TEMPLATE. A stock move keeps its from, to and amount in one sentence.',
   '- Keep "<5" as written: it means 1 to 4 people.',
+  '- Plain characters only: straight quotes and apostrophes, hyphens, no emoji; keep "×" and "–" where TEMPLATE has them. No link, web or e-mail address.',
   'Reply with the alert text only.',
 ].join('\n')
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { scenarioPayloads } from '../test/lunaScenario.js'
-import { checkAlertText } from './check.js'
+import { checkAlertText, LINK_REASON } from './check.js'
 import { alertCandidates, MAX_ALERTS, type AlertCandidate } from './facts.js'
 
 const candidates = alertCandidates(scenarioPayloads())
@@ -97,7 +97,7 @@ describe('the wording check (the laptop panel’s positional check)', () => {
 
   it('rejects a link and an overlong text', () => {
     const team = byKind('doctor-team')
-    expect(rejects(`${team.templateText} See https://example.com`, team)).toEqual(['The wording adds a link.'])
+    expect(rejects(`${team.templateText} See https://example.com`, team)).toEqual([LINK_REASON])
     expect(rejects(team.templateText.repeat(5), team).join(' ')).toMatch(/longer than/)
   })
 })

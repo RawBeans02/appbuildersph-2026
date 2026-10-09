@@ -75,6 +75,27 @@ describe('drafting alerts', () => {
     })
   })
 
+  it("keeps the template when GPT-6 Luna's reply has characters outside the alphabet or a link", async () => {
+    const luna = model((template) =>
+      template.includes('Riverside-D')
+        ? `${template} Text ０９１７ for help.`
+        : template.includes('Bagong Silang-D')
+          ? `${template} More at sid-health.ph`
+          : template.replace('Maligaya-D', 'Mali\u200Bgaya-D'),
+    )
+    const result = await draftAlerts(store, ENV, 'SID', NOW, { fetch: luna.fetcher })
+    expect(luna.requests).toHaveLength(4)
+    for (const alert of result.alerts) {
+      expect(alert).toMatchObject({ source: 'template', aiNote: 'check-failed', text: alert.templateText })
+    }
+    expect(result.alerts.map((alert) => alert.checkReasons.join(' '))).toEqual([
+      expect.stringContaining('U+200B'),
+      expect.stringContaining('a link'),
+      expect.stringContaining('U+200B'),
+      expect.stringContaining('U+FF10'),
+    ])
+  })
+
   it('kill switch: with LUNA_ENABLED off, templates only and no call', async () => {
     const luna = model((template) => template)
     const result = await draftAlerts(store, { ...ENV, lunaEnabled: false }, 'SID', NOW, { fetch: luna.fetcher })
@@ -145,6 +166,18 @@ describe('deciding', () => {
     const { alert } = await approveAlert(store, { id: move.id, municipality: 'SID', role: 'Regional officer', text: edited }, NOW)
     expect(alert.text).toBe(edited)
     expect(store.auditLog.at(-1)?.detail).toMatchObject({ edited: true })
+  })
+
+  it('refuses an edited wording with look-alike digits or an e-mail address', async () => {
+    const [team, move] = await drafts()
+    for (const [alert, text] of [
+      [move, move.text.replace('up to 30', 'up to ３０')],
+      [team, `${team.text} Questions: mho@sid-health.ph`],
+    ] as const) {
+      const refused = await approveAlert(store, { id: alert.id, municipality: 'SID', role: 'Regional officer', text }, NOW).catch((e: unknown) => e)
+      expect((refused as HttpError).code).toBe('check-failed')
+      expect(store.alerts.get(alert.id)?.status).toBe('draft')
+    }
   })
 
   it('rejects, logs it, and refuses an alert of another municipality', async () => {
