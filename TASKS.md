@@ -118,6 +118,9 @@ Until `design/` lands, build the logic plus plain, unstyled screens and write `N
   - Done (dd02256 children + 2e8832f PlanPage passes the box): ASK from B5-UI (19a/19d layout): the panel's card and the officer's wording box (`CheckedWording`, in PlanPage) are two blocks now, the card then the box under it. In 19a and 19d the box is inside the card. Could the panel take `children` and render them where the box goes (done, off and idle states)? PlanPage would pass `<CheckedWording … />`. With the box in the card, the done state could call `onUse(text)` as soon as its check passes, instead of "Use this wording" (19a has no Use button).
   - First real run (with the owner, after messaging Account Admin): Chrome on the laptop, online, open the plan, "Draft the wording with AI", record the MB the panel shows when the download ends into the README Models table (now _TBD_), the draft time, and whether the check accepted it. Then airplane mode, reload, draft again: it must work from the cache. NEEDS DESIGN: the AI panel on screen 19.
 - [ ] todo · B7 `docs/ARCHITECTURE.md` + the README sections as features land · [lead]
+- [x] done · R1 Signed offline return QR (laptop approval → barangay phone): `AGPR1` packet signed with the laptop's key, phone verifies, compares the municipal fingerprint on first trust, previews and saves; `/municipal/return` (from Plan and the Approval log) and `/receive` (from Home and Send). Also: export counts past 1,000 records, AI wording cancel/stall fixes, Windows test portability, new demo story (Maligaya-D, the live phone, is the doctor-team priority and gets the Riverside-D move) · [human:Gabriel] (Syd7, with OpenAI Codex, disclosed in the README) · owns: `src/features/return/`, `src/qr/return.ts` · PR #7, 294aa38, merged by the Lead in 57cd84a with the owner's approval (Fri ~11:20 PM)
+  - NEEDS DESIGN: the Receive (`/receive`) and Return QR (`/municipal/return`) screens and the Home instructions card were built from a written spec (`design/Offline Return QR.md`), not Claude Design. The Lead adds them to design pass 2.
+  - Phone acceptance (physical camera both ways, offline reload) is in `docs/FINAL-VALIDATION.md`; still to run on the live URL.
 
 **Decision points:** ~4:30 PM design pass 1 lands → UI phase · **7:00 PM** S1 Hinga kill call (fallback: a tap-to-select chest region; then a guided tap counter) and AMD (dropped unless a Ryzen AI laptop is confirmed) · **12:00 AM** scope check · **4:00 AM** feature freeze.
 
@@ -210,6 +213,7 @@ Never on the offline demo path: the core works with no network, the offline e2e 
 ## Scope (locked by the owner, Fri ~3:45 PM)
 1. **The core offline flow:** Hinga → flood-exposure watch → medicine OCR → de-identified QR → municipal plan (rules + optional local LLM).
 2. **Phase 2, only if 1 is solid at the 12:00 AM scope check:** a cloud "operations manager" assistant (OpenAI GPT-6 Luna, server-side) that drafts alerts from the de-identified aggregate counts after sync; the MHO approves every alert. The key stays in Vercel env vars (added by the owner) with rate limits and a spend cap; disclosed under "What requires internet". Never part of the offline demo path.
+   - Added by the owner, Fri ~11:20 PM: the signed offline return QR (R1, PR #7), part of the offline flow, no cloud needed.
 3. **Parking lot (don't build unless everything else is done and polished):** a consultation explainer (Whisper), offline first-aid cards ("Unang Lunas"), an emergency mode.
 
 ## Ideas (not now — only after the wow flow is done)
