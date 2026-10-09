@@ -116,7 +116,21 @@ export type RefusalIcon = 'crying' | 'motion' | 'chest' | 'disagree' | 'paused'
 
 // 5a–5d. 'no-rhythm' (no clear breathing rhythm) gets 5c's advice: better
 // light and the whole chest in view. A cancelled count is not a refusal.
-export function refusalText(refusal: Exclude<CountRefusal, 'interrupted'>): { title: string; body: string; icon: RefusalIcon } {
+// `again`: the second refusal in a row (5e), when the sheet also offers the
+// hand count.
+export function refusalText(
+  refusal: Exclude<CountRefusal, 'interrupted'>,
+  again = false,
+): { title: string; body: string; icon: RefusalIcon } {
+  // 5e. The canvas words the motion case; NEEDS DESIGN: the second-time
+  // words for the other reasons, which keep their first-time text for now.
+  if (again && refusal === 'motion') {
+    return {
+      icon: 'motion',
+      title: 'Still too much movement',
+      body: 'Rest the phone on something steady and try once more, or count by hand. The app keeps the time and applies the cut-off.',
+    }
+  }
   switch (refusal) {
     case 'crying':
       return {

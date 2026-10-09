@@ -202,7 +202,8 @@ function RefusalSheet(props: {
   onRetry(): void
   onHandCount: (() => void) | null
 }) {
-  const text = refusalText(props.refusal)
+  // 5e: the second refusal in a row also offers the hand count.
+  const text = refusalText(props.refusal, props.onHandCount !== null)
   return (
     <BottomSheet
       open

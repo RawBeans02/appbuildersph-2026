@@ -81,4 +81,13 @@ describe('Hinga copy (design/COPY.md)', () => {
     expect(refusalText('no-rhythm').title).toBe("Can't see the chest clearly")
     expect(refusalText('disagree').title).toBe("Readings didn't agree")
   })
+
+  it('words the second refusal in a row (5e)', () => {
+    expect(refusalText('motion', true)).toEqual({
+      icon: 'motion',
+      title: 'Still too much movement',
+      body: 'Rest the phone on something steady and try once more, or count by hand. The app keeps the time and applies the cut-off.',
+    })
+    expect(refusalText('crying', true).title).toBe('Crying detected')
+  })
 })
