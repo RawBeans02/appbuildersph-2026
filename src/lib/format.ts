@@ -54,3 +54,22 @@ export function clockTime(date: Date): string {
   const minutes = String(date.getMinutes()).padStart(2, '0')
   return `${hours % 12 === 0 ? 12 : hours % 12}:${minutes} ${hours < 12 ? 'AM' : 'PM'}`
 }
+
+// A moment (a Date or an ISO timestamp) on the device's calendar, as the
+// YYYY-MM-DD day the helpers above take.
+function calendarDay(at: Date | string): string {
+  const date = new Date(at)
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
+}
+
+// "Tue, Oct 6": the day a moment fell on, on the device's calendar.
+export function weekdayMonthDayAt(at: Date | string): string {
+  return weekdayMonthDay(calendarDay(at))
+}
+
+// "Fri, Oct 9, 10:45 PM": a moment on the device's calendar and clock. Every
+// shown timestamp goes through this, never toLocaleString().
+export function dateTime(at: Date | string): string {
+  return `${weekdayMonthDayAt(at)}, ${clockTime(new Date(at))}`
+}

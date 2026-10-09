@@ -1,5 +1,16 @@
 import { describe, expect, it } from 'vitest'
-import { clockTime, dayRange, formatFreeSpace, formatMB, monthDay, monthYear, weekdayMonthDay, weekdayMonthDayPlain } from './format'
+import {
+  clockTime,
+  dateTime,
+  dayRange,
+  formatFreeSpace,
+  formatMB,
+  monthDay,
+  monthYear,
+  weekdayMonthDay,
+  weekdayMonthDayAt,
+  weekdayMonthDayPlain,
+} from './format'
 
 describe('format', () => {
   it('writes days the way the copy deck does', () => {
@@ -18,5 +29,16 @@ describe('format', () => {
     expect(clockTime(new Date(2026, 9, 10, 8, 31))).toBe('8:31 AM')
     expect(clockTime(new Date(2026, 9, 10, 12, 5))).toBe('12:05 PM')
     expect(clockTime(new Date(2026, 9, 10, 0, 7))).toBe('12:07 AM')
+  })
+
+  it('writes a moment on the device calendar and clock, never a raw timestamp', () => {
+    // Built in local time, so the test holds in any time zone.
+    const late = new Date(2026, 9, 9, 22, 45, 39)
+    expect(dateTime(late)).toBe('Fri, Oct 9, 10:45 PM')
+    expect(dateTime(late.toISOString())).toBe('Fri, Oct 9, 10:45 PM')
+    expect(dateTime(new Date(2026, 9, 10, 10, 52))).toBe('Sat, Oct 10, 10:52 AM')
+    expect(dateTime(new Date(2026, 9, 11, 0, 5))).toBe('Sun, Oct 11, 12:05 AM')
+    expect(weekdayMonthDayAt(new Date(2026, 9, 6, 23, 59).toISOString())).toBe('Tue, Oct 6')
+    expect(weekdayMonthDayAt(new Date(2026, 9, 7, 0, 0))).toBe('Wed, Oct 7')
   })
 })
