@@ -32,8 +32,8 @@ Before turning it on:
 - The service worker serves `index.html` from its cache, with the headers it had when it was cached. The new headers reach a returning user only after `index.html` changes and the precache refreshes it, which every build with code changes does.
 - After deploying, check the device check on the live URL shows **Cross-origin isolated: Yes**, and rerun `docs/OFFLINE-SMOKE-TEST.md`.
 
-## Fallback host: Cloudflare Pages (free)
-Used only if Vercel can't deploy (e.g. its Hobby daily deployment limit). It serves the core offline app; the phase 2 backend (`api/`, Postgres, GPT-6 Luna) runs only on Vercel, so phase 2 stays off there (don't set `VITE_PHASE2`).
+## Live host: Cloudflare Pages (free), since Sat Oct 10, 3:54 AM
+https://agapaymo.pages.dev. It became the live host when Vercel's Hobby daily deployment limit stopped deploys (Fri 11:34 PM, "retry in 24 hours"). Production branch `main`; preview branches off, so pull requests don't build. Every push to `main` deploys (Cloudflare has no `[deploy]` gate), so nobody pushes during a rehearsal or the pitch. It serves the core offline app; the phase 2 backend (`api/`, Postgres, GPT-6 Luna) runs only on Vercel, so phase 2 stays off there (don't set `VITE_PHASE2`).
 - Build command `npm run build`, output directory `dist`, environment variable `NODE_VERSION=22`.
 - `public/_headers` mirrors `vercel.json`'s caching headers. With no `404.html` in `dist`, Cloudflare Pages serves `index.html` for unknown paths (single-page app), so the app's own 404 still works.
 - Every file is under Cloudflare's 25 MiB per-file limit (the largest is the ONNX Runtime WebAssembly file, about 14 MB).

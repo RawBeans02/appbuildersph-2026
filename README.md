@@ -7,7 +7,7 @@ Named Agapay until Oct 9, 9 PM, when the team renamed it AgapayMo (internal iden
 | | |
 |---|---|
 | **Team name** | Banana cue |
-| **Live URL** | https://appbuildersph-2026.vercel.app |
+| **Live URL** | https://agapaymo.pages.dev |
 | **Repository** | https://github.com/RawBeans02/appbuildersph-2026 |
 | **Demo video** | _TBD_ |
 | **X / LinkedIn post (video)** | _TBD_ |
@@ -23,7 +23,7 @@ After a typhoon, a flooded barangay can be without signal for days. That is exac
 The **municipal health officer** (MHO) decides where doctor teams and medicine go, but with paper records and no signal that picture arrives late. AgapayMo keeps all of it on the BHW's phone with no internet, and hands the MHO only the counts, by QR code.
 
 ## Try it
-- **Live URL:** https://appbuildersph-2026.vercel.app
+- **Live URL:** https://agapaymo.pages.dev (Cloudflare Pages since Sat 3:54 AM. The first URL, https://appbuildersph-2026.vercel.app, stopped at Fri 9:59 PM's build when Vercel's free plan hit its daily deployment cap.)
 - **Offline test (phone or laptop):**
   1. Online, open the live URL and tap **Prepare for offline** (a one-time download of the on-device AI; sizes under "What requires internet").
   2. Turn on airplane mode and reload.
@@ -106,7 +106,7 @@ Offline health record systems also exist (iClinicSys and SHINE OS+ have offline 
 - Leptospirosis: symptoms 5 to 15 days after flood exposure, and doxycycline "may be given as prophylaxis to people exposed to floodwaters, but only after consultation with a health professional" (DOH Usec. Balboa, [Manila Times, Sept 3, 2026](https://www.manilatimes.net/2026/09/03/news/doh-leptospirosis-cases-in-ph-12-lower-than-last-year/2418017)). AgapayMo's watch window and its never-a-dose rule follow this.
 
 ## Architecture
-One offline-first web app (Vite, React, TypeScript, a service worker), static on Vercel.
+One offline-first web app (Vite, React, TypeScript, a service worker), static on Cloudflare Pages.
 - **Phone screens:**
   - Records live in IndexedDB.
   - The models are downloaded once into Cache Storage and run in Web Workers: MediaPipe Pose and YAMNet for Hinga, PP-OCRv5 on ONNX Runtime Web (WebAssembly) for the medicine-box reader.
@@ -160,7 +160,8 @@ Self-hosted, unmodified: the OCR models in `public/models/ppocr/` and the pose m
 React + TypeScript, built with Vite as an installable web app (PWA: vite-plugin-pwa / Workbox service worker). On-device storage in IndexedDB (idb). Inference in Web Workers on WebAssembly (ONNX Runtime Web, MediaPipe Tasks, Tesseract.js) and, on the laptop only, WebGPU (WebLLM). Browser APIs: Cache Storage, Web Crypto (ECDSA P-256), camera (getUserMedia), BarcodeDetector. The optional phase 2 sync (off unless built with `VITE_PHASE2`) adds Vercel Functions (Node.js, Web-standard Request/Response) in `api/` with Postgres through node-postgres. Tests: Vitest and Playwright in GitHub Actions, with axe-core for automated accessibility checks, and a Postgres 16 service container for the API tests. Small build scripts in Python with Pillow (synthetic labels). Every library and its license is in the table below.
 
 ### APIs and cloud services
-- **Vercel:** static hosting of the app and the self-hosted model files. For the optional phase 2 sync only (off unless built with `VITE_PHASE2=1`), small Vercel Functions in `api/` (enroll, sync, reports, health, and for the alerts alerts-draft, alerts, alerts-approve, alerts-reject and inbox); the offline core never calls them.
+- **Cloudflare Pages:** static hosting of the live app and the self-hosted model files (`public/_headers` sets the caching). Every push to `main` deploys.
+- **Vercel:** the first host (Fri 3:37 PM to 9:59 PM, until its daily deployment cap). For the optional phase 2 sync only (off unless built with `VITE_PHASE2=1`), small Vercel Functions in `api/` (enroll, sync, reports, health, and for the alerts alerts-draft, alerts, alerts-approve, alerts-reject and inbox); the offline core never calls them.
 - **Neon Postgres (through Vercel's Neon integration):** phase 2 sync only. Stores the enrolled laptops' public keys, the phone public keys they vouch for, and the de-identified barangay reports (codes, ISO weeks, export numbers and counts with "<5"), plus nonces, rate-limit windows (a keyed hash of the address, kept at most an hour) and an audit log of actions and result counts. Never a name, birth date, household, purok or exact date of a person.
 - **Hugging Face and raw.githubusercontent.com:** only the first use of the optional AI wording on the municipal laptop downloads WebLLM's model weights and WebGPU library from them.
 - **GitHub:** the repository and CI (GitHub Actions); not used by the app.
