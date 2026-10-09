@@ -33,7 +33,7 @@
 
 **Out of scope for this build (say no to these):**
 
-**Business in one line (who pays, how it grows — ties to our startup):**
+**Business in one line (who pays, how it grows):**
 
 **Rubric check (score 1–5 against the official judging criteria in RULES.md):**
 | Criterion (weight) | Score | How we show it in the demo |

@@ -116,7 +116,7 @@ Our README has a section for every row of the checklist; see `TASKS.md`.
 ## Links
 - Official site: https://appbuildersph.com/hackathon/
 - Official participant list: https://appbuildersph.com/hackathon/participants
-- Questions (Oct 8 reminder): the official Telegram group, or Bryl Lim and the organizers on Demo Day.
+- Questions (Oct 8 reminder): the official Telegram group, or Bryl Lim (organizer) and the organizers on Demo Day.
 
 ## Notes from the briefing
 - The FAQ has 7 pages; we captured only page 1. Add anything from pages 2–7 here.

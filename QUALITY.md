@@ -6,8 +6,8 @@ Scoped from our team's build standard (Ultimate Build Source of Truth) to a 21-h
 - Every screen and every state a user can see (default, loading, empty, error, success, the first screen, the 404) is designed and finalized in **Claude Design** before it is built. Exports, tokens and copy live in `design/`; `design/README.md` maps each screen to its task.
 - Build to the design. Colors, fonts, type scale, spacing, radius, shadows and icons come only from the tokens in `design/README.md`, implemented once in a shared theme. Don't add a color, font, gradient, shadow, icon set or component that isn't in `design/`. Customize any component library to the tokens; never ship its default look.
 - A screen or state isn't designed yet? Write `NEEDS DESIGN: <screen/state>` under the task in `TASKS.md`, build the logic behind it, and wait for the Lead's next Claude Design pass. Never improvise UI.
-- Use the copy from the design (or its copy deck) word for word. Filipino context: pesos, real names and places, Taglish where natural.
-- **"Vibe-coded" tells to avoid.** One alone can be fine; a stack of them is what makes an app look AI-generated:
+- Use the copy from the design (or its copy deck) word for word. Filipino context: pesos, invented sample names, real place names, Taglish where natural. Seeded data is labeled as sample data in the UI and the README.
+- **"Vibe-coded" tells to avoid.** One alone can be fine; a stack of them is what makes an app look generic:
   1. purple-to-blue gradients
   2. gradient hero text
   3. emojis in headings
@@ -71,7 +71,7 @@ The challenge (`RULES.md`): an AI product that stays genuinely useful when the c
   - max tokens
   - bounded retries (at most 2, with backoff)
   - timeouts
-  - an env **kill switch** that falls back to a cached demo response
+  - an env **kill switch** that falls back to the on-device path or a clearly labeled "cloud feature off" state; never a canned answer presented as live
 
   A crowd may open the live URL at once, and a runaway loop must not drain credits. A human sets a spend cap in each provider's dashboard.
 - Privacy: say in the UI what stays on the device and what (if anything) leaves it, and send any cloud service only the data it needs. Add a short "Privacy & AI" page: what is collected, where it is processed (on the device or which service), what the AI can get wrong.

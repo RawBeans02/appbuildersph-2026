@@ -1,13 +1,15 @@
 # Hackathon repo — rules for every agent (Lead, Sr. Builder, Devin)
 
+Scope: working instructions for this team's own build agents during the build.
+
 **Who builds:** the **Lead** and the **Sr. Builder**, both Claude Code sessions on the owner's 8 GB laptop, each in its **own clone** of this repo (so neither sees the other's work until it's pushed). Devin is optional, for self-contained tasks. There is no cloud Jr. Builder for this build. Its work (tests, heavy checks, the audit) goes to the Lead and to the cloud checks below. Our human teammates push here too.
 
 AppBuildersPH Hackathon 2026. **Submissions close 10:00 AM Sat Oct 10 (PH time), no extensions; the code freezes then. Feature freeze 4:00 AM; nobody pushes after 9:45 AM.** The idea is in `ONE-PAGER.md`, the official rules in `RULES.md`, the work in `TASKS.md`, the build standard in `QUALITY.md`. Read all four before doing anything.
 
 ## Hard rules
-- **Official rules — a break disqualifies the team (details in `RULES.md`):** build everything from scratch now; never copy code from our other projects (KitaMo, KayaMo, CarinderAI or any other); open-source libraries are fine, and each one goes in the README's list. No help from anyone outside our 4 registered members. Every number shown in the UI, README, video or pitch is measured or cited — no made-up benchmarks or statistics. AI use is disclosed in the README.
+- **Official rules — a break disqualifies the team (details in `RULES.md`):** build everything from scratch now; never copy code from the team's other projects; open-source libraries are fine, and each one goes in the README's list. No help from anyone outside our 4 registered members. Every number shown in the UI, README, video or pitch is measured or cited — no made-up benchmarks or statistics. AI use is disclosed in the README.
 - **This repo is public.** Anyone can read every commit, so never commit keys, personal data, or internal details of our other products. If a key ever lands in a commit, tell the owner at once so it can be rotated; deleting it later doesn't help.
-- **Never touch KitaMo.** No reads or writes in `~/Documents/KitaMo-ph`, nothing in the `kitamo-ph` GitHub org, its Supabase/Vercel projects, secrets or deploys. It is a live product with a real customer.
+- **Never read or modify the team's other products, their repos, accounts or deploys.** Work only in the hackathon folders and this repo.
 - **Secrets:** keys go in `.env.local` (git-ignored) and the hosting dashboard, added by a human. Never commit, print, or paste a key; never put one in an issue, a PR, or TASKS.md.
 - **Scope:** the one wow flow in `ONE-PAGER.md` comes first. Don't add features that aren't on `TASKS.md`; propose them in TASKS.md under "Ideas" instead.
 
@@ -46,7 +48,7 @@ They said so at the briefing: assume an AI reads every commit, every README clai
 - Light commands (typecheck, lint, a single unit test file) can run directly.
 - **Both agents share this one laptop**, and the guard runs one heavy job at a time across both, so expect queueing. The Sr. Builder takes the heavy local steps; the Lead keeps to light checks where it can. Don't keep a dev server running when you're not using it.
 - **Heavy checks run in the cloud wherever possible:** the hosting build on every push to `main`, and GitHub Actions CI (typecheck, lint, tests, production build, e2e). Read their results instead of re-running them locally.
-- **Running a local AI model on this laptop** (a WebGPU browser tab, Ollama, MLX) is the heaviest job of all, 1–3 GB. Message **Account Admin** (the owner's Mac session) first so it can check memory. Use the smallest quantized model that proves the point, one at a time, and close the tab or process right after. Real model checks are better done on our phones and other laptops via the live URL.
+- **Running a local AI model on this laptop** (a WebGPU browser tab, Ollama, MLX) is the heaviest job of all (about 1–3 GB, estimate). Message **Account Admin** (the owner's separate Claude session that watches laptop memory; an AI that writes no code) first so it can check memory. Use the smallest quantized model that proves the point, one at a time, and close the tab or process right after. Real model checks are better done on our phones and other laptops via the live URL.
 - No Docker unless the Lead approves it. Use hosted services for infrastructure (hosting, CI). The AI itself runs on the user's device (`QUALITY.md`).
 - Under ultracode, parallel subagents count too: heavy commands still go through the guard one at a time, and subagents stick to reading and reviewing.
 
