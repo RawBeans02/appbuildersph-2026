@@ -310,6 +310,8 @@
   transform: scaleX(-1);
 }
 
+/* 17g: the target is four 4 px paper corner brackets, --ok-on-night once a
+   QR is read. A scrim halo keeps them visible on a bright picture. */
 .target {
   position: absolute;
   left: 50%;
@@ -317,15 +319,51 @@
   width: 210px;
   height: 210px;
   transform: translate(-50%, -50%);
-  border: 3px solid var(--paper);
-  border-radius: var(--r-md);
-  box-shadow: 0 0 0 2px var(--scrim);
+  color: var(--paper);
+  filter: drop-shadow(0 0 1px var(--scrim)) drop-shadow(0 0 1px var(--scrim));
+}
+
+.target span {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  border: 0 solid currentColor;
+}
+
+.target span:nth-child(1) {
+  top: 0;
+  left: 0;
+  border-top-width: 4px;
+  border-left-width: 4px;
+  border-top-left-radius: var(--r-md);
+}
+
+.target span:nth-child(2) {
+  top: 0;
+  right: 0;
+  border-top-width: 4px;
+  border-right-width: 4px;
+  border-top-right-radius: var(--r-md);
+}
+
+.target span:nth-child(3) {
+  bottom: 0;
+  left: 0;
+  border-bottom-width: 4px;
+  border-left-width: 4px;
+  border-bottom-left-radius: var(--r-md);
+}
+
+.target span:nth-child(4) {
+  right: 0;
+  bottom: 0;
+  border-right-width: 4px;
+  border-bottom-width: 4px;
+  border-bottom-right-radius: var(--r-md);
 }
 
 .targetOk {
-  width: 200px;
-  height: 200px;
-  border: 4px solid var(--ok-on-night);
+  color: var(--ok-on-night);
 }
 
 .looking {

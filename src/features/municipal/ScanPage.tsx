@@ -219,7 +219,12 @@ export default function ScanPage() {
           )}
           <div className={cx(styles.camera, (banner || pairing || problem) && styles.cameraShort)} hidden={!!problem}>
             <video ref={videoRef} muted playsInline className={styles.video} aria-label="Camera preview" />
-            <div className={cx(styles.target, success && styles.targetOk)} aria-hidden />
+            <div className={cx(styles.target, success && styles.targetOk)} aria-hidden>
+              <span />
+              <span />
+              <span />
+              <span />
+            </div>
           </div>
           {problem ? (
             <div className={cx(styles.controls, styles.controlsRow)}>
