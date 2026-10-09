@@ -9,10 +9,10 @@ describe('Hinga copy (design/COPY.md)', () => {
     expect([0, 1, 2, 11, 12, 59].map((months) => ageBand(months))).toEqual([
       { firstMonth: 0, label: 'Under 2 months', cutoff: 60 },
       { firstMonth: 0, label: 'Under 2 months', cutoff: 60 },
-      { firstMonth: 2, label: '2 up to 12 months', cutoff: 50 },
-      { firstMonth: 2, label: '2 up to 12 months', cutoff: 50 },
-      { firstMonth: 12, label: '12 months up to 5 years', cutoff: 40 },
-      { firstMonth: 12, label: '12 months up to 5 years', cutoff: 40 },
+      { firstMonth: 2, label: '2 to 11 months', cutoff: 50 },
+      { firstMonth: 2, label: '2 to 11 months', cutoff: 50 },
+      { firstMonth: 12, label: '1 to 4 years', cutoff: 40 },
+      { firstMonth: 12, label: '1 to 4 years', cutoff: 40 },
     ])
     expect(ageBand(60)).toBeNull()
   })
@@ -33,18 +33,18 @@ describe('Hinga copy (design/COPY.md)', () => {
     expect(bandText('fast', 52, toddler, [])).toEqual({
       label: 'Fast breathing for age',
       perMin: 52,
-      line: 'The cut-off for 12 months up to 5 years is 40.',
+      line: 'The cut-off for 1 to 4 years is 40.',
     })
-    expect(bandText('not-fast', 38, ageBand(6)!, []).line).toBe('The cut-off for 2 up to 12 months is 50.')
+    expect(bandText('not-fast', 38, ageBand(6)!, []).line).toBe('The cut-off for 2 to 11 months is 50.')
     expect(bandText('urgent', 52, toddler, ['chest-indrawing'])).toEqual({
       label: 'Urgent · danger sign',
       perMin: 52,
-      line: 'Fast for 12 months up to 5 years (cut-off 40), and chest indrawing.',
+      line: 'Fast for 1 to 4 years (cut-off 40), and chest indrawing.',
     })
     expect(bandText('urgent', 52, toddler, ['convulsions', 'chest-indrawing', 'stridor']).line).toBe(
-      'Fast for 12 months up to 5 years (cut-off 40), and convulsions, chest indrawing and stridor.',
+      'Fast for 1 to 4 years (cut-off 40), and convulsions, chest indrawing and stridor.',
     )
-    expect(bandText('urgent', 30, toddler, ['stridor']).line).toBe('Not fast for 12 months up to 5 years (cut-off 40), but stridor.')
+    expect(bandText('urgent', 30, toddler, ['stridor']).line).toBe('Not fast for 1 to 4 years (cut-off 40), but stridor.')
   })
 
   it('joins words with "and"', () => {
@@ -57,10 +57,10 @@ describe('Hinga copy (design/COPY.md)', () => {
   it('writes the meta line, marking a count by hand', () => {
     const resident = { name: 'Residente 010', householdId: 'HH-02' }
     expect(metaLine({ resident, band: toddler, time: '8:31 AM', method: 'camera' })).toBe(
-      'Residente 010 · HH-02 · 12 months up to 5 years · 8:31 AM',
+      'Residente 010 · HH-02 · 1 to 4 years · 8:31 AM',
     )
     expect(metaLine({ resident: null, band: toddler, time: '8:31 AM', method: 'hand' })).toBe(
-      '12 months up to 5 years · 8:31 AM · Counted by hand',
+      '1 to 4 years · 8:31 AM · Counted by hand',
     )
   })
 

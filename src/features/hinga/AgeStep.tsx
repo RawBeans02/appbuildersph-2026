@@ -54,7 +54,7 @@ export function AgeStep({ child, onChange, onNext, onBack }: { child: Child; onC
                 name="hinga-age"
                 value={String(option.firstMonth)}
                 label={option.label}
-                meta={`fast: ${cutoff}+ /min`}
+                meta={`Fast: ${cutoff} or more a minute`}
                 checked={band?.firstMonth === option.firstMonth}
                 onSelect={(value) => pickBand(Number(value))}
               />

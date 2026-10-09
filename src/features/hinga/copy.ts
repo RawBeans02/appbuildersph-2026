@@ -8,13 +8,15 @@ import type { CountRefusal } from './countSession'
 
 export const SCREENING_NOTE = 'Screening aid only. Not a diagnosis.'
 
-// The age bands of step 1, in the WHO IMCI wording (design review decision 1).
-// A band picked without a linked resident is saved as its first month, which
-// is all the record needs: the cut-off and the QR's age band.
+// The age bands of step 1, as non-overlapping completed months or years
+// (design pass 1b, "Age bands"): a child of exactly 12 months is "1 to 4
+// years", cut-off 40, as in imci.ts. A band picked without a linked resident
+// is saved as its first month, which is all the record needs: the cut-off and
+// the QR's age band.
 export const AGE_BANDS = [
   { firstMonth: 0, label: 'Under 2 months' },
-  { firstMonth: 2, label: '2 up to 12 months' },
-  { firstMonth: 12, label: '12 months up to 5 years' },
+  { firstMonth: 2, label: '2 to 11 months' },
+  { firstMonth: 12, label: '1 to 4 years' },
 ] as const
 
 export type AgeBand = { firstMonth: number; label: string; cutoff: number }
@@ -76,7 +78,7 @@ export const HEADLINES: Record<ResultKind, { tagalog: string; english: string }>
 
 export const timeText = (iso: string) => new Date(iso).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
 
-// "Residente 010 · HH-02 · 12 months up to 5 years · 8:31 AM", plus
+// "Residente 010 · HH-02 · 1 to 4 years · 8:31 AM", plus
 // "Counted by hand" for an L8b count.
 export function metaLine(input: {
   resident: { name: string; householdId: string } | null
