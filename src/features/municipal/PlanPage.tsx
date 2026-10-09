@@ -1,5 +1,5 @@
 import { CaretDownIcon, CheckIcon, InfoIcon, ListNumbersIcon, ScanIcon, WarningCircleIcon } from '@phosphor-icons/react'
-import { useMemo, useState, type ComponentType } from 'react'
+import { useMemo, useState, type ComponentType, type ReactNode } from 'react'
 import { Button, ButtonLink, Field, StateBlock, useToast } from '../../components'
 import { getDb } from '../../data/db/appDb'
 import { DEMO_MUNICIPALITY } from '../../data/places'
@@ -16,9 +16,9 @@ import styles from './PlanPage.module.css'
 import { planSteps, planStepsText } from './steps'
 
 // Screen 19a: the rule-based plan on the left (always there, with or without
-// the AI), the optional on-device AI's draft wording on the right, checked
-// number by number against the plan, and Approve. The approver is a role,
-// never a name. Never a dose.
+// the AI), the optional on-device AI's card on the right with the officer's
+// wording box inside it, checked number by number against the plan, and
+// Approve. The approver is a role, never a name. Never a dose.
 
 export default function PlanPage() {
   const data = useDbQuery(['pairedDevices', 'receivedPayloads'], readMunicipalScreen)
@@ -94,9 +94,15 @@ export function PlanSteps({ plan }: { plan: MunicipalPlan }) {
 }
 
 // The slot for B6's optional on-device AI panel. It gets the structured plan
-// and the template text, and hands back its draft with onUse; the plan is
-// complete and approvable without it.
-export type WordingPanel = ComponentType<{ plan: MunicipalPlan; draft: string; onUse: (text: string) => void }>
+// and the template text, hands back its draft with onUse, and shows the
+// officer's wording box (children) inside its card; the plan is complete and
+// approvable without it.
+export type WordingPanel = ComponentType<{
+  plan: MunicipalPlan
+  draft: string
+  onUse: (text: string) => void
+  children?: ReactNode
+}>
 
 // The steps, the wording (the AI's draft once the officer takes it, or their
 // own words, or none), and Approve.
@@ -137,13 +143,20 @@ export function PlanBody({ plan, wordingPanel: Wording }: { plan: MunicipalPlan;
     }
   }
 
+  // The one check line is the box's own, under the text.
+  const box = <CheckedWording value={text} onChange={setText} reference={reference} placeholder="Write the wording (optional)" />
   return (
     <>
       <div className={styles.columns}>
         <PlanSteps plan={plan} />
         <div className={styles.wording}>
-          {Wording && <Wording plan={plan} draft={draft} onUse={takeDraft} />}
-          <CheckedWording value={text} onChange={setText} reference={reference} placeholder="Write the wording (optional)" />
+          {Wording ? (
+            <Wording plan={plan} draft={draft} onUse={takeDraft}>
+              {box}
+            </Wording>
+          ) : (
+            box
+          )}
         </div>
       </div>
       <div className={styles.approveBar}>

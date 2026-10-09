@@ -39,15 +39,20 @@ describe('laptop screens', () => {
     const FakePanel: WordingPanel = (props) => {
       seen.plan = props.plan
       seen.draft = props.draft
-      return createElement('p', null, 'Wording panel here')
+      return createElement('section', { 'data-panel': '' }, 'Wording panel here', props.children)
     }
     const body = renderToStaticMarkup(createElement(PlanBody, { plan, wordingPanel: FakePanel }))
-    expect(body).toContain('Wording panel here')
-    expect(body).toContain('placeholder="Write the wording (optional)"')
+    // The officer's box sits inside the panel's card.
+    expect(body).toMatch(/<section data-panel="">Wording panel here<div[^>]*>.*<textarea[^>]*placeholder="Write the wording \(optional\)".*<\/section>/)
     expect(text(body)).toContain('Approved by Municipal health officer')
     expect(text(body)).toContain('Approve plan')
     expect(seen.plan).toBe(plan)
     expect(seen.draft).toContain('Draft plan for week 2026-W41, San Isidro Demo (SID)')
+
+    // Without the AI panel the box is there on its own, and the plan is complete.
+    const alone = renderToStaticMarkup(createElement(PlanBody, { plan }))
+    expect(alone).toContain('placeholder="Write the wording (optional)"')
+    expect(text(alone)).toContain('Approve plan')
   })
 
   it('19a mismatch: the new number gets an outline mark with an icon, and the line names it', () => {
