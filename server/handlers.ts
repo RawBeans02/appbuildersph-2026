@@ -200,18 +200,25 @@ export function handleAlertsReject(request: Request, deps: Deps): Promise<Respon
   })
 }
 
-type InboxKey = { publicJwk: JsonWebKey; scope: InboxResponse['scope'] }
+// 'ambiguous': a phone key vouched for in two municipalities (or two keys
+// sharing a fingerprint); refused once its signature checks out.
+type InboxKey = { publicJwk: JsonWebKey; scope: InboxResponse['scope'] | 'ambiguous' }
+
+const sameKey = (a: JsonWebKey, b: JsonWebKey) => a.x === b.x && a.y === b.y
 
 // Who a signing key is: an enrolled laptop (its municipality), or a phone key
-// an enrolled laptop vouched for (its barangay only).
+// vouched for by an enrolled laptop of the barangay's own municipality (that
+// barangay only). Never a guess between two municipalities.
 async function inboxKey(store: Store, fingerprint: string): Promise<InboxKey | null> {
   const device = await store.getDevice(fingerprint)
   if (device) return { publicJwk: device.publicJwk, scope: { device: 'laptop', municipality: device.municipality, barangays: null } }
-  const keys = await store.phoneKeys(fingerprint)
+  const keys = (await store.phoneKeys(fingerprint)).filter((key) => key.barangay.startsWith(`${key.municipality}-`))
   if (keys.length === 0) return null
-  const { municipality } = keys[0]
-  const barangays = keys.filter((key) => key.municipality === municipality).map((key) => key.barangay)
-  return { publicJwk: keys[0].publicJwk, scope: { device: 'phone', municipality, barangays } }
+  const [first] = keys
+  if (keys.some((key) => key.municipality !== first.municipality || !sameKey(key.publicJwk, first.publicJwk))) {
+    return { publicJwk: first.publicJwk, scope: 'ambiguous' }
+  }
+  return { publicJwk: first.publicJwk, scope: { device: 'phone', municipality: first.municipality, barangays: keys.map((key) => key.barangay) } }
 }
 
 // POST /api/inbox { fingerprint, ts, nonce, data: {} }, signed like a sync.
@@ -228,6 +235,9 @@ export async function handleInbox(request: Request, deps: Deps): Promise<Respons
       inboxKey(store, fingerprint),
     )
     validateInboxData(envelope.data)
+    if (key.scope === 'ambiguous') {
+      throw new HttpError('ambiguous-key', "This phone's key is paired in more than one municipality. Pair it again from its own municipality's laptop.")
+    }
     return json(200, await readInbox(store, key.scope, now))
   })
 }

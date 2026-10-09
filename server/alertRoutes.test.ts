@@ -201,6 +201,34 @@ describe('inbox', () => {
     expect(phone.scope).toEqual({ device: 'phone', municipality: 'SID', barangays: ['SID-RIV'] })
   })
 
+  it('refuses (409) a phone key vouched for in two municipalities, rather than pick one', async () => {
+    await approveAll()
+    const phone = phones.get('SID-MAL')!
+    // A laptop enrolled for another municipality vouches for the same phone key.
+    const other = await makeDevice()
+    expect((await handleEnroll(await enrollRequest(other, { municipality: 'ABC' }), deps(store))).status).toBe(200)
+    const now = tick()
+    const vouch = await syncRequest(other, { barangayKeys: [{ barangay: 'ABC-MAL', publicJwk: phone.publicJwk }], reports: [] }, { now })
+    expect((await handleSync(vouch, deps(store, {}, now))).status).toBe(200)
+    const response = await inboxAs(phone)
+    expect(response.status).toBe(409)
+    expect(await body<ErrorResponse>(response)).toMatchObject({ ok: false, error: 'ambiguous-key' })
+    // The other phones still read their own barangay's.
+    expect((await inboxAs(phones.get('SID-RIV')!)).status).toBe(200)
+    // An unsigned try learns nothing: the signature is checked first.
+    expect((await inboxAs(phone, { signer: phones.get('SID-RIV')! })).status).toBe(401)
+  })
+
+  it("reads only a vouch made by a laptop still enrolled for that barangay's municipality", async () => {
+    await approveAll()
+    expect((await inboxAs(phones.get('SID-BGS')!)).status).toBe(200)
+    // The vouching laptop re-enrolls for another municipality: its SID vouches no longer count.
+    expect((await handleEnroll(await enrollRequest(laptop, { municipality: 'ABC' }), deps(store))).status).toBe(200)
+    const response = await inboxAs(phones.get('SID-BGS')!)
+    expect(response.status).toBe(401)
+    expect(await body<ErrorResponse>(response)).toMatchObject({ error: 'unknown-device' })
+  })
+
   it('checks the signature, the time and the nonce like a sync', async () => {
     await approveAll()
     const stranger = await makeDevice()

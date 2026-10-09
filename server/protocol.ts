@@ -127,6 +127,8 @@ export type ErrorCode =
   | 'already-decided'
   // A newer draft batch replaced this undecided alert (409).
   | 'superseded'
+  // A phone key vouched for in more than one municipality (409).
+  | 'ambiguous-key'
   | 'check-failed'
   | 'server-error'
 

@@ -139,7 +139,8 @@ export interface Store {
   listAlerts(municipality: string, statuses: readonly AlertStatus[], limit: number): Promise<AlertRecord[]>
   // Approved alerts of a municipality, or only those for these barangays.
   approvedAlerts(municipality: string, barangays: readonly string[] | null, limit: number): Promise<AlertRecord[]>
-  // The barangays a phone key is vouched for (normally one).
+  // The barangays a phone key is vouched for (normally one), each by an
+  // enrolled laptop of that barangay's own municipality.
   phoneKeys(fingerprint: string): Promise<BarangayKeyRecord[]>
 
   // Runs `work` in one database transaction (all or nothing).

@@ -540,9 +540,12 @@ export function createPgStore(db: pg.Pool | pg.PoolClient, inTransaction = false
     },
 
     async phoneKeys(fingerprint) {
+      // Only vouches by a laptop that is (still) enrolled for that municipality.
       const result = await db.query<KeyRow>(
-        `SELECT barangay, municipality, public_jwk, fingerprint, vouched_by, updated_at
-         FROM barangay_keys WHERE fingerprint = $1 ORDER BY barangay LIMIT 10`,
+        `SELECT k.barangay, k.municipality, k.public_jwk, k.fingerprint, k.vouched_by, k.updated_at
+         FROM barangay_keys k
+         JOIN devices d ON d.fingerprint = k.vouched_by AND d.municipality = k.municipality
+         WHERE k.fingerprint = $1 ORDER BY k.barangay LIMIT 10`,
         [fingerprint],
       )
       return result.rows.map(keyRecord)

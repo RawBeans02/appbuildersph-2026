@@ -230,6 +230,27 @@ describe('alerts on Postgres', () => {
     await expect(getPool(databaseUrl).query(`UPDATE alerts SET status = 'pending' WHERE id = $1`, [first.alerts[1].id])).rejects.toThrow(/check constraint/)
   })
 
+  it("scopes a phone's inbox to its vouching laptop's municipality, and refuses a key vouched in two", async () => {
+    const inboxStatus = async (device: TestDevice) => {
+      const now = new Date((clock += 1000))
+      const signed = await signEnvelope(device.privateKey, device.fingerprint, {}, { now })
+      const response = await handleInbox(post('/api/inbox', signed.body, { [SIGNATURE_HEADER]: signed.signature }), realDeps(now))
+      return { status: response.status, error: response.ok ? null : (await body<ErrorResponse>(response)).error }
+    }
+    expect(await inboxStatus(phones.get('SID-MAL')!)).toEqual({ status: 200, error: null })
+    // Another municipality's laptop vouches for the same phone key.
+    const other = await makeDevice()
+    expect((await handleEnroll(await enrollRequest(other, { code: base.enrollCode!, municipality: 'ABC' }), realDeps())).status).toBe(200)
+    const now = new Date((clock += 1000))
+    const vouch = await syncRequest(other, { barangayKeys: [{ barangay: 'ABC-MAL', publicJwk: phones.get('SID-MAL')!.publicJwk }], reports: [] }, { now })
+    expect((await handleSync(vouch, realDeps(now))).status).toBe(200)
+    expect(await inboxStatus(phones.get('SID-MAL')!)).toEqual({ status: 409, error: 'ambiguous-key' })
+    // The SID laptop re-enrolls for ABC: its SID vouches no longer count.
+    expect(await inboxStatus(phones.get('SID-BGS')!)).toEqual({ status: 200, error: null })
+    expect((await handleEnroll(await enrollRequest(laptop, { code: base.enrollCode!, municipality: 'ABC' }), realDeps())).status).toBe(200)
+    expect(await inboxStatus(phones.get('SID-BGS')!)).toEqual({ status: 401, error: 'unknown-device' })
+  })
+
   it('keeps the alert columns free of anything but codes, facts and roles', async () => {
     const columns = await getPool(databaseUrl).query<{ column_name: string }>(
       `SELECT column_name FROM information_schema.columns WHERE table_name = 'alerts' ORDER BY ordinal_position`,

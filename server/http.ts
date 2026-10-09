@@ -27,6 +27,7 @@ const STATUS: Record<ErrorCode, number> = {
   'not-found': 404,
   'already-decided': 409,
   superseded: 409,
+  'ambiguous-key': 409,
   'check-failed': 422,
   'server-error': 500,
 }

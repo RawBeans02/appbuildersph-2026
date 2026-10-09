@@ -202,7 +202,9 @@ export function createMemoryStore(): MemoryStore {
     },
 
     async phoneKeys(fingerprint) {
-      return [...keys.values()].filter((key) => key.fingerprint === fingerprint).sort((a, b) => (a.barangay < b.barangay ? -1 : 1))
+      return [...keys.values()]
+        .filter((key) => key.fingerprint === fingerprint && devices.get(key.vouchedBy)?.municipality === key.municipality)
+        .sort((a, b) => (a.barangay < b.barangay ? -1 : 1))
     },
 
     // All or nothing, like the SQL transaction: on a throw, every map goes
