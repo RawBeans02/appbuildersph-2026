@@ -29,7 +29,7 @@ Every task names the files or folders it **owns**, so agents pushing straight to
 - [ ] todo · `docs/ARCHITECTURE.md`: diagram, key decisions, AI pipeline, limitations · [lead]
 - [ ] todo · README: problem, live link, how to run/recreate, architecture, Responsible AI, Built with (AI tools), open-source libraries, Lighthouse scores, team roles & contributions, note that only process templates predate the event · [lead]
 - [ ] todo · ~1-minute demo video, wow moment in the first 10 s (+ a longer backup for Demo Day) · [human]
-- [ ] todo · secret check of the whole git history · [lead] → make the repo public · [human:Rovs]
+- [ ] todo · final secret check of the whole git history (the repo is public) · [lead]
 - [ ] todo · X/LinkedIn post: #AppBuildersPH, tag Cognition and Devin · [human]
 - [ ] todo · submit on the Cerebral Valley event page (team, roles, contributions, AI tools) · [human:Rovs]
 - [ ] todo · 5-minute pitch + Q&A drill, rehearsed ×3 · [human]

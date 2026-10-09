@@ -4,7 +4,7 @@ AppBuildersPH Hackathon 2026. **Submissions close 10:00 AM Sat Oct 10 (PH time),
 
 ## Hard rules
 - **Official rules — a break disqualifies the team (details in `RULES.md`):** build everything from scratch now; never copy code from our other projects (KitaMo, KayaMo, CarinderAI or any other); open-source libraries are fine, and each one goes in the README's list. No help from anyone outside our 4 registered members. Every number shown in the UI, README, video or pitch is measured or cited — no made-up benchmarks or statistics. AI use is disclosed in the README.
-- **This repo becomes public before submission.** Never commit keys, personal data, or internal details of our other products.
+- **This repo is public.** Anyone can read every commit, so never commit keys, personal data, or internal details of our other products. If a key ever lands in a commit, tell the owner at once so it can be rotated; deleting it later doesn't help.
 - **Never touch KitaMo.** No reads or writes in `~/Documents/KitaMo-ph`, nothing in the `kitamo-ph` GitHub org, its Supabase/Vercel projects, secrets or deploys. It is a live product with a real customer.
 - **Secrets:** keys go in `.env.local` (git-ignored) and the hosting dashboard, added by a human. Never commit, print, or paste a key; never put one in an issue, a PR, or TASKS.md.
 - **Scope:** the one wow flow in `ONE-PAGER.md` comes first. Don't add features that aren't on `TASKS.md`; propose them in TASKS.md under "Ideas" instead.
