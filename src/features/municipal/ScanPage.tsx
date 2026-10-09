@@ -99,7 +99,7 @@ export default function ScanPage() {
   )
 }
 
-function Slots({ devices, received }: Awaited<ReturnType<typeof readHandoff>>) {
+export function Slots({ devices, received }: Awaited<ReturnType<typeof readHandoff>>) {
   const known = DEMO_BARANGAYS.map((place) => place.code)
   const extra = [...new Set([...devices, ...received].map((item) => item.barangay))].filter((code) => !known.includes(code))
   const codes = [...known, ...extra.sort()]

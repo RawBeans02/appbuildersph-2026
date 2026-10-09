@@ -67,7 +67,7 @@ export function QrScanner({ onText }: { onText: (text: string) => void }) {
         </button>
       )}
       <p role="status">{statusText(state)}</p>
-      <video ref={videoRef} muted playsInline width={480} hidden={!scanning} aria-label="Camera preview" />
+      <video ref={videoRef} muted playsInline width={480} hidden={!scanning && state.status !== 'starting'} aria-label="Camera preview" />
 
       <details>
         <summary>No camera? Use a photo or the QR text</summary>

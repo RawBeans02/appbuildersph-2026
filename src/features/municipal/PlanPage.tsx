@@ -91,7 +91,7 @@ function rowTotals(counts: PlanRow['counts']) {
   }
 }
 
-function MergedTable({ plan }: { plan: MunicipalPlan }) {
+export function MergedTable({ plan }: { plan: MunicipalPlan }) {
   const { totals } = plan
   const cell = (count: Count) => formatCount(count)
   return (
@@ -158,7 +158,7 @@ function MergedTable({ plan }: { plan: MunicipalPlan }) {
   )
 }
 
-function Priority({ plan }: { plan: MunicipalPlan }) {
+export function Priority({ plan }: { plan: MunicipalPlan }) {
   return (
     <section aria-labelledby="priority-heading">
       <h2 id="priority-heading">Doctor teams: priority order</h2>
@@ -203,7 +203,7 @@ function moveReason(move: DoxyMove): string {
   )
 }
 
-function Moves({ plan }: { plan: MunicipalPlan }) {
+export function Moves({ plan }: { plan: MunicipalPlan }) {
   return (
     <section aria-labelledby="moves-heading">
       <h2 id="moves-heading">Doxycycline stock moves, for the MHO to decide</h2>
@@ -256,7 +256,7 @@ function HowComputed() {
   )
 }
 
-function PlanEditor({ plan, draft }: { plan: MunicipalPlan; draft: string }) {
+export function PlanEditor({ plan, draft }: { plan: MunicipalPlan; draft: string }) {
   const [text, setText] = useState(draft)
   const [note, setNote] = useState('')
   const [saving, setSaving] = useState(false)
