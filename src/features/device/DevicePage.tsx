@@ -9,6 +9,7 @@ import { useShellStatus } from '../../lib/appShell'
 import { detectPlatform, pickBackend, type Backend } from '../../lib/backend'
 import type { ShellStatus } from '../../lib/pwa'
 import { useOnlineStatus } from '../../lib/useOnlineStatus'
+import { DemoReadiness } from './DemoReadiness'
 import { DemoTools } from './DemoTools'
 import { MeasureDevice } from './MeasureDevice'
 
@@ -84,6 +85,7 @@ export default function DevicePage() {
   return (
     <>
       <h1>Device check</h1>
+      <DemoReadiness />
       <p>Network: {online ? 'Online' : 'Offline'}</p>
       <p>Offline app shell: {shellStatusText[shellStatus]}</p>
 
