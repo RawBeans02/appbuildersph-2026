@@ -1,4 +1,4 @@
-import { chromium, expect, test, type BrowserContext } from '@playwright/test'
+import { expect, test, type BrowserContext } from '@playwright/test'
 import { DEMO_SCAN_LABEL } from '../src/data/seed/demoLabel'
 import { prepareForOffline } from './prepare'
 import { openPage } from './lock'
@@ -94,10 +94,16 @@ test('the full demo offline: phone wow flow, then pair, receive, merge and appro
   expect(countsText).toMatch(/^AGP1\./)
 
   // ---- The municipal laptop ---------------------------------------------------
-  // The municipal laptop runs Chrome (the wording model needs WebGPU), so in
-  // the WebKit (iPhone) run only the phone is WebKit and the laptop is Chromium.
-  const laptopBrowser = browserName === 'chromium' ? browser : await chromium.launch()
-  const laptop = await laptopBrowser.newContext()
+  // The laptop half runs in the Chromium jobs (the municipal laptop is Chrome:
+  // the wording model needs WebGPU). In the WebKit (iPhone) run the phone half
+  // above is the point; a Chromium launched beside WebKit hung on the scan
+  // screen's first click in CI (A18), so the WebKit run stops here.
+  if (browserName !== 'chromium') {
+    test.info().annotations.push({ type: 'note', description: 'WebKit run: the phone half only; the laptop half runs in the Chromium jobs.' })
+    expect(phoneElsewhere, 'phone requests to other origins').toEqual([])
+    return
+  }
+  const laptop = await browser.newContext()
   const laptopElsewhere: string[] = []
   watchOrigin(laptop, origin, laptopElsewhere)
   try {
@@ -171,7 +177,6 @@ test('the full demo offline: phone wow flow, then pair, receive, merge and appro
     await expect(entry).toContainText('Rules only')
   } finally {
     await laptop.close()
-    if (laptopBrowser !== browser) await laptopBrowser.close()
   }
 
   expect(phoneElsewhere, 'phone requests to other origins').toEqual([])

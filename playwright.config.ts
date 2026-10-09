@@ -19,7 +19,7 @@ export default defineConfig({
     trace: 'retain-on-failure',
   },
   projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] }, testIgnore: ['webkit-pose.spec.ts'] },
     // The closest CI gets to the owner's iPhones (Safari): WebKit with an
     // iPhone 14 Pro Max's screen, touch and user agent, on the specs that
     // matter there. WebKit on Linux isn't iOS; where it can't stand in for
@@ -35,6 +35,7 @@ export default defineConfig({
         'demo-handoff.spec.ts',
         'lock.spec.ts',
         'a11y.spec.ts',
+        'webkit-pose.spec.ts',
       ],
     },
   ],

@@ -86,8 +86,7 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      # The WebKit run also needs Chromium: demo-handoff's laptop is Chrome.
-      - run: npx playwright install --with-deps ${{ matrix.browser == 'webkit' && 'webkit chromium' || 'chromium' }}
+      - run: npx playwright install --with-deps ${{ matrix.browser }}
       - run: npm run test:e2e -- --project=${{ matrix.browser }}
         env:
           CI: true
