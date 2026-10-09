@@ -1,4 +1,4 @@
-import { FlagIcon, ListNumbersIcon, WarningCircleIcon } from '@phosphor-icons/react'
+import { ClockIcon, FlagIcon, ListNumbersIcon, WarningCircleIcon } from '@phosphor-icons/react'
 import { Button, ButtonLink, Pill, StateBlock } from '../../components'
 import { cx } from '../../components/cx'
 import { useDbQuery } from '../../data/db/useDbQuery'
@@ -74,6 +74,7 @@ export default function MergedPage() {
         </p>
       )}
       <MergedTable view={view} />
+      {view.partial && <p className={styles.partial}>{view.partial}</p>}
       {view.why && (
         <div className={styles.why}>
           <FlagIcon size={22} weight="bold" className={styles.whyIcon} aria-hidden />
@@ -116,9 +117,14 @@ export function MergedTable({ view }: { view: MergedView }) {
           row.kind === 'waiting' ? (
             <tr key={row.barangay} className={styles.waiting}>
               <th scope="row">{row.name}</th>
-              <td>Waiting</td>
+              <td>
+                <span className={styles.waitingWord}>
+                  <ClockIcon size={16} weight="bold" aria-hidden />
+                  Waiting
+                </span>
+              </td>
               {COLUMNS.map((column) => (
-                <td key={column.key} className={styles.number}>
+                <td key={column.key} className={cx(styles.number, styles.dash)}>
                   –
                 </td>
               ))}

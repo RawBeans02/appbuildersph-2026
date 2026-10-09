@@ -59,6 +59,7 @@ describe('the merged view (screen 18)', () => {
       ['Riverside-D', '2–8', '1–4', '1–4', '50', '30'],
     ])
     expect(view.totalLabel).toBe('4 of 5 barangays')
+    expect(view.partial).toBe('Totals cover the 4 barangays received so far. Maligaya-D is not counted yet.')
     expect(view.totals).toEqual({
       exposed: '238–256',
       inWatchWindow: '103–106',
@@ -99,6 +100,7 @@ describe('the merged view (screen 18)', () => {
     if (maligaya.kind !== 'received') throw new Error('expected a row')
     expect(maligaya.cells).toEqual({ exposed: '8–14', inWatchWindow: '9', fastBreathing: '1–4', doxyOnHand: '40', doxyExpiring: '30' })
     expect(view.totalLabel).toBe('All 5 barangays')
+    expect(view.partial).toBeNull()
     expect(view.totals.exposed).toBe('9–18')
     expect(view.why?.reason).toBe(
       'the most residents in the watch window (9), fast-breathing referrals (1–4), and 30 of its 40 capsules expire within 6 weeks.',
@@ -119,6 +121,17 @@ describe('the merged view (screen 18)', () => {
     expect(empty.rows.every((row) => row.kind === 'waiting')).toBe(true)
     expect(empty.totalLabel).toBe('0 of 5 barangays')
     expect(empty.totals.exposed).toBe('–')
+    expect(empty.partial).toBeNull()
+  })
+
+  it('18b: says which barangays the totals leave out', () => {
+    const three = mergedView(planOf([payload('SID-MAL', {}), payload('SID-BGS', {}), payload('SID-STN', {})]), [])
+    expect(three.totalLabel).toBe('3 of 5 barangays')
+    expect(three.partial).toBe('Totals cover the 3 barangays received so far. Mabini-D and Riverside-D are not counted yet.')
+    const one = mergedView(planOf([payload('SID-MAL', {})]), [])
+    expect(one.partial).toBe(
+      'Totals cover the 1 barangay received so far. Bagong Silang-D, Santo Niño-D, Mabini-D and Riverside-D are not counted yet.',
+    )
   })
 
   it('never calls a tie "the most"', () => {

@@ -43,6 +43,19 @@ export type MergedView = {
   totals: MergedCells
   // "Why Maligaya-D first:" and the reason, when one barangay comes first.
   why: { name: string; reason: string } | null
+  // 18b, some but not all received: "Totals cover the 3 barangays received
+  // so far. Mabini-D and Riverside-D are not counted yet."
+  partial: string | null
+}
+
+// "a", "a and b", "a, b and c"
+const joinNames = (names: readonly string[]) =>
+  names.length < 2 ? (names[0] ?? '') : `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`
+
+function partialNote(received: number, waiting: readonly string[]): string | null {
+  if (received === 0 || waiting.length === 0) return null
+  const covered = received === 1 ? 'the 1 barangay' : `the ${received} barangays`
+  return `Totals cover ${covered} received so far. ${joinNames(waiting)} ${waiting.length === 1 ? 'is' : 'are'} not counted yet.`
 }
 
 const DASH = '–'
@@ -149,5 +162,9 @@ export function mergedView(
     totalLabel: count === codes.length ? `All ${count} barangays` : `${count} of ${codes.length} barangays`,
     totals: plan ? totalCells(plan) : WAITING_CELLS,
     why: plan && first ? { name: first.row.name, reason: priorityReason(plan, first.row, 'merged') } : null,
+    partial: partialNote(
+      count,
+      merged.flatMap((row) => (row.kind === 'waiting' ? [row.name] : [])),
+    ),
   }
 }

@@ -113,6 +113,25 @@
   color: var(--ink-2);
 }
 
+.waitingWord {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font: var(--type-body-dense);
+  font-weight: 600;
+}
+
+.waiting .dash {
+  color: var(--ink-3);
+}
+
+/* 18b: which barangays the totals leave out. */
+.partial {
+  margin-top: var(--space-4);
+  font: var(--type-body-dense);
+  color: var(--ink-2);
+}
+
 .table tfoot th,
 .table tfoot td {
   height: 60px;
@@ -128,7 +147,7 @@
   display: flex;
   gap: var(--space-3);
   max-width: 820px;
-  margin-top: 22px;
+  margin-top: var(--space-6);
   font: var(--type-body-lg);
 }
 
