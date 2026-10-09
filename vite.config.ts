@@ -29,6 +29,9 @@ export default defineConfig({
       },
     }),
   ],
+  // ES module workers can code-split; model runtimes dynamically import their
+  // own .mjs and locate their .wasm through import.meta.url, which IIFE breaks.
+  worker: { format: 'es' },
   test: {
     environment: 'node',
     include: ['src/**/*.test.ts'],
