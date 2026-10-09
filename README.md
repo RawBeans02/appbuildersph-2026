@@ -243,8 +243,8 @@ Human rows stay pending until each member's actual work is confirmed.
 | Name (as on appbuildersph.com/hackathon/participants) | GitHub | Role | Contributions |
 |---|---|---|---|
 | Rovince Eduvane | RawBeans02 | Build lead | _TBD_ |
-| Vicente Seumal | ThirdyThirdy | _TBD_ | _TBD_ |
-| Adam Arous | takashii18 | _TBD_ | _TBD_ |
-| Gabriel Syd Paguio | Syd7 | _TBD_ | _TBD_ |
+| Vicente Seumal | ThirdyThirdy | Support: idea creation and design | _TBD_ |
+| Adam Arous | takashii18 | Support: idea creation and design | _TBD_ |
+| Gabriel Syd Paguio | Syd7 | Co-builder | The signed offline return QR from the laptop's approval to the barangay phone ([PR #7](https://github.com/RawBeans02/appbuildersph-2026/pull/7), with OpenAI Codex); more _TBD_ |
 
 The original core was built with the Lead and Sr. Builder AI sessions under the owner's direction. The offline-return branch adds the Codex work disclosed above. AI tools and Git authorship do not establish a person's actual contribution; the human contribution rows remain pending confirmation in `docs/FINAL-VALIDATION.md`.
