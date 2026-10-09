@@ -1,6 +1,7 @@
 import { CheckIcon, CircleNotchIcon, InfoIcon } from '@phosphor-icons/react'
 import { useCallback, useState } from 'react'
 import { BottomSheet, Button, FlowTopBar, RecordsError } from '../../components'
+import { useHoldReload } from '../../lib/useHoldReload'
 import { cx } from '../../components/cx'
 import type { ExposureKind } from '../../data/db/types'
 import { monthDay, weekdayMonthDay } from '../../lib/format'
@@ -108,6 +109,8 @@ export function MarkExposed({
   // Writes the marks; resolves once saved.
   onSave: (after: Marks) => Promise<void>
 }) {
+  // What is typed or marked here isn't saved yet: a new version waits.
+  useHoldReload()
   const [confirming, setConfirming] = useState(false)
   const [saving, setSaving] = useState(false)
   const [saveFailed, setSaveFailed] = useState(false)

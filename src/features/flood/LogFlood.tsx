@@ -1,6 +1,7 @@
 import { ArrowRightIcon, CalendarBlankIcon, CheckIcon, LockSimpleIcon } from '@phosphor-icons/react'
 import { useId, type MouseEvent } from 'react'
 import { Button, Field, FlowTopBar } from '../../components'
+import { useHoldReload } from '../../lib/useHoldReload'
 import { cx } from '../../components/cx'
 import styles from './Watch.module.css'
 import { floodDateWords } from './words'
@@ -34,6 +35,8 @@ export function LogFlood({
   onBack: () => void
   onNext: () => void
 }) {
+  // What is typed or marked here isn't saved yet: a new version waits.
+  useHoldReload()
   const areasId = useId()
   const togglePurok = (purok: string) =>
     onChange({

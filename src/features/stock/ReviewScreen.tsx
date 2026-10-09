@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Button, Field, FlowTopBar, RecordsError, useToast, type FieldTag } from '../../components'
 import { cx } from '../../components/cx'
 import { getDb } from '../../data/db/appDb'
+import { useHoldReload } from '../../lib/useHoldReload'
 import type { LabelReading } from '../../rules/label'
 import styles from './Review.module.css'
 import screen from './screen.module.css'
@@ -58,6 +59,8 @@ export function ReviewScreen({
   onScanAgain: () => void
   onSaved: () => void
 }) {
+  // What is typed or marked here isn't saved yet: a new version waits.
+  useHoldReload()
   const [draft, setDraft] = useState<StockDraft>(() => (scan ? draftFromReading(scan.reading) : EMPTY_DRAFT))
   const [quantityText, setQuantityText] = useState('')
   const [errors, setErrors] = useState<DraftErrors>({})
