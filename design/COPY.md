@@ -161,7 +161,7 @@ Every string, by screen. Use word for word. `{x}` = filled by the app. Sample va
 
 - Title: `Send to the RHU` · `{Maligaya-D} · Week {2026-W41} · Sample data`
 - Heading: `What leaves this phone` · `Only these counts. No names, birthdays or addresses.`
-- Groups and rows: `Exposed to floodwater, by age` (`Under 2 months`, `2 up to 12 months`, `12 months up to 5 years`, `5 to 17 years`, `18 to 59 years`, `60 and over`) · `In the watch window now` · `Fast-breathing referrals, by age` (first three bands) · `URGENT referrals` · `Doxycycline capsules on hand` · `Of those, expiring within 6 weeks` · `Flags for clinician review`
+- Groups and rows: `Exposed, watch not started yet, by age` (`Under 2 months`, `2 up to 12 months`, `12 months up to 5 years`, `5 to 17 years`, `18 to 59 years`, `60 and over`) · `In the watch window now` · `Fast-breathing referrals, by age` (first three bands) · `URGENT referrals` · `Doxycycline capsules on hand` · `Of those, expiring within 6 weeks` · `Flags for clinician review`
 - Footnote: `“<5” means 1 to 4. Small numbers are hidden so no household can be singled out.`
 - Meta: `Export #{3} · signed on this phone`
 - Primary: `Show the QR · Ipakita`

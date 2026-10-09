@@ -19,7 +19,10 @@ export type HingaAgeBand = (typeof HINGA_AGE_BANDS)[number]
 // Every count in the payload, generic over the value: raw numbers on the
 // phone, suppressed counts in the QR, ranges in the merged totals.
 export type CountsOf<T> = {
-  // Residents logged as exposed to floodwater, by age band.
+  // Residents exposed to floodwater whose day-5–15 watch hasn't started yet
+  // (phase 'upcoming'), by age band. Disjoint from inWatchWindow on purpose:
+  // if the bands also counted residents in the window, a single "<5" band
+  // could be worked out by subtracting the exact bands from inWatchWindow.
   exposed: Record<AgeBand, T>
   // Residents currently in the day 5–15 watch window after exposure.
   inWatchWindow: T
