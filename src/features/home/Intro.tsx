@@ -18,6 +18,7 @@ import { formatMB } from '../../lib/format'
 import { modelBytes, offlineModels } from '../../lib/offlineModels'
 import { useModelsPrepared } from '../../lib/useModelsPrepared'
 import { closeIntro } from './introSeen'
+import { IntroArt } from './IntroArt'
 import styles from './Intro.module.css'
 
 // The first-run intro (design pass 2, A1): 0a who it's for, 0b what you can
@@ -131,8 +132,7 @@ export default function Intro() {
                   <BrandTile size={32} />
                   AgapayMo
                 </p>
-                {/* I3 "After the flood" goes here once it's drawn. */}
-                <BrandTile size={96} className={styles.hero} />
+                <IntroArt className={styles.hero} />
                 {title(styles.display, 'Health checks after a typhoon, kahit walang signal.')}
                 <p className={styles.body}>
                   AgapayMo is for barangay health workers. It helps you keep track of who to check, what medicine you

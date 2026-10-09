@@ -116,8 +116,13 @@
   font: 800 20px/26px var(--font-ui);
 }
 
+/* I3 "After the flood", 335 × 160 (0a): 24 px above, 28 px below. */
 .hero {
-  margin: 56px auto 60px;
+  display: block;
+  width: 100%;
+  max-width: 335px;
+  height: auto;
+  margin: var(--space-6) auto 28px;
 }
 
 .display {
