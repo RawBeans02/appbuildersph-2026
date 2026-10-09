@@ -165,6 +165,11 @@ The brief (from the team's phone-test feedback) goes to Claude Design. Build fro
 - [ ] doing · P5 Laptop core: LaptopNav v2 (BrandTile), LoopStrip, 16b received meter, 17g/17h check lines (shared `components/CheckLines.tsx`, 25dbf3f), 19g approved panel · [lead] (taken at 1:15 AM: no word or branch from Syd) · owns: `src/features/municipal/` (except `llm/`), `src/components/CheckLines.tsx`
 - [ ] doing · P6 21a Receive restyle (uses CheckLines), and 22a Return QR · [lead] (taken at 1:15 AM) · owns: `src/features/return/`
 - [x] done · P7 Laptop rest: 18c newest row + B22 pill variant, 19f rule rail, 19h AI-off row · [lead] · owns: `MergedPage`, `PlanPage` `PlanSteps`, `llm/LlmWordingPanel.tsx` · 394845a (the "Just now" row is the newest QR scanned on this laptop this session: `justReceived.ts`; the rail animates only when the received exports changed: `planShown.ts`)
+- **Clock (Lead, Sat 1:20 AM):**
+  - The 4:00 AM feature freeze stays: no new features or flows.
+  - One timeboxed exception until 4:45 AM: polish to the Claude Design pass 2 frames (CSS, copy and SVG on screens already built). Fixes from the owner's 3:10 phone test are audit items, so they're allowed after 4:00.
+  - 4:45: QUALITY audit + self-audit #2 + Lighthouse (median of 3) on the Cloudflare URL.
+  - The owner's 3:10–3:55 phone test list is in the kit (`owner-test-3am.md`): the demo loop with real cameras is the go/no-go.
 - [ ] todo · P8 I2 loop art on 0c (ordered-list fallback until then) · [sr] after P4
 
 ## Next
