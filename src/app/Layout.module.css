@@ -1,0 +1,16 @@
+.main {
+  width: 100%;
+  max-width: 560px;
+  min-height: 100vh;
+  margin: 0 auto;
+  outline: none;
+}
+
+.withNav {
+  padding-bottom: calc(78px + var(--space-6));
+}
+
+/* The municipal laptop's screens use the full width. */
+.laptop {
+  max-width: none;
+}

@@ -1,0 +1,37 @@
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 12px 0 9px;
+  border-radius: var(--r-full);
+  font: var(--type-caption);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.ok {
+  background: var(--ok-tint);
+  color: var(--ok);
+}
+
+.warn {
+  background: var(--warn-tint);
+  color: var(--warn);
+}
+
+.bad {
+  background: var(--bad-tint);
+  color: var(--bad);
+}
+
+.neutral {
+  background: var(--sunken);
+  color: var(--ink-2);
+}
+
+/* URGENT is the only solid pill. */
+.urgent {
+  background: var(--bad-fill);
+  color: var(--surface);
+}

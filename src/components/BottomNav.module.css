@@ -1,0 +1,74 @@
+.nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+  height: 78px;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  align-items: stretch;
+  padding: 0 var(--space-1) 6px;
+  border-top: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--ink-3);
+  font: var(--type-caption);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.tab:hover {
+  color: var(--ink-2);
+}
+
+.bar {
+  width: 32px;
+  height: 4px;
+}
+
+.icon {
+  margin-top: 6px;
+}
+
+.active {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.active:hover {
+  color: var(--ink);
+}
+
+.active .bar {
+  border-radius: 0 0 3px 3px;
+  background: var(--ink);
+}
+
+.hinga {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 62px;
+  height: 62px;
+  margin-top: -20px;
+  border-radius: var(--r-full);
+  background: var(--ink);
+  color: var(--surface);
+  box-shadow: 0 0 0 5px var(--paper), var(--shadow-1);
+}
+
+.hinga:hover .circle {
+  background: var(--ink-2);
+}

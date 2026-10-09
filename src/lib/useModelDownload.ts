@@ -3,6 +3,7 @@ import { appShell } from './appShell'
 import { ensureModelCached, isModelCached, type ModelSpec } from './modelCache'
 import { createModelDownload, type ModelDownloadDeps } from './modelDownload'
 import { prepareStorageForDownload } from './storage'
+import { announceModelsChanged } from './useModelsPrepared'
 
 export const browserModelDownloadDeps: ModelDownloadDeps = {
   isModelCached: (spec) => isModelCached(spec),
@@ -22,6 +23,11 @@ export function useModelDownload(models: ModelSpec | ModelSpec[]) {
     void download.checkCached()
     return download.cancel
   }, [download])
+
+  // Tell indicators (LocalStatus) once the download is ready.
+  useEffect(() => {
+    if (state.status === 'ready') announceModelsChanged()
+  }, [state.status])
 
   return { state, start: download.start, cancel: download.cancel, retry: download.retry }
 }

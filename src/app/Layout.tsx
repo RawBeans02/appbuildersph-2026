@@ -1,41 +1,32 @@
-import type { ReactNode } from 'react'
-import { Link } from './Link'
-import { PLANNED_ROUTES } from './routes'
+import { useEffect, type ReactNode } from 'react'
+import { BottomNav, BOTTOM_NAV_HEIGHT } from '../components'
+import { cx } from '../components/cx'
+import { useFlowActive } from './flow'
+import styles from './Layout.module.css'
 
-// Placeholder layout until design/ lands: plain, unstyled, every planned screen
-// linked so each one can be reached and checked. NEEDS DESIGN.
-export function Layout({ notice, children }: { notice?: ReactNode; children: ReactNode }) {
-  const phone = PLANNED_ROUTES.filter((route) => route.device === 'phone')
-  const laptop = PLANNED_ROUTES.filter((route) => route.device === 'laptop')
+// The app frame. Phone screens get the bottom nav, except inside a flow
+// (useFlowMode) and on the municipal laptop's screens, which bring their own
+// LaptopNav.
+export function Layout({ path, notice, children }: { path: string; notice?: ReactNode; children: ReactNode }) {
+  const inFlow = useFlowActive()
+  const laptop = path === '/municipal' || path.startsWith('/municipal/')
+  const showNav = !laptop && !inFlow
+
+  // The toast sits above the nav.
+  useEffect(() => {
+    document.documentElement.style.setProperty('--nav-offset', showNav ? `${BOTTOM_NAV_HEIGHT}px` : '0px')
+  }, [showNav])
+
   return (
     <>
-      <a href="#main">Skip to content</a>
-      <header>
-        <p>
-          <Link to="/">Agapay</Link>
-        </p>
-        {notice}
-        <nav aria-label="Screens">
-          <ul>
-            {phone.map((route) => (
-              <li key={route.path}>
-                <Link to={route.path}>{route.title}</Link>
-              </li>
-            ))}
-          </ul>
-          <p>Municipal laptop:</p>
-          <ul>
-            {laptop.map((route) => (
-              <li key={route.path}>
-                <Link to={route.path}>{route.title}</Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      </header>
-      <main id="main" tabIndex={-1}>
+      <a href="#main" className="skip-link">
+        Skip to content
+      </a>
+      {notice}
+      <main id="main" tabIndex={-1} className={cx(styles.main, showNav && styles.withNav, laptop && styles.laptop)}>
         {children}
       </main>
+      {showNav && <BottomNav path={path} />}
     </>
   )
 }

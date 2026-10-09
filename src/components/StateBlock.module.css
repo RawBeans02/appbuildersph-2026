@@ -1,0 +1,44 @@
+.block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--space-6) var(--space-5);
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: var(--r-full);
+  background: var(--sunken);
+  color: var(--ink-2);
+}
+
+.error .icon {
+  background: var(--bad-tint);
+  color: var(--bad);
+}
+
+.title {
+  margin-top: var(--space-4);
+  font: 800 22px/28px var(--font-ui);
+}
+
+.body {
+  margin-top: var(--space-2);
+  font: 400 17px/25px var(--font-ui);
+  color: var(--ink-2);
+  text-wrap: pretty;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-3);
+  width: 100%;
+  margin-top: var(--space-5);
+}

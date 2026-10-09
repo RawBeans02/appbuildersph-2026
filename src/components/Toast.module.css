@@ -1,0 +1,47 @@
+.region {
+  position: fixed;
+  left: var(--space-4);
+  right: var(--space-4);
+  bottom: calc(var(--nav-offset, 0px) + var(--space-4));
+  z-index: 40;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  max-width: 520px;
+  min-height: 56px;
+  padding: 10px 10px 10px var(--space-4);
+  border-radius: var(--r-md);
+  background: var(--ink);
+  color: var(--surface);
+  box-shadow: var(--shadow-2);
+  pointer-events: auto;
+}
+
+.icon {
+  flex: none;
+  color: var(--ok-on-night);
+}
+
+.message {
+  flex: 1;
+  font: 600 16px/22px var(--font-ui);
+}
+
+.action {
+  min-height: 44px;
+  padding: 0 10px;
+  border: 0;
+  background: none;
+  color: var(--surface);
+  font: 700 16px/22px var(--font-ui);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}

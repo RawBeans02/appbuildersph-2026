@@ -5,6 +5,7 @@ import { NotFoundPage } from './app/NotFoundPage'
 import { PlaceholderPage } from './app/PlaceholderPage'
 import { usePath } from './app/router'
 import { resolveRoute } from './app/routes'
+import { ToastProvider } from './components'
 import type { AgapayDb } from './data/db/db'
 import { useDbQuery } from './data/db/useDbQuery'
 
@@ -45,14 +46,16 @@ export default function App() {
   }, [title])
 
   return (
-    <Layout notice={<SampleDataNotice />}>
-      {resolved.kind === 'feature' ? (
-        pages.get(resolved.route.path)
-      ) : resolved.kind === 'planned' ? (
-        <PlaceholderPage route={resolved.route} />
-      ) : (
-        <NotFoundPage />
-      )}
-    </Layout>
+    <ToastProvider>
+      <Layout path={path} notice={<SampleDataNotice />}>
+        {resolved.kind === 'feature' ? (
+          pages.get(resolved.route.path)
+        ) : resolved.kind === 'planned' ? (
+          <PlaceholderPage route={resolved.route} />
+        ) : (
+          <NotFoundPage />
+        )}
+      </Layout>
+    </ToastProvider>
   )
 }
