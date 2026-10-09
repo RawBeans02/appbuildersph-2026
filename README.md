@@ -89,6 +89,7 @@ _TBD_
 - **Designs:** the UI designs, tokens and images in `design/` were generated with Claude Design during the event.
 - **Fonts, icons, images and other third-party assets,** with their licenses: _TBD (listed as they are added)_.
   - The synthetic test label `src/inference/ocr/fixtures/label.ppm` was rendered during the event with Pillow's bundled font, Aileron Regular (CC0). Its text is invented.
+  - The synthetic demo label `docs/demo/label-doxy-24A.png` (the box scanned in the demo's stock step) was rendered during the event by `scripts/demo-label/make_label.py` with the same font, Aileron Regular (CC0). Its text is invented, with no brand, logo or company, and it is marked "DEMO · NOT A REAL MEDICINE · SAMPLE DATA".
 
 ### AI development tools
 Every AI session that touched this project:
@@ -118,7 +119,7 @@ A cloud "Jr. Builder" agent named in early commits was planned but never used.
 | [fake-indexeddb](https://github.com/dumbmatter/fakeIndexedDB) | In-memory IndexedDB for unit tests (development only) | Apache-2.0 |
 | [ONNX Runtime Web](https://onnxruntime.ai) (`onnxruntime-web`) | On-device model inference (WebAssembly) for the OCR spike | MIT |
 | [MediaPipe Tasks Vision](https://github.com/google-ai-edge/mediapipe) (`@mediapipe/tasks-vision` 1.0.1) | On-device pose landmarks (WebAssembly, CPU) for the Hinga spike; its SIMD WebAssembly build is copied into the site at build time (`npm run copy:mediapipe`), never loaded from a CDN | Apache-2.0 |
-| [Pillow](https://python-pillow.org) | Renders the synthetic test label (`src/inference/ocr/fixtures/make_label.py`); a development tool, not shipped | MIT-CMU |
+| [Pillow](https://python-pillow.org) | Renders the synthetic test label (`src/inference/ocr/fixtures/make_label.py`) and the synthetic demo label (`scripts/demo-label/make_label.py`); a development tool, not shipped | MIT-CMU |
 
 ## Lighthouse (mobile, measured at feature freeze)
 _TBD: Performance, Accessibility, Best Practices and SEO, measured on pagespeed.web.dev against the live URL._
