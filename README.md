@@ -78,7 +78,7 @@ prepared. The final video recording and posted submission link remain pending.
 ## What requires internet
 | Part | Why it needs internet | What happens offline |
 |---|---|---|
-| First visit to the live URL | Downloads the app shell (HTML, JS, CSS). The offline-return candidate build precaches 136 entries, 1929.65 KiB (Workbox output; local build, default core). Includes the spike pages and bundled QR decoder; re-measure the final deployment at feature freeze | After the first visit, the app opens offline |
+| First visit to the live URL | Downloads the app shell (HTML, JS, CSS): 133 entries, 2005.65 KiB, Workbox's precache figure in CI's production build of `ef7af1c` (run 37989732745). It includes the spike pages and the bundled QR decoder | After the first visit, the app opens offline |
 | Approved return instructions | No internet: the laptop signs locally and the phone verifies, compares the municipal fingerprint before first trust, previews and explicitly saves | Works after the app shell is prepared; saved instructions remain after offline reload. No cloud enrollment is required |
 | "Prepare for offline" (one tap, once) | Downloads the on-device AI into the browser's Cache Storage: the ONNX Runtime WebAssembly file (14,239,897 bytes) and the PP-OCRv5 models with their dictionary (12,658,822 bytes) for the medicine-box reader; for Hinga, the MediaPipe vision and audio runtimes (18,913,890 bytes), the pose model and YAMNet (9,904,556 bytes). 55,717,165 bytes in all | After it, the models load from the device; without it, AI features need the network |
 | First use of the AI wording on the municipal laptop (optional) | WebLLM downloads configuration, tokenizer and weights from huggingface.co and its WebGPU library from raw.githubusercontent.com; the service worker caches the app's wording worker. Offline readiness requires every required file for the GPU-selected f16/f32 variant. Persistent storage is requested best-effort; browser eviction can still remove files | Incomplete offline preparation shows a reconnect message and keeps the template and approval available. Real-model tests are opt-in; results and demonstration acceptance gates are in [docs/LLM-VALIDATION.md](docs/LLM-VALIDATION.md) |
@@ -232,6 +232,7 @@ Measured with Lighthouse 12.8.2 (mobile emulation, simulated throttling), the sa
 
 | Run | Performance | Accessibility | Best Practices | SEO |
 |---|---|---|---|---|
+| [Sat Oct 10, 4:53 AM PH](https://github.com/RawBeans02/appbuildersph-2026/actions/runs/37989864218), https://agapaymo.pages.dev at `ef7af1c` (the intro loads with Home), median of 3 runs (Performance 79, 89, 90; median LCP 3.5 s) | 89 | 100 | 100 | 100 |
 | [Sat Oct 10, 4:35 AM PH](https://github.com/RawBeans02/appbuildersph-2026/actions/runs/37987917415), https://agapaymo.pages.dev at `0432022` (after design pass 2), median of 3 runs (Performance 80, 87, 89; median LCP 4.0 s) | 87 | 100 | 100 | 100 |
 | [Fri Oct 9, 6:09 PM PH](https://github.com/RawBeans02/appbuildersph-2026/actions/runs/37915694829), median of 3 runs (Performance 66, 99, 99) | 99 | 100 | 100 | 100 |
 | [Fri Oct 9, 5:58 PM PH](https://github.com/RawBeans02/appbuildersph-2026/actions/runs/37914606334), single run, before the `robots.txt` and first-load fixes | 86 | 100 | 100 | 91 |
