@@ -58,6 +58,12 @@ test('tap exposed, add the scanned box, flag for review, create the QR', async (
   await page.getByRole('button', { name: 'Flag for clinician review' }).click()
   await expect(page.getByText('Flagged for clinician review', { exact: true })).toBeVisible()
 
+  // Home (1e): the same records as task sentences, each row a link.
+  await openPage(page, '/')
+  await expect(page.getByRole('link', { name: /^9 people in the watch window today/ })).toBeVisible({ timeout: 30_000 })
+  await expect(page.getByRole('link', { name: /^30 doxycycline capsules expire within 6 weeks/ })).toContainText('Use these first · 40 on hand')
+  await expect(page.getByRole('link', { name: /^1 flag waiting for clinician review/ })).toBeVisible()
+
   // Send: the de-identified table and the QR.
   await openPage(page, '/send')
   await expect(page.getByRole('row', { name: /Doxycycline capsules on hand/ })).toContainText('40')

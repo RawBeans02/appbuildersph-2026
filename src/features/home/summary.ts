@@ -24,6 +24,8 @@ export type HomeSummary = {
   watch: {
     active: number
     upcoming: number
+    // Of the people in the window now, those at higher risk (an open wound
+    // or repeated contact). Home writes it under the in-the-window count.
     higherRisk: number
     // When the soonest upcoming window opens.
     nextStart: string | null
@@ -80,7 +82,7 @@ export function summarizeHome(records: HomeRecords, today: string, modelsPrepare
     watch: {
       active: watch.filter((entry) => entry.phase === 'active').length,
       upcoming: watch.filter((entry) => entry.phase === 'upcoming').length,
-      higherRisk: watch.filter((entry) => entry.higherRisk).length,
+      higherRisk: watch.filter((entry) => entry.phase === 'active' && entry.higherRisk).length,
       nextStart: upcoming[0] ?? null,
     },
     hingaThisWeek: {

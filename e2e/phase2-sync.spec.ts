@@ -35,7 +35,7 @@ test('phase 2 off: no Sync item, and /municipal/sync and /doh are the 404', asyn
   }
   // P2-C: no messages card on the phone's Home.
   await openPage(page, '/')
-  await expect(page.getByText('On the watch list', { exact: true })).toBeVisible({ timeout: 30_000 })
+  await expect(page.getByRole('heading', { level: 2, name: /^Today, / })).toBeVisible({ timeout: 30_000 })
   await expect(page.getByRole('heading', { name: 'Messages from the municipality' })).toHaveCount(0)
 })
 

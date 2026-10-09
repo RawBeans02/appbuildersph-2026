@@ -56,6 +56,8 @@ describe('summarizeHome', () => {
           exposure('a', '2026-10-04'),
           exposure('b', '2026-10-04', ['waded', 'open-wound']),
           exposure('c', '2026-10-10'),
+          // Higher risk but not in the window yet: not in the higher-risk count.
+          exposure('d', '2026-10-09', ['open-wound']),
           exposure('old', '2026-08-01'),
         ],
         hingaChecks: [
@@ -75,7 +77,7 @@ describe('summarizeHome', () => {
     )
     expect(summary).toEqual({
       flood: { startedOn: '2026-10-04', day: 6, window: 'open', windowStart: '2026-10-09', windowEnd: '2026-10-19', puroks: [] },
-      watch: { active: 2, upcoming: 1, higherRisk: 1, nextStart: '2026-10-15' },
+      watch: { active: 2, upcoming: 2, higherRisk: 1, nextStart: '2026-10-14' },
       hingaThisWeek: { fast: 1, urgent: 1, refused: 1, referred: 2, lastReferredAt: '2026-10-09T03:00:00.000Z' },
       doxycycline: { onHand: 40, expiringSoon: 30, expired: 5 },
       openFlags: 1,

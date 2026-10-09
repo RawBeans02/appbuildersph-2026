@@ -13,7 +13,9 @@ type Screen = { path: string; ready: (page: Page) => Locator }
 
 const PHONE: Screen[] = [
   { path: '/receive', ready: (page) => page.getByRole('heading', { level: 1, name: 'Receive RHU instructions' }) },
-  { path: '/', ready: (page) => page.getByText('On the watch list', { exact: true }) },
+  // Home's task list (1e): the "Today" heading shows once the records and the
+  // saved instructions are read.
+  { path: '/', ready: (page) => page.getByRole('heading', { level: 2, name: /^Today, / }) },
   // The first-run intro's first card (0a), over Home.
   { path: '/?intro', ready: (page) => page.getByRole('heading', { level: 1, name: /Health checks after a typhoon/ }) },
   { path: '/prepare', ready: (page) => page.getByRole('heading', { level: 1, name: 'Get AgapayMo ready for no signal' }) },

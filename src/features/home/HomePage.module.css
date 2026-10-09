@@ -8,6 +8,57 @@
   flex: 1;
 }
 
+/* 1e brand row (56 px): the I1 tile and the name; the shield moved here. */
+.brandRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  height: 56px;
+  padding: 0 var(--space-3) 0 var(--space-5);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font: 800 18px/24px var(--font-ui);
+}
+
+.iconButton {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border: 0;
+  border-radius: var(--r-md);
+  background: none;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.iconButton:hover,
+.iconButton:active {
+  background: var(--sunken);
+}
+
+/* What AgapayMo is for, then "How it works" (the text button's own 8 px
+   padding sits in the gutter, so its words line up with the line above). */
+.purpose {
+  padding: 0 var(--space-5);
+}
+
+.purposeLine {
+  font: var(--type-body-md);
+  color: var(--ink-2);
+}
+
+.howLink {
+  margin-left: calc(-1 * var(--space-2));
+}
+
 .card {
   margin: var(--space-5) var(--space-5) 0;
   padding: var(--space-4) 18px;
@@ -74,49 +125,151 @@
   border-top: 1px solid var(--line);
 }
 
-.row {
-  display: grid;
-  grid-template-columns: 56px minmax(0, 1fr) 24px;
-  align-items: center;
-  gap: var(--space-2);
-  min-height: 72px;
-  padding: var(--space-3) var(--space-4) var(--space-3) var(--space-5);
-  border-bottom: 1px solid var(--line);
-  color: var(--ink);
-  text-decoration: none;
+/* 1e task rows: dividers on paper, the whole row is the link. */
+.tasks {
+  border-top: 1px solid var(--line);
 }
 
-a.row:hover {
+.task {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) 22px;
+  align-items: center;
+  gap: var(--space-4);
+  width: 100%;
+  min-height: 72px;
+  padding: var(--space-4) var(--space-4) var(--space-4) var(--space-5);
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.task:hover,
+.task:active {
   background: var(--sunken);
 }
 
-.count {
-  font: 800 32px/36px var(--font-ui);
+.task:focus-visible {
+  outline-offset: -3px;
+}
+
+/* 1g: the instructions row on the visit right after they were saved. */
+.taskJust {
+  background: var(--ok-tint);
+}
+
+.taskIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--r-full);
+}
+
+.taskIconNeutral {
+  background: var(--sunken);
+  color: var(--ink);
+}
+
+.task:hover .taskIconNeutral,
+.task:active .taskIconNeutral {
+  background: var(--surface);
+}
+
+.taskIconBad {
+  background: var(--bad-tint);
+  color: var(--bad);
+}
+
+.taskIconWarn {
+  background: var(--warn-tint);
+  color: var(--warn);
+}
+
+.taskText {
+  min-width: 0;
+}
+
+.taskTitle {
+  display: block;
+  font: var(--type-body-lg);
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
 
-.rowTitle {
+.taskMeta {
   display: block;
-  font: 700 18px/24px var(--font-ui);
-}
-
-.rowMeta {
-  display: block;
-  font: var(--type-body-dense);
+  margin-top: 2px;
+  font: var(--type-body);
   color: var(--ink-2);
-}
-
-.rowMetaWarn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font: var(--type-body-dense);
-  font-weight: 700;
-  color: var(--warn);
+  font-variant-numeric: tabular-nums;
 }
 
 .caret {
   color: var(--ink-3);
+}
+
+/* The breathing line: plainly not a row (no divider, caret or press). */
+.breathing {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-5) 0;
+}
+
+.breathingLine {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  font: var(--type-body-md);
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.breathingIcon {
+  flex: none;
+  margin-top: 1px;
+}
+
+.breathingUrgent {
+  color: var(--bad);
+}
+
+/* 1g: the way to receive instructions, a text button (Home keeps one primary). */
+.receive {
+  padding: var(--space-3) var(--space-5) 0;
+}
+
+.receiveLink {
+  margin-left: calc(-1 * var(--space-2));
+}
+
+.savedError {
+  margin: var(--space-4) var(--space-5) 0;
+  font: var(--type-body);
+  color: var(--bad);
+}
+
+/* The 1g sheet: the instructions under the sheet's own title, numbered. */
+.sheetInstructions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* Element selectors here outrank Return.module.css's single classes. */
+.sheetInstructions > :is(p, ol) {
+  margin: 0;
+}
+
+.sheetInstructions ol {
+  padding-left: var(--space-6);
+  list-style: decimal;
 }
 
 /* Loading: skeletons in --sunken. */

@@ -1,9 +1,10 @@
-import { useRef, useState } from 'react'
+import { useRef, useState, type MouseEvent } from 'react'
 import { navigate } from '../../app/router'
 import { useFlowMode } from '../../app/flow'
 import { Button, ButtonLink, Field, FlowTopBar } from '../../components'
 import { getDb } from '../../data/db/appDb'
 import { placeLine, usePlace } from '../../data/db/usePlace'
+import { markJustReceived } from '../home/justReceived'
 import { useQrScanner } from '../municipal/scan/useQrScanner'
 import { Instructions } from './Instructions'
 import { previewReceipt, saveReceipt } from './receipt'
@@ -45,6 +46,14 @@ export default function ReceivePage() {
     catch (cause) { setError(cause instanceof Error ? cause.message : 'Could not save on this phone. Try again.') }
     finally { working.current = false; setBusy(false) }
   }
+  // 1g: after a new save, Home shows the instructions row as just received
+  // for that visit (a plain click; new-tab clicks stay with the browser).
+  function backHome(event: MouseEvent<HTMLAnchorElement>) {
+    if (saved !== 'saved' || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+    event.preventDefault()
+    navigate('/')
+    markJustReceived()
+  }
   return <div className={styles.screen}>
     <FlowTopBar onBack={() => navigate('/send')} />
     <h1 className={styles.title}>Receive RHU instructions</h1>
@@ -52,7 +61,7 @@ export default function ReceivePage() {
     {saved ? <>
       <div role="status"><h2>{saved === 'duplicate' ? 'Already saved on this phone' : 'Instructions saved on this phone'}</h2></div>
       <p>Available on Home after an offline reload.</p>
-      <ButtonLink to="/">Back to Home</ButtonLink>
+      <ButtonLink to="/" onClick={backHome}>Back to Home</ButtonLink>
     </> : preview ? <>
       <p role="status">Signature verified. Review the instructions before saving.</p>
       <Instructions packet={preview.packet} />

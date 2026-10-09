@@ -47,7 +47,7 @@ test('the PIN lock: wrong PIN, sample PIN, sealed at rest, locked on reload, for
   await field.fill(pin)
   await unlock.click()
   await expect(html).toHaveAttribute('data-lock-status', 'unlocked', { timeout: 30_000 })
-  await expect(page.getByText('On the watch list', { exact: true })).toBeVisible({ timeout: 30_000 })
+  await expect(page.getByRole('heading', { level: 2, name: /^Today, / })).toBeVisible({ timeout: 30_000 })
 
   // At rest, each resident is its id, the sample flag and one sealed box.
   const keys = await residentKeys(page)
@@ -66,5 +66,5 @@ test('the PIN lock: wrong PIN, sample PIN, sealed at rest, locked on reload, for
   await field.fill(pin)
   await unlock.click()
   await expect(html).toHaveAttribute('data-lock-status', 'unlocked', { timeout: 30_000 })
-  await expect(page.getByText('On the watch list', { exact: true })).toBeVisible({ timeout: 30_000 })
+  await expect(page.getByRole('heading', { level: 2, name: /^Today, / })).toBeVisible({ timeout: 30_000 })
 })

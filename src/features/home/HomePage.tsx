@@ -1,32 +1,40 @@
-import { ArrowRightIcon, CaretRightIcon, CircleNotchIcon, ClockIcon, DropIcon, FileTextIcon, WindIcon } from '@phosphor-icons/react'
-import { lazy, Suspense, useState } from 'react'
+import { ArrowRightIcon, CircleNotchIcon, DropIcon, FileTextIcon, ShieldCheckIcon, WarningIcon, WindIcon } from '@phosphor-icons/react'
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react'
 import { Link } from '../../app/Link'
+import { navigate } from '../../app/router'
 import { PHASE2 } from '../../lib/phase2'
-import { ButtonLink, RecordsError, ScreenHeader, StateBlock } from '../../components'
+import { BottomSheet, BrandTile, ButtonLink, RecordsError, ScreenHeader, StateBlock } from '../../components'
 import { cx } from '../../components/cx'
+import type { AgapayDb } from '../../data/db/db'
+import { useDbQuery } from '../../data/db/useDbQuery'
 import { placeLine, usePlace } from '../../data/db/usePlace'
-import { dayRange, monthDay, weekdayMonthDay, weekdayMonthDayPlain } from '../../lib/format'
+import { barangayName } from '../../data/places'
+import { dayRange, weekdayMonthDay, weekdayMonthDayPlain } from '../../lib/format'
+import { modelBytes, offlineModels } from '../../lib/offlineModels'
 import { localToday } from '../../rules/dates'
 import { WATCH_END_DAY } from '../../rules/watch'
+import { Instructions } from '../return/Instructions'
+import { clearJustReceived, readJustReceived } from './justReceived'
 import type { HomeSummary } from './summary'
+import { TaskList } from './TaskList'
+import { breathingLine, taskRows } from './taskRows'
 import { useHomeSummary } from './useHomeSummary'
 import { useShowIntro } from './introSeen'
 import styles from './HomePage.module.css'
-import InstructionsCard from '../return/InstructionsCard'
 
 // Phase 2 only (P2-C): approved messages from the municipality, its own chunk.
 const MessagesCard = lazy(() => import('../inbox/MessagesCard'))
 // The first-run intro (0a–0c), its own chunk: loaded only when it shows.
 const Intro = lazy(() => import('./Intro'))
 
-// Screen 1: Home (1a default, 1b loading, 1c empty, 1d error). Every number
-// comes from the records on this phone (useHomeSummary).
+// Screen 1: Home (pass 2: 1e story-led, 1f without the AI yet, 1g with RHU
+// instructions; pass 1: 1b loading, 1c empty, 1d error). Every number comes
+// from the records on this phone (useHomeSummary) and the saved instructions.
 
-const localDay = (iso: string) => {
-  const date = new Date(iso)
-  const pad = (n: number) => String(n).padStart(2, '0')
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
-}
+// 1f: the phone models' real download size.
+const PHONE_AI_BYTES = modelBytes(offlineModels.filter((model) => model.device === 'phone'))
+
+const readInstructions = (db: AgapayDb) => db.getReceivedInstructions()
 
 // "Purok 1, 2, 3"
 function puroksLine(puroks: string[]): string {
@@ -71,46 +79,22 @@ function FloodCard({ flood }: { flood: NonNullable<HomeSummary['flood']> }) {
   )
 }
 
-function Rows({ summary }: { summary: HomeSummary }) {
-  const { watch, hingaThisWeek: hinga, doxycycline: doxy } = summary
-  const watched = watch.active + watch.upcoming
+// Under the rows, plainly not a task: no divider, caret or press state.
+function BreathingLine({ summary }: { summary: HomeSummary }) {
+  const line = breathingLine(summary)
+  if (!line) return null
   return (
-    <div className={styles.rows}>
-      <Link to="/watch" className={styles.row}>
-        <span className={styles.count}>{watched}</span>
-        <span>
-          <span className={styles.rowTitle}>On the watch list</span>
-          <span className={styles.rowMeta}>
-            {watch.active} in the window now
-            {watch.upcoming > 0 && watch.nextStart ? ` · ${watch.upcoming} start ${monthDay(watch.nextStart)}` : ''}
-          </span>
-        </span>
-        <CaretRightIcon className={styles.caret} size={22} weight="bold" aria-hidden />
-      </Link>
-      {/* No designed screen to open, so not tappable. */}
-      <div className={styles.row}>
-        <span className={styles.count}>{hinga.referred}</span>
-        <span>
-          <span className={styles.rowTitle}>{hinga.referred === 1 ? 'Child with fast breathing' : 'Children with fast breathing'}</span>
-          {hinga.lastReferredAt && (
-            <span className={styles.rowMeta}>Referred {weekdayMonthDay(localDay(hinga.lastReferredAt))}</span>
-          )}
-        </span>
-        <span />
-      </div>
-      <Link to="/stock" className={styles.row}>
-        <span className={styles.count}>{doxy.onHand}</span>
-        <span>
-          <span className={styles.rowTitle}>Doxycycline capsules</span>
-          {doxy.expiringSoon > 0 && (
-            <span className={styles.rowMetaWarn}>
-              <ClockIcon size={17} weight="bold" aria-hidden />
-              {doxy.expiringSoon} expire within 6 weeks
-            </span>
-          )}
-        </span>
-        <CaretRightIcon className={styles.caret} size={22} weight="bold" aria-hidden />
-      </Link>
+    <div className={styles.breathing}>
+      <p className={styles.breathingLine}>
+        <WindIcon className={styles.breathingIcon} size={22} weight="bold" aria-hidden />
+        {line.referred}
+      </p>
+      {line.urgent && (
+        <p className={cx(styles.breathingLine, styles.breathingUrgent)}>
+          <WarningIcon className={styles.breathingIcon} size={22} weight="bold" aria-hidden />
+          {line.urgent}
+        </p>
+      )}
     </div>
   )
 }
@@ -125,12 +109,12 @@ function Loading() {
       <div className={styles.skeletonCard} aria-hidden />
       <div className={styles.skeleton} style={{ width: 170, height: 22, margin: '26px 20px 14px' }} aria-hidden />
       <div className={styles.rows} aria-hidden>
-        {[[170, 120], [190, 100], [160, 140]].map(([title, meta], i) => (
+        {[[220, 160], [190, 200], [240, 140]].map(([title, meta], i) => (
           <div key={i} className={styles.skeletonRow}>
-            <span className={styles.skeleton} style={{ width: 40, height: 34, borderRadius: 8 }} />
+            <span className={styles.skeleton} style={{ width: 40, height: 40, borderRadius: '50%' }} />
             <span style={{ flex: 1 }}>
-              <span className={styles.skeleton} style={{ display: 'block', width: title, height: 16 }} />
-              <span className={styles.skeleton} style={{ display: 'block', width: meta, height: 12, marginTop: 8 }} />
+              <span className={styles.skeleton} style={{ display: 'block', width: title, maxWidth: '100%', height: 16 }} />
+              <span className={styles.skeleton} style={{ display: 'block', width: meta, maxWidth: '100%', height: 12, marginTop: 8 }} />
             </span>
           </div>
         ))}
@@ -141,49 +125,113 @@ function Loading() {
 
 export default function HomePage() {
   const summary = useHomeSummary()
+  const saved = useDbQuery(['meta'], readInstructions)
   const place = usePlace()
   const [today] = useState(localToday)
+  // 1g: this visit came straight from saving instructions on /receive. Read
+  // once; the mark is cleared so a reload shows the row as usual.
+  const [justReceived] = useState(readJustReceived)
+  const [sheetOpen, setSheetOpen] = useState(false)
+  const openSheet = useCallback(() => setSheetOpen(true), [])
+  const closeSheet = useCallback(() => setSheetOpen(false), [])
+  useEffect(() => {
+    if (justReceived) clearJustReceived()
+  }, [justReceived])
+
+  const loading = summary.status === 'loading' || saved.status === 'loading'
   const failed = summary.status === 'error'
   const showIntro = useShowIntro()
+  const instructions = saved.status === 'ready' ? saved.data : null
+  const packet = instructions?.packet
 
   return (
     <div className={styles.page}>
       <div className={styles.content}>
-        <ScreenHeader
-          title={place.barangay ?? 'AgapayMo'}
-          place={placeLine([place.municipality], place.sample) || undefined}
-          privacyButton
-        />
-        {summary.status === 'loading' && <Loading />}
-        {summary.status === 'error' && <RecordsError />}
-        {summary.status === 'ready' &&
-          (isEmpty(summary.data) ? (
-            <div className={styles.empty}>
-              <StateBlock
-                icon={FileTextIcon}
-                title="Nothing recorded yet"
-                body="Start with a breathing check. When floodwater reaches the barangay, log the flood to start a 15-day leptospirosis watch."
-              >
-                <Link to="/watch?step=log" className={styles.emptyLink}>
-                  Log a flood
-                  <ArrowRightIcon size={20} weight="bold" aria-hidden />
-                </Link>
-              </StateBlock>
-            </div>
-          ) : (
-            <>
-              {summary.data.flood && summary.data.flood.window !== 'over' && <FloodCard flood={summary.data.flood} />}
-              <h2 className={styles.today}>Today, {weekdayMonthDayPlain(today)}</h2>
-              <Rows summary={summary.data} />
-            </>
-          ))}
-        <InstructionsCard />
+        <div className={styles.brandRow}>
+          <span className={styles.brand}>
+            <BrandTile size={28} />
+            AgapayMo
+          </span>
+          <button type="button" className={styles.iconButton} aria-label="Privacy and AI" onClick={() => navigate('/privacy')}>
+            <ShieldCheckIcon size={26} weight="bold" aria-hidden />
+          </button>
+        </div>
+        <ScreenHeader title={place.barangay ?? 'AgapayMo'} place={placeLine([place.municipality], place.sample) || undefined} />
+        <div className={styles.purpose}>
+          <p className={styles.purposeLine}>Health checks for your barangay after a typhoon, kahit walang signal.</p>
+          <ButtonLink to="/?intro" variant="text" className={styles.howLink}>
+            How it works
+          </ButtonLink>
+        </div>
+        {loading ? (
+          <Loading />
+        ) : summary.status === 'error' ? (
+          <RecordsError />
+        ) : summary.status === 'ready' && isEmpty(summary.data) && !instructions ? (
+          <div className={styles.empty}>
+            <StateBlock
+              icon={FileTextIcon}
+              title="Nothing recorded yet"
+              body="Start with a breathing check. When floodwater reaches the barangay, log the flood to start a 15-day leptospirosis watch."
+            >
+              <Link to="/watch?step=log" className={styles.emptyLink}>
+                Log a flood
+                <ArrowRightIcon size={20} weight="bold" aria-hidden />
+              </Link>
+            </StateBlock>
+          </div>
+        ) : summary.status === 'ready' ? (
+          <>
+            {summary.data.flood && summary.data.flood.window !== 'over' && <FloodCard flood={summary.data.flood} />}
+            <h2 className={styles.today}>Today, {weekdayMonthDayPlain(today)}</h2>
+            <TaskList
+              rows={taskRows({
+                summary: summary.data,
+                instructions: instructions && { receivedAt: instructions.receivedAt, actions: instructions.packet.actions.length },
+                justReceived,
+                today,
+                aiBytes: PHONE_AI_BYTES,
+              })}
+              justReceived={justReceived}
+              onOpenInstructions={openSheet}
+            />
+            <BreathingLine summary={summary.data} />
+          </>
+        ) : null}
+        {saved.status === 'error' && (
+          <p role="alert" className={styles.savedError}>
+            Saved instructions could not be opened. Try reloading.
+          </p>
+        )}
+        {!loading && (
+          <div className={styles.receive}>
+            <ButtonLink to="/receive" variant="text" className={styles.receiveLink}>
+              Got a QR from the RHU? Scan it
+            </ButtonLink>
+          </div>
+        )}
+        {/* 1g's text twin for the row that just landed. */}
+        <p className="visually-hidden" role="status">
+          {justReceived && instructions && !loading ? 'Instructions from the RHU saved on this phone.' : ''}
+        </p>
         {PHASE2 && (
           <Suspense fallback={null}>
             <MessagesCard />
           </Suspense>
         )}
       </div>
+      {packet && (
+        <BottomSheet
+          open={sheetOpen}
+          onClose={closeSheet}
+          showClose
+          title={`Approved instructions for ${barangayName(packet.barangay) ?? packet.barangay}`}
+        >
+          <div className={styles.sheetInstructions}>
+            <Instructions packet={packet} bare />
+          </div>
+        </BottomSheet>
+      )}
       <div className={styles.footer}>
         {failed ? (
           <ButtonLink to="/hinga" variant="secondary" icon={<WindIcon size={24} weight="bold" aria-hidden />}>
