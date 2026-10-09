@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { getDb } from './appDb'
-import type { AgapayDb, RecordStore } from './db'
+import type { AgapayDb, SubscriptionStore } from './db'
 
 export type DbQueryState<T> =
   | { status: 'loading' }
@@ -11,7 +11,7 @@ export type DbQueryState<T> =
 // of `stores` is written. Pass a stable `query` (module-level or useCallback),
 // or it re-runs on every render.
 export function useDbQuery<T>(
-  stores: readonly RecordStore[],
+  stores: readonly SubscriptionStore[],
   query: (db: AgapayDb) => Promise<T>,
 ): DbQueryState<T> {
   const [state, setState] = useState<DbQueryState<T>>({ status: 'loading' })
@@ -28,7 +28,7 @@ export function useDbQuery<T>(
     getDb().then(
       (db) => {
         if (cancelled) return
-        const watched = storesKey ? (storesKey.split(',') as RecordStore[]) : []
+        const watched = storesKey ? (storesKey.split(',') as SubscriptionStore[]) : []
         unsubscribe = db.subscribe(watched, () => void run(db))
         void run(db)
       },

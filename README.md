@@ -1,6 +1,6 @@
 # AgapayMo
 
-An offline web app for barangay health workers after a typhoon: an on-device camera breathing check for children, a leptospirosis watch list and medicine-box reading on the phone, handed to the municipal health officer as de-identified counts by QR code, with no internet needed.
+An offline web app for barangay health workers after a typhoon: local medicine-box reading, a flood watch list and a breathing-screening prototype. A barangay reports de-identified counts by signed QR, the municipal officer approves a response, and the phone receives and saves signed instructions without internet.
 
 Named Agapay until Oct 9, 9 PM, when the team renamed it AgapayMo (internal identifiers such as the database name keep "agapay"). Built for the **AppBuildersPH Hackathon 2026** (Oct 9–10, 2026). Theme: **Local AI**. The challenge: "Build an AI product that remains genuinely useful when the cloud disappears."
 
@@ -33,8 +33,9 @@ The **municipal health officer** (MHO) decides where doctor teams and medicine g
      - **Compare:** it shows "12 exposed · 40 … · 30 expire within 6 weeks". Flag it.
      - **Hinga:** check breathing with the camera, or count by hand.
      - **Send:** shows the QR.
-  4. **Laptop (desktop Chrome):** open `/municipal`. Scan the phone's pairing QR, then its counts QR (or paste their text). Then Merged view → Plan → Approve → Approval log. The optional AI wording needs WebGPU and one online use first.
-  5. `/device` → **Reset sample data** puts the demo back to today's sample data without re-downloading the models.
+  4. **Laptop (desktop Chrome):** open `/municipal`. Scan the phone's pairing QR, compare fingerprints, then scan its counts QR (photo and text fallbacks available). Merged view → Plan → Approve → **Make return QR** → choose Maligaya-D → Generate return QR. The complete synthetic demo directs the first doctor team and a transfer of up to 30 capsules from Riverside-D to Maligaya-D. The optional AI wording needs WebGPU and one online use first.
+  5. **Phone:** Home or Send → **Receive RHU instructions**. Scan, choose a QR image, or paste the return text. Verify, compare the first municipal fingerprint with the laptop, review, then explicitly save. Reload Home offline: the instructions remain. Inventory stays at the demonstrated 40 capsules; receipt never marks a transfer complete. An existing approval can also generate its return QR from Approval log.
+  6. `/device` → **Reset sample data** clears received instructions and restores today's sample records without re-downloading models. Reset pairing also clears municipal trust; compare the next fingerprint again.
 - **Run or recreate it locally:** needs Node.js 20.19+ (or 22.12+) and npm.
   ```sh
   npm ci            # install the exact versions in package-lock.json
@@ -47,12 +48,25 @@ The **municipal health officer** (MHO) decides where doctor teams and medicine g
   ```
 - Any demo data in the app is invented sample data and is labeled as such.
 
+## Offline response preview
+
+Actual screenshots from the local production browser tests, with synthetic
+records and the network disabled. These are desktop browser captures using a
+phone viewport, not evidence of physical iPhone/Android trials.
+
+<img src="docs/demo/offline-first-trust.png" width="300" alt="Return instructions preview and first municipal fingerprint comparison" />
+<img src="docs/demo/offline-saved-instructions.png" width="300" alt="Instructions saved on Home after an offline reload" />
+
+The [one-minute narration and five-minute script](docs/DEMO-SCRIPT.md) are
+prepared. The final video recording and posted submission link remain pending.
+
 ## What runs locally
 | Part | Runs on | Model / runtime |
 |---|---|---|
 | App shell (HTML, JS, CSS), cached by a service worker | The user's browser | No model yet |
 | Records (residents, flood exposures, breathing checks, medicine stock, flags, approvals; on the municipal laptop also the paired phones' public keys, the received QR codes and the approved plans) | IndexedDB in the user's browser; they never leave the device except as the de-identified QR | No model |
 | De-identified export (Send screen): counts by age band, small numbers shown as "<5", signed with the phone's own key and drawn as a QR | The user's browser (Web Crypto ECDSA P-256; the private key can't be read out) | No model |
+| Approved return instructions (`AGPR1`): approval ID, municipality, recipient, reporting week, approval time/role, structured doctor-team and stock-transfer actions, municipal public key and signature; first trust requires fingerprint comparison; duplicate receipts are idempotent and older approvals cannot replace newer ones | ECDSA P-256 in the laptop and phone browsers; trusted keys and instructions in the existing IndexedDB metadata store. No cloud enrollment or phase 2 required | No model |
 | Optional AI wording of the municipal plan (laptop): a small language model rewords the rule-based plan; a check rejects any draft that adds a number that isn't in the plan, adds a dose, a diagnosis or a barangay, or reorders priorities, and the officer edits and approves either way | The laptop's GPU (WebGPU), in a Web Worker; without WebGPU the template wording is used | Qwen2.5-0.5B-Instruct on WebLLM |
 | De-identified QR payload (`src/qr/`): small-cell suppression ("<5"), signing on the phone, verification and merge on the laptop, and the one-time pairing QR that carries a phone's public key (the officer compares its fingerprint) | The user's browser, with the built-in Web Crypto API (ECDSA P-256) | No model |
 | Municipal laptop (`/municipal`, `/municipal/plan`, `/municipal/log`): reads the barangay QR codes from the laptop camera (or a photo, or pasted text), checks each signature against the paired phone's key, merges the barangays, computes the plan by fixed rules (doctor-team priority, doxycycline stock moves for the officer to decide, never a dose), and logs the officer's approval; camera frames are never stored or sent | The user's browser: the browser's built-in BarcodeDetector where it reads QR codes, else the bundled jsQR decoder; records in IndexedDB | No model: the plan is rules (the optional AI wording is the row above) |
@@ -65,7 +79,8 @@ The **municipal health officer** (MHO) decides where doctor teams and medicine g
 ## What requires internet
 | Part | Why it needs internet | What happens offline |
 |---|---|---|
-| First visit to the live URL | Downloads the app shell (HTML, JS, CSS: 1065.75 KiB, Workbox's precache figure in the build at `85d916c`; re-measured at feature freeze), which the service worker caches. 485.88 KiB of it is the Hinga spike page and its MediaPipe loader script, and 164,487 bytes the municipal laptop screens with their QR reader (130,108 of them jsQR) (`ls -l` on the build output) | After the first visit, the app opens offline |
+| First visit to the live URL | Downloads the app shell (HTML, JS, CSS). The offline-return candidate build precaches 136 entries, 1929.65 KiB (Workbox output; local build, default core). Includes the spike pages and bundled QR decoder; re-measure the final deployment at feature freeze | After the first visit, the app opens offline |
+| Approved return instructions | No internet: the laptop signs locally and the phone verifies, compares the municipal fingerprint before first trust, previews and explicitly saves | Works after the app shell is prepared; saved instructions remain after offline reload. No cloud enrollment is required |
 | "Prepare for offline" (one tap, once) | Downloads the on-device AI into the browser's Cache Storage: the ONNX Runtime WebAssembly file (14,239,897 bytes) and the PP-OCRv5 models with their dictionary (12,658,822 bytes) for the medicine-box reader; for Hinga, the MediaPipe vision and audio runtimes (18,913,890 bytes), the pose model and YAMNet (9,904,556 bytes). 55,717,165 bytes in all | After it, the models load from the device; without it, AI features need the network |
 | First use of the AI wording on the municipal laptop (optional) | WebLLM downloads the model weights from huggingface.co and its WebGPU library from raw.githubusercontent.com, and caches them in the browser; the app's 6 MB worker for it is cached by the service worker at the same time | Designed to run with no network afterwards (from WebLLM's cache); offline use not yet measured (first real run pending). Never used online: the panel says the AI is unavailable and the template wording is used |
 | Hinga spike, "Download for offline" (one tap on `spike-hinga.html`) | Downloads the MediaPipe WebAssembly file (11,756,954 bytes) and the pose model (5,777,746 bytes), 17,534,700 bytes in all, into the browser's Cache Storage | After it, the spike page works in airplane mode; without it, the pose model needs the network |
@@ -174,7 +189,8 @@ Every AI session that touched this project:
 - **Review and verification subagents** (Claude Code): review only; they write no code.
 - **The owner's separate Claude session ("Account Admin", an AI):** drafted the pre-event process docs on Oct 8, sets up and monitors the laptop (starts the agent sessions, watches memory), relays briefing details, and runs read-only audits; it writes no product code.
 - **Claude** (chat, Research mode): research and idea selection.
-- **Claude Design**: all UI design.
+- **Claude Design**: the original UI design; the return-flow extension by Codex follows its tokens and components.
+- **OpenAI Codex (GPT-6)**: repository review and the `codex/offline-return-qr` implementation: signed offline return packets, municipal trust and receipt screens extending the existing design, persistence/reset rules, loading cancellation/timeout and pagination fixes, Windows test portability, synthetic fixture updates, browser verification and submission materials. See `design/Offline Return QR.md` for the new screen specification. No additional model is added to the app.
 - **OpenAI gpt-image-2** (development only, not shipped in the app): placeholder photos inside the Claude Design mockups (a chest in a camera view, a hand holding a synthetic "SAMPLE" medicine box, a phone held up to a webcam), and one illustration of a flooded street for the video and pitch, labeled "AI illustration" wherever it appears. Prompts, model and dates are kept with the files; every image was checked by a person. Screenshots of the product in this README are real screenshots of the working app.
 
 A cloud "Jr. Builder" agent named in early commits was planned but never used.
@@ -219,6 +235,11 @@ Measured with Lighthouse 12.8.2 (mobile emulation, simulated throttling), the sa
 Single runs vary on GitHub's shared runners (one of the three runs above scored 66, with 2,120 ms of blocking time), so we report the median of three and show every run. Re-measured at the feature freeze; the latest median is the one that counts. Accessibility is also checked on every push by axe-core on 14 screens (`docs/MEASUREMENTS.md`, method 6).
 
 ## Team
+
+Contribution confirmation and the final physical-device/rehearsal checklist are
+in [`docs/FINAL-VALIDATION.md`](docs/FINAL-VALIDATION.md). The one-minute narration
+and five-minute demonstration are in [`docs/DEMO-SCRIPT.md`](docs/DEMO-SCRIPT.md).
+Human rows stay pending until each member's actual work is confirmed.
 | Name (as on appbuildersph.com/hackathon/participants) | GitHub | Role | Contributions |
 |---|---|---|---|
 | Rovince Eduvane | RawBeans02 | Build lead | _TBD_ |
@@ -226,4 +247,4 @@ Single runs vary on GitHub's shared runners (one of the three runs above scored 
 | Adam Arous | takashii18 | _TBD_ | _TBD_ |
 | Gabriel Syd Paguio | Syd7 | _TBD_ | _TBD_ |
 
-So far every commit comes from the owner's account (RawBeans02), written by the Lead and Sr. Builder AI sessions under the owner's direction; teammates who commit do so under their own accounts. No one outside the team contributes. Each member's actual contributions, code or not, are listed above.
+The original core was built with the Lead and Sr. Builder AI sessions under the owner's direction. The offline-return branch adds the Codex work disclosed above. AI tools and Git authorship do not establish a person's actual contribution; the human contribution rows remain pending confirmation in `docs/FINAL-VALIDATION.md`.

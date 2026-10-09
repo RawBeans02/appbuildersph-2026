@@ -12,33 +12,33 @@ export const MUNICIPAL_SAMPLE_EPI_WEEK = '2026-W41'
 export const municipalSampleDevices: SampleDevice[] = [
   {
     barangay: 'SID-BGS',
-    publicJwk: { kty: 'EC', crv: 'P-256', x: 'ss0x9NQIFOK8qGbi07-rr0EBZaPvVjTLAghk2vmeU-4', y: 'WiPaAjDCfIYnskCOoY8j4SxzIp88pYzll3naxeVQcu4' },
-    fingerprint: 'E366-AF1D-6F67-5D0B',
+    publicJwk: { kty: 'EC', crv: 'P-256', x: 'ykBFH4G3pP0C0KImEvwFXrI3BPFFgQ7vebyXuwpA6Zg', y: 'UWOgMNlbg33QEzgXiiGmaLPHZEVdhLriIUWfJ0BUrxI' },
+    fingerprint: '0949-6322-55FB-5095',
     source: 'seed',
   },
   {
     barangay: 'SID-STN',
-    publicJwk: { kty: 'EC', crv: 'P-256', x: 'G3RO7Yif9Qlk_dwb1ORiUxNX4J3AdIBjeoNGXupovs4', y: 'ULDiep2ksUfZ6UoOYoT4OduRZXm2p8P3YGT6epFzZXg' },
-    fingerprint: 'D9D9-D243-A53B-1E49',
+    publicJwk: { kty: 'EC', crv: 'P-256', x: '5g-5JQ0_fW2k3FUXwRuzKLNj3LWEevIPyr6Q539qz94', y: '8aVUqlCehKtnhBsl7pnAez-vKZk6animSxK1ycgUe5w' },
+    fingerprint: '8AB3-B601-D128-E1C8',
     source: 'seed',
   },
   {
     barangay: 'SID-MAB',
-    publicJwk: { kty: 'EC', crv: 'P-256', x: 'VrmVCWxmh44pXJ9YUhf5wUzVpMUOFsohG6aVniTRUi0', y: '9_xprEbK2JDIvPrhKzLKrh6Ig2byUVwsPOQ6sgjLPV0' },
-    fingerprint: 'F0C8-DA19-02BF-07BF',
+    publicJwk: { kty: 'EC', crv: 'P-256', x: 'Az15YxLM1vkkE35Bkuh5G360vXK9Ey4BLNLCClvIaZs', y: 'Nd2VMDFEt2VoZZCbV1iyyVf4X0uhzEkAUXIIPTCNzy8' },
+    fingerprint: 'DFEF-41BC-40F5-302B',
     source: 'seed',
   },
   {
     barangay: 'SID-RIV',
-    publicJwk: { kty: 'EC', crv: 'P-256', x: '2h20cSyBIFNeBlEiFu24dkHuGHvqO3Wlef5abuddPfQ', y: 'JmMZiK0KmCzrQCKtxXFG7EtlPE9f0-YGa2V9sq-hYGQ' },
-    fingerprint: '9624-94D4-4FD4-F8A7',
+    publicJwk: { kty: 'EC', crv: 'P-256', x: 'br1UWJ-XHFOy2vAFFblVi3h4GrPzhgcYqNV8PM7yWcI', y: 'PGdzoUWVIx6z3UZgS87KJlpRUoWzWaRya61fyP9m9x8' },
+    fingerprint: '4574-D5B0-EE32-DBC7',
     source: 'seed',
   },
 ]
 
 export const municipalSampleQrTexts: string[] = [
-  'AGP1.eyJ2IjoxLCJtIjoiU0lEIiwiYiI6IlNJRC1CR1MiLCJ3ayI6IjIwMjYtVzQxIiwibiI6MywiZSI6WyI8NSIsNiwxNCwzOCw3MSwxMl0sInciOjY0LCJmIjpbIjw1IiwiPDUiLDddLCJ1Ijo1LCJkIjoxMCwieCI6MCwiciI6MTJ9.Hwnpxvy0-2ZAl9BkyH9JIkG0waaC_reZVmd5L-r_090HVIPBqj0oXbdiyiv6UIMUK69Ku7ahgm4gacj34Utdgw',
-  'AGP1.eyJ2IjoxLCJtIjoiU0lEIiwiYiI6IlNJRC1TVE4iLCJ3ayI6IjIwMjYtVzQxIiwibiI6MiwiZSI6WzAsIjw1Iiw2LDE1LDMzLDddLCJ3IjoyNywiZiI6WzAsIjw1IiwiPDUiXSwidSI6Ijw1IiwiZCI6NjAsIngiOjAsInIiOjV9.i2XQTi0JnAVsbKuTSnU0PCfVap9L8wLHWckXa1RxYubI32BTUsWpIsNcyPvx9OcJSWV2_gUDANXgRLhQQOiIww',
-  'AGP1.eyJ2IjoxLCJtIjoiU0lEIiwiYiI6IlNJRC1NQUIiLCJ3ayI6IjIwMjYtVzQxIiwibiI6NCwiZSI6WzAsMCwiPDUiLDksMjEsIjw1Il0sInciOjExLCJmIjpbMCwwLDVdLCJ1IjowLCJkIjoyNCwieCI6MCwiciI6Ijw1In0.6Ye-Bri2PnXCIrnBjeL_RdR1E9veSHCc2euJZhubMXh4ou6otOsIRBNm5t8pUSXaleiP4ulGeWIRamrmEfN-BQ',
-  'AGP1.eyJ2IjoxLCJtIjoiU0lEIiwiYiI6IlNJRC1SSVYiLCJ3ayI6IjIwMjYtVzQxIiwibiI6MiwiZSI6WzAsMCwwLCI8NSIsIjw1IiwwXSwidyI6Ijw1IiwiZiI6WzAsMCwiPDUiXSwidSI6MCwiZCI6NTAsIngiOjMwLCJyIjowfQ.upaDv816IFh6YMeXZ3aC2IziD7IwE5IMq0QWWLlnZZvw9trixpWPHafBgocZ_Nx21hkHBdwD4gR3-_aFCdwQTQ',
+  'AGP1.eyJ2IjoxLCJtIjoiU0lEIiwiYiI6IlNJRC1CR1MiLCJ3ayI6IjIwMjYtVzQxIiwibiI6MywiZSI6WyI8NSIsNiwxNCwzOCw3MSwxMl0sInciOjYsImYiOlswLDAsMF0sInUiOjAsImQiOjEwLCJ4IjowLCJyIjoxMn0.jfZLYRFtJC_tSwR7XNpNgzYAWaNBM_N4oZS4wcovogEREd-2isw_wLviKs3dqzS8gUYt5src-0Z7U3LuTlga_w',
+  'AGP1.eyJ2IjoxLCJtIjoiU0lEIiwiYiI6IlNJRC1TVE4iLCJ3ayI6IjIwMjYtVzQxIiwibiI6MiwiZSI6WzAsIjw1Iiw2LDE1LDMzLDddLCJ3IjowLCJmIjpbMCwwLDBdLCJ1IjowLCJkIjo2MCwieCI6MCwiciI6NX0.OyZIAp-YNVDYuEKzEFHO_AFlCnbQAQVwZ7SfepdhlgsDvZUA-4wUgIs5m8jHaFKPwS8Q7JXyTflBW_FvZRZpPQ',
+  'AGP1.eyJ2IjoxLCJtIjoiU0lEIiwiYiI6IlNJRC1NQUIiLCJ3ayI6IjIwMjYtVzQxIiwibiI6NCwiZSI6WzAsMCwiPDUiLDksMjEsIjw1Il0sInciOjAsImYiOlswLDAsMF0sInUiOjAsImQiOjI0LCJ4IjowLCJyIjoiPDUifQ._rKgiNS91_WF5B25uUhiB77gcZVgu5dgTrrBNWLNqIO4oljxmbvGBfO8nJrUxZJBNyoFDwywbFOwvX9_uOK5bg',
+  'AGP1.eyJ2IjoxLCJtIjoiU0lEIiwiYiI6IlNJRC1SSVYiLCJ3ayI6IjIwMjYtVzQxIiwibiI6MiwiZSI6WzAsMCwwLCI8NSIsIjw1IiwwXSwidyI6MCwiZiI6WzAsMCwwXSwidSI6MCwiZCI6NTAsIngiOjMwLCJyIjowfQ.zO-5hEfSjc_pWSGyQ2sAxzPFsV7UqcQWDQiFA8MolA71pCEwEKVc_ebg_ukZBuhRsIThT5MiWdZsMyooaoEp9w',
 ]

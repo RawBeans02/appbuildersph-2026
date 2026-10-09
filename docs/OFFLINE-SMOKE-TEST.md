@@ -34,6 +34,28 @@ Load once and wait until the model shows as ready, go offline, reload, and run t
 `E2E_BASE_URL=<url> npx playwright test e2e/offline.spec.ts` runs the laptop steps 1-5 against a deployed site in headless Chromium: first visit, wait for the shell to report ready, go offline, reload, open a deep link. Without `E2E_BASE_URL` it builds and serves the app locally (that's what CI runs on every push).
 
 ## Results
+
+### Offline-return branch, local production preview
+
+Oct 9, 2026, Windows desktop, headless Chromium 156.0.8078.4, default core
+(`VITE_PHASE2` unset), branch `codex/offline-return-qr` based on `ddc193e`.
+`npm run build` and lint pass. Unit suite: 831 pass, 3 pre-existing skips.
+Full browser suite: 26 pass, 4 skipped because
+phase 2 is disabled. The complete demo runs in separate phone/laptop contexts:
+prepare → offline → report → pair/verify → approve → return QR → compare first
+municipal fingerprint → explicit save → Home → offline reload. The laptop's
+rendered return QR also decodes through the image fallback, and repeat receipt
+is already saved. Both contexts observe no requests to other origins.
+
+The new receipt test also rejects unsupported versions, wrong recipients,
+changed keys and stale approvals, and exercises sample/pairing resets. Original
+offline shell, model prepare/cache, OCR, manual Hinga, no-torso Hinga, reset and
+wow-flow tests pass. Hinga's fake camera verifies refusal/model startup only.
+This is automated local-browser evidence, not a final deployment, physical QR
+scan or iPhone/Android acceptance result. Record those in
+[Final validation](FINAL-VALIDATION.md).
+
+### Earlier deployment record
 | Date and time (PH) | Commit | Device and OS | Browser and version | Result | Notes |
 |---|---|---|---|---|---|
 | Oct 9, 3:40 PM | `04ab7dd` (production at the time) | MacBook Air M2, macOS 26.6.2 | Playwright headless Chromium shell 156.0.8078.4 | Pass | Automated (`e2e/offline.spec.ts` against https://appbuildersph-2026.vercel.app): offline reload and an offline deep link both served by the service worker. curl checks: deep links return the shell, `/assets/missing.js` returns 404, `sw.js` is `max-age=0, must-revalidate`. The phone part is pending (owner, with the S2 OCR test). |

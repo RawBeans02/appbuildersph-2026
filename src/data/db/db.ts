@@ -16,6 +16,7 @@ import type {
   WatchCheck,
 } from './types'
 import { LockedError, openValue, sealValue, session, type LockAttempts, type LockRecord, type SealedBox } from './vault'
+import { INSTRUCTIONS_META, MUNICIPAL_TRUST_META, type ReceivedInstructions, type TrustedMunicipalKey } from './returnTypes'
 
 // The on-device database. Every list is bounded (QUALITY.md): pass a limit, or
 // get DEFAULT_LIMIT. Writes notify subscribers of that store, so screens can
@@ -44,6 +45,7 @@ interface AgapaySchema extends DBSchema {
 }
 
 export type RecordStore = Exclude<StoreNames<AgapaySchema>, 'meta'>
+export type SubscriptionStore = RecordStore | 'meta'
 
 export const DB_NAME = 'agapay'
 export const DB_VERSION = 3
@@ -193,8 +195,8 @@ export async function openAgapayDb(name = DB_NAME, { encryption = false }: { enc
     },
   })
 
-  const listeners = new Map<RecordStore, Set<() => void>>()
-  const notify = (store: RecordStore) => listeners.get(store)?.forEach((listener) => listener())
+  const listeners = new Map<SubscriptionStore, Set<() => void>>()
+  const notify = (store: SubscriptionStore) => listeners.get(store)?.forEach((listener) => listener())
   const codec = createCodec(encryption)
 
   return {
@@ -210,6 +212,39 @@ export async function openAgapayDb(name = DB_NAME, { encryption = false }: { enc
     pairedDevices: createRepository(db, 'pairedDevices', notify, codec),
     plans: createRepository(db, 'plans', notify, codec),
     watchChecks: createRepository(db, 'watchChecks', notify, codec),
+
+    async getMunicipalTrust(): Promise<TrustedMunicipalKey[]> {
+      return (await db.get('meta', MUNICIPAL_TRUST_META) as TrustedMunicipalKey[] | undefined) ?? []
+    },
+    async getReceivedInstructions(): Promise<ReceivedInstructions | null> {
+      return (await db.get('meta', INSTRUCTIONS_META) as ReceivedInstructions | undefined) ?? null
+    },
+    // Verification happens before this transaction. Trust, recency and duplicate
+    // checks happen inside it so concurrent saves cannot replace a newer receipt.
+    async saveReceivedInstructions(receipt: ReceivedInstructions, compared: boolean): Promise<'saved' | 'duplicate'> {
+      const tx = db.transaction('meta', 'readwrite')
+      const keys = (await tx.store.get(MUNICIPAL_TRUST_META) as TrustedMunicipalKey[] | undefined) ?? []
+      const trust = keys.find((key) => key.municipality === receipt.packet.municipality)
+      const previous = (await tx.store.get(INSTRUCTIONS_META) as ReceivedInstructions | undefined) ?? null
+      let problem: string | null = null
+      if (trust && (trust.publicJwk.x !== receipt.packet.publicJwk.x || trust.publicJwk.y !== receipt.packet.publicJwk.y)) problem = 'The municipal key changed. Reset pairing and compare the new fingerprint with the RHU laptop.'
+      else if (!trust && !compared) problem = 'Compare the fingerprint with the RHU laptop before saving.'
+      else if (previous && previous.packet.barangay === receipt.packet.barangay) {
+        if (previous.packet.approvalId === receipt.packet.approvalId) {
+          if (JSON.stringify(previous.packet) === JSON.stringify(receipt.packet)) {
+            await tx.done
+            return 'duplicate'
+          }
+          problem = 'This approval ID already has different instructions. Nothing was saved.'
+        } else if (receipt.packet.approvedAt <= previous.packet.approvedAt) problem = 'This approval is older than, or conflicts with, the saved instructions. Nothing was saved.'
+      }
+      if (problem) { await tx.done; throw new Error(problem) }
+      if (!trust) await tx.store.put([...keys, { municipality: receipt.packet.municipality, publicJwk: receipt.packet.publicJwk, fingerprint: receipt.fingerprint, trustedAt: receipt.receivedAt } satisfies TrustedMunicipalKey], MUNICIPAL_TRUST_META)
+      await tx.store.put(receipt, INSTRUCTIONS_META)
+      await tx.done
+      notify('meta')
+      return 'saved'
+    },
 
     // Phase 2: the PIN lock's record and the wrong-PIN tries (vault.ts).
     async getLock(): Promise<LockRecord | null> {
@@ -268,7 +303,7 @@ export async function openAgapayDb(name = DB_NAME, { encryption = false }: { enc
     },
 
     // Tells the listener whenever a record in one of these stores is written.
-    subscribe(stores: RecordStore[], listener: () => void): () => void {
+    subscribe(stores: SubscriptionStore[], listener: () => void): () => void {
       for (const store of stores) {
         if (!listeners.has(store)) listeners.set(store, new Set())
         listeners.get(store)!.add(listener)
@@ -341,10 +376,11 @@ export async function openAgapayDb(name = DB_NAME, { encryption = false }: { enc
       const work: Promise<unknown>[] = [
         ...records.map((store) => tx.objectStore(store).clear()),
         tx.objectStore('meta').delete('seed'),
+        tx.objectStore('meta').delete(INSTRUCTIONS_META),
       ]
       if (resetLock) work.push(tx.objectStore('meta').delete('lock'), tx.objectStore('meta').delete('lockAttempts'))
       if (resetPairing) {
-        work.push(paired.clear(), tx.objectStore('deviceIdentity').clear())
+        work.push(paired.clear(), tx.objectStore('deviceIdentity').clear(), tx.objectStore('meta').delete(MUNICIPAL_TRUST_META))
       } else {
         for (const device of await paired.getAll()) {
           if (device.source === 'seed') work.push(paired.delete(device.barangay))
@@ -352,6 +388,7 @@ export async function openAgapayDb(name = DB_NAME, { encryption = false }: { enc
       }
       await Promise.all([...work, tx.done])
       for (const store of [...records, 'pairedDevices', 'deviceIdentity'] as const) notify(store)
+      notify('meta')
     },
 
     close: () => db.close(),

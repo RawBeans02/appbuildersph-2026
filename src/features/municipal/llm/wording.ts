@@ -10,6 +10,7 @@ import { buildMessages, MAX_DRAFT_TOKENS, type ChatMessage } from './prompt'
 export type LoadProgress = { progress: number; fetchedMB: number | null }
 
 export type LlmEngine = {
+  dispose?(): void
   complete(
     messages: ChatMessage[],
     options: { maxTokens: number; signal: AbortSignal; onText: (textSoFar: string) => void },
@@ -18,7 +19,7 @@ export type LlmEngine = {
 
 export type WordingDeps = {
   gpu(): Promise<WebGPUSupport>
-  loadEngine(onProgress: (progress: LoadProgress) => void): Promise<LlmEngine>
+  loadEngine(onProgress: (progress: LoadProgress) => void, signal: AbortSignal): Promise<LlmEngine>
   now?: () => number
 }
 
@@ -57,12 +58,13 @@ export function createWording(deps: WordingDeps) {
     }
   }
 
-  function getEngine(): Promise<LlmEngine> {
+  function getEngine(abort: AbortController): Promise<LlmEngine> {
     if (!engine) {
       const loading = deps.loadEngine((progress) => {
+        if (controller !== abort || abort.signal.aborted) return
         if (progress.progress >= 1) setState({ status: 'loading' })
         else setState({ status: 'downloading', ...progress })
-      })
+      }, abort.signal)
       engine = loading
       loading.catch(() => {
         if (engine === loading) engine = null
@@ -71,24 +73,42 @@ export function createWording(deps: WordingDeps) {
     return engine
   }
 
+  // Settles even if a backend never resolves initialization or generation.
+  function untilAborted<T>(pending: Promise<T>, signal: AbortSignal): Promise<T> {
+    return new Promise((resolve, reject) => {
+      const stop = () => reject(signal.reason)
+      if (signal.aborted) { stop(); return }
+      signal.addEventListener('abort', stop, { once: true })
+      pending.then(resolve, reject).finally(() => signal.removeEventListener('abort', stop))
+    })
+  }
+
   async function draft(template: string, plan: PlanFacts, knownNames: readonly string[]) {
     if (state.status === 'unavailable' || state.status === 'checking') return
     if (['downloading', 'loading', 'drafting'].includes(state.status)) return
     const abort = new AbortController()
     controller = abort
     const timer = setTimeout(() => abort.abort(new Error('timeout')), DRAFT_TIMEOUT_MS)
-    const update = (next: WordingState) => !abort.signal.aborted && setState(next)
+    const update = (next: WordingState) => controller === abort && !abort.signal.aborted && setState(next)
+    let loading: Promise<LlmEngine> | null = null
+    const release = () => {
+      if (engine === loading) engine = null
+      // Also releases an engine which arrives after cancellation.
+      void loading?.then((llm) => llm.dispose?.(), () => {})
+    }
+    abort.signal.addEventListener('abort', release, { once: true })
     try {
       setState({ status: 'loading' })
-      const llm = await getEngine()
+      loading = getEngine(abort)
+      const llm = await untilAborted(loading, abort.signal)
       if (abort.signal.aborted) throw abort.signal.reason
       const started = now()
       update({ status: 'drafting', text: '', template })
-      const text = await llm.complete(buildMessages(template), {
+      const text = await untilAborted(llm.complete(buildMessages(template), {
         maxTokens: MAX_DRAFT_TOKENS,
         signal: abort.signal,
         onText: (soFar) => update({ status: 'drafting', text: soFar, template }),
-      })
+      }), abort.signal)
       if (abort.signal.aborted) throw abort.signal.reason
       update({
         status: 'done',
@@ -98,13 +118,16 @@ export function createWording(deps: WordingDeps) {
         template,
       })
     } catch (error) {
+      if (controller !== abort) return
       if (abort.signal.reason instanceof Error && abort.signal.reason.message === 'timeout') {
         setState({ status: 'error', message: 'The model took too long. Use the template wording.' })
       } else if (!abort.signal.aborted) {
+        release()
         setState({ status: 'error', message: error instanceof Error ? error.message : String(error) })
       }
     } finally {
       clearTimeout(timer)
+      abort.signal.removeEventListener('abort', release)
       if (controller === abort) controller = null
     }
   }

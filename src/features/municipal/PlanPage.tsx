@@ -116,6 +116,7 @@ export function PlanBody({ plan, wordingPanel: Wording }: { plan: MunicipalPlan;
   const [aiDraft, setAiDraft] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [approvedText, setApprovedText] = useState<string | null>(null)
+  const [approvalId, setApprovalId] = useState<string | null>(null)
   const [problem, setProblem] = useState<string | null>(null)
   // A new deploy waits while the officer has unapproved text in the editor.
   useHoldReload(text !== '' && approvedText === null)
@@ -132,13 +133,14 @@ export function PlanBody({ plan, wordingPanel: Wording }: { plan: MunicipalPlan;
     setSaving(true)
     setProblem(null)
     try {
-      await approvePlan(await getDb(), {
+      const id = await approvePlan(await getDb(), {
         plan,
         draftText: aiDraft ?? '',
         draftSource: aiDraft !== null ? 'llm' : 'template',
         finalText: text,
       })
       setApprovedText(text)
+      setApprovalId(id)
       toast({ message: 'Plan approved and saved to the log.' })
     } catch {
       setProblem("Couldn't save the approval on this laptop. Nothing was lost. Try again.")
@@ -172,6 +174,7 @@ export function PlanBody({ plan, wordingPanel: Wording }: { plan: MunicipalPlan;
         </div>
       </div>
       <div className={styles.approveBar}>
+        {approvalId && <ButtonLink to={`/municipal/return?approval=${encodeURIComponent(approvalId)}`} variant="secondary">Make return QR</ButtonLink>}
         {problem && (
           <p role="alert" className={styles.problem}>
             <WarningCircleIcon size={18} weight="bold" aria-hidden />

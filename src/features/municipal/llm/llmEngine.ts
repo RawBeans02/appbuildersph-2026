@@ -8,9 +8,13 @@ import type { LlmEngine, LoadProgress } from './wording'
 export async function loadWordingEngine(
   backend: Backend,
   onProgress: (progress: LoadProgress) => void,
+  signal?: AbortSignal,
 ): Promise<LlmEngine> {
+  signal?.throwIfAborted()
   const worker = new Worker(new URL('./webllm.worker.ts', import.meta.url), { type: 'module' })
   const client = createInferenceClient(worker)
+  const stop = () => client.dispose()
+  signal?.addEventListener('abort', stop, { once: true })
   try {
     await client.init(backend, {
       onProgress: (progress, partial) =>
@@ -19,8 +23,11 @@ export async function loadWordingEngine(
   } catch (error) {
     client.dispose()
     throw error
+  } finally {
+    signal?.removeEventListener('abort', stop)
   }
   return {
+    dispose: () => client.dispose(),
     complete: (messages, { maxTokens, signal, onText }) =>
       client.run<string>(
         { messages, maxTokens },
