@@ -4,7 +4,8 @@ import { Button, Progress } from '../../../components'
 import { DEMO_BARANGAYS } from '../../../data/places'
 import { checkWebGPU } from '../../../lib/capabilities'
 import type { MunicipalPlan } from '../../../rules/plan'
-import { checkDraft, numbersIn, withReminder } from './check'
+import { checkNumbers } from '../numberCheck'
+import { checkDraft, withReminder } from './check'
 import { loadWordingEngine } from './llmEngine'
 import { WORDING_MODEL_NAME } from './model'
 import { createWording, type Wording } from './wording'
@@ -30,36 +31,25 @@ function getWording(): Wording {
 }
 
 const KNOWN_NAMES = DEMO_BARANGAYS.map((place) => place.name)
-const NUMBER_TOKEN = /<\s*5|\d+(?:[.,]\d+)?(?:\s*[–-]\s*\d+)?/g
-
-// The draft with each number marked: tinted when it's one of the plan's,
-// outlined with an icon when it isn't (never color alone).
+// The draft with each number marked, read by the plan screen's own number
+// check: a number the plan doesn't have is outlined with an icon (never color
+// alone); one it has is only highlighted for the officer to check, never
+// called a match.
 function markNumbers(text: string, template: string): ReactNode[] {
-  const allowed = numbersIn(template)
-  const out: ReactNode[] = []
-  let last = 0
-  for (const match of text.matchAll(NUMBER_TOKEN)) {
-    const token = match[0]
-    const at = match.index ?? 0
-    out.push(text.slice(last, at))
-    const found = numbersIn(token)
-    const ok = found.numbers.every((n) => allowed.numbers.includes(n)) && (found.smallCells === 0 || allowed.smallCells > 0)
-    out.push(
-      ok ? (
-        <span key={at} className={styles.match}>
-          {token}
-        </span>
-      ) : (
-        <span key={at} className={styles.mismatch}>
-          <WarningIcon size={14} weight="bold" aria-label="doesn't match the plan" />
-          {token}
-        </span>
-      ),
-    )
-    last = at + token.length
-  }
-  out.push(text.slice(last))
-  return out
+  return checkNumbers(text, template).segments.map((segment, i) =>
+    segment.number === undefined ? (
+      segment.text
+    ) : segment.number === 'found' ? (
+      <span key={i} className={styles.found}>
+        {segment.text}
+      </span>
+    ) : (
+      <span key={i} className={styles.mismatch}>
+        <WarningIcon size={14} weight="bold" aria-label="not in the plan" />
+        {segment.text}
+      </span>
+    ),
+  )
 }
 
 export type LlmWordingPanelProps = {

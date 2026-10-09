@@ -31,15 +31,18 @@ const NUMBER_WORDS: Record<string, number> = {
 
 const SMALL_CELL = /<\s*5/g
 
-// The numbers in a text. A "<5" is its own token, so it never allows a 5.
-export function numbersIn(text: string): { numbers: number[]; smallCells: number } {
+// A number as the check reads it: a value, or "<5" (a suppressed count of 1
+// to 4), which is its own token and never allows a 5.
+export type NumberValue = number | '<5'
+
+export function numbersIn(text: string): NumberValue[] {
   const smallCells = text.match(SMALL_CELL)?.length ?? 0
   const rest = text.replace(SMALL_CELL, ' ')
   const digits = [...rest.matchAll(/\d+(?:[.,]\d+)?/g)].map((m) => Number(m[0].replace(',', '.')))
   const words = [...rest.toLowerCase().matchAll(/[a-z]+/g)]
     .map((m) => NUMBER_WORDS[m[0]])
     .filter((n): n is number => n !== undefined)
-  return { numbers: [...digits, ...words], smallCells }
+  return [...Array<NumberValue>(smallCells).fill('<5'), ...digits, ...words]
 }
 
 // Terms the draft may not use more often than the template does: the template
@@ -93,9 +96,9 @@ export function checkDraft(draft: string, template: string, plan: PlanFacts, kno
   // Numbers: each one must be a number of the plan.
   const allowed = numbersIn(template)
   const found = numbersIn(text)
-  const added = [...new Set(found.numbers.filter((n) => !allowed.numbers.includes(n)))]
+  const added = [...new Set(found.filter((n) => n !== '<5' && !allowed.includes(n)))]
   if (added.length) reasons.push(`It adds numbers that are not in the plan: ${added.join(', ')}.`)
-  if (found.smallCells > 0 && allowed.smallCells === 0) reasons.push('It adds a "<5" that is not in the plan.')
+  if (found.includes('<5') && !allowed.includes('<5')) reasons.push('It adds a "<5" that is not in the plan.')
 
   for (const [label, pattern] of GUARDED_TERMS) {
     if (count(text, pattern) > count(template, pattern)) reasons.push(`It adds ${label}.`)

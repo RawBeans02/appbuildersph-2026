@@ -28,10 +28,7 @@ const reasons = (draft: string) => {
 
 describe('numbersIn', () => {
   it('reads digits, number words, and "<5" as its own token', () => {
-    expect(numbersIn('score 14–20, <5, week 2026-W41, twelve residents, lima, seventy')).toEqual({
-      numbers: [14, 20, 2026, 41, 12, 5, 70],
-      smallCells: 1,
-    })
+    expect(numbersIn('score 14–20, <5, week 2026-W41, twelve residents, lima, seventy')).toEqual(['<5', 14, 20, 2026, 41, 12, 5, 70])
   })
 })
 
