@@ -14,6 +14,7 @@ export function CantRunScreen({ onHandCount, onBack }: { onHandCount(): void; on
       <h1 className="visually-hidden">Hinga breathing check</h1>
       <div className={styles.body}>
         <StateBlock
+          tone="warn"
           icon={MemoryIcon}
           title="This phone can't run the camera check"
           body="Its browser can't run the breathing AI. Updating Chrome or Safari may fix this."
