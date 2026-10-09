@@ -136,7 +136,7 @@ The diagram, the pipelines, the key decisions and the limitations are in [`docs/
 Self-hosted, unmodified: the OCR models in `public/models/ppocr/` and the pose model and YAMNet in `public/models/mediapipe/`, each with checksums, sources and the license text in a README there.
 
 ### Technologies and frameworks
-React + TypeScript, built with Vite as an installable web app (PWA: vite-plugin-pwa / Workbox service worker). On-device storage in IndexedDB (idb). Inference in Web Workers on WebAssembly (ONNX Runtime Web, MediaPipe Tasks, Tesseract.js) and, on the laptop only, WebGPU (WebLLM). Browser APIs: Cache Storage, Web Crypto (ECDSA P-256), camera (getUserMedia), BarcodeDetector. Tests: Vitest and Playwright in GitHub Actions, with axe-core for automated accessibility checks. Small build scripts in Python with Pillow (synthetic labels). Every library and its license is in the table below.
+React + TypeScript, built with Vite as an installable web app (PWA: vite-plugin-pwa / Workbox service worker). On-device storage in IndexedDB (idb). Inference in Web Workers on WebAssembly (ONNX Runtime Web, MediaPipe Tasks, Tesseract.js) and, on the laptop only, WebGPU (WebLLM). Browser APIs: Cache Storage, Web Crypto (ECDSA P-256), camera (getUserMedia), BarcodeDetector. The optional phase 2 sync (off unless built with `VITE_PHASE2`) adds Vercel Functions (Node.js, Web-standard Request/Response) in `api/` with Postgres through node-postgres. Tests: Vitest and Playwright in GitHub Actions, with axe-core for automated accessibility checks, and a Postgres 16 service container for the API tests. Small build scripts in Python with Pillow (synthetic labels). Every library and its license is in the table below.
 
 ### APIs and cloud services
 - **Vercel:** static hosting of the app and the self-hosted model files. No server code, no API routes.
@@ -192,6 +192,8 @@ A cloud "Jr. Builder" agent named in early commits was planned but never used.
 | [qrcode-generator](https://github.com/kazuhikoarase/qrcode-generator) | Draws the de-identified QR on the Send screen | MIT |
 | [jsQR](https://github.com/cozmo/jsQR) (`jsqr` 1.4.0) | Reads QR codes from the municipal laptop's camera in browsers without the built-in BarcodeDetector; bundled with the app, so it works offline | Apache-2.0 |
 | [idb](https://github.com/jakearchibald/idb) | Promise wrapper for IndexedDB, the on-device records | ISC |
+| [node-postgres](https://node-postgres.com) (`pg` 8.23, with its dependencies `pg-pool`, `pg-protocol`, `pg-types`, `pg-connection-string`, `pgpass`, `pg-cloudflare`, `postgres-array`, `postgres-bytea`, `postgres-date`, `postgres-interval`, `xtend` (MIT) and `split2`, `pg-int8` (ISC)) | Postgres client for the optional phase 2 sync API (`server/db.ts`); server only, never in the app the browser loads | MIT |
+| `@types/pg` ([DefinitelyTyped](https://github.com/DefinitelyTyped/DefinitelyTyped)) | Type definitions for node-postgres (development only) | MIT |
 | [fake-indexeddb](https://github.com/dumbmatter/fakeIndexedDB) | In-memory IndexedDB for unit tests (development only) | Apache-2.0 |
 | [ONNX Runtime Web](https://onnxruntime.ai) (`onnxruntime-web`) | On-device model inference (WebAssembly) for the medicine-box reader | MIT |
 | [MediaPipe Tasks Vision](https://github.com/google-ai-edge/mediapipe) (`@mediapipe/tasks-vision` 1.0.1) | On-device pose landmarks (WebAssembly, CPU) for Hinga and the Hinga spike; its WebAssembly builds are copied into the site at build time (`npm run copy:mediapipe`), never loaded from a CDN | Apache-2.0 |

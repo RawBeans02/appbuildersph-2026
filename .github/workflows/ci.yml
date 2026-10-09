@@ -32,6 +32,38 @@ jobs:
       - run: npm run build
       - run: npm test
 
+  # The optional phase 2 API (api/, server/) against a real Postgres in a
+  # throwaway service container. Every value below is a dummy for this job
+  # only: no secret, no real database. The offline e2e never needs it.
+  api:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: agapay_test
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgres://postgres@localhost:5432/agapay_test
+      MUNICIPAL_ENROLL_CODE: ci-dummy-enroll-code
+      DOH_VIEW_CODE: ci-dummy-view-code
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run test:api
+
   # The offline end-to-end test: built app, real service worker, network cut
   # off in the browser. Runs here, never on the laptop.
   # Twice: the offline core as shipped, and with phase 2 on (VITE_PHASE2: the

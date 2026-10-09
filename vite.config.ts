@@ -46,6 +46,12 @@ export default defineConfig({
         globIgnores: ['**/worker.min-*.js', '**/tesseract-core-*.js', '**/webllm.worker-*.js', 'splash/**'],
         runtimeCaching: [
           {
+            // The optional phase 2 backend (api/): always the network, never a
+            // cache, so a sync or the DOH view never sees a stored answer.
+            urlPattern: ({ url, sameOrigin }) => sameOrigin && url.pathname.startsWith('/api/'),
+            handler: 'NetworkOnly',
+          },
+          {
             // The laptop's AI wording worker (WebLLM, about 6 MB, too big to
             // precache for every phone): cached the first time the officer uses
             // it online, which the model download needs anyway. Hashed file
@@ -73,7 +79,8 @@ export default defineConfig({
         ],
         navigateFallback: '/index.html',
         // A real file, not an app route: opening /robots.txt shows the file.
-        navigateFallbackDenylist: [/^\/robots\.txt$/],
+        // The API's routes are never the app shell either.
+        navigateFallbackDenylist: [/^\/robots\.txt$/, /^\/api\//],
         cleanupOutdatedCaches: true,
       },
     }),
@@ -91,6 +98,8 @@ export default defineConfig({
   },
   test: {
     environment: 'node',
-    include: ['src/**/*.test.ts', 'spikes/**/*.test.ts'],
+    // server/**/*.pg.test.ts need a real Postgres: `npm run test:api` (CI).
+    include: ['src/**/*.test.ts', 'spikes/**/*.test.ts', 'server/**/*.test.ts'],
+    exclude: ['**/node_modules/**', '**/.git/**', 'server/**/*.pg.test.ts'],
   },
 })

@@ -17,7 +17,8 @@
     "test": "vitest run",
     "test:e2e": "playwright test",
     "seed:municipal": "node scripts/seed/run.mjs scripts/seed/municipal.ts",
-    "copy:mediapipe": "node scripts/copy-mediapipe.mjs"
+    "copy:mediapipe": "node scripts/copy-mediapipe.mjs",
+    "test:api": "vitest run --config server/vitest.pg.config.ts"
   },
   "dependencies": {
     "@mediapipe/tasks-audio": "^1.0.1",
@@ -28,6 +29,7 @@
     "idb": "^8.0.4",
     "jsqr": "^1.4.0",
     "onnxruntime-web": "^1.30.0",
+    "pg": "^8.23.1",
     "qrcode-generator": "^2.0.4",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
@@ -38,6 +40,7 @@
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.64.0",
     "@types/node": "^24.19.1",
+    "@types/pg": "^8.23.1",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.2",
