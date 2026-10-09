@@ -2,6 +2,7 @@
 // never restyle them locally.
 export { BottomNav, BOTTOM_NAV_HEIGHT } from './BottomNav'
 export { BottomSheet } from './BottomSheet'
+export { BrandTile } from './BrandTile'
 export { Button, ButtonLink, type ButtonVariant } from './Button'
 export { CheckRow, RadioRow } from './ChoiceRow'
 export { Field, type FieldInputProps, type FieldTag } from './Field'
