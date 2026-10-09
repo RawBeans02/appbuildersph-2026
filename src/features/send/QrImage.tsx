@@ -3,6 +3,8 @@ import { useMemo } from 'react'
 
 // Draws QR text as an SVG: crisp at any size, black on white with the
 // standard 4-module quiet zone, so any phone or laptop camera can scan it.
+// data-qr-text holds the same text for the camera-less e2e test
+// (e2e/demo-handoff.spec.ts); it is the QR's content, nothing more.
 export function QrImage({ text, label }: { text: string; label: string }) {
   const { size, path } = useMemo(() => {
     const qr = qrcode(0, 'M')
@@ -23,6 +25,7 @@ export function QrImage({ text, label }: { text: string; label: string }) {
     <svg
       role="img"
       aria-label={label}
+      data-qr-text={text}
       viewBox={`0 0 ${size} ${size}`}
       width="100%"
       style={{ maxWidth: 360 }}
