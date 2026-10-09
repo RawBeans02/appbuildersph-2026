@@ -100,7 +100,8 @@ function MergedBody({ plan, view, newest }: { plan: MunicipalPlan | null; view: 
   const landing = newest !== undefined && landId === newest.id
   return (
     <>
-      {plan && <DoctorTeamOrder plan={plan} filling={landing ? newest.barangay : undefined} />}
+      <MergedTable view={view} newest={newest} land={landing} />
+      {view.partial && <p className={styles.partial}>{view.partial}</p>}
       {view.why && (
         <div className={styles.why}>
           <FlagIcon size={22} weight="bold" className={styles.whyIcon} aria-hidden />
@@ -109,8 +110,9 @@ function MergedBody({ plan, view, newest }: { plan: MunicipalPlan | null; view: 
           </p>
         </div>
       )}
-      <MergedTable view={view} newest={newest} land={landing} />
-      {view.partial && <p className={styles.partial}>{view.partial}</p>}
+      {/* 18d under the table (Lead override of the brief's "above"): at
+          1280 × 800 the table, the demo's main content, must stay in view. */}
+      {plan && <DoctorTeamOrder plan={plan} filling={landing ? newest.barangay : undefined} />}
     </>
   )
 }
