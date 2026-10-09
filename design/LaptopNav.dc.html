@@ -24,7 +24,7 @@
 <sc-if value="{{ logOff }}" hint-placeholder-val="{{ true }}"><a style="display:flex;align-items:center;gap:12px;height:48px;padding:0 12px;border-radius:10px;color:#4D463F;font-size:16px;font-weight:600;text-decoration:none"><i class="ph-bold ph-clock-counter-clockwise" style="font-size:22px"></i>Approval log</a></sc-if>
 </div>
 <div style="margin-top:auto;padding:0 8px;display:flex;flex-direction:column;gap:14px">
-<dc-import name="LocalStatus" device="laptop" online="{{ online }}" hint-size="216px,44px"></dc-import>
+<dc-import name="LocalStatus" device="laptop" stacked="{{ true }}" online="{{ online }}" hint-size="216px,48px"></dc-import>
 <a style="display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;color:#221D18;text-decoration:underline;text-underline-offset:3px"><i class="ph-bold ph-shield-check" style="font-size:18px"></i>Privacy &amp; AI</a>
 </div>
 </nav>

@@ -14,7 +14,7 @@ Every string, by screen. Use word for word. `{x}` = filled by the app. Sample va
 - Toast actions: `Undo`
 - Retry: `Try again · Subukan ulit`
 - Note on results: `Screening aid only. Not a diagnosis.`
-- Dose note: `Agapay never suggests a dose. Doxycycline is given only after consultation with a health professional (DOH).`
+- Dose note: `Agapay never suggests a dose. Doxycycline is given only after consultation with a health professional (DOH guideline).`
 - Records error (any screen): `Couldn't open the records` / `Nothing was lost. Your records are still saved on this phone.` / `Still stuck? Close Agapay and open it again.`
 - Loading records: `Opening the records on this phone…`
 
@@ -35,7 +35,7 @@ Every string, by screen. Use word for word. `{x}` = filled by the app. Sample va
 - Step: `Hinga · step 1 of 3`
 - Title: `How old is the child?`
 - Sub: `The cut-off for fast breathing depends on age.`
-- Options: `Under 2 months` `fast: 60+ /min` · `2 up to 12 months` `fast: 50+ /min` · `12 months up to 5 years` `fast: 40+ /min`
+- Options: `Under 2 months` `Fast: 60 or more a minute` · `2 to 11 months` `Fast: 50 or more a minute` · `1 to 4 years` `Fast: 40 or more a minute`
 - Section: `Before you start`
 - Checkbox: `The child is calm: not crying, not feeding, and the chest is visible.`
 - Field: `Link a resident` `(optional)` · value `{Residente 010} · {HH-02}`
@@ -48,7 +48,7 @@ Every string, by screen. Use word for word. `{x}` = filled by the app. Sample va
 - Guide label: `Chest here` → `Chest found`
 - Status: `Looking for the chest…` → `Chest found. Ready to count.`
 - Primary: `Start counting · Simulan` (disabled label: `Start counting`)
-- 3c pre-permission: `Next, allow the camera and microphone` / `The camera counts breaths. The microphone listens for crying. Nothing is recorded, and nothing leaves this phone.` / `Continue`
+- 3c pre-permission: `Next, allow the camera and microphone` / `The camera counts breaths. The microphone listens for crying. No video or sound is saved, and none of it leaves this phone.` / `Continue`
 - 3d blocked: `The camera is blocked` / `Hinga can't count without it. To allow it, open this site's settings in your browser and turn on Camera.` / primary `Count by hand with a timer` / link `I turned it on: try again`
 
 ## 4 · Hinga step 3 (counting)
@@ -56,7 +56,7 @@ Every string, by screen. Use word for word. `{x}` = filled by the app. Sample va
 - `Cancel` · countdown `{m:ss}` [0:42] `left`
 - Headline: `Hold still` · `step 3 of 3`
 - Trace label (screen readers): `Breathing trace`
-- Mic line: `Listening for crying. Nothing is recorded.`
+- Mic line: `Listening for crying. No video or sound is saved.`
 
 ## 5 · Hinga refusals
 
@@ -66,25 +66,26 @@ Every string, by screen. Use word for word. `{x}` = filled by the app. Sample va
 - 5b `Too much movement` / `Steady the phone. Rest your elbows on your knees or a table, and keep the chest inside the box.`
 - 5c `Can't see the chest clearly` / `Move to brighter light or lift the shirt. Keep the whole chest inside the box.`
 - 5d `Readings didn't agree` / `The phone counted two ways and got different numbers, so this count isn't safe to use.`
+- 5e (second refusal in a row, any reason) e.g. `Still too much movement` / `Rest the phone on something steady and try once more, or count by hand. The app keeps the time and applies the cut-off.` · primary `Try again · Subukan ulit` · secondary `Count by hand with a timer`
 
 ## 6 · Hinga result, fast
 
-- Meta: `{Residente 010} · {HH-02} · {12 months up to 5 years} · {8:31 AM}` (no resident: `{12 months up to 5 years} · {8:31 AM}`)
-- Band: `Fast breathing for age` · `{52}` `breaths a minute` · `The cut-off for {12 months up to 5 years} is {40}.`
-- Headline: `I-refer ngayong araw` · `Refer to the midwife or RHU today.`
-- Checklist title: `Check for danger signs` · `Tick any you see, or None of these. One tick makes this URGENT.` (after a tick: `{n} ticked`)
-- Signs (the four WHO IMCI 2014 general danger signs first, then two severe signs): `Can't drink or breastfeed` · `Vomits everything (sumusuka ng lahat)` · `Convulsions (kombulsyon)` · `Very sleepy or hard to wake (lethargic or unconscious)` · `Chest pulls in when breathing in (chest indrawing)` · `Harsh noise when breathing in, while calm (stridor)` · then a separate row `None of these`. Save is enabled only after a tick or `None of these`.
-- Primary: `Save to the record · I-save`
-- 6b URGENT band: `Urgent · danger sign` · `{52}` `breaths a minute` · `Fast for {12 months up to 5 years} (cut-off {40}), and {chest indrawing}.`
+- Meta: `{Residente 010} · {HH-02} · {1 to 4 years} · {8:31 AM}` (no resident: `{1 to 4 years} · {8:31 AM}`)
+- Band: `Fast breathing for age` · `{52}` `breaths a minute` · `The cut-off for {1 to 4 years} is {40}.`
+- Headline (h1): `I-refer ngayong araw` · `Refer to the midwife or RHU today.`
+- Checklist title: `Check for danger signs` · `Tick any you see, or None of these. Any sign makes this URGENT.` (after a tick: `{n} ticked`)
+- Signs: `Chest pulls in when breathing in (chest indrawing)` · `Harsh noise when breathing in (stridor)` · `Can't drink or breastfeed` · `Vomits everything` · `Convulsions (kombulsyon)` · `Very sleepy or hard to wake` · then `None of these`
+- Primary: `Save to the record · I-save`, disabled until a sign or None of these is ticked, with the hint `Tick any danger signs, or None of these, to save.`
+- 6b URGENT band: `Urgent · danger sign` · `{52}` `breaths a minute` · `Fast for {1 to 4 years} (cut-off {40}), and {chest indrawing}.`
 - 6b headline: `I-refer agad` · `URGENT: bring the child to the RHU now. Don't wait for the next check.`
 - 6b primary: `Save as URGENT · I-save`
-- 6c saved: `Saved to {Residente 010}'s record` · `No danger signs ticked · {8:32 AM}` (or `{n} danger sign(s) ticked`) · primary `Done · Tapos na` · secondary `Check another child`
+- 6c saved: `Saved to {Residente 010}'s record` · `No danger signs · {8:32 AM}` (or `{n} danger sign(s) ticked`) · primary `Done · Tapos na` · secondary `Check another child`
 - Counted by hand (L8b result): add `Counted by hand` to the meta line.
 
 ## 7 · Hinga result, not fast
 
-- Band: `Not fast breathing for age` · `{38}` `breaths a minute` · `The cut-off for {2 up to 12 months} is {50}.`
-- Headline: `Hindi mabilis ang paghinga` · `Not fast breathing for this age.`
+- Band: `Not fast breathing for age` · `{38}` `breaths a minute` · `The cut-off for {2 to 11 months} is {50}.`
+- Headline: `Hindi mabilis ang paghinga` (h1) · `Not fast breathing for this age.`
 - Section: `When to check again` · `In 5 days if the child isn't getting better. Right away if breathing gets faster or harder, or the child can't drink.` (WHO IMCI 2014)
 - Row: `See a danger sign? Refer now, whatever the count.`
 - Primary: `Save to the record · I-save` · link `Check another child`
@@ -139,7 +140,7 @@ Every string, by screen. Use word for word. `{x}` = filled by the app. Sample va
 - Link row: `Exposure and stock` · `{12} exposed · {40} doxycycline capsules`
 - Sections: `Expires within 6 weeks` · `All stock`
 - Row: `{Doxycycline 100 mg}` · `{DEMO-LOT-24A} · EXP {Nov 2026}` · `{30}` `{capsules}`
-- Pills: `Expires within 6 weeks` · `Expired: set aside`
+- The `Expires within 6 weeks` group heading carries the clock icon (no pill on its rows). Pill for expired lots: `Expired: set aside`
 - Primary: `Scan a box`
 - Empty: `No medicine recorded yet` / `Scan a box to add its lot and expiry. It takes a few seconds and works offline.` / link `Type it in instead`
 
@@ -161,7 +162,7 @@ Every string, by screen. Use word for word. `{x}` = filled by the app. Sample va
 
 - Title: `Send to the RHU` · `{Maligaya-D} · Week {2026-W41} · Sample data`
 - Heading: `What leaves this phone` · `Only these counts. No names, birthdays or addresses.`
-- Groups and rows: `Exposed, watch not started yet, by age` (`Under 2 months`, `2 up to 12 months`, `12 months up to 5 years`, `5 to 17 years`, `18 to 59 years`, `60 and over`) · `In the watch window now` · `Fast-breathing referrals, by age` (first three bands) · `URGENT referrals` · `Doxycycline capsules on hand` · `Of those, expiring within 6 weeks` · `Flags for clinician review`
+- Groups and rows: `Exposed, watch not started yet, by age` (`Under 2 months`, `2 to 11 months`, `1 to 4 years`, `5 to 17 years`, `18 to 59 years`, `60 and over`) · `In the watch window now` · `Fast-breathing referrals, by age` (first three bands) · `URGENT referrals` · `Doxycycline capsules on hand` · `Of those, expiring within 6 weeks` · `Flags for clinician review`
 - Footnote: `“<5” means 1 to 4. Small numbers are hidden so no household can be singled out.`
 - Meta: `Export #{3} · signed on this phone`
 - Primary: `Show the QR · Ipakita`
@@ -173,8 +174,8 @@ Every string, by screen. Use word for word. `{x}` = filled by the app. Sample va
 
 - Title: `Privacy & AI`
 - `What runs on this phone`
-  - `Breathing check (Hinga)` · `Uses the camera to count breaths. The video is never recorded or saved.`
-  - `Crying check` · `Listens for crying during a count. Sound is never recorded.`
+  - `Breathing check (Hinga)` · `Uses the camera to count breaths. The video is never saved.`
+  - `Crying check` · `Listens for crying during a count. Sound is never saved.`
   - `Medicine-box reader` · `Reads the lot and expiry from a photo. The photo is deleted after reading.`
   - `Your records` · `Residents, floods, checks and stock stay in this phone's browser storage.`
 - `What leaves this phone` · `Only the counts in the QR code, and only when you show it to the municipal laptop. No names, birthdays or addresses. Counts from 1 to 4 show as “<5”.` · link `See exactly what the QR holds`
@@ -195,11 +196,11 @@ Every string, by screen. Use word for word. `{x}` = filled by the app. Sample va
 - L2: `Not enough space on this phone` · `Agapay needs` `{55.1} MB` · `Free now` `{21.4} MB` · `Free up about {34} MB, then check again. Deleting old videos or an app you don't use is usually enough.` · primary `Check again` · link `Use Agapay without the AI for now`
 - L3: `Next, your browser may ask to keep Agapay's files` / `Tap Allow, so the AI isn't deleted when the phone runs low on space.` / `Continue`
 - L4: `Getting the AI ready` / `Loading it into this phone's memory. This takes a few seconds.`
-- L5: `Runs on this phone` / `The AI is saved on this phone and works with no signal. What you record stays here. Only counts leave, in the QR you choose to show.` · rows + `Ready` · link `What stays on this phone`
+- L5: `Runs on this phone` / `The AI is saved on this phone and works with no signal. Your records stay here. Only counts leave, in the QR.` · rows + `Ready` · link `What stays on this phone`
 - L6a/b: `Reading the box` · `Finding the text` `step 1 of 2` · `Reading the text` `step 2 of 2` · `Reading on this phone. The photo is deleted after.` · `Cancel`
 - L7: `Offline. Everything here still works.` / `Breathing checks, the watch list, stock and the QR all work with no signal. Only the first download and app updates need internet.` / `Got it`
 - L8a: `This phone can't run the camera check` / `Its browser can't run the breathing AI. Updating Chrome or Safari may fix this.` · `You can still` · `Count breaths by hand with a timer` · `Keep the flood watch list` · `Add medicine stock by typing` · `Send the QR to the RHU` · primary `Count by hand with a timer`
-- L8b: `Stop` · `{0:29}` `left` · `Count by hand` · `Watch the chest rise. Tap once for each breath.` · button `Tap for each breath` · `{12 months up to 5 years} · fast is {40} or more a minute`
+- L8b: `Stop` · `{0:29}` `left` · `Count by hand` · `Watch the chest rise. Tap once for each breath.` · button `Tap for each breath` · `{1 to 4 years} · fast is {40} or more a minute`
 - L9a: `The download stopped` / `The signal dropped at {9.8} of {55.1} MB. Connect to Wi-Fi or mobile data, then try again. What already downloaded is kept.` / `Try again · Subukan ulit`
 - L9b: `The breathing check couldn't start` / `Its files are on this phone, but it didn't load. Closing other apps usually fixes this.` / `Try again · Subukan ulit` (other models: `The crying check couldn't start`, `The box reader couldn't start`)
 - L9c: see screen 11.
@@ -229,18 +230,19 @@ Every string, by screen. Use word for word. `{x}` = filled by the app. Sample va
 - Pill: `Priority` · total row `All 5 barangays` (fewer: `{3} of 5 barangays`) · waiting row `Waiting` with dashes
 - Reason: `Why {Maligaya-D} first:` `the most residents in the watch window ({9}), fast-breathing referrals ({1–4}), and {30} of its {40} capsules expire within 6 weeks.`
 - Footnote: `Ranges include counts sent as “<5” (1 to 4 people), which phones use to protect small households. No names, birthdays or addresses reach this laptop.`
+- 18b (fewer than 5): sub `Week {2026-W41} · {3} of 5 barangays · Sample data` · waiting rows `Waiting` with dashes · total row `{3} of 5 barangays` · note `Totals cover the {3} barangays received so far. {Mabini-D and Riverside-D} are not counted yet.`
 
 ## 19 · Plan
 
 - Title: `Plan for week {2026-W41}` · `From {5} of 5 barangays · Sample data`
 - `The plan` · `Made by fixed rules from the counts. Always available, with or without the AI.`
 - Steps (rule output): `Send a doctor team to {Maligaya-D} first.` · `Move {60} capsules from {Bagong Silang-D} to {Maligaya-D}.` · `Use the {40} capsules that expire within 6 weeks first.` + their reason lines
-- Note: `No doses. Doxycycline is given only after consultation with a health professional (DOH).`
+- Note: `No doses. Doxycycline is given only after consultation with a health professional (DOH guideline).`
 - Panel title (all states): `Draft wording by the on-device AI: check before approving`
-- Done: `Written on this laptop · {Qwen2.5 0.5B} · {6.2} s` · `All {6} numbers match the plan` · mismatch: `{1} number doesn't match the plan: {45}` · link `Write it again`
+- Done: `Written on this laptop · {Qwen2.5 0.5B} · {6.2} s` · `No new numbers found; check each number against the plan steps` · mismatch (19e): `{1} number doesn't match the plan: {70}. The plan says {60}.` · approve hint `Fix the number to approve.` · link `Write it again`
 - Loading: `Downloading the writing AI` · `First time only. After this it runs on this laptop with no internet.` · `{412} / {879} MB · {46}%` · `The plan on the left works without it. You can approve now and skip the wording.` · secondary `Cancel the download`
 - Drafting: `Writing on this laptop` · `Writing from the plan's numbers…` · secondary `Stop`
-- Off: `The writing AI is off on this laptop` · `This laptop can't run it. The plan still works: approve it as listed, or write the wording yourself.` · placeholder `Write the wording (optional)`
+- Off: `The writing AI is off on this laptop` · `This laptop can't run it. The plan still works: approve it as listed, or write the wording yourself.` · field label `Wording` `(optional)`
 - Approve bar: `Approved by` · `Municipal health officer` · primary `Approve plan`
 - Toast after: `Plan approved and saved to the log.`
 
@@ -249,9 +251,9 @@ Every string, by screen. Use word for word. `{x}` = filled by the app. Sample va
 - Title: `Approval log` · `Kept on this laptop only · Sample data`
 - Columns: `When` · `Approved by` · `Plan` · `From` · `Wording`
 - Values: `{5} of 5 barangays` · wording `AI draft` / `AI draft, edited` / `Rules only`
-- Empty: `No plans approved yet. Approved plans show here.`
+- Empty (20b): `No plans approved yet` / `Approved plans show here, with who approved them and when.` / primary `Go to the plan`
 
 ## 404
 
-- `404` · `Walang ganitong page.` · `This page isn't part of Agapay. Your records are safe on this phone.` · primary `Go to Home · Bumalik sa Home` (laptop: `Go to the municipal home`)
+- `404` · `Walang ganitong page.` · `This page isn't part of Agapay. Your records are safe on this phone.` · primary `Go to Home · Pumunta sa Home` (laptop: `Go to the municipal home`)
 - Page title: `Page not found · Agapay`

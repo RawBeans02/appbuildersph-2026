@@ -10,28 +10,35 @@
 <helmet>
 <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
 </helmet>
-<sc-if value="{{ light }}" hint-placeholder-val="{{ true }}">
-<div style="display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px;font-family:'Atkinson Hyperlegible Next',system-ui,sans-serif;font-size:14px;line-height:20px;font-weight:600">
-<span style="display:inline-flex;align-items:center;gap:5px;color:#0D6880;white-space:nowrap"><i class="{{ deviceIcon }}" style="font-size:16px"></i>{{ deviceLabel }}</span>
-<sc-if value="{{ offline }}" hint-placeholder-val="{{ true }}"><span style="display:inline-flex;align-items:center;gap:5px;color:#4D463F;white-space:nowrap"><i class="ph-bold ph-cloud-slash" style="font-size:16px"></i>Offline</span></sc-if>
+<sc-if value="{{ lightInline }}" hint-placeholder-val="{{ true }}">
+<div style="flex:none;display:flex;flex-wrap:nowrap;align-items:center;column-gap:16px;font-family:'Atkinson Hyperlegible Next',system-ui,sans-serif">
+<button aria-haspopup="dialog" style="flex:none;display:inline-flex;align-items:center;gap:5px;min-height:48px;margin:-14px 0;padding:0;background:none;border:0;font:inherit;font-size:14px;line-height:20px;font-weight:600;color:#0D6880;white-space:nowrap;cursor:pointer"><i class="{{ deviceIcon }}" style="font-size:16px"></i><span style="text-decoration:underline dotted;text-decoration-thickness:1px;text-underline-offset:4px">{{ deviceLabel }}</span></button>
+<sc-if value="{{ offline }}" hint-placeholder-val="{{ true }}"><button aria-haspopup="dialog" style="flex:none;display:inline-flex;align-items:center;gap:5px;min-height:48px;margin:-14px 0;padding:0;background:none;border:0;font:inherit;font-size:14px;line-height:20px;font-weight:600;color:#4D463F;white-space:nowrap;cursor:pointer"><i class="ph-bold ph-cloud-slash" style="font-size:16px"></i><span style="text-decoration:underline dotted;text-decoration-thickness:1px;text-underline-offset:4px">Offline</span></button></sc-if>
+</div>
+</sc-if>
+<sc-if value="{{ lightStacked }}">
+<div style="display:flex;flex-direction:column;align-items:flex-start;row-gap:8px;font-family:'Atkinson Hyperlegible Next',system-ui,sans-serif">
+<button aria-haspopup="dialog" style="display:inline-flex;align-items:center;gap:5px;min-height:48px;margin:-14px 0;padding:0;background:none;border:0;font:inherit;font-size:14px;line-height:20px;font-weight:600;color:#0D6880;white-space:nowrap;cursor:pointer"><i class="{{ deviceIcon }}" style="font-size:16px"></i><span style="text-decoration:underline dotted;text-decoration-thickness:1px;text-underline-offset:4px">{{ deviceLabel }}</span></button>
+<sc-if value="{{ offline }}" hint-placeholder-val="{{ true }}"><button aria-haspopup="dialog" style="display:inline-flex;align-items:center;gap:5px;min-height:48px;margin:-14px 0;padding:0;background:none;border:0;font:inherit;font-size:14px;line-height:20px;font-weight:600;color:#4D463F;white-space:nowrap;cursor:pointer"><i class="ph-bold ph-cloud-slash" style="font-size:16px"></i><span style="text-decoration:underline dotted;text-decoration-thickness:1px;text-underline-offset:4px">Offline</span></button></sc-if>
 </div>
 </sc-if>
 <sc-if value="{{ dark }}">
-<div style="display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px;font-family:'Atkinson Hyperlegible Next',system-ui,sans-serif;font-size:14px;line-height:20px;font-weight:600">
-<span style="display:inline-flex;align-items:center;gap:5px;color:#91CFE5;white-space:nowrap"><i class="{{ deviceIcon }}" style="font-size:16px"></i>{{ deviceLabel }}</span>
-<sc-if value="{{ offline }}" hint-placeholder-val="{{ true }}"><span style="display:inline-flex;align-items:center;gap:5px;color:#C7C3BD;white-space:nowrap"><i class="ph-bold ph-cloud-slash" style="font-size:16px"></i>Offline</span></sc-if>
+<div style="flex:none;display:flex;flex-wrap:nowrap;align-items:center;column-gap:16px;font-family:'Atkinson Hyperlegible Next',system-ui,sans-serif">
+<button aria-haspopup="dialog" style="flex:none;display:inline-flex;align-items:center;gap:5px;min-height:48px;margin:-14px 0;padding:0;background:none;border:0;font:inherit;font-size:14px;line-height:20px;font-weight:600;color:#91CFE5;white-space:nowrap;cursor:pointer"><i class="{{ deviceIcon }}" style="font-size:16px"></i><span style="text-decoration:underline dotted;text-decoration-thickness:1px;text-underline-offset:4px">{{ deviceLabel }}</span></button>
+<sc-if value="{{ offline }}" hint-placeholder-val="{{ true }}"><button aria-haspopup="dialog" style="flex:none;display:inline-flex;align-items:center;gap:5px;min-height:48px;margin:-14px 0;padding:0;background:none;border:0;font:inherit;font-size:14px;line-height:20px;font-weight:600;color:#C7C3BD;white-space:nowrap;cursor:pointer"><i class="ph-bold ph-cloud-slash" style="font-size:16px"></i><span style="text-decoration:underline dotted;text-decoration-thickness:1px;text-underline-offset:4px">Offline</span></button></sc-if>
 </div>
 </sc-if>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:375,&quot;height&quot;:24},&quot;device&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;phone&quot;,&quot;laptop&quot;],&quot;default&quot;:&quot;phone&quot;,&quot;tsType&quot;:&quot;'phone'|'laptop'&quot;},&quot;online&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;dark&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;}}">
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:375,&quot;height&quot;:48},&quot;device&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;phone&quot;,&quot;laptop&quot;],&quot;default&quot;:&quot;phone&quot;,&quot;tsType&quot;:&quot;'phone'|'laptop'&quot;},&quot;online&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;dark&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;stacked&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;}}">
 class Component extends DCLogic {
   renderVals() {
     const t = (v) => v === true || v === 'true';
     const dark = t(this.props.dark);
+    const stacked = t(this.props.stacked);
     const online = t(this.props.online);
     const laptop = this.props.device === 'laptop';
     return {
-      dark, light: !dark, offline: !online,
+      dark, lightInline: !dark && !stacked, lightStacked: !dark && stacked, offline: !online,
       deviceIcon: laptop ? 'ph-bold ph-laptop' : 'ph-bold ph-device-mobile',
       deviceLabel: laptop ? 'Runs on this laptop' : 'Runs on this phone',
     };

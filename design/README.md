@@ -18,11 +18,11 @@ The `.dc.html` files are **design references built in HTML**, not production cod
 |---|---|
 | `Agapay Design System.dc.html` | Tokens, contrast pairs, type scale, spacing, radius, elevation, focus and touch rules, icon list, components, app icon, manifest |
 | `Agapay Local AI States.dc.html` | L1a–L1b first-run download, L2 not enough space, L3 keep files, L4 getting ready, L5 ready sheet, L6a–L6b working, L7 offline sheet, L8a can't run, L8b count by hand, L9a–L9c errors, L10 Privacy & AI (brief screen 15) |
-| `Agapay Phone 1 Home and Hinga.dc.html` | 1a–1d Home (default, loading, empty, error), 2a age, 3a–3d framing and camera permission, 4a counting, 5a–5d refusals, 6a–6c fast / URGENT / saved, 7a not fast |
+| `Agapay Phone 1 Home and Hinga.dc.html` | 1a–1d Home (default, loading, empty, error), 2a age, 3a–3d framing and camera permission, 4a counting, 5a–5e refusals, 6a–6c fast / URGENT / saved, 7a not fast |
 | `Agapay Phone 2 Flood and Watch.dc.html` | 8a–8c log a flood, mark exposed, confirm · 9a–9c watch list, row sheet, empty |
 | `Agapay Phone 3 Stock.dc.html` | 10a scan · 11a review (L11, the AI result review) · 12a–12b stock list, empty · 13a–13b exposure and stock, flagged |
 | `Agapay Phone 4 Send and Privacy.dc.html` | 14a–14c what leaves, QR, shared · 404 |
-| `Agapay Laptop.dc.html` | 16 home · 17a–17e scan and its results · 18 merged view · 19a–19d plan and AI panel states · 20 approval log |
+| `Agapay Laptop.dc.html` | 16 home · 17a–17f scan and its results · 18–18b merged view · 19a–19e plan and AI panel states · 20–20b approval log |
 | `StatusBar`, `BottomNav`, `LocalStatus`, `LaptopNav` `.dc.html` | Shared pieces the screens import. They map to app components (see below) |
 | `support.js` | Preview runtime only. Not part of the app |
 | `COPY.md` | Every string, by screen |
@@ -35,16 +35,16 @@ The `.dc.html` files are **design references built in HTML**, not production cod
 |---|---|
 | `/` | 1a default, 1b loading, 1c empty, 1d error |
 | `/prepare` | L1a intro, L1b downloading, L2 not enough space, L3 keep files, L4 getting ready, L9a download stopped |
-| `/hinga` | 2a age, 3a–3b framing, 3c camera pre-permission, 3d camera blocked, 4a counting, 5a–5d refusals, 6a fast, 6b URGENT, 6c saved, 7a not fast, L8a can't run, L8b count by hand, L9b didn't load |
+| `/hinga` | 2a age, 3a–3b framing, 3c camera pre-permission, 3d camera blocked, 4a counting, 5a–5d refusals, 5e second refusal, 6a fast, 6b URGENT, 6c saved, 7a not fast, L8a can't run, L8b count by hand, L9b didn't load |
 | `/watch` | 8a log a flood, 8b mark exposed, 8c confirm, 9a watch list, 9b row sheet, 9c empty |
 | `/stock` | 10a scan, L6a–L6b reading, 11a review, L9c couldn't read, 12a list, 12b empty |
 | `/compare` | 13a exposure and stock, 13b flagged |
 | `/send` | 14a what leaves, 14b QR, 14c shared |
 | `/privacy` | L10 |
-| `/municipal` | 16 home, 17a scanning, 17b success, 17c–17e other scan results |
-| `/municipal/merged` | 18 merged view. **New route**: add it to `PLANNED_ROUTES` |
-| `/municipal/plan` | 19a plan with AI draft, 19b–19d AI panel states |
-| `/municipal/log` | 20 approval log |
+| `/municipal` | 16 home, 17a scanning, 17b success, 17c–17f other scan results (17f camera blocked) |
+| `/municipal/merged` | 18 merged view, 18b fewer than 5 received. **New route**: add it to `PLANNED_ROUTES` |
+| `/municipal/plan` | 19a plan with AI draft, 19b–19e AI panel states (19e mismatch) |
+| `/municipal/log` | 20 approval log, 20b empty |
 | any other | 404 |
 
 L5, L7, 8c and 9b are sheets over their screen, not routes. Loading and error states for Watch, Stock and Compare reuse Home's patterns (1b skeleton rows, 1d error block).
@@ -52,8 +52,9 @@ L5, L7, 8c and 9b are sheets over their screen, not routes. Loading and error st
 ## Components to build once
 
 - **StatusBar**: preview chrome only. Don't build it; the phone draws its own.
-- **LocalStatus**: one quiet text line, icon + word, no pill and no border. `Runs on this phone` (laptop: `Runs on this laptop`) in --device with `device-mobile` / `laptop`, then `Offline` in --ink-2 with `cloud-slash`. 14/20 600, icons 16, 14 px gap. Shown only once the AI is ready. When online, only the device part shows. Tap opens L5 / L7. On camera screens: --device-on-night and --on-night-2.
-- **BottomNav**: 78 px tall, --surface, 1 px --line top border, 5 equal columns: Home (`house`), Watch list (`users-three`), Hinga (`wind`), Stock (`package`), Send (`qr-code`). Labels 14 px. Active: ink, Fill icon, 700, a 32 × 4 ink bar at the top. Inactive: --ink-3, Bold icon, 600. Hinga is a raised 62 px ink circle (white `wind` 30 px), lifted 20 px with a 5 px --paper ring. Hidden inside the Hinga, scan and send flows.
+- **LocalStatus**: one quiet text line, icon + word, no pill and no border. Two buttons: `Runs on this phone` (laptop: `Runs on this laptop`) in --device with `device-mobile` / `laptop`, and `Offline` in --ink-2 with `cloud-slash`. 14/20 600, icons 16, 16 px apart, dotted underline (1 px, offset 4 px) because each opens a sheet (L5 / L7). Each has a 48 px tap area: the 20 px line plus 14 px of invisible padding above and below (negative margin, so the layout doesn't move). Shown only once the AI is ready. When online, only the device part shows. On camera screens: --device-on-night and --on-night-2.
+- **BottomNav**: 78 px tall, --surface, 1 px --line top border, 5 equal flat tabs: Home (`house`), Watch list (`users-three`), Hinga (`wind`), Stock (`package`), Send (`qr-code`). Labels 14 px. Active: ink, Fill icon, 700, a 32 × 4 ink bar at the top. Inactive: --ink-3, Bold icon, 600. Nothing is raised: Home's Check breathing button is the big way into Hinga. Hidden inside the Hinga, scan and send flows.
+- **Camera screens**: the status bar and top bar sit on a solid --night band (96 px; 132 px on the counting screen, which has the timer). Never put text or the indicator straight over the camera image.
 - **LaptopNav**: 248 px sidebar, --surface, 1 px --line right border. Brand block (36 px ink "a" tile + "Agapay" / "Municipal view"), then items (48 px tall, radius 10): Scan QR codes (`scan`), Merged view (`table`), Plan (`list-numbers`), Approval log (`clock-counter-clockwise`). Active item gets a --sunken fill and 700. LocalStatus and a Privacy & AI link at the bottom.
 - **Screen header (main phone screens)**: title 26/32 700, then a place line 16/24 --ink-2 (`San Isidro Demo · Sample data`), then LocalStatus 8 px below. 20 px side padding. Home adds a 48 px shield button (`shield-check`) on the right that opens Privacy & AI.
 - **Flow top bar**: 56 px. A 48 px back or close button on the left, LocalStatus on the right. Step text under it, 15 px 700 --ink-2, with a small segmented step bar (28 × 6 segments).
@@ -69,16 +70,18 @@ L5, L7, 8c and 9b are sheets over their screen, not routes. Loading and error st
   - "Sure": a `check` tag in --ok.
 - **Checkbox and radio rows**: the whole row is the target (min 58–60 px). Box 28 px, radius 6, 2 px --line-strong. Checked: ink fill, white check, and the label goes 700.
 - **Status pills** (only for one record's status in a list): 28 px, radius full, 14 px 700, 16 px icon. ok / warn / bad use their tint fill and text color; neutral uses --sunken / --ink-2. URGENT is the only solid pill (--bad-fill, white).
-- **Bottom sheet**: --surface, top radius 24, shadow-2, a 40 × 5 grabber in --line, padding 12 / 20 / 24, scrim rgba(22,19,16,.5).
+- **Bottom sheet**: --surface, top radius 24, shadow-2, a 40 × 5 grabber in --line, padding 12 / 20 / 24, scrim rgba(22,19,16,.5). Dismissible sheets (L5, L7, 9b) also get a 48 px Close (`x`) top right. Sheet titles are h2 (h1 when the sheet is the whole screen, like 3c and 3d).
 - **Toast**: ink, 12 radius, shadow-2, 16 px 600 text, optional underlined action. Sits above the nav, 16 px from the edges, for 6 s.
 - **Progress**: 14 px track (--sunken with a 1 px --line inset), ink fill, radius full, always with a text label and MB / %. Indeterminate: a 30% segment that slides on a 1.4 s loop (it pulses under reduced motion).
-- **Empty and error blocks**: a 64 px circle icon (--sunken; errors use --bad-tint with a --bad icon), title 22/28 800, body 17/25 --ink-2, one action.
-- **Hinga result band**: radius 16, padding 16 / 18 / 18. A 17/22 800 label with icon, the 56 px metric + "breaths a minute" (20 px 700), then the cut-off line (16 px 600). Fast: --warn-fill with ink text. URGENT: --bad-fill with white text. Not fast: --ok-tint with ink text (the label in --ok).
+- **Empty and error blocks**: a 64 px circle icon (always 64; icon 32–34) (--sunken; errors use --bad-tint with a --bad icon), title 22/28 800, body 17/25 --ink-2, one action.
+- **Hinga result band**: radius 16, padding 16 / 18 / 18. A 17/22 800 label with icon, the 56 px metric + "breaths a minute" (20 px 700), then the cut-off line (16 px 600). Fast: --warn-fill with ink text. URGENT: --bad-fill with white text. Not fast: --ok-tint with ink text (the label in --ok). The headline under the band is the screen's h1.
+- **Danger-sign checklist (6a, 6b)**: 6 signs, then `None of these` on a --paper row. Save stays disabled (--sunken fill, --ink-3 text, with a hint line above) until a sign or None of these is ticked. None and a sign can't both be ticked; any sign turns the screen into 6b.
+- **Household rows (8b)**: only the checkbox row (48 px) marks or unmarks a household. Under a marked household, “Waded in floodwater” is static text; `Open wound` and `Repeated` are 48 px toggle chips, 8 px apart.
 
 ## Behavior that matters
 
-- **Hinga:** step 1 enables Next only when an age is picked and readiness is ticked. Framing enables Start only when the pose model finds the torso. Counting runs 60 s with a live trace and no running count. The quality gate can stop the count at any point (5a–5d), each with one Try again that goes back to framing.
-  - Results: any danger-sign tick turns 6a into 6b immediately. Save writes a `HingaCheck` (outcome fast / urgent / not-fast). Cut-offs come from `imci.ts`.
+- **Hinga:** step 1 enables Next only when an age is picked and readiness is ticked. Framing enables Start only when the pose model finds the torso. Counting runs 60 s with a live trace and no running count. The quality gate can stop the count at any point (5a–5d), each with one Try again that goes back to framing. After a second refusal in a row, the sheet adds Count by hand with a timer (5e).
+  - Results: Save is gated by the danger-sign checklist (see Components); any sign turns 6a into 6b immediately. 6a's headline is “I-refer ngayong araw · Refer to the midwife or RHU today”; 6b's is “I-refer agad”. Save writes a `HingaCheck` (outcome fast / urgent / not-fast). Cut-offs come from `imci.ts`.
   - The 7a re-check line cites WHO IMCI 2014 (follow up in 5 days if not improving).
   - 3c shows once, before the browser's camera and microphone prompt. 3d (blocked) and L8a (can't run) both offer L8b, counting by hand: tap per breath for 60 s, the same result screens, marked "Counted by hand".
 - **First run:** L1a → L3 (one line, then `navigator.storage.persist()`) → L1b → L4 → Home. Check storage before downloading (L2). Cancel and failures (L9a) keep finished files. A model that fails to load twice leads to L8a.
@@ -87,7 +90,7 @@ L5, L7, 8c and 9b are sheets over their screen, not routes. Loading and error st
 - **Compare:** the reasons are the `reviewExposureStock()` strings, verbatim. One action, flag. Never a dose.
 - **Send:** 14a lists all 14 schema counts already suppressed (`src/qr/`). The QR is pure black on white with a quiet zone; keep the screen awake while it shows. 14c is the BHW's own confirmation (the phone can't know it was scanned).
 - **Laptop:** the webcam stays on between scans. The banner outcomes are success, already received, not valid, and newer replaces older. Merged totals add the age bands, so any total that includes "<5" cells is a range with an en dash (`formatRange`).
-  - The plan comes from fixed rules and always works. The AI panel only drafts wording. Every number in the draft is checked against the plan: matches are tinted --ok-tint, and a mismatch turns the check line amber.
+  - The plan comes from fixed rules and always works. The AI panel only drafts wording. Every number in the draft is checked against the plan: matches are tinted --ok-tint and underlined 2 px --ok. A mismatch gets a dashed --warn outline and a warning icon, the check line turns amber and names it, and Approve is disabled until it matches or the draft is written again (19e).
   - Approve saves the plan and the final text to the log. The approver is a role, never a name.
 
 ## Tokens
@@ -159,8 +162,10 @@ Contrast (WCAG 2.2). All text pairs pass AA:
 | metric | 56/56 | 800, tabular | the one big number on a result |
 | display | 34/40 | 800, -0.01em | result headline, one per screen |
 | title | 26/32 | 700 | screen title (h1) |
-| heading | 20/26 | 700 | section heading (h2), sheet title |
+| heading-lg | 22/28 | 800 | sheet titles, empty and error titles |
+| heading | 20/26 | 700 | section heading (h2) |
 | body-lg | 18/26 | 500 (700 bold) | default text, row titles; buttons 18/24 700 |
+| body-md | 17/25 | 500 | helper lines, checklist rows, notes |
 | body | 16/24 | 400 | descriptions, row meta (15/22 in dense rows) |
 | caption | 14/20 | 600 | nav labels, pills, meta; smallest size in the app |
 | mono | 16/22 | 500 | lot numbers, codes, MB, export numbers |
@@ -249,7 +254,32 @@ Manifest values (the `manifest` block in `vite.config.ts`):
 - 17e: a newer export replaces an older one.
 - 19a checks every number in the AI draft against the plan.
 
-## Task map (added by the Lead when landing pass 1)
+## Age bands (from the pass 1 review)
+
+The bands no longer overlap: `Under 2 months`, `2 to 11 months`, `1 to 4 years`, `5 to 17 years`, `18 to 59 years`, `60 and over` (completed months or years; a 12-month-old is “1 to 4 years”, cut-off 40, as in `imci.ts`). Rename the band labels in `src/data/seed/generate.ts` and anywhere else in the UI to match. The schema keys (`m2to12`, `y1to5`…) don't change.
+
+## Not tappable in pass 1 (log as NEEDS DESIGN)
+
+Build these as plain rows; their detail screens aren't designed yet:
+- Home: the fast-breathing row (Hinga history)
+- Stock list: lot rows (editing a lot)
+- Merged view: barangay rows (age-band detail)
+- Approval log: rows (full approved text)
+
+## Changes after the pass 1 review (Oct 9)
+
+- Ages: non-overlapping bands everywhere (above).
+- Hinga results: added “Vomits everything” and “None of these”; Save gated on the checklist; headlines are h1; 6a reads “I-refer ngayong araw · Refer today”.
+- Camera screens: solid --night top band behind the indicator and controls.
+- Bottom nav: Hinga tab is flat (it overlapped Home's Check breathing button).
+- Refusals: 5e adds the hand-count fallback after a second refusal.
+- LocalStatus: two real buttons with 48 px tap areas and a dotted underline.
+- 8b: checkbox-only toggle, 48 px chips 8 px apart, static “Waded”.
+- Laptop: 19e mismatch state, 18b fewer than 5, 20b empty, 17f camera blocked, 19d field label, Priority pill 14/28, consistent sample times and log weeks.
+- Copy: “No video or sound is saved”, L5 “Only counts leave, in the QR.”, 8c “Start the watch · Simulan”, 404 “Go to Home · Pumunta sa Home”, “(DOH guideline)”, design-system strings aligned with COPY.md.
+- Tokens: added heading-lg 22/28 and body-md 17/25; 22 px gaps snapped to 24; all empty and error circles 64 px; no letter-spacing on the URGENT pill.
+
+## Task map (added by the Lead when landing pass 1 / 1b)
 
 Disclosure: the screens, tokens, copy, components and app icons in this folder were made with Claude Design during the event (Oct 9, 2026). The photos in `assets/` are placeholder images made with OpenAI gpt-image-2 for the mockups only; they are not product evidence and never ship in the app (see the repo README's AI disclosures).
 
@@ -262,14 +292,8 @@ Disclosure: the screens, tokens, copy, components and app icons in this folder w
 
 Build order: A7's theme and shared components land first, in small pushes; the screen tasks use them and never restyle them locally.
 
-## Pass 1 review decisions (Lead, Fri ~5 PM; these override the canvases)
+## Lead notes: code-driven overrides (Fri ~6 PM)
 
-From a three-reviewer design review (visual tells, UX/accessibility, copy) and the code audits. COPY.md already has the copy changes.
-1. **Age bands** use the WHO IMCI wording: "Under 2 months", "2 up to 12 months", "12 months up to 5 years" (then "5 to 17 years", "18 to 59 years", "60 and over"). Exactly 12 months uses the 40 cut-off (`src/rules/imci.ts`).
-2. **Fast breathing (6a) says "Refer today"** ("I-refer ngayong araw"); only URGENT (6b) says "now". That follows IMCI 2014 (fast breathing alone isn't an urgent referral; a danger sign is).
-3. **Danger signs (6a/6b/7a)**: the four IMCI 2014 general danger signs (including "Vomits everything"), then chest indrawing and stridor in a calm child, then a separate "None of these" row. Save is enabled only after a tick or "None of these", and the list scrolls fully clear of the Save bar on an 812 px screen.
-4. **Refusals 5a–5d**: after the second refusal in a row, add a secondary button "Count by hand with a timer" (L8b).
-5. **Camera screens (3a/3b/4a, 10a)**: the top bar with LocalStatus sits on a solid --night bar (or a scrim of at least 0.8), never over the live image at 0.55.
-6. **Home 1a**: the primary button keeps clear of the raised Hinga tab (no overlap); the raised tab stays.
-7. **Laptop 19a**: also build the MISMATCH state: icon + outline on the number that doesn't match, an amber check line, and "Write it again". Never color only.
-8. **Accessibility**: LocalStatus is a button at least 48 px tall (it opens L5/L7); 8b chips are 48 px with an 8 px gap; one h1 per screen (6a/6b/7a included); rows that would open an undesigned screen aren't tappable.
+Pass 1b (Claude Design's own revision with the review fixes) replaced pass 1; where it differs from what was built, the design wins. Two strings in COPY.md are set by the code instead, on purpose:
+- **Send 14a / laptop 18:** "Exposed, watch not started yet, by age". The exposed age bands count only residents whose day-5–15 watch hasn't started, so they don't overlap "In the watch window now" (a privacy fix: otherwise a "<5" band could be worked out by subtraction).
+- **Laptop 19a/19e:** the check line never claims "all numbers match". When the check finds nothing wrong it says "No new numbers found; check each number against the plan steps"; the model name comes from the code (Qwen2.5 0.5B).
