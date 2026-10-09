@@ -1,6 +1,6 @@
 # Architecture
 
-Agapay is one offline-first web app (a PWA: Vite, React, TypeScript, `vite-plugin-pwa`) served as static files from Vercel. The barangay health worker uses the phone screens; the municipal health officer uses the laptop screens of the same app. There is no server and no cloud AI: every model runs in the browser, and the only link between the phone and the laptop is a QR code shown on one screen and scanned by the other.
+Agapay is one offline-first web app (a PWA: Vite, React, TypeScript, `vite-plugin-pwa`) served as static files from Vercel. The barangay health worker uses the phone screens; the municipal health officer uses the laptop screens of the same app. The core has no server and no cloud AI: every model runs in the browser, and the only link between the phone and the laptop is a QR code shown on one screen and scanned by the other. An optional phase 2, built only with `VITE_PHASE2=1`, adds a small sync backend for when the internet returns (see "Phase 2: sync when the internet returns"); the offline core never calls it.
 
 Sizes, hashes, sources and licenses of every file are in the [README](../README.md) (Models used, What requires internet). This document links to them rather than repeating them.
 
@@ -156,6 +156,46 @@ flowchart LR
   - **Limits:** 4–6 digits are few combinations. The delay limits guesses typed into the app, but someone who copies the browser's storage can try PINs offline, each costing one PBKDF2 run. The lock protects records on a shared, lost or borrowed phone against casual access, not against a determined attacker with the device's storage. The municipal laptop's screens aren't behind the PIN: they hold de-identified counts only.
   - **Timing:** the iterations are meant to keep unlocking at about 1.5 s or less on a mid-range phone. /device "Measure the PIN key" times one derivation on the device it runs on (docs/MEASUREMENTS.md); no phone figure is claimed until it's measured there.
 
+## Phase 2: sync when the internet returns
+
+Optional and secondary, off unless the app is built with `VITE_PHASE2=1`. When the municipal laptop is online, it uploads what it already holds (the paired phones' public keys and the signed barangay QRs it received) to the app's own API, and a DOH or regional officer reads the latest report per barangay. Everything offline works the same with or without it.
+
+```mermaid
+flowchart LR
+  CODE(["Enroll code (MUNICIPAL_ENROLL_CODE)"])
+  subgraph LAPTOP["Municipal laptop (online)"]
+    LK["Laptop key: ECDSA P-256, non-extractable, in IndexedDB"]
+    HELD[("Paired phone keys + received QR texts")]
+  end
+  subgraph API["Vercel Functions in api/, code in server/"]
+    ENROLL["POST /api/enroll"]
+    SYNC["POST /api/sync: verify every QR again (src/qr decodeQr)"]
+    REPORTS["GET /api/reports"]
+  end
+  PG[("Postgres (Neon): devices, barangay_keys, reports, nonces, rate_limits, audit_log, alerts")]
+  DOH["/doh: DOH view (view code)"]
+  CODE --> ENROLL
+  LK -->|"signs once, with the code"| ENROLL
+  LK -->|"signs every request"| SYNC
+  HELD --> SYNC
+  ENROLL --> PG
+  SYNC --> PG
+  PG --> REPORTS --> DOH
+```
+
+- **Trust chain**: the enroll code admits a laptop's key; the laptop's key signs every later request; the laptop vouches for the phone keys it paired (the officer compared fingerprints on both screens); each phone's key signs its counts QR, and the server verifies every QR again against the vouched key before storing it.
+  - **Enroll** (`POST /api/enroll { publicJwk, municipality, code }`): the body must be signed by the key it enrolls (proof the laptop holds it), and the code is compared with `MUNICIPAL_ENROLL_CODE` as SHA-256 digests with `timingSafeEqual`. The answer is the key's fingerprint, never the code. A refused code is logged with the key's fingerprint.
+  - **Signed requests**: the body is `{ fingerprint, ts, nonce, data }` and the `x-agapay-signature` header is a base64url ECDSA P-256 / SHA-256 signature over the exact body bytes, verified with the enrolled key through Web Crypto.
+  - **Vouching** (`POST /api/sync`, `data.barangayKeys`): a laptop can vouch only for barangays of its own municipality. When a barangay's key changes (a new phone was paired), the newest vouch wins.
+  - **Reports** (`data.reports`, the QR texts as scanned): each is decoded and verified with `decodeQr` against the municipality's vouched keys; an unknown, tampered, malformed or other-municipality QR is refused on its own, and the others are stored. Per barangay and ISO week the highest export number is kept; a report signed by the barangay's new phone replaces the old phone's, since a new phone counts again from 1. Each key and report gets its own result.
+  - **DOH view** (`GET /api/reports?municipality=SID`): the `x-agapay-view-code` header is compared with `DOH_VIEW_CODE` the same constant-time way. The page keeps the code in `sessionStorage` only.
+- **Replay protection**: `ts` must be within 5 minutes of the server's clock, and each nonce (per laptop key) is accepted once; nonces are kept 10 minutes, longer than any accepted `ts`. The nonce is spent only after the signature checks out.
+- **Not configured is closed**: if `DATABASE_URL`, `MUNICIPAL_ENROLL_CODE` or `DOH_VIEW_CODE` is missing, the routes that need it answer 503 "not configured", never an open endpoint. `GET /api/health` says which settings are present and whether the database answers, as booleans only.
+- **Limits**: bodies over 256 KB get 413; fixed-window rate limits per route and address (enroll 5 per 10 minutes, sync 30 per minute, reports 60 per minute) answer 429 with `Retry-After`, checked before any code or signature. Every request shape is exact (`server/validate.ts`, on `src/qr`'s validators); messages never echo what was sent. A sync is one transaction.
+- **What's stored** (Postgres, `server/db.ts`): `devices` (laptop key fingerprint, role, municipality, public key), `barangay_keys` (barangay code, municipality, phone public key and fingerprint, which laptop vouched), `reports` (barangay, ISO week, export number, the verified payload: codes, week and counts with "<5"; which phone key signed it and which laptop sent it, and when), `nonces`, `rate_limits` (a keyed hash of route and address, never the address, kept at most an hour), `audit_log` (who by key fingerprint or role, the action, result counts) and `alerts` (empty until P2-C). CHECK constraints keep codes, weeks and fingerprints in their fixed patterns.
+- **No personal data reaches the server**: the laptop holds only de-identified counts (the phone never sends names, birth dates, households, puroks or exact dates), and the server accepts only QR payloads that pass `src/qr`'s strict schema and signature check. The DOH view gets the suppressed counts back, revalidated, with totals as ranges.
+- **Tests**: unit tests on an in-memory store (bad signature, expired `ts`, replayed nonce, wrong code, a missing setting, rate limits, shapes and the 256 KB limit, unknown and tampered QRs, newest export kept, cross-municipality vouches), and the same handlers against a real Postgres 16 in CI (`npm run test:api`, the `api` job).
+
 ## Key decisions
 
 - **A PWA, not a native app**: one codebase for the phone and the laptop, nothing to install from a store, and offline through a service worker. The cost is the browser's limits on iPhone (memory, no share target).
@@ -163,7 +203,8 @@ flowchart LR
 - **Models on demand, not precached**: the first visit stays small for every visitor (including judges on mobile data), and the big download happens once, on purpose, with progress, a storage check and persistent storage.
 - **Rules decide, AI reads and rewords**: counts, the watch window, flags, priorities and stock moves are deterministic, explainable rules with unit tests. The OCR reads labels for a human to confirm. The language model only rewords, and its output is checked against the rules' numbers.
 - **Open-source models only**: Qwen2.5-0.5B-Instruct (Apache-2.0) rather than Llama 3.2 1B, whose community license is not an open-source license.
-- **No cloud in the core**: no backend, no accounts, no API keys. Static hosting delivers the app; the phone-to-laptop handoff is a QR, not a sync.
+- **No cloud in the core**: no backend, no accounts, no API keys. Static hosting delivers the app; the phone-to-laptop handoff is a QR, not a sync. Phase 2's sync is optional, off by default, and carries the same de-identified counts.
+- **Phase 2 trusts keys, not accounts**: a laptop holds a key that never leaves it, admitted once by an enroll code; every upload is signed and each barangay QR is verified again on the server, so no password or session is stored.
 
 ## Limitations
 
@@ -171,6 +212,7 @@ flowchart LR
 - **iPhone**: Safari keeps a whole file in memory while caching it, and iOS can close a tab that uses too much memory without an error. Photos are downscaled to 1280 px and the models are small, but this is only proven on our test phones.
 - **Laptop AI wording**: it needs WebGPU (desktop Chrome or Edge) and a large first download. A 0.5B model writes plainly at best. `checkDraft` is a word-level check and can't catch every rewording that changes the meaning, so the officer's review is the final safeguard.
 - **Storage**: if the browser refuses persistent storage, it may clear the models under storage pressure. The Prepare for offline screen then offers the download again.
+- **Phase 2 sync**: one enroll code for every laptop, so anyone who learns it can enroll a key (rotate it in the Vercel settings; enrolled laptops keep working). A laptop's vouch for a phone key is trusted as given; two laptops of one municipality that disagree overwrite each other's vouch. The DOH view code is shared, not per person. A laptop whose clock is more than 5 minutes off can't sync until it's corrected.
 - **Pairing**: trust rests on the officer comparing fingerprints. A lost phone's key stays trusted until the laptop pairs a new one ("Reset sample data and pairing" forgets keys on a device).
 - **Hinga**: the pose model's own card says it isn't intended for life-critical decisions, and it isn't tested on children; we test only on ourselves, breathing to a metronome. The head and both shoulders must be in view. Camera breath counts are least reliable with movement, crying and young infants, which is why it refuses rather than guesses. All thresholds are untuned until the phone trials.
 - **Data and clinical use**: synthetic data only, never real patients. Agapay is a research prototype and screening aid, not a registered medical device: it never diagnoses or doses, and its output is "refer". The watch window and medical sources are cited in the README (Medical sources).

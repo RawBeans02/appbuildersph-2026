@@ -26,7 +26,7 @@ describe('imports the deployed functions reach', () => {
   )
 
   it('finds the files', () => {
-    expect(files).toEqual(expect.arrayContaining(['server/handlers.ts', 'src/qr/codec.ts']))
+    expect(files).toEqual(expect.arrayContaining(['api/enroll.ts', 'api/sync.ts', 'api/reports.ts', 'api/health.ts', 'server/handlers.ts', 'src/qr/codec.ts']))
   })
 
   it('end every relative import in .js', () => {

@@ -70,10 +70,12 @@ The **municipal health officer** (MHO) decides where doctor teams and medicine g
 | First use of the AI wording on the municipal laptop (optional) | WebLLM downloads the model weights from huggingface.co and its WebGPU library from raw.githubusercontent.com, and caches them in the browser; the app's 6 MB worker for it is cached by the service worker at the same time | Designed to run with no network afterwards (from WebLLM's cache); offline use not yet measured (first real run pending). Never used online: the panel says the AI is unavailable and the template wording is used |
 | Hinga spike, "Download for offline" (one tap on `spike-hinga.html`) | Downloads the MediaPipe WebAssembly file (11,756,954 bytes) and the pose model (5,777,746 bytes), 17,534,700 bytes in all, into the browser's Cache Storage | After it, the spike page works in airplane mode; without it, the pose model needs the network |
 | App updates | When a new version is deployed, the service worker fetches the new app shell on the next online visit | The cached version keeps working offline |
+| Sync (phase 2, optional and secondary; only in a build with `VITE_PHASE2=1`): the municipal laptop uploads what it already holds when the internet returns | The laptop registers its own key once with an enroll code (`POST /api/enroll`), then sends the paired phones' public keys and the signed barangay QR texts it received (`POST /api/sync`), each request signed by the laptop. The server, Vercel Functions in `api/` with Postgres (Neon), verifies every QR's signature again and keeps de-identified counts only: codes, ISO weeks and counts with "<5" | Sync waits; scanning, merging, the plan and approvals work on the laptop as before. The offline core never calls the API |
+| DOH view (phase 2, optional and secondary; `/doh`) | Reads the latest report per barangay from `GET /api/reports` with a view code; nothing is cached | Not available offline |
 
 ## Why does this product benefit from running AI locally?
 - **It's needed when there is no signal.** The days after a typhoon are when phones have no data, and the health worker still has to check children and log exposures. Every AI step runs on the device: the camera breathing count, the cry check, the medicine-box reading, and the laptop's plan wording. Our CI tests run the app with the network cut off (see `e2e/`).
-- **The data is about children and patients.** Names, birth dates and households never leave the phone. Only signed, de-identified counts move, from one screen to the other by QR. There is no server at all.
+- **The data is about children and patients.** Names, birth dates and households never leave the phone. Only signed, de-identified counts move, from one screen to the other by QR. The core has no server; the optional phase 2 sync uploads only those same signed counts from the laptop, never a record.
 - **The breathing count needs live video.** It reads a steady stream of camera frames for a full minute. Sending that to a server would be slow, costly on mobile data, and impossible offline.
 - **No cost per use.** There are no API bills for a municipality, and it runs on the phones health workers already have.
 
@@ -106,7 +108,7 @@ The diagram, the pipelines, the key decisions and the limitations are in [`docs/
   - The officer edits and approves every plan.
   - The language model only rewords a plan that fixed rules already computed.
 - **Privacy by design:**
-  - Records stay on the device, and nothing is sent to a server.
+  - Records stay on the device. The core sends nothing to a server; the optional phase 2 sync sends only the laptop's de-identified QR counts and public keys.
   - The QR carries counts only: no names, birth dates, households, puroks or exact dates. Counts from 1 to 4 show as "<5", and the fields don't overlap, so a hidden cell can't be worked out by subtraction.
   - Photos, video and microphone audio are never stored or sent.
   - With phase 2 on (`VITE_PHASE2`), a PIN locks the phone's records: names, birth dates, households, puroks, flood notes and health details are encrypted at rest (AES-GCM 256-bit, a key derived from the PIN with PBKDF2-HMAC-SHA-256 at 600,000 iterations, kept in memory only). The exact scheme and its limits are in `docs/ARCHITECTURE.md` (Data and privacy).
@@ -139,7 +141,8 @@ Self-hosted, unmodified: the OCR models in `public/models/ppocr/` and the pose m
 React + TypeScript, built with Vite as an installable web app (PWA: vite-plugin-pwa / Workbox service worker). On-device storage in IndexedDB (idb). Inference in Web Workers on WebAssembly (ONNX Runtime Web, MediaPipe Tasks, Tesseract.js) and, on the laptop only, WebGPU (WebLLM). Browser APIs: Cache Storage, Web Crypto (ECDSA P-256), camera (getUserMedia), BarcodeDetector. The optional phase 2 sync (off unless built with `VITE_PHASE2`) adds Vercel Functions (Node.js, Web-standard Request/Response) in `api/` with Postgres through node-postgres. Tests: Vitest and Playwright in GitHub Actions, with axe-core for automated accessibility checks, and a Postgres 16 service container for the API tests. Small build scripts in Python with Pillow (synthetic labels). Every library and its license is in the table below.
 
 ### APIs and cloud services
-- **Vercel:** static hosting of the app and the self-hosted model files. No server code, no API routes.
+- **Vercel:** static hosting of the app and the self-hosted model files. For the optional phase 2 sync only (off unless built with `VITE_PHASE2=1`), four small Vercel Functions in `api/` (enroll, sync, reports, health); the offline core never calls them.
+- **Neon Postgres (through Vercel's Neon integration):** phase 2 sync only. Stores the enrolled laptops' public keys, the phone public keys they vouch for, and the de-identified barangay reports (codes, ISO weeks, export numbers and counts with "<5"), plus nonces, rate-limit windows (a keyed hash of the address, kept at most an hour) and an audit log of actions and result counts. Never a name, birth date, household, purok or exact date of a person.
 - **Hugging Face and raw.githubusercontent.com:** only the first use of the optional AI wording on the municipal laptop downloads WebLLM's model weights and WebGPU library from them.
 - **GitHub:** the repository and CI (GitHub Actions); not used by the app.
 - **OpenAI Images API (gpt-image-2):** used during development only, for the placeholder photos and illustration listed under AI development tools; the app never calls it.
