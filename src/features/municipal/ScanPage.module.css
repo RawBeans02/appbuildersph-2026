@@ -243,6 +243,12 @@
   width: max-content;
 }
 
+.controlsRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
 .listNarrow {
   margin-top: 10px;
 }

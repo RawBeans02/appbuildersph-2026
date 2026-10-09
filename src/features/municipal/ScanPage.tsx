@@ -149,9 +149,12 @@ export default function ScanPage() {
             <div className={cx(styles.target, success && styles.targetOk)} aria-hidden />
           </div>
           {problem ? (
-            <div className={styles.controls}>
+            <div className={cx(styles.controls, styles.controlsRow)}>
               <Button variant="secondary" onClick={() => void start()}>
                 Try again
+              </Button>
+              <Button variant="text" onClick={stop}>
+                Cancel
               </Button>
             </div>
           ) : (
@@ -170,7 +173,14 @@ export default function ScanPage() {
                 )
               )}
               <div className={styles.controls}>
-                <Button variant="secondary" onClick={stop}>
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    stop()
+                    setBanner(null)
+                    setPairing(null)
+                  }}
+                >
                   Stop the camera
                 </Button>
               </div>
