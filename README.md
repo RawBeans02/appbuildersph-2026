@@ -191,6 +191,7 @@ Every AI session that touched this project:
 - **Claude** (chat, Research mode): research and idea selection.
 - **Claude Design**: the original UI design; the return-flow extension by Codex follows its tokens and components.
 - **OpenAI Codex (GPT-6)**: repository review and the `codex/offline-return-qr` implementation: signed offline return packets, municipal trust and receipt screens extending the existing design, persistence/reset rules, loading cancellation/timeout and pagination fixes, Windows test portability, synthetic fixture updates, browser verification and submission materials. See `design/Offline Return QR.md` for the new screen specification. No additional model is added to the app.
+- **OpenAI Codex with three GPT-6 Luna agents at max reasoning**: the `codex/bugfix-local-llm` work: complete active-model cache readiness, offline preparation errors, compact fact-copying prompts, regression tests and real local-model trials. Results and rejected cases are disclosed in `docs/LLM-VALIDATION.md`. The app still uses the existing Qwen model.
 - **OpenAI gpt-image-2** (development only, not shipped in the app): placeholder photos inside the Claude Design mockups (a chest in a camera view, a hand holding a synthetic "SAMPLE" medicine box, a phone held up to a webcam), and one illustration of a flooded street for the video and pitch, labeled "AI illustration" wherever it appears. Prompts, model and dates are kept with the files; every image was checked by a person. Screenshots of the product in this README are real screenshots of the working app.
 
 A cloud "Jr. Builder" agent named in early commits was planned but never used.
@@ -245,6 +246,6 @@ Human rows stay pending until each member's actual work is confirmed.
 | Rovince Eduvane | RawBeans02 | Build lead | _TBD_ |
 | Vicente Seumal | ThirdyThirdy | Support: idea creation and design | _TBD_ |
 | Adam Arous | takashii18 | Support: idea creation and design | _TBD_ |
-| Gabriel Syd Paguio | Syd7 | Co-builder | The signed offline return QR from the laptop's approval to the barangay phone ([PR #7](https://github.com/RawBeans02/appbuildersph-2026/pull/7), with OpenAI Codex); more _TBD_ |
+| Gabriel Syd Paguio | Syd7 | Co-builder | The signed offline return QR from the laptop's approval to the barangay phone ([PR #7](https://github.com/RawBeans02/appbuildersph-2026/pull/7), with OpenAI Codex), and local LLM cache/prompt validation on `codex/bugfix-local-llm`; more _TBD_ |
 
 The original core was built with the Lead and Sr. Builder AI sessions under the owner's direction. The offline-return branch adds the Codex work disclosed above. AI tools and Git authorship do not establish a person's actual contribution; the human contribution rows remain pending confirmation in `docs/FINAL-VALIDATION.md`.

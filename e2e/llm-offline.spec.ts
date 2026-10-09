@@ -152,7 +152,7 @@ test('real Qwen inference and offline cache survive three full reloads', async (
 
     const panel = page.getByRole('region', { name: 'Draft wording by the on-device AI: check before approving' })
     const start = panel.getByRole('button', { name: 'Write the wording with AI' })
-    const unavailable = panel.getByText('The writing AI is off on this laptop')
+    const unavailable = page.getByRole('button', { name: 'Write the wording yourself', exact: true })
     await expect(start.or(unavailable)).toBeVisible({ timeout: 15_000 })
     if (await unavailable.isVisible()) {
       test.skip(true, 'The app capability check rejected WebGPU; no real model download or inference was attempted.')
@@ -192,7 +192,7 @@ test('real Qwen inference and offline cache survive three full reloads', async (
 
       const panelAfterReload = page.getByRole('region', { name: 'Draft wording by the on-device AI: check before approving' })
       const generate = panelAfterReload.getByRole('button', { name: 'Write the wording with AI' })
-      const unavailableAfterReload = panelAfterReload.getByText('The writing AI is off on this laptop')
+      const unavailableAfterReload = page.getByRole('button', { name: 'Write the wording yourself', exact: true })
       await expect(generate.or(unavailableAfterReload)).toBeVisible({ timeout: 15_000 })
       if (await unavailableAfterReload.isVisible()) {
         throw new Error(`offline reload ${attempt}: the app did not expose its real WebGPU wording action`)

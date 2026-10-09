@@ -62,7 +62,10 @@ export async function loadWordingEngine(
       cached = false
     }
     signal?.throwIfAborted()
-    if (!cached) throw new Error(OFFLINE_WORDING_CACHE_MISSING)
+    if (!cached) {
+      notifyLaptopAiReadinessChanged(false)
+      throw new Error(OFFLINE_WORDING_CACHE_MISSING)
+    }
   }
   signal?.throwIfAborted()
   requestPersistentStorage()

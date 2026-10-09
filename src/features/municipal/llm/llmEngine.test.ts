@@ -63,6 +63,7 @@ describe('wording worker lifecycle', () => {
     expect(cached).toHaveBeenCalledWith(globalThis.caches, true)
     expect(FakeWorker.instances).toHaveLength(0)
     expect(persist).not.toHaveBeenCalled()
+    expect(readinessChanged).toHaveBeenCalledWith(false)
   })
 
   it('allows offline initialization when the selected cache set is complete', async () => {

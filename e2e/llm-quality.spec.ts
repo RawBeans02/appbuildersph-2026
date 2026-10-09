@@ -127,7 +127,7 @@ test('real Qwen meets the guarded 8-of-10 wording quality threshold', async ({ p
 
     const panel = page.getByRole('region', { name: 'Draft wording by the on-device AI: check before approving' })
     const start = panel.getByRole('button', { name: 'Write the wording with AI' })
-    const unavailable = panel.getByText('The writing AI is off on this laptop')
+    const unavailable = page.getByRole('button', { name: 'Write the wording yourself', exact: true })
     await expect(start.or(unavailable)).toBeVisible({ timeout: 15_000 })
     if (await unavailable.isVisible()) {
       test.skip(true, 'The app capability check rejected WebGPU; no real model initialization was attempted.')
