@@ -15,6 +15,15 @@ export type HingaScreen =
   | 'result' // 6a fast, 6b URGENT, 7a not fast
   | 'saved' // 6c
 
+// The child being checked (2a). ageMonths is a linked resident's age in whole
+// months, or the picked band's first month (all the record needs: the cut-off
+// and the QR's age band).
+export type LinkedResident = { id: string; name: string; householdId: string }
+
+export type Child = { resident: LinkedResident | null; ageMonths: number | null; calm: boolean }
+
+export const NO_CHILD: Child = { resident: null, ageMonths: null, calm: false }
+
 // 'camera' covers 3a–5d with the camera check's own fallbacks (3c, 3d, L9b,
 // L8a); 'hand' is L8b, reached from 3d and L8a.
 export type HingaStep = 'age' | 'camera' | 'hand'
@@ -64,3 +73,24 @@ export function hingaScreen(input: FlowInput): HingaScreen {
 export function needsPrePermission(shownBefore: boolean, permission: PermissionState | null): boolean {
   return !shownBefore && permission !== 'granted' && permission !== 'denied'
 }
+
+// After the second refusal in a row, the refusal sheet also offers the hand
+// count (design review decision 4). A count that worked resets the run.
+export const HAND_COUNT_AFTER_REFUSALS = 2
+
+export const offerHandCount = (refusalsInRow: number) => refusalsInRow >= HAND_COUNT_AFTER_REFUSALS
+
+// The danger-sign answer on 6a/6b/7a: ticked signs, or "None of these" (never
+// both). Save needs one of the two (design review decision 3).
+export type DangerAnswer<Sign extends string = string> = { signs: Sign[]; none: boolean }
+
+export function tickSign<Sign extends string>(answer: DangerAnswer<Sign>, sign: Sign, on: boolean): DangerAnswer<Sign> {
+  const signs = answer.signs.filter((s) => s !== sign)
+  return on ? { signs: [...signs, sign], none: false } : { signs, none: answer.none }
+}
+
+export function tickNone<Sign extends string>(answer: DangerAnswer<Sign>, on: boolean): DangerAnswer<Sign> {
+  return on ? { signs: [], none: true } : { signs: answer.signs, none: false }
+}
+
+export const answered = (answer: DangerAnswer) => answer.signs.length > 0 || answer.none

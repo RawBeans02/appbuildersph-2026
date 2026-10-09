@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { hingaScreen, MAX_LOAD_FAILURES, needsPrePermission, type FlowInput } from './flow'
+import { answered, hingaScreen, MAX_LOAD_FAILURES, needsPrePermission, offerHandCount, tickNone, tickSign, type DangerAnswer, type FlowInput } from './flow'
 
 // The camera step on a phone that runs everything: model ready, camera on.
 const camera: FlowInput = {
@@ -71,5 +71,30 @@ describe('Hinga camera pre-permission (3c)', () => {
     expect(needsPrePermission(true, 'prompt')).toBe(false)
     expect(needsPrePermission(false, 'granted')).toBe(false)
     expect(needsPrePermission(false, 'denied')).toBe(false)
+  })
+})
+
+describe('Hinga refusals in a row', () => {
+  it('offers the hand count from the second refusal in a row', () => {
+    expect([0, 1, 2, 3].map(offerHandCount)).toEqual([false, false, true, true])
+  })
+})
+
+describe('Hinga danger-sign answer', () => {
+  const empty: DangerAnswer = { signs: [], none: false }
+
+  it('needs a tick or "None of these" before saving', () => {
+    expect(answered(empty)).toBe(false)
+    expect(answered(tickSign(empty, 'stridor', true))).toBe(true)
+    expect(answered(tickNone(empty, true))).toBe(true)
+    expect(answered(tickSign(tickSign(empty, 'stridor', true), 'stridor', false))).toBe(false)
+  })
+
+  it('keeps signs and "None of these" apart', () => {
+    const signs = tickSign(tickSign(empty, 'stridor', true), 'convulsions', true)
+    expect(signs).toEqual({ signs: ['stridor', 'convulsions'], none: false })
+    expect(tickNone(signs, true)).toEqual({ signs: [], none: true })
+    expect(tickSign(tickNone(signs, true), 'lethargic', true)).toEqual({ signs: ['lethargic'], none: false })
+    expect(tickSign(signs, 'stridor', true).signs).toEqual(['convulsions', 'stridor'])
   })
 })

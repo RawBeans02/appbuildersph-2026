@@ -1,0 +1,475 @@
+/* Hinga's screen layouts (design: Phone 1, 2a–7a; Local AI states, L8a, L8b,
+   L9b). Tokens only; the shared components keep their own look. */
+
+/* Light screens: the content, then the one primary action at the bottom. */
+.screen {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.body {
+  flex: 1;
+  padding: 0 var(--space-5) var(--space-6);
+}
+
+.footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-5) var(--space-5);
+}
+
+/* The result screens' save bar stays in view; the list scrolls clear of it. */
+.saveBar {
+  position: sticky;
+  bottom: 0;
+  border-top: 1px solid var(--line);
+  background: var(--paper);
+}
+
+.title {
+  margin-top: var(--space-3);
+  font: var(--type-title);
+}
+
+.sub {
+  margin-top: var(--space-1);
+  font: var(--type-body);
+  color: var(--ink-2);
+}
+
+.sectionTitle {
+  margin: var(--space-6) 0 var(--space-3);
+  font: var(--type-heading);
+}
+
+/* A grouped list (the age bands, the readiness tick, the danger signs). */
+.group {
+  margin-top: var(--space-4);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+
+.group > * + * {
+  border-top: 1px solid var(--line);
+}
+
+.signs {
+  composes: group;
+  margin-top: var(--space-6);
+}
+
+.none {
+  composes: group;
+  margin-top: var(--space-2);
+}
+
+.groupTitle {
+  font: var(--type-heading);
+}
+
+.groupHead {
+  padding: var(--space-4) var(--space-4) var(--space-3);
+}
+
+.groupHead p {
+  margin-top: var(--space-1);
+  font: var(--type-body-dense);
+  color: var(--ink-2);
+}
+
+.term {
+  color: var(--ink-2);
+}
+
+.field {
+  margin-top: var(--space-5);
+}
+
+/* An inline status: icon + words. */
+.note {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+  font: var(--type-body-dense);
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.note svg {
+  flex: none;
+  margin-top: 1px;
+}
+
+.warnNote {
+  composes: note;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.warnNote svg {
+  color: var(--warn);
+}
+
+.errorNote {
+  composes: note;
+  color: var(--bad);
+}
+
+/* Results (6a–6c, 7a). */
+.meta {
+  font: var(--type-body-dense);
+  color: var(--ink-2);
+}
+
+.headline {
+  margin-top: var(--space-5);
+}
+
+.headline h1 {
+  font: var(--type-display);
+  letter-spacing: -0.01em;
+}
+
+.headline p {
+  margin-top: var(--space-1);
+  font: var(--type-body-lg);
+}
+
+.recheck {
+  font: var(--type-body-lg);
+  text-wrap: pretty;
+}
+
+.source {
+  color: var(--ink-2);
+}
+
+.saved {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+  padding: 14px var(--space-4);
+  border-radius: var(--r-md);
+  background: var(--ok-tint);
+  color: var(--ok);
+}
+
+.saved svg {
+  flex: none;
+}
+
+.savedTitle {
+  font: 800 17px/24px var(--font-ui);
+}
+
+.savedDetail {
+  font: var(--type-body-dense);
+  font-weight: 600;
+}
+
+/* L8a's list. */
+.canList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  font: var(--type-body-lg);
+}
+
+.canList li {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.canList svg {
+  flex: none;
+  margin-top: 3px;
+  color: var(--ok);
+}
+
+/* L8b: count by hand. */
+.timer {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.clock {
+  font: var(--type-mono-lg);
+  font-variant-numeric: tabular-nums;
+}
+
+.left {
+  font: var(--type-body);
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.tapArea {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-8);
+  margin-top: var(--space-8);
+}
+
+.tap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  width: 260px;
+  height: 260px;
+  border: 0;
+  border-radius: var(--r-full);
+  background: var(--ink);
+  box-shadow: 0 0 0 10px var(--sunken);
+  color: var(--surface);
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.tap:hover {
+  background: var(--ink-2);
+}
+
+.tapCount {
+  font: var(--type-metric);
+  font-variant-numeric: tabular-nums;
+}
+
+.tapLabel {
+  font: var(--type-button);
+  color: var(--on-night-2);
+}
+
+.cutoffLine {
+  font: var(--type-body);
+  color: var(--ink-2);
+  text-align: center;
+}
+
+/* Camera screens (3a–5d): a solid night bar on top, the live image, then the
+   panel. The top bar never sits over the image (design review decision 5). */
+.camera {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  background: var(--night);
+  color: var(--paper);
+}
+
+.cameraBar {
+  flex: none;
+  padding-bottom: var(--space-3);
+  background: var(--night);
+}
+
+.cameraStatus {
+  padding: 0 var(--space-5);
+}
+
+.barTitle {
+  font: var(--type-body-lg);
+  font-weight: 700;
+}
+
+.feed {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.guide {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 240px;
+  height: 290px;
+  max-height: calc(100% - var(--space-12));
+  transform: translate(-50%, -50%);
+  border: 3px dashed var(--paper);
+  border-radius: 32px;
+}
+
+.guideFound {
+  border: 4px solid var(--ok-on-night);
+}
+
+.guideCounting {
+  border: 3px solid var(--paper);
+}
+
+.guideLabel {
+  position: absolute;
+  top: var(--space-3);
+  left: var(--space-3);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 10px;
+  border-radius: var(--r-full);
+  background: var(--night);
+  font: var(--type-caption);
+  font-weight: 700;
+}
+
+.guideFound .guideLabel {
+  color: var(--ok-on-night);
+}
+
+.panel {
+  position: relative;
+  flex: none;
+  margin-top: calc(-1 * var(--r-xl));
+  padding: var(--space-5) var(--space-5) var(--space-6);
+  border-radius: var(--r-xl) var(--r-xl) 0 0;
+  background: var(--night-2);
+}
+
+.panel h1 {
+  font: var(--type-title);
+}
+
+.panelStatus {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: var(--space-3) 0 18px;
+  font: var(--type-body-lg);
+  font-weight: 600;
+  color: var(--on-night-2);
+}
+
+.panelStatus svg {
+  flex: none;
+}
+
+.found {
+  color: var(--ok-on-night);
+}
+
+.spin {
+  animation: spin 1.4s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.countHead {
+  font: var(--type-display);
+}
+
+.trace {
+  position: relative;
+  height: 76px;
+  margin-top: var(--space-3);
+  overflow: hidden;
+  border-radius: var(--r-md);
+  background: var(--night);
+  color: var(--paper);
+}
+
+.trace::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 0;
+  left: 0;
+  height: 1px;
+  background: var(--disabled-night-bg);
+}
+
+.trace canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.countBar {
+  height: 10px;
+  margin-top: 14px;
+  overflow: hidden;
+  border-radius: var(--r-full);
+  background: var(--disabled-night-bg);
+}
+
+.countFill {
+  height: 100%;
+  border-radius: var(--r-full);
+  background: var(--paper);
+}
+
+.micLine {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  font: var(--type-body-dense);
+  color: var(--on-night-2);
+}
+
+.cameraClock {
+  composes: clock;
+}
+
+.cameraLeft {
+  font: var(--type-body);
+  font-weight: 600;
+  color: var(--on-night-2);
+}
+
+/* Inside the bottom sheets (3c, 3d, 5a–5d). */
+.sheetText {
+  font: var(--type-body-lg);
+  text-wrap: pretty;
+}
+
+.sheetIcon {
+  display: inline-flex;
+  vertical-align: -4px;
+  margin-right: var(--space-2);
+}
+
+.sheetIconWarn {
+  composes: sheetIcon;
+  color: var(--warn);
+}
+
+.sheetNote {
+  font: var(--type-body-dense);
+  color: var(--ink-2);
+}
+
+.sheetActions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}

@@ -1,6 +1,6 @@
-import { cryDetected, cryingSeconds } from '../../inference/hinga/cry'
+import { cryingSeconds, cryVerdict } from '../../inference/hinga/cry'
 import { listenForCrying, startCryModel, type CryModel, type Listening } from '../../inference/hinga/cryChecker'
-import { analyze, type Analysis, type Frame, type Refusal } from '../../inference/hinga/dsp'
+import { analyze, detrend, type Analysis, type Frame, type Refusal } from '../../inference/hinga/dsp'
 import type { CountMethod, FrameMeasure, MethodInfo } from '../../inference/hinga/method'
 import { createCountMethod } from '../../inference/hinga/poseMethod'
 import type { Box } from '../../inference/hinga/roi'
@@ -12,18 +12,24 @@ import type { Box } from '../../inference/hinga/roi'
 
 export const COUNT_MS = 60_000
 const TRACE_MS = 10_000
+// How often the countdown and the end of the minute are checked, so the count
+// ends on time even if the camera stops sending frames.
+const TICK_MS = 250
 
 export type CountRefusal = Refusal | 'crying' | 'interrupted'
 
+// The cry check right now ('off' with a plain reason for the screen).
 export type CryCheck =
   | { status: 'loading' }
   | { status: 'ready' }
   | { status: 'listening'; cryingSeconds: number }
   | { status: 'off'; reason: string }
 
+// cryOff: why the cry check couldn't vouch for this count, shown with the
+// result as "Cry check off: …"; null when it listened to the whole minute.
 export type CountOutcome =
-  | { kind: 'counted'; perMin: number; analysis: Analysis; cry: CryCheck }
-  | { kind: 'refused'; refusal: CountRefusal; analysis: Analysis | null; cry: CryCheck }
+  | { kind: 'counted'; perMin: number; analysis: Analysis; cryOff: string | null; at: string }
+  | { kind: 'refused'; refusal: CountRefusal; analysis: Analysis | null; cryOff: string | null }
 
 export type SessionState = {
   model: { status: 'loading' } | ({ status: 'ready' } & MethodInfo) | { status: 'error'; message: string }
@@ -32,17 +38,25 @@ export type SessionState = {
   loadFailures: number
   // 'blocked': the browser gave no camera (permission denied, no camera, or no
   // camera API); the reason is for the console, not the screen.
-  camera: { status: 'off' } | { status: 'starting' } | { status: 'on'; settings: string } | { status: 'blocked'; reason: string }
+  camera: { status: 'off' } | { status: 'starting' } | { status: 'on' } | { status: 'blocked'; reason: string }
   regionFound: boolean
+  // True from the Start tap until the count starts (the microphone opening).
+  startingCount: boolean
   counting: { secondsLeft: number } | null
   cry: CryCheck
   outcome: CountOutcome | null
-  // Measured on this device since the camera started.
-  avgInferMs: number | null
-  fps: number | null
+  // Refusals since the last count that worked (or resetRefusals()).
+  refusalsInRow: number
 }
 
-type Count = { startMs: number; locked: Box; frames: Frame[]; listening: Listening | null }
+type Count = {
+  startMs: number
+  locked: Box
+  frames: Frame[]
+  listening: Listening | null
+  // Why the cry check isn't listening, when it isn't.
+  cryOffReason: string | null
+}
 
 const errorText = (error: unknown) => (error instanceof Error ? error.message : String(error))
 
@@ -55,11 +69,11 @@ export function createCountSession(makeMethod: () => CountMethod = () => createC
     loadFailures: 0,
     camera: { status: 'off' },
     regionFound: false,
+    startingCount: false,
     counting: null,
     cry: { status: 'loading' },
     outcome: null,
-    avgInferMs: null,
-    fps: null,
+    refusalsInRow: 0,
   }
   const listeners = new Set<() => void>()
   const set = (patch: Partial<SessionState>) => {
@@ -68,20 +82,20 @@ export function createCountSession(makeMethod: () => CountMethod = () => createC
   }
 
   let generation = 0
+  // Bumped by stopCamera(), so a camera that opens after the health worker
+  // left (Back while the browser was still opening it) is closed at once.
+  let cameraRequest = 0
   let method: CountMethod | null = null
   let methodReady = false
   let cryModel: CryModel | null = null
   let video: HTMLVideoElement | null = null
-  let overlay: HTMLCanvasElement | null = null
+  let traceCanvas: HTMLCanvasElement | null = null
   let stream: MediaStream | null = null
   let raf = 0
+  let tick = 0
   let busy = false
   let lastVideoTime = -1
   let lastTimestamp = 0
-  let frames = 0
-  let inferTotalMs = 0
-  let firstFrameAt = 0
-  let lastFrameAt = 0
   let last: FrameMeasure | null = null
   let count: Count | null = null
   // Model starts run one at a time (both MediaPipe runtimes use one global
@@ -104,7 +118,8 @@ export function createCountSession(makeMethod: () => CountMethod = () => createC
         cryModel = model
         set({ cry: { status: 'ready' } })
       } catch (error) {
-        if (opened === generation) set({ cry: { status: 'off', reason: `the cry model could not load (${errorText(error)})` } })
+        console.error('Hinga: the cry check could not load', error)
+        if (opened === generation) set({ cry: { status: 'off', reason: "the cry check couldn't start" } })
       }
     })
   }
@@ -120,6 +135,7 @@ export function createCountSession(makeMethod: () => CountMethod = () => createC
       try {
         const info = await current.start()
         if (opened !== generation || method !== current) return current.dispose()
+        console.info(`Hinga: the torso finder runs ${info.where === 'worker' ? 'in a background worker' : 'on the page'}`, info)
         methodReady = true
         set({ model: { status: 'ready', ...info } })
       } catch (error) {
@@ -150,9 +166,11 @@ export function createCountSession(makeMethod: () => CountMethod = () => createC
     cryModel = null
   }
 
-  function attach(videoElement: HTMLVideoElement | null, overlayCanvas: HTMLCanvasElement | null) {
+  // The camera's <video>, and the canvas the 4a trace is drawn on (its CSS
+  // color is the line's color).
+  function attach(videoElement: HTMLVideoElement | null, trace: HTMLCanvasElement | null) {
     video = videoElement
-    overlay = overlayCanvas
+    traceCanvas = trace
     if (video && stream && video.srcObject !== stream) {
       video.srcObject = stream
       void video.play().catch(() => {})
@@ -169,28 +187,30 @@ export function createCountSession(makeMethod: () => CountMethod = () => createC
       return
     }
     const opened = generation
+    const request = ++cameraRequest
     set({ camera: { status: 'starting' } })
+    let opening: MediaStream
     try {
-      stream = await openCamera(withMicrophone)
+      opening = await openCamera(withMicrophone)
     } catch (error) {
       console.error('Hinga: no camera', error)
-      set({ camera: { status: 'blocked', reason: error instanceof DOMException ? error.name : errorText(error) } })
+      if (opened === generation && request === cameraRequest) {
+        set({ camera: { status: 'blocked', reason: error instanceof DOMException ? error.name : errorText(error) } })
+      }
       return
     }
-    if (opened !== generation) return stopStream()
+    if (opened !== generation || request !== cameraRequest) {
+      opening.getTracks().forEach((track) => track.stop())
+      return
+    }
+    stream = opening
     if (video) {
       video.muted = true
       video.playsInline = true
       video.srcObject = stream
       await video.play().catch(() => {})
     }
-    const settings = stream.getVideoTracks()[0]?.getSettings() ?? {}
-    frames = 0
-    inferTotalMs = 0
-    firstFrameAt = 0
-    set({
-      camera: { status: 'on', settings: `${settings.width ?? '?'}x${settings.height ?? '?'}, ${settings.facingMode ?? 'facing not reported'}` },
-    })
+    set({ camera: { status: 'on' } })
     cancelAnimationFrame(raf)
     raf = requestAnimationFrame(loop)
   }
@@ -202,11 +222,11 @@ export function createCountSession(makeMethod: () => CountMethod = () => createC
   }
 
   function stopCamera() {
+    cameraRequest++
     cancelCount('interrupted')
     cancelAnimationFrame(raf)
     stopStream()
     last = null
-    overlay?.getContext('2d')?.clearRect(0, 0, overlay.width, overlay.height)
     // A blocked camera stays blocked (3d) until the health worker tries again.
     set({ camera: state.camera.status === 'blocked' ? state.camera : { status: 'off' }, regionFound: false })
   }
@@ -225,24 +245,11 @@ export function createCountSession(makeMethod: () => CountMethod = () => createC
         busy = false
         if (!stream) return
         last = measure
-        frames++
-        inferTotalMs += measure.inferMs
-        if (!firstFrameAt) firstFrameAt = now
-        lastFrameAt = now
-        if (counting && count === counting) {
+        if (counting && count === counting && now - counting.startMs < COUNT_MS) {
           counting.frames.push({ t: now, box: measure.region, signals: measure.signals })
-          if (now - counting.startMs >= COUNT_MS) finishCount()
+          drawTrace(counting)
         }
-        draw()
-        const secondsLeft = count ? Math.max(0, Math.ceil((COUNT_MS - (now - count.startMs)) / 1000)) : null
-        const patch: Partial<SessionState> = {}
-        if (state.regionFound !== !!measure.region) patch.regionFound = !!measure.region
-        if (count && state.counting?.secondsLeft !== secondsLeft) patch.counting = { secondsLeft: secondsLeft! }
-        if (frames % 15 === 0) {
-          patch.avgInferMs = inferTotalMs / frames
-          patch.fps = lastFrameAt > firstFrameAt ? ((frames - 1) * 1000) / (lastFrameAt - firstFrameAt) : null
-        }
-        if (Object.keys(patch).length) set(patch)
+        if (state.regionFound !== !!measure.region) set({ regionFound: !!measure.region })
       },
       (error: unknown) => {
         busy = false
@@ -255,119 +262,141 @@ export function createCountSession(makeMethod: () => CountMethod = () => createC
     )
   }
 
-  // Call from the user's tap: the microphone and its audio start from a gesture.
+  // Call from the user's tap: the microphone and its audio start from a
+  // gesture. A second tap while the microphone opens does nothing.
   async function startCount() {
-    if (count || !last?.region || state.camera.status !== 'on') return
+    if (count || state.startingCount || !last?.region || state.camera.status !== 'on') return
+    set({ startingCount: true })
     let listening: Listening | null = null
-    let cry: CryCheck = state.cry
-    if (cryModel) {
-      try {
-        listening = await listenForCrying(cryModel, () => {
-          if (count?.listening) set({ cry: { status: 'listening', cryingSeconds: cryingSeconds(count.listening.windows()) } })
-        })
-        cry = { status: 'listening', cryingSeconds: 0 }
-      } catch (error) {
-        const denied = error instanceof DOMException && error.name === 'NotAllowedError'
-        cry = { status: 'off', reason: denied ? 'microphone not allowed' : `microphone unavailable (${errorText(error)})` }
+    let cryOffReason: string | null = null
+    try {
+      if (cryModel) {
+        try {
+          listening = await listenForCrying(cryModel, () => {
+            if (count?.listening) set({ cry: { status: 'listening', cryingSeconds: cryingSeconds(count.listening.windows()) } })
+          })
+        } catch (error) {
+          console.error('Hinga: no microphone for the cry check', error)
+          const name = error instanceof DOMException ? error.name : ''
+          cryOffReason =
+            name === 'NotAllowedError' ? 'microphone not allowed' : name === 'NotFoundError' ? 'no microphone' : "the microphone didn't open"
+        }
+      } else {
+        cryOffReason = state.cry.status === 'off' ? state.cry.reason : 'it was still loading when the count started'
       }
+      // The camera may have stopped, the region moved, or a count started while
+      // the microphone prompt was open.
+      const region = last?.region
+      if (count || !region || state.camera.status !== 'on') {
+        listening?.stop()
+        return
+      }
+      count = { startMs: performance.now(), locked: region, frames: [], listening, cryOffReason }
+      clearInterval(tick)
+      tick = window.setInterval(onTick, TICK_MS)
+      set({
+        counting: { secondsLeft: COUNT_MS / 1000 },
+        outcome: null,
+        cry: listening ? { status: 'listening', cryingSeconds: 0 } : state.cry,
+      })
+    } finally {
+      set({ startingCount: false })
     }
-    // The region may have moved while the microphone prompt was open.
-    const region = last?.region
-    if (!region || state.camera.status !== 'on') {
-      listening?.stop()
-      return
-    }
-    count = { startMs: performance.now(), locked: region, frames: [], listening }
-    set({ counting: { secondsLeft: COUNT_MS / 1000 }, outcome: null, cry })
   }
 
-  function stopListening(done: Count): CryCheck {
-    if (!done.listening) return state.cry
-    done.listening.stop()
-    return { status: 'listening', cryingSeconds: cryingSeconds(done.listening.windows()) }
+  // The countdown, and the end of the minute whether or not frames arrive.
+  function onTick() {
+    if (!count) return
+    const elapsed = performance.now() - count.startMs
+    if (elapsed >= COUNT_MS) return finishCount()
+    const secondsLeft = Math.ceil((COUNT_MS - elapsed) / 1000)
+    if (state.counting?.secondsLeft !== secondsLeft) set({ counting: { secondsLeft } })
   }
 
-  function finishCount() {
-    const done = count!
+  function endCount(): Count | null {
+    const done = count
     count = null
-    const cry = stopListening(done)
-    const crying = done.listening ? cryDetected(done.listening.windows()) : false
+    clearInterval(tick)
+    done?.listening?.stop()
+    clearTrace()
+    return done
+  }
+
+  const cryAfterCount = () => (cryModel ? { status: 'ready' as const } : state.cry)
+
+  // A camera that stopped sending frames gives a short recording, which the
+  // quality gate refuses ('too-few-frames').
+  function finishCount() {
+    const done = endCount()
+    if (!done) return
+    const cry = cryVerdict({
+      offReason: done.cryOffReason,
+      windows: done.listening?.windows() ?? [],
+      failed: done.listening?.failed() ?? 0,
+    })
     const analysis = analyze(done.frames)
-    const outcome: CountOutcome = crying
-      ? { kind: 'refused', refusal: 'crying', analysis, cry }
+    const outcome: CountOutcome = cry.crying
+      ? { kind: 'refused', refusal: 'crying', analysis, cryOff: null }
       : analysis.ok
-        ? { kind: 'counted', perMin: analysis.perMin, analysis, cry }
-        : { kind: 'refused', refusal: analysis.refusal, analysis, cry }
-    set({ counting: null, outcome, cry: cryModel ? { status: 'ready' } : state.cry })
+        ? { kind: 'counted', perMin: analysis.perMin, analysis, cryOff: cry.off, at: new Date().toISOString() }
+        : { kind: 'refused', refusal: analysis.refusal, analysis, cryOff: cry.off }
+    const refusalsInRow = outcome.kind === 'counted' ? 0 : state.refusalsInRow + 1
+    set({ counting: null, outcome, cry: cryAfterCount(), refusalsInRow })
   }
 
   function cancelCount(refusal: CountRefusal = 'interrupted') {
-    if (!count) return
-    const done = count
-    count = null
-    const cry = stopListening(done)
-    set({ counting: null, outcome: { kind: 'refused', refusal, analysis: null, cry }, cry: cryModel ? { status: 'ready' } : state.cry })
+    const done = endCount()
+    if (!done) return
+    set({ counting: null, outcome: { kind: 'refused', refusal, analysis: null, cryOff: done.cryOffReason }, cry: cryAfterCount() })
   }
 
-  function draw() {
-    if (!overlay || !video) return
-    const context = overlay.getContext('2d')
-    if (!context) return
-    if (overlay.width !== video.videoWidth || overlay.height !== video.videoHeight) {
-      overlay.width = video.videoWidth
-      overlay.height = video.videoHeight
+  // The last TRACE_MS of the first signal with values, its linear trend
+  // removed, scaled to its own range: the live trace on 4a. No count is shown.
+  function drawTrace(counting: Count) {
+    const canvas = traceCanvas
+    const context = canvas?.getContext('2d')
+    if (!canvas || !context) return
+    const ratio = window.devicePixelRatio || 1
+    const width = Math.round(canvas.clientWidth * ratio)
+    const height = Math.round(canvas.clientHeight * ratio)
+    if (!width || !height) return
+    if (canvas.width !== width || canvas.height !== height) {
+      canvas.width = width
+      canvas.height = height
     }
-    const w = overlay.width
-    const h = overlay.height
-    const line = Math.max(2, w / 320)
-    context.clearRect(0, 0, w, h)
-    context.lineWidth = line
-    const rect = (box: Box) => context.strokeRect(box.x0 * w, box.y0 * h, (box.x1 - box.x0) * w, (box.y1 - box.y0) * h)
-    if (last?.region) {
-      context.strokeStyle = 'lime'
-      rect(last.region)
+    context.clearRect(0, 0, width, height)
+    const now = counting.frames[counting.frames.length - 1].t
+    const recent = counting.frames.filter((frame) => now - frame.t <= TRACE_MS)
+    const names = Object.keys(recent[recent.length - 1].signals)
+    const pick = names
+      .map((name) => recent.flatMap((frame) => (Number.isFinite(frame.signals[name]) ? [[frame.t, frame.signals[name]!] as const] : [])))
+      .find((points) => points.length > 2)
+    if (!pick) return
+    const flat = detrend(Float64Array.from(pick, ([, v]) => v))
+    let lo = Infinity
+    let hi = -Infinity
+    for (const v of flat) {
+      lo = Math.min(lo, v)
+      hi = Math.max(hi, v)
     }
-    if (count) {
-      context.strokeStyle = 'deepskyblue'
-      context.setLineDash([line * 3, line * 3])
-      rect(count.locked)
-      context.setLineDash([])
-    }
-    context.fillStyle = 'yellow'
-    for (const point of last?.points ?? []) {
-      context.beginPath()
-      context.arc(point.x * w, point.y * h, line * 2, 0, 2 * Math.PI)
-      context.fill()
-    }
-    if (count && count.frames.length > 1) {
-      const now = count.frames[count.frames.length - 1].t
-      const recent = count.frames.filter((frame) => now - frame.t <= TRACE_MS)
-      const names = Object.keys(recent[recent.length - 1].signals)
-      names.forEach((name, i) => {
-        const top = h * (0.72 + (0.14 * i) / Math.max(1, names.length - 1))
-        trace(context, recent.map((frame) => [frame.t, frame.signals[name] ?? NaN]), now, top, h * 0.12, w, i ? 'orange' : 'white')
-      })
-    }
-  }
-
-  // One signal over the last TRACE_MS, scaled to its own range.
-  function trace(context: CanvasRenderingContext2D, points: [number, number][], now: number, top: number, height: number, width: number, color: string) {
-    const values = points.map(([, v]) => v).filter(Number.isFinite)
-    if (values.length < 2) return
-    const lo = Math.min(...values)
-    const span = Math.max(...values) - lo || 1
-    context.strokeStyle = color
+    const span = hi - lo || 1
+    const pad = height * 0.15
+    context.strokeStyle = getComputedStyle(canvas).color
+    context.lineWidth = 3 * ratio
+    context.lineJoin = 'round'
+    context.lineCap = 'round'
     context.beginPath()
-    let started = false
-    for (const [t, v] of points) {
-      if (!Number.isFinite(v)) continue
+    pick.forEach(([t], i) => {
       const x = width - ((now - t) / TRACE_MS) * width
-      const y = top + height - ((v - lo) / span) * height
-      if (started) context.lineTo(x, y)
+      const y = height - pad - ((flat[i] - lo) / span) * (height - 2 * pad)
+      if (i) context.lineTo(x, y)
       else context.moveTo(x, y)
-      started = true
-    }
+    })
     context.stroke()
+  }
+
+  function clearTrace() {
+    traceCanvas?.getContext('2d')?.clearRect(0, 0, traceCanvas.width, traceCanvas.height)
   }
 
   function onVisibility() {
@@ -395,8 +424,12 @@ export function createCountSession(makeMethod: () => CountMethod = () => createC
       set({ outcome: null })
     },
     clearOutcome: () => set({ outcome: null }),
+    // A new child starts a new run of attempts.
+    resetRefusals: () => set({ refusalsInRow: 0 }),
   }
 }
+
+export type CountSession = ReturnType<typeof createCountSession>
 
 async function openCamera(withMicrophone: boolean): Promise<MediaStream> {
   const video = { facingMode: { ideal: 'environment' }, width: { ideal: 640 }, height: { ideal: 480 } }
@@ -410,10 +443,8 @@ async function openCamera(withMicrophone: boolean): Promise<MediaStream> {
       return both
     } catch {
       // No microphone, or it was refused: the camera alone decides (the cry
-      // check says it is off during the count).
+      // check says it is off with the result).
     }
   }
   return navigator.mediaDevices.getUserMedia({ audio: false, video })
 }
-
-export type CountSession = ReturnType<typeof createCountSession>

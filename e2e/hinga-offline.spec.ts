@@ -27,28 +27,25 @@ test('Hinga starts its models offline and will not count without a chest in view
 
   await context.setOffline(true)
   await page.goto('/hinga')
+  const hinga = page.locator('[data-hinga-screen]')
 
-  // The torso finder starts on the device: in a worker, or on the page with the reason shown.
-  const model = page.getByText(/^Torso finder ready on this phone \((in a background worker|on the page itself)\)\.$/)
-  await expect(model).toBeVisible({ timeout: 120_000 })
-  if ((await model.textContent())?.includes('on the page itself')) {
-    await expect(page.getByText(/^Running on the page itself because /)).toBeVisible()
-  }
-  console.log('Hinga model status (CI runner):', await model.textContent())
-  await expect(page.getByText(/^Cry check: ready\.|^Cry check off: /)).toBeVisible({ timeout: 120_000 })
+  // The torso finder starts on the device: in a worker, or on the page itself.
+  await expect(hinga).toHaveAttribute('data-hinga-model', /^ready:(worker|main-thread)$/, { timeout: 120_000 })
+  console.log('Hinga model status (CI runner):', await hinga.getAttribute('data-hinga-model'))
+  await expect(hinga).toHaveAttribute('data-hinga-cry', /^(ready|off)$/, { timeout: 120_000 })
 
-  // Setup: an 18-month-old typed in, every readiness box ticked.
-  await page.getByLabel('Age in months').fill('18')
-  await expect(page.getByText(/^Age band: .*Fast breathing is 40 breaths per minute or more \(WHO IMCI\)\.$/)).toBeVisible()
-  for (const box of await page.getByRole('checkbox').all()) await box.check()
-  await page.getByRole('button', { name: 'Next: frame the chest' }).click()
+  // Step 1: the age band and the readiness tick.
+  await page.getByText('12 months up to 5 years').click()
+  await page.getByText('The child is calm: not crying, not feeding, and the chest is visible.').click()
+  await page.getByRole('button', { name: 'Next: point the camera' }).click()
 
-  // Framing: the fake camera shows no person, so no torso and no count.
-  await expect(page.getByRole('heading', { name: 'Frame the chest' })).toBeVisible()
-  const start = page.getByRole('button', { name: 'Start the camera' })
-  if (await start.isVisible()) await start.click()
-  await expect(page.getByText('No torso found: show the head, shoulders and chest.')).toBeVisible({ timeout: 60_000 })
-  await expect(page.getByRole('button', { name: 'Start the 60 s count' })).toBeDisabled()
+  // Framing: the camera is already allowed (no 3c), and the fake camera shows
+  // no person, so no chest and no count.
+  await expect(hinga).toHaveAttribute('data-hinga-screen', 'framing')
+  await expect(hinga).toHaveAttribute('data-hinga-camera', 'on', { timeout: 60_000 })
+  await page.waitForTimeout(3_000)
+  await expect(page.getByText('Looking for the chest…')).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Start counting' })).toBeDisabled()
 
   expect(elsewhere, 'requests to other origins').toEqual([])
 })

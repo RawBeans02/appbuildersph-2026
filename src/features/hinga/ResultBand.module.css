@@ -1,0 +1,55 @@
+/* design/README.md, "Hinga result band": radius 16, padding 16 / 18 / 18; a
+   17/22 800 label with icon, the 56 px metric + "breaths a minute" (20 px
+   700), then the cut-off line (16 px 600). */
+.band {
+  margin-top: 10px;
+  padding: var(--space-4) 18px 18px;
+  border-radius: var(--r-lg);
+}
+
+.fast {
+  background: var(--warn-fill);
+  color: var(--ink);
+}
+
+.urgent {
+  background: var(--bad-fill);
+  color: var(--surface);
+}
+
+.not-fast {
+  background: var(--ok-tint);
+  color: var(--ink);
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font: 800 17px/22px var(--font-ui);
+}
+
+.not-fast .label {
+  color: var(--ok);
+}
+
+.reading {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.metric {
+  font: var(--type-metric);
+  font-variant-numeric: tabular-nums;
+}
+
+.unit {
+  font: 700 20px/26px var(--font-ui);
+}
+
+.line {
+  margin-top: var(--space-2);
+  font: 600 16px/24px var(--font-ui);
+}
