@@ -3,7 +3,13 @@
 Sources: appbuildersph.com/hackathon and the organizers' Oct 8 reminder on the Cerebral Valley event page. Add anything new from the 12:45 PM briefing at the bottom.
 
 ## Challenge (revealed 1:00 PM Fri Oct 9)
+- Theme, word for word: **"Local AI"**
+  > "Useful AI experiences where meaningful AI computation happens on the user's device, rather than depending entirely on cloud inference."
+  >
+  > "This is different from building an AI product for a local audience."
 - Challenge, word for word:
+  > "Build an AI product that remains genuinely useful when the cloud disappears."
+- How we read it (our interpretation, not official wording): the core AI runs on the user's device, and the product keeps its core value with no internet at all (airplane mode), not just a degraded mode. Any cloud part is optional and never the core inference. "Local" means on-device, not "for Filipinos."
 - Judging criteria: **not published**. Fill in if the briefing gives them:
 - Special-award criteria (WhiteCloak, Cognition/Devin, AMD, Tutorials Dojo):
 

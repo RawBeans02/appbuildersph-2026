@@ -39,6 +39,21 @@ Scoped from our team's build standard (Ultimate Build Source of Truth) to a 21-h
 - AI suggestions are reviewable: the user confirms before anything is saved or sent.
 - Phone-first: works at 375 px wide and on mobile data.
 
+## Local AI: the challenge theme (MUST)
+The challenge (`RULES.md`): an AI product that stays genuinely useful when the cloud disappears. Judges will check where the computation happens.
+- **The core inference runs on the user's device** (browser via WebGPU/WASM, phone or laptop). Cloud features are optional, disclosed in the UI, and never needed for the wow flow.
+- **Fully offline after the first load:** the wow flow works in airplane mode, start to finish.
+  - The app shell is cached by a service worker (PWA).
+  - Model weights are cached (Cache API or OPFS), so the second load is instant and works offline. Ask for persistent storage (`navigator.storage.persist()`) so the browser doesn't evict them.
+  - User data is stored on the device (IndexedDB, SQLite or OPFS).
+  - Any sync or cloud feature shows a clear offline state and never blocks the core flow.
+- **Provable on stage:** a visible "running on this device" indicator, an offline indicator, and no network requests during inference (the Network tab stays empty).
+- **Check device capability before loading a model** (WebGPU support, memory, storage quota), with a designed fallback: a smaller model, a WASM/CPU path, or a clear "this device can't run it" state. Never a blank screen or a frozen tab.
+- **Model loading is a designed part of the wow flow:** download progress (MB and %), initialization or warm-up, ready, and failed with retry. Weights load after first paint and never block the page.
+- **Size budget:** small quantized models that run on a mid-range phone or laptop. Record each model's name, parameter count, quantization, download size and license in `docs/ARCHITECTURE.md` and the README. Pre-download the model on every demo device before the pitch.
+- **Inference runs off the main thread** (Web Worker), so the UI stays responsive while the model works.
+- **No fake speed numbers:** any tokens/s or latency shown in the UI, README or pitch is measured live or on a named device.
+
 ## Web quality (MUST)
 - Accessible basics: semantic HTML, one `h1` per page, labels on inputs, alt text, visible focus states, WCAG AA contrast, a keyboard path through the main flow, a skip-to-content link.
 - A real (designed) 404 page, a page title and meta description, and an `og:image` for link previews.
@@ -51,7 +66,7 @@ Scoped from our team's build standard (Ultimate Build Source of Truth) to a 21-h
 - Validate all input on the server (e.g. zod). Validate AI output against a schema before using it.
 - Database: RLS on every table, and decide **which columns** a user may change, not just which rows. Quotas, credits, roles, prices and anything else that grants authority are server-only.
 - Every query is bounded (`limit`, pagination); never load a whole table.
-- AI and other paid APIs need:
+- Cloud AI and other paid APIs (only for optional cloud parts; the core inference is on-device) need:
   - a per-IP or per-user rate limit
   - max tokens
   - bounded retries (at most 2, with backoff)
@@ -59,7 +74,7 @@ Scoped from our team's build standard (Ultimate Build Source of Truth) to a 21-h
   - an env **kill switch** that falls back to a cached demo response
 
   A crowd may open the live URL at once, and a runaway loop must not drain credits. A human sets a spend cap in each provider's dashboard.
-- Privacy: say in the UI what goes to the AI, and send the AI only the data it needs. Add a short "Privacy & AI" page: what is collected, which services process it, what the AI can get wrong.
+- Privacy: say in the UI what stays on the device and what (if anything) leaves it, and send any cloud service only the data it needs. Add a short "Privacy & AI" page: what is collected, where it is processed (on the device or which service), what the AI can get wrong.
 - No login wall for the demo (or a working demo account).
 
 ## Engineering (MUST)
