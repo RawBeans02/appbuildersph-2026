@@ -134,7 +134,7 @@ Until `design/` lands, build the logic plus plain, unstyled screens and write `N
 - [ ] todo · X/LinkedIn post **with the video attached** (its URL is the required "X / LinkedIn video URL"): #AppBuildersPH, tag Cognition and Devin · [human]
 - [ ] todo · submit on the Cerebral Valley event page: project name, short description, team members, repo, demo video, X/LinkedIn video URL, what runs locally, what requires internet, the five disclosures, and the "Why local?" answer (copy from the README) · [human:Rovs]
 - [ ] todo · Demo Day prep: model already downloaded on every demo device; airplane-mode run rehearsed; on-site by 12:00 PM for the 12:15 PM AV check · [human]
-  - clear site data on the demo phone before Demo Day so the seed reloads with that day's dates; show docs/demo/label-doxy-24A.png on the laptop screen (or print it) for the stock scan
+  - on the demo phone and the laptop, open `/device` and tap "Reset sample data" before Demo Day so the seed reloads with that day's dates (it keeps the downloaded models; never clear site data, which would delete them and force a re-download on venue Wi-Fi); show docs/demo/label-doxy-24A.png on the laptop screen (or print it) for the stock scan
 - [ ] todo · 5-minute pitch + Q&A drill, rehearsed ×3 (the questions will cover what runs locally and why) · [human]
 
 ## Scope (locked by the owner, Fri ~3:45 PM)

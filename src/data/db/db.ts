@@ -211,6 +211,39 @@ export async function openAgapayDb(name = DB_NAME) {
       return true
     },
 
+    // For "Reset sample data": empties every record store and the seed marker
+    // in one transaction, so loadSeed() runs again. Keeps this phone's signing
+    // identity and any phone the laptop paired for real, unless resetPairing.
+    // Never touches Cache Storage, so downloaded models stay.
+    async clearForReset({ resetPairing }: { resetPairing: boolean }): Promise<void> {
+      const records = [
+        'residents',
+        'floodEvents',
+        'exposures',
+        'hingaChecks',
+        'stockLots',
+        'flags',
+        'approvals',
+        'receivedPayloads',
+        'plans',
+      ] as const
+      const tx = db.transaction([...records, 'meta', 'pairedDevices', 'deviceIdentity'], 'readwrite')
+      const paired = tx.objectStore('pairedDevices')
+      const work: Promise<unknown>[] = [
+        ...records.map((store) => tx.objectStore(store).clear()),
+        tx.objectStore('meta').delete('seed'),
+      ]
+      if (resetPairing) {
+        work.push(paired.clear(), tx.objectStore('deviceIdentity').clear())
+      } else {
+        for (const device of await paired.getAll()) {
+          if (device.source === 'seed') work.push(paired.delete(device.barangay))
+        }
+      }
+      await Promise.all([...work, tx.done])
+      for (const store of [...records, 'pairedDevices', 'deviceIdentity'] as const) notify(store)
+    },
+
     close: () => db.close(),
   }
 }
