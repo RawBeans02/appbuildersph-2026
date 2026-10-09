@@ -143,6 +143,16 @@ export function createMemoryStore(): MemoryStore {
       })
     },
 
+    async supersedeDrafts(municipality) {
+      let count = 0
+      for (const [id, alert] of alerts) {
+        if (alert.municipality !== municipality || alert.status !== 'draft') continue
+        alerts.set(id, { ...alert, status: 'superseded' })
+        count += 1
+      }
+      return count
+    },
+
     async getAlert(id) {
       const alert = alerts.get(id)
       return alert ? structuredClone(alert) : null
@@ -199,6 +209,8 @@ export function createMemoryStore(): MemoryStore {
         reports: new Map(reports),
         nonces: new Map(nonces),
         rateLimits: new Map(rateLimits),
+        alerts: new Map(alerts),
+        lunaUsage: new Map(lunaUsage),
         audit: auditLog.length,
       }
       try {
@@ -213,6 +225,8 @@ export function createMemoryStore(): MemoryStore {
         restore(reports, saved.reports)
         restore(nonces, saved.nonces)
         restore(rateLimits, saved.rateLimits)
+        restore(alerts, saved.alerts)
+        restore(lunaUsage, saved.lunaUsage)
         auditLog.length = saved.audit
         throw error
       }

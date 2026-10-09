@@ -129,6 +129,16 @@ describe('deciding through the routes', () => {
     expect(again.status).toBe(409)
   })
 
+  it('answers 409 "superseded" for a draft a newer batch replaced', async () => {
+    const old = (await draft()).alerts
+    await draft()
+    const response = await handleAlertsApprove(viewPost('/api/alerts-approve', { id: old[0].id, approverRole: 'Provincial health officer' }), deps(store))
+    expect(response.status).toBe(409)
+    expect(await body<ErrorResponse>(response)).toMatchObject({ ok: false, error: 'superseded' })
+    const rejected = await handleAlertsReject(viewPost('/api/alerts-reject', { id: old[1].id, role: 'Regional officer' }), deps(store))
+    expect(rejected.status).toBe(409)
+  })
+
   it('takes a role, not anything else', async () => {
     const { alerts } = await draft()
     for (const approverRole of ['Dr. 12', 'x', '<b>officer</b>']) {

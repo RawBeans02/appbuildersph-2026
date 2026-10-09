@@ -99,12 +99,22 @@ export const SCHEMA: readonly string[] = [
     calls integer NOT NULL CHECK (calls >= 0)
   )`,
   `CREATE INDEX IF NOT EXISTS barangay_keys_fingerprint ON barangay_keys (fingerprint)`,
+  // P2-security: a draft can be superseded by a newer batch. The status CHECK
+  // is replaced once (Postgres named the first one alerts_status_check).
+  `DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'alerts_status_v2') THEN
+      ALTER TABLE alerts DROP CONSTRAINT IF EXISTS alerts_status_check;
+      ALTER TABLE alerts ADD CONSTRAINT alerts_status_v2 CHECK (status IN ('draft', 'approved', 'rejected', 'superseded'));
+    END IF;
+  END $$`,
 ]
 
 // Any fixed number: concurrent cold starts take this transaction lock, so two
 // instances never run CREATE TABLE IF NOT EXISTS at the same moment (which
 // Postgres can fail on).
 const SCHEMA_LOCK = 20261010
+// With the municipality's hash, while a draft batch replaces the open drafts.
+const DRAFT_LOCK = 20261011
 
 // Reports of a week that hasn't come yet (stored before the sync refused
 // them) would top the DOH view and drive the alerts until that week: deleted
@@ -461,6 +471,14 @@ export function createPgStore(db: pg.Pool | pg.PoolClient, inTransaction = false
         records.push(alertRecord(result.rows[0]))
       }
       return records
+    },
+
+    async supersedeDrafts(municipality) {
+      // One drafting at a time per municipality (until this transaction ends),
+      // so two batches drafted at once can't both stay open.
+      await db.query('SELECT pg_advisory_xact_lock($1, hashtext($2))', [DRAFT_LOCK, municipality])
+      const result = await db.query(`UPDATE alerts SET status = 'superseded' WHERE municipality = $1 AND status = 'draft'`, [municipality])
+      return result.rowCount ?? 0
     },
 
     async getAlert(id) {

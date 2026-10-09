@@ -206,6 +206,20 @@ describe('alerts on Postgres', () => {
     expect(days.rows).toEqual([{ calls: 3 }])
   })
 
+  it('a new draft batch supersedes the undecided drafts, which then answer 409', async () => {
+    const first = await body<DraftAlertsResponse>(await handleAlertsDraft(viewPost('/api/alerts-draft', { municipality: 'SID' }), realDeps()))
+    expect((await handleAlertsApprove(viewPost('/api/alerts-approve', { id: first.alerts[0].id, approverRole: 'Regional officer' }), realDeps())).status).toBe(200)
+    const second = await body<DraftAlertsResponse>(await handleAlertsDraft(viewPost('/api/alerts-draft', { municipality: 'SID' }), realDeps()))
+    const statuses = await getPool(databaseUrl).query<{ id: string; status: string }>('SELECT id::text, status FROM alerts ORDER BY id')
+    expect(statuses.rows.map((row) => row.status)).toEqual(['approved', 'superseded', 'superseded', 'superseded', 'draft', 'draft', 'draft', 'draft'])
+    expect(second.alerts.map((alert) => alert.id)).toEqual(statuses.rows.slice(4).map((row) => row.id))
+    const refused = await handleAlertsApprove(viewPost('/api/alerts-approve', { id: first.alerts[1].id, approverRole: 'Regional officer' }), realDeps())
+    expect(refused.status).toBe(409)
+    expect((await body<ErrorResponse>(refused)).error).toBe('superseded')
+    // The CHECK still refuses any other status.
+    await expect(getPool(databaseUrl).query(`UPDATE alerts SET status = 'pending' WHERE id = $1`, [first.alerts[1].id])).rejects.toThrow(/check constraint/)
+  })
+
   it('keeps the alert columns free of anything but codes, facts and roles', async () => {
     const columns = await getPool(databaseUrl).query<{ column_name: string }>(
       `SELECT column_name FROM information_schema.columns WHERE table_name = 'alerts' ORDER BY ordinal_position`,

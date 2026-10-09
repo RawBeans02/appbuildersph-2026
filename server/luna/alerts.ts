@@ -125,27 +125,33 @@ export async function draftAlerts(store: Store, env: ServerEnv, municipality: st
     worded.push(...(await Promise.all(candidates.slice(1).map((candidate) => word(candidate, store, env, status, now, ai, session)))))
   }
   const batch = randomUUID()
-  const records = await store.insertAlerts(
-    candidates.map((candidate, i) => ({
-      municipality,
-      barangay: candidate.barangay,
-      audience: candidate.audience,
-      epiWeek: candidate.facts.epiWeek,
-      kind: candidate.kind,
-      templateText: candidate.templateText,
-      facts: candidate.facts,
-      draftedBy: 'doh-view',
-      batch,
-      createdAt: now,
-      ...worded[i],
-    })),
-  )
-  const luna = records.filter((record) => record.source === 'luna').length
-  await store.audit({
-    at: now,
-    actor: 'doh-view',
-    action: 'alerts-draft',
-    detail: { municipality, alerts: records.length, luna, template: records.length - luna, ai: status.on ? 'on' : status.reason },
+  // The new batch replaces every draft still waiting: those can no longer be
+  // approved (they may rest on older reports).
+  const records = await store.transaction(async (tx) => {
+    const superseded = await tx.supersedeDrafts(municipality)
+    const records = await tx.insertAlerts(
+      candidates.map((candidate, i) => ({
+        municipality,
+        barangay: candidate.barangay,
+        audience: candidate.audience,
+        epiWeek: candidate.facts.epiWeek,
+        kind: candidate.kind,
+        templateText: candidate.templateText,
+        facts: candidate.facts,
+        draftedBy: 'doh-view',
+        batch,
+        createdAt: now,
+        ...worded[i],
+      })),
+    )
+    const luna = records.filter((record) => record.source === 'luna').length
+    await tx.audit({
+      at: now,
+      actor: 'doh-view',
+      action: 'alerts-draft',
+      detail: { municipality, alerts: records.length, luna, template: records.length - luna, superseded, ai: status.on ? 'on' : status.reason },
+    })
+    return records
   })
   // After the calls, so the day's count is current.
   return { ok: true, ai: await aiStatus(store, env, now), alerts: records.map(alertView) }
@@ -163,11 +169,22 @@ export async function listAlerts(store: Store, env: ServerEnv, municipality: str
   return { ok: true, ai, drafts: drafts.map(alertView), decided: decided.map(alertView), audit: auditViews }
 }
 
+const notOpen = (status: AlertRecord['status'] | undefined) =>
+  status === 'superseded'
+    ? new HttpError('superseded', 'A newer draft replaced this alert. Decide on the newer one.')
+    : new HttpError('already-decided', 'This alert was already approved or rejected.')
+
 async function draftOf(store: Store, id: string, municipality?: string): Promise<AlertRecord> {
   const alert = await store.getAlert(id)
   if (!alert || (municipality !== undefined && alert.municipality !== municipality)) throw new HttpError('not-found', 'No such alert.')
-  if (alert.status !== 'draft') throw new HttpError('already-decided', 'This alert was already approved or rejected.')
+  if (alert.status !== 'draft') throw notOpen(alert.status)
   return alert
+}
+
+// When the decision found the alert no longer a draft (decided or superseded
+// in the meantime), says which.
+async function lostRace(store: Store, id: string): Promise<never> {
+  throw notOpen((await store.getAlert(id))?.status)
 }
 
 // POST /api/alerts-approve: an edited wording gets back any safety caveat it
@@ -185,8 +202,7 @@ export async function approveAlert(
     const check = checkAlertText(text, { facts: alert.facts as AlertFacts, templateText: alert.templateText })
     if (!check.ok) throw new HttpError('check-failed', "The edited wording doesn't match the alert's facts.", {}, check.reasons)
   }
-  const decided = await store.decideAlert(alert.id, { status: 'approved', role: input.role, at: now, text })
-  if (!decided) throw new HttpError('already-decided', 'This alert was already approved or rejected.')
+  const decided = (await store.decideAlert(alert.id, { status: 'approved', role: input.role, at: now, text })) ?? (await lostRace(store, alert.id))
   await store.audit({
     at: now,
     actor: input.role,
@@ -199,8 +215,7 @@ export async function approveAlert(
 // POST /api/alerts-reject.
 export async function rejectAlert(store: Store, input: { id: string; municipality?: string; role: string }, now: Date): Promise<DecideResponse> {
   const alert = await draftOf(store, input.id, input.municipality)
-  const decided = await store.decideAlert(alert.id, { status: 'rejected', role: input.role, at: now, text: alert.text })
-  if (!decided) throw new HttpError('already-decided', 'This alert was already approved or rejected.')
+  const decided = (await store.decideAlert(alert.id, { status: 'rejected', role: input.role, at: now, text: alert.text })) ?? (await lostRace(store, alert.id))
   await store.audit({
     at: now,
     actor: input.role,

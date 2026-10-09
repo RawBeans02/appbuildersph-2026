@@ -125,6 +125,8 @@ export type ErrorCode =
   | 'wrong-code'
   | 'not-found'
   | 'already-decided'
+  // A newer draft batch replaced this undecided alert (409).
+  | 'superseded'
   | 'check-failed'
   | 'server-error'
 
@@ -194,7 +196,7 @@ export type AlertView = {
   checkReasons: string[]
   // Why the template is shown when the AI wasn't asked or didn't answer.
   aiNote: string | null
-  status: 'draft' | 'approved' | 'rejected'
+  status: 'draft' | 'approved' | 'rejected' | 'superseded'
   createdAt: string
   // Roles, never names.
   decidedByRole: string | null

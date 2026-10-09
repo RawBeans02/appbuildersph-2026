@@ -291,6 +291,31 @@ describe('deciding', () => {
     }
   })
 
+  it('a new draft batch supersedes the drafts still waiting: they can be neither approved nor rejected', async () => {
+    const first = await drafts()
+    await approveAlert(store, { id: first[0].id, municipality: 'SID', role: 'Regional officer' }, NOW)
+    const second = await drafts()
+    expect(first.slice(1).map((alert) => store.alerts.get(alert.id)?.status)).toEqual(['superseded', 'superseded', 'superseded'])
+    // A decided alert stays decided.
+    expect(store.alerts.get(first[0].id)?.status).toBe('approved')
+    expect(store.auditLog.at(-1)).toMatchObject({ action: 'alerts-draft', detail: { alerts: 4, superseded: 3 } })
+    for (const decide of [
+      () => approveAlert(store, { id: first[1].id, municipality: 'SID', role: 'Regional officer' }, NOW),
+      () => rejectAlert(store, { id: first[2].id, municipality: 'SID', role: 'Regional officer' }, NOW),
+    ]) {
+      const refused = await decide().catch((e: unknown) => e)
+      expect(refused).toBeInstanceOf(HttpError)
+      expect((refused as HttpError).code).toBe('superseded')
+    }
+    // Already decided is its own answer.
+    const again = await rejectAlert(store, { id: first[0].id, municipality: 'SID', role: 'Regional officer' }, NOW).catch((e: unknown) => e)
+    expect((again as HttpError).code).toBe('already-decided')
+    // Only the new batch is waiting.
+    const list = await listAlerts(store, ENV, 'SID', NOW)
+    expect(list.drafts.map((alert) => alert.id).sort()).toEqual(second.map((alert) => alert.id).sort())
+    expect(list.decided.map((alert) => alert.id)).toEqual([first[0].id])
+  })
+
   it('rejects, logs it, and refuses an alert of another municipality', async () => {
     const [first, second] = await drafts()
     const { alert } = await rejectAlert(store, { id: first.id, municipality: 'SID', role: 'Provincial health officer' }, NOW)

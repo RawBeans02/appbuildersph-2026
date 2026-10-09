@@ -29,6 +29,8 @@ export type SyncProblem =
   // the check's reasons; an alert someone already decided.
   | { kind: 'check-failed'; reasons: string[] }
   | { kind: 'already-decided' }
+  // A newer draft batch replaced the alert.
+  | { kind: 'superseded' }
   | { kind: 'failed' }
 
 export type ApiResult<T> = { ok: true; value: T } | { ok: false; problem: SyncProblem }
@@ -64,6 +66,8 @@ export async function callApi<T>(fetcher: Fetcher, path: string, init: RequestIn
     }
     case 'already-decided':
       return { ok: false, problem: { kind: 'already-decided' } }
+    case 'superseded':
+      return { ok: false, problem: { kind: 'superseded' } }
     default:
       return { ok: false, problem: { kind: 'failed' } }
   }
@@ -129,6 +133,8 @@ export function problemText(problem: SyncProblem): { title: string; body: string
       return { title: "The wording doesn't match the alert's facts", body: problem.reasons.join(' ') }
     case 'already-decided':
       return { title: 'Someone already decided this alert', body: 'The list now shows what was decided.' }
+    case 'superseded':
+      return { title: 'A newer draft replaced this alert', body: 'The list now shows the newer drafts.' }
     case 'failed':
       return { title: "Sync didn't finish", body: 'Nothing on this laptop changed. Try again.' }
   }

@@ -155,7 +155,7 @@ export function DraftCard({ alert, code, role, onDone }: { alert: AlertView; cod
       ? await alertsApi.approve(code, alert.id, role.trim(), edited ? text.trim() : null)
       : await alertsApi.reject(code, alert.id, role.trim())
     setBusy(false)
-    if (result.ok || result.problem.kind === 'already-decided') onDone()
+    if (result.ok || result.problem.kind === 'already-decided' || result.problem.kind === 'superseded') onDone()
     else setProblem(result.problem)
   }
 

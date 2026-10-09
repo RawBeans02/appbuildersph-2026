@@ -3,7 +3,8 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import type { AlertView } from '../../../server/protocol'
 import { DraftCard } from './AlertsPanel'
-import { aiLine, auditLine, factRows, isRole, sourceLine } from './alerts'
+import { problemText } from '../municipal/sync/client'
+import { aiLine, alertsApi, auditLine, factRows, isRole, sourceLine } from './alerts'
 
 // The alerts panel's words, from synthetic alerts.
 
@@ -53,6 +54,13 @@ describe('alerts panel words', () => {
     expect(failed).toEqual({ tag: 'Template', line: "GPT-6 Luna's wording didn't pass the check, so the template is shown: It adds numbers that are not in the plan: 60." })
     expect(sourceLine({ source: 'template', aiNote: 'disabled', checkReasons: [] }).line).toBe('AI off: the wording comes from the facts only.')
     for (const line of [luna.line, failed.line]) expect(line).not.toMatch(/all numbers match/i)
+  })
+
+  it('says when a newer draft replaced the alert', async () => {
+    const superseded = async () => new Response(JSON.stringify({ ok: false, error: 'superseded', message: 'x' }), { status: 409 })
+    const result = await alertsApi.reject('code', '7', 'Regional officer', superseded)
+    expect(result).toEqual({ ok: false, problem: { kind: 'superseded' } })
+    if (!result.ok) expect(problemText(result.problem).title).toBe('A newer draft replaced this alert')
   })
 
   it('lists the facts as shown, "<5" kept', () => {

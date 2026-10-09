@@ -51,7 +51,9 @@ export type AuditEntry = {
 export type ReportWrite = 'stored' | 'kept-newer' | 'unchanged'
 
 export type AlertKind = 'doctor-team' | 'move-stock' | 'watch'
-export type AlertStatus = 'draft' | 'approved' | 'rejected'
+// 'superseded': a draft left undecided when a newer draft batch of its
+// municipality was made; it can't be approved or rejected any more.
+export type AlertStatus = 'draft' | 'approved' | 'rejected' | 'superseded'
 
 // An alert as drafted (server/luna/): the facts it's built from, the template
 // made from them, the wording offered (GPT-6 Luna's when it passed the check,
@@ -124,6 +126,9 @@ export interface Store {
   refundLunaCall(day: string): Promise<void>
   lunaCalls(day: string): Promise<number>
   insertAlerts(alerts: NewAlert[]): Promise<AlertRecord[]>
+  // Marks every undecided draft of the municipality superseded (before a new
+  // batch is inserted, in the same transaction); returns how many.
+  supersedeDrafts(municipality: string): Promise<number>
   getAlert(id: string): Promise<AlertRecord | null>
   // Decides a draft; null when it isn't a draft any more.
   decideAlert(id: string, decision: AlertDecision): Promise<AlertRecord | null>
