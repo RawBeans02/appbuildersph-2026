@@ -38,6 +38,9 @@ export default function ComparePage() {
   const [today] = useState(localToday)
   const [busy, setBusy] = useState(false)
   const busyRef = useRef(false)
+  // Flagged by a tap in this visit: the block rises and its flag stamps (13b).
+  // A flag already open when the screen opens shows still.
+  const [justFlagged, setJustFlagged] = useState(false)
   useFlowMode(true)
 
   const placeText = placeLine([place.barangay], place.sample)
@@ -113,8 +116,8 @@ export default function ComparePage() {
         {header}
 
         {flag && (
-          <div className={styles.flagged} role="status">
-            <FlagIcon size={24} weight="bold" aria-hidden className={styles.flaggedIcon} />
+          <div className={cx(styles.flagged, justFlagged && 'rise')} role="status">
+            <FlagIcon size={24} weight="bold" aria-hidden className={cx(styles.flaggedIcon, justFlagged && 'stamp')} />
             <div>
               <p className={styles.flaggedTitle}>Flagged for clinician review</p>
               <p className={styles.flaggedMeta}>{flaggedAt(flag.createdAt)}. It goes in the next QR as a count.</p>
@@ -192,7 +195,10 @@ export default function ComparePage() {
               tagalog="I-flag"
               icon={<FlagIcon size={22} weight="bold" aria-hidden />}
               disabled={busy}
-              onClick={() => void write((db) => flagForClinician(db, review))}
+              onClick={() => {
+                setJustFlagged(true)
+                void write((db) => flagForClinician(db, review))
+              }}
             >
               Flag for clinician review
             </Button>
