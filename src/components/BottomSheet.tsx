@@ -12,6 +12,7 @@ export function BottomSheet({
   onClose,
   title,
   icon,
+  iconTone = 'neutral',
   showClose,
   titleLevel = 'h2',
   children,
@@ -19,9 +20,10 @@ export function BottomSheet({
   open: boolean
   onClose: () => void
   title: ReactNode
-  // A Phosphor icon element (about 30 px, Bold), shown in a 56 px circle
-  // above the title.
+  // A Phosphor icon element (32 px, Bold), shown in a 64 px circle above
+  // the title: --sunken, or --warn-tint with a --warn icon for 'warn'.
   icon?: ReactNode
+  iconTone?: 'neutral' | 'warn'
   showClose?: boolean
   titleLevel?: 'h1' | 'h2'
   children: ReactNode
@@ -60,7 +62,7 @@ export function BottomSheet({
       >
         <div className={styles.grabber} aria-hidden />
         {icon && (
-          <span className={styles.icon} aria-hidden>
+          <span className={iconTone === 'warn' ? `${styles.icon} ${styles.iconWarn}` : styles.icon} aria-hidden>
             {icon}
           </span>
         )}
