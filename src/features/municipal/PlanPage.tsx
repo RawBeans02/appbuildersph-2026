@@ -87,7 +87,7 @@ export function PlanSteps({ plan }: { plan: MunicipalPlan }) {
       </ol>
       <p className={styles.dose}>
         <InfoIcon size={18} weight="bold" aria-hidden />
-        No doses. Doxycycline is given only after consultation with a health professional (DOH).
+        No doses. Doxycycline is given only after consultation with a health professional (DOH guideline).
       </p>
     </section>
   )

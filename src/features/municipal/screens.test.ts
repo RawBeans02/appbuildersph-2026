@@ -33,7 +33,7 @@ describe('laptop screens', () => {
     const steps = text(renderToStaticMarkup(createElement(PlanSteps, { plan })))
     expect(steps).toContain('1. Send a doctor team to Bagong Silang-D first.')
     expect(steps).toContain('2. Move 30 capsules from Riverside-D to Bagong Silang-D.')
-    expect(steps).toContain('No doses. Doxycycline is given only after consultation with a health professional (DOH).')
+    expect(steps).toContain('No doses. Doxycycline is given only after consultation with a health professional (DOH guideline).')
 
     const seen: { plan?: unknown; draft?: string } = {}
     const FakePanel: WordingPanel = (props) => {
