@@ -33,6 +33,25 @@ describe('Hinga check record', () => {
     })
   })
 
+  it('saves a danger sign checked without a count as URGENT, with no count and a valid reason', () => {
+    for (const method of ['camera', 'hand'] as const) {
+      expect(buildHingaCheck({ ...base, method, breathsPerMinute: null, refusal: null, dangerSigns: ['vomits-everything'] })).toEqual({
+        ...base,
+        method,
+        breathsPerMinute: null,
+        outcome: 'urgent',
+        refusal: 'not-counted',
+        dangerSigns: ['vomits-everything'],
+        sample: false,
+      })
+    }
+  })
+
+  it('saves fast breathing under 2 months as URGENT', () => {
+    expect(buildHingaCheck({ ...base, ageMonths: 1, breathsPerMinute: 60 })).toMatchObject({ outcome: 'urgent', dangerSigns: [] })
+    expect(buildHingaCheck({ ...base, ageMonths: 2, breathsPerMinute: 50 })).toMatchObject({ outcome: 'fast' })
+  })
+
   it('saves a refused check with its reason, and drops the reason when there is a count', () => {
     expect(buildHingaCheck({ ...base, breathsPerMinute: null, refusal: 'motion' })).toMatchObject({ outcome: 'refused', refusal: 'motion' })
     expect(buildHingaCheck({ ...base, breathsPerMinute: null, refusal: null })).toMatchObject({ refusal: 'not-counted' })

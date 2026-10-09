@@ -18,6 +18,7 @@ import { BottomSheet, Button, FlowTopBar, LocalStatus } from '../../components'
 import { cx } from '../../components/cx'
 import { COUNT_MS, type CountRefusal, type CountSession, type SessionState } from './countSession'
 import { refusalText, type RefusalIcon } from './copy'
+import { DangerSignsAction } from './FallbackScreens'
 import { clockText } from './handCount'
 import styles from './Hinga.module.css'
 
@@ -50,6 +51,8 @@ export function CameraScreen(props: {
   onRetry(): void
   // After the second refusal in a row (design review decision 4).
   onHandCount: (() => void) | null
+  // On every refusal: the danger signs without a count.
+  onDangerSigns(): void
 }) {
   const { session, state } = props
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -164,6 +167,7 @@ export function CameraScreen(props: {
           cryOff={outcome?.kind === 'refused' ? outcome.cryOff : null}
           onRetry={props.onRetry}
           onHandCount={props.onHandCount}
+          onDangerSigns={props.onDangerSigns}
         />
       )}
     </div>
@@ -201,6 +205,7 @@ function RefusalSheet(props: {
   cryOff: string | null
   onRetry(): void
   onHandCount: (() => void) | null
+  onDangerSigns(): void
 }) {
   // 5e: the second refusal in a row also offers the hand count.
   const text = refusalText(props.refusal, props.onHandCount !== null)
@@ -218,6 +223,7 @@ function RefusalSheet(props: {
             Count by hand with a timer
           </Button>
         )}
+        <DangerSignsAction onClick={props.onDangerSigns} />
       </div>
     </BottomSheet>
   )
@@ -257,8 +263,10 @@ export function PrePermissionScreen({ onContinue, onCancel }: { onContinue(): vo
   )
 }
 
-// 3d: permission denied, or no camera. The fallback is counting by hand.
-export function CameraBlockedScreen({ onHandCount, onRetry, onClose }: { onHandCount(): void; onRetry(): void; onClose(): void }) {
+// 3d: permission denied, or no camera. The fallback is counting by hand, and
+// the danger signs stay in reach.
+export function CameraBlockedScreen(props: { onHandCount(): void; onDangerSigns(): void; onRetry(): void; onClose(): void }) {
+  const { onHandCount, onRetry, onClose } = props
   return (
     <NoCameraScreen onCancel={onClose} backLabel="Close">
       <BottomSheet
@@ -275,6 +283,7 @@ export function CameraBlockedScreen({ onHandCount, onRetry, onClose }: { onHandC
           <Button icon={<TimerIcon size={22} weight="bold" aria-hidden />} onClick={onHandCount}>
             Count by hand with a timer
           </Button>
+          <DangerSignsAction onClick={props.onDangerSigns} />
           <Button variant="text" onClick={onRetry}>
             I turned it on: try again
           </Button>

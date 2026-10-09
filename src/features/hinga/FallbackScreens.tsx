@@ -1,13 +1,24 @@
 import { ArrowClockwiseIcon, CheckIcon, MemoryIcon, TimerIcon, WarningCircleIcon } from '@phosphor-icons/react'
 import { Button, FlowTopBar, StateBlock } from '../../components'
+import { DANGER_SIGNS_ACTION } from './copy'
 import styles from './Hinga.module.css'
 
 // No "Runs on this phone" here: the breathing check isn't running.
 const NO_STATUS = false
 
+// The way to the danger signs from every screen without a count (flow.ts,
+// DANGER_SIGN_ROUTE): the same checklist and URGENT band as the result screen.
+export function DangerSignsAction({ onClick }: { onClick(): void }) {
+  return (
+    <Button variant="secondary" icon={<WarningCircleIcon size={22} weight="bold" aria-hidden />} onClick={onClick}>
+      {DANGER_SIGNS_ACTION}
+    </Button>
+  )
+}
+
 // L8a: no WebAssembly, or the breathing check failed to load twice. Counting
 // by hand still works, and so does the rest of AgapayMo.
-export function CantRunScreen({ onHandCount, onBack }: { onHandCount(): void; onBack(): void }) {
+export function CantRunScreen({ onHandCount, onDangerSigns, onBack }: { onHandCount(): void; onDangerSigns(): void; onBack(): void }) {
   return (
     <div className={styles.screen}>
       <FlowTopBar onBack={onBack} right={NO_STATUS} />
@@ -35,6 +46,7 @@ export function CantRunScreen({ onHandCount, onBack }: { onHandCount(): void; on
         <Button icon={<TimerIcon size={22} weight="bold" aria-hidden />} onClick={onHandCount}>
           Count by hand with a timer
         </Button>
+        <DangerSignsAction onClick={onDangerSigns} />
       </div>
     </div>
   )
@@ -43,7 +55,8 @@ export function CantRunScreen({ onHandCount, onBack }: { onHandCount(): void; on
 // L9b: the files are on the phone but the breathing check didn't load. A
 // second failure leads to L8a. Counting by hand is offered here too, so a
 // check never gets stuck on a phone whose camera AI won't start.
-export function DidntLoadScreen({ onRetry, onHandCount, onBack }: { onRetry(): void; onHandCount(): void; onBack(): void }) {
+export function DidntLoadScreen(props: { onRetry(): void; onHandCount(): void; onDangerSigns(): void; onBack(): void }) {
+  const { onRetry, onHandCount, onBack } = props
   return (
     <div className={styles.screen}>
       <FlowTopBar onBack={onBack} right={NO_STATUS} />
@@ -63,6 +76,7 @@ export function DidntLoadScreen({ onRetry, onHandCount, onBack }: { onRetry(): v
         <Button variant="secondary" icon={<TimerIcon size={22} weight="bold" aria-hidden />} onClick={onHandCount}>
           Count by hand with a timer
         </Button>
+        <DangerSignsAction onClick={props.onDangerSigns} />
       </div>
     </div>
   )

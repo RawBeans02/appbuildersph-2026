@@ -58,8 +58,13 @@ export function joinAnd(parts: readonly string[]): string {
 
 export type ResultKind = 'fast' | 'urgent' | 'not-fast'
 
-// The result band's three lines (6a, 6b, 7a).
-export function bandText(kind: ResultKind, perMin: number, band: AgeBand, signs: readonly DangerSign[]) {
+// The secondary action on every screen without a count (flow.ts,
+// DANGER_SIGN_ROUTE). NEEDS DESIGN (review fix).
+export const DANGER_SIGNS_ACTION = 'Danger sign seen? Refer now'
+
+// The result band's three lines (6a, 6b, 7a). perMin is null for the danger
+// signs checked without a count, which can only be URGENT.
+export function bandText(kind: ResultKind, perMin: number | null, band: AgeBand, signs: readonly DangerSign[]) {
   const signWords = joinAnd(signs.map((sign) => DANGER_SIGN_COPY[sign].inLine))
   switch (kind) {
     case 'fast':
@@ -72,6 +77,8 @@ export function bandText(kind: ResultKind, perMin: number, band: AgeBand, signs:
       if (signs.length === 0 && isYoungInfant(band.firstMonth)) {
         return { label: 'Urgent · fast breathing', perMin, line: `Fast breathing under 2 months (${band.cutoff} or more).` }
       }
+      // NEEDS DESIGN (review fix): a danger sign with no count.
+      if (perMin === null) return { label: 'Urgent · danger sign', perMin, line: `Danger sign: ${signWords}.` }
       return {
         label: 'Urgent · danger sign',
         perMin,
@@ -102,18 +109,19 @@ export function recheckText(band: AgeBand): string {
 export const timeText = (iso: string) => new Date(iso).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
 
 // "Residente 010 · HH-02 · 1 to 4 years · 8:31 AM", plus
-// "Counted by hand" for an L8b count.
+// "Counted by hand" for an L8b count, or "Not counted" (method null) for the
+// danger signs checked without a count.
 export function metaLine(input: {
   resident: { name: string; householdId: string } | null
   band: AgeBand
   time: string
-  method: 'camera' | 'hand'
+  method: 'camera' | 'hand' | null
 }): string {
   return [
     ...(input.resident ? [input.resident.name, input.resident.householdId] : []),
     input.band.label,
     input.time,
-    ...(input.method === 'hand' ? ['Counted by hand'] : []),
+    ...(input.method === 'hand' ? ['Counted by hand'] : input.method === null ? ['Not counted'] : []),
   ].join(' · ')
 }
 

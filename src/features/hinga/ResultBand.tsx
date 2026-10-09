@@ -9,7 +9,8 @@ import styles from './ResultBand.module.css'
 // under A7, asks whether it should move to src/components).
 const ICONS = { fast: WarningIcon, urgent: WarningCircleIcon, 'not-fast': CheckCircleIcon } as const
 
-export function ResultBand({ kind, label, perMin, line }: { kind: ResultKind; label: string; perMin: number; line: string }) {
+// perMin is null for the danger signs checked without a count: no number then.
+export function ResultBand({ kind, label, perMin, line }: { kind: ResultKind; label: string; perMin: number | null; line: string }) {
   const Icon = ICONS[kind]
   return (
     <section className={cx(styles.band, styles[kind])} role={kind === 'urgent' ? 'alert' : undefined} aria-label={label}>
@@ -17,10 +18,12 @@ export function ResultBand({ kind, label, perMin, line }: { kind: ResultKind; la
         <Icon size={20} weight="bold" aria-hidden />
         {label}
       </p>
-      <p className={styles.reading}>
-        <span className={styles.metric}>{perMin}</span>
-        <span className={styles.unit}>breaths a minute</span>
-      </p>
+      {perMin !== null && (
+        <p className={styles.reading}>
+          <span className={styles.metric}>{perMin}</span>
+          <span className={styles.unit}>breaths a minute</span>
+        </p>
+      )}
       <p className={styles.line}>{line}</p>
     </section>
   )

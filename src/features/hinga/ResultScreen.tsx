@@ -26,8 +26,11 @@ import { ResultBand } from './ResultBand'
 // 6a fast, 6b URGENT, 7a not fast, then 6c saved. The same screens for a
 // count by the camera and by hand ("Counted by hand" in the meta line). Any
 // danger sign makes it URGENT at once; Save needs a tick or "None of these".
+// With no count (perMin null, the "Danger sign seen? Refer now" route) the
+// same checklist shows first: a tick gives the URGENT band and Save, and
+// "None of these" goes back to the screen it came from (onNoSigns).
 
-export type Reading = { perMin: number; at: string; method: CountMethodUsed; cryOff: string | null }
+export type Reading = { perMin: number | null; at: string; method: CountMethodUsed; cryOff: string | null }
 
 export type SavedCheck = { check: HingaCheck; at: string }
 
@@ -40,6 +43,8 @@ export function ResultScreen(props: {
   resident: LinkedResident | null
   saved: SavedCheck | null
   onSaved(saved: SavedCheck): void
+  // No count: "None of these" goes back.
+  onNoSigns?(): void
   onClose(): void
   onAnother(): void
   onDone(): void
@@ -51,12 +56,22 @@ export function ResultScreen(props: {
   const savingRef = useRef(false)
   const [failed, setFailed] = useState(false)
   const signs = saved ? (saved.check.dangerSigns as DangerSign[]) : answer.signs
-  const kind = hingaOutcome({ breathsPerMinute: reading.perMin, ageMonths: props.ageMonths, dangerSigns: signs }) as ResultKind
-  const bandLines = bandText(kind, reading.perMin, band, signs)
-  const headline = HEADLINES[kind]
+  const counted = reading.perMin !== null
+  const outcome = hingaOutcome({ breathsPerMinute: reading.perMin, ageMonths: props.ageMonths, dangerSigns: signs })
+  // No count and no sign ticked yet: no band, only the checklist.
+  const kind: ResultKind | null = outcome === 'refused' || outcome === null ? null : outcome
+  const bandLines = kind && bandText(kind, reading.perMin, band, signs)
+  const headline = kind && HEADLINES[kind]
+  // With no count, only a ticked sign can be saved (an URGENT referral).
+  const canSave = counted ? answered(answer) : answer.signs.length > 0
+
+  function onAnswer(next: DangerAnswer<DangerSign>) {
+    if (!counted && next.none) props.onNoSigns?.()
+    else setAnswer(next)
+  }
 
   async function save() {
-    if (savingRef.current || saved || !answered(answer)) return
+    if (savingRef.current || saved || !canSave) return
     savingRef.current = true
     setSaving(true)
     setFailed(false)
@@ -89,13 +104,19 @@ export function ResultScreen(props: {
     <div className={styles.screen}>
       <FlowTopBar backKind="close" onBack={props.onClose} />
       <div className={styles.body}>
-        <p className={styles.meta}>{metaLine({ resident, band, time: timeText(reading.at), method: reading.method })}</p>
-        <ResultBand kind={kind} {...bandLines} />
+        <p className={styles.meta}>
+          {metaLine({ resident, band, time: timeText(reading.at), method: counted ? reading.method : null })}
+        </p>
+        {kind && bandLines && <ResultBand kind={kind} {...bandLines} />}
         {reading.cryOff && <CryOffNote reason={reading.cryOff} />}
-        <div className={styles.headline}>
-          <h1 lang="tl">{headline.tagalog}</h1>
-          <p>{headline.english}</p>
-        </div>
+        {headline ? (
+          <div className={styles.headline}>
+            <h1 lang="tl">{headline.tagalog}</h1>
+            <p>{headline.english}</p>
+          </div>
+        ) : (
+          <h1 className="visually-hidden">Hinga breathing check</h1>
+        )}
 
         {kind === 'not-fast' && !saved && (
           <>
@@ -122,7 +143,7 @@ export function ResultScreen(props: {
             </div>
           </div>
         ) : (
-          <DangerSigns answer={answer} onChange={setAnswer} />
+          <DangerSigns answer={answer} onChange={onAnswer} />
         )}
 
         <p className={styles.note}>
@@ -149,8 +170,12 @@ export function ResultScreen(props: {
         </div>
       ) : (
         <div className={`${styles.footer} ${styles.saveBar}`}>
-          {!answered(answer) && <p className={styles.saveHint}>Tick any danger signs, or None of these, to save.</p>}
-          <Button tagalog="I-save" disabled={!answered(answer) || saving} onClick={() => void save()}>
+          {!canSave && (
+            <p className={styles.saveHint}>
+              {counted ? 'Tick any danger signs, or None of these, to save.' : 'Tick any danger sign you see. None of these goes back.'}
+            </p>
+          )}
+          <Button tagalog="I-save" disabled={!canSave || saving} onClick={() => void save()}>
             {kind === 'urgent' ? 'Save as URGENT' : 'Save to the record'}
           </Button>
           {kind === 'not-fast' && (

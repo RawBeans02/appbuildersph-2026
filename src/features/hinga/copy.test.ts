@@ -1,6 +1,17 @@
 import { describe, expect, it } from 'vitest'
 import { DANGER_SIGNS } from '../../rules/imci'
-import { ageBand, bandText, DANGER_SIGN_COPY, DANGER_SIGN_ROWS, joinAnd, metaLine, recheckText, refusalText, savedText } from './copy'
+import {
+  ageBand,
+  bandText,
+  DANGER_SIGN_COPY,
+  DANGER_SIGN_ROWS,
+  DANGER_SIGNS_ACTION,
+  joinAnd,
+  metaLine,
+  recheckText,
+  refusalText,
+  savedText,
+} from './copy'
 
 const toddler = ageBand(18)!
 
@@ -61,6 +72,18 @@ describe('Hinga copy (design/COPY.md)', () => {
     expect(bandText('fast', 50, ageBand(2)!, []).label).toBe('Fast breathing for age')
   })
 
+  it('names the sign on the URGENT band when there is no count', () => {
+    expect(bandText('urgent', null, toddler, ['vomits-everything'])).toEqual({
+      label: 'Urgent · danger sign',
+      perMin: null,
+      line: 'Danger sign: vomits everything.',
+    })
+    expect(bandText('urgent', null, ageBand(1)!, ['convulsions', 'lethargic']).line).toBe(
+      'Danger sign: convulsions and very sleepy or hard to wake.',
+    )
+    expect(DANGER_SIGNS_ACTION).toBe('Danger sign seen? Refer now')
+  })
+
   it('has no 5-day recheck under 2 months', () => {
     expect(recheckText(ageBand(0)!)).toBe(
       'Bring the baby back right away if breathing gets fast or hard, the baby feeds poorly, has a fever or feels cold.',
@@ -71,7 +94,13 @@ describe('Hinga copy (design/COPY.md)', () => {
   })
 
   it('writes no em dashes in the result lines', () => {
-    const lines = [bandText('urgent', 64, ageBand(1)!, []).line, recheckText(ageBand(1)!), recheckText(toddler)]
+    const lines = [
+      bandText('urgent', 64, ageBand(1)!, []).line,
+      bandText('urgent', null, toddler, ['stridor']).line,
+      recheckText(ageBand(1)!),
+      recheckText(toddler),
+      DANGER_SIGNS_ACTION,
+    ]
     for (const line of lines) expect(line).not.toMatch(/\u2014/)
   })
 
@@ -90,6 +119,7 @@ describe('Hinga copy (design/COPY.md)', () => {
     expect(metaLine({ resident: null, band: toddler, time: '8:31 AM', method: 'hand' })).toBe(
       '1 to 4 years · 8:31 AM · Counted by hand',
     )
+    expect(metaLine({ resident: null, band: toddler, time: '8:31 AM', method: null })).toBe('1 to 4 years · 8:31 AM · Not counted')
   })
 
   it("writes 6c's confirmation", () => {

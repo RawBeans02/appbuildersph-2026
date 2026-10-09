@@ -1,12 +1,15 @@
 import { useEffect, useRef, useState } from 'react'
 import { FlowTopBar } from '../../components'
 import type { AgeBand } from './copy'
+import { DangerSignsAction } from './FallbackScreens'
 import { clockText, handRate, isDone, msLeft, NOT_STARTED, tap, type HandCount } from './handCount'
 import styles from './Hinga.module.css'
 
 // L8b, count by hand: tap once per breath; the clock starts at the first tap
-// and the result screens follow at 0:00, marked "Counted by hand".
-export function HandCountScreen({ band, onDone, onStop }: { band: AgeBand; onDone(perMin: number): void; onStop(): void }) {
+// and the result screens follow at 0:00, marked "Counted by hand". A danger
+// sign seen before the minute is up goes straight to the checklist.
+export function HandCountScreen(props: { band: AgeBand; onDone(perMin: number): void; onStop(): void; onDangerSigns(): void }) {
+  const { band, onDone, onStop } = props
   const [count, setCount] = useState<HandCount>(NOT_STARTED)
   const [left, setLeft] = useState(() => msLeft(NOT_STARTED, 0))
   const countRef = useRef(count)
@@ -66,6 +69,9 @@ export function HandCountScreen({ band, onDone, onStop }: { band: AgeBand; onDon
             {band.label} · fast is {band.cutoff} or more a minute
           </p>
         </div>
+      </div>
+      <div className={styles.footer}>
+        <DangerSignsAction onClick={props.onDangerSigns} />
       </div>
     </div>
   )

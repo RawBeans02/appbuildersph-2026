@@ -13,6 +13,7 @@ export type HingaScreen =
   | 'cant-run' // L8a: no WebAssembly, or it failed to load twice
   | 'hand-count' // L8b: tap once per breath for 60 s
   | 'result' // 6a fast, 6b URGENT, 7a not fast
+  | 'danger-signs' // the danger-sign check with no count (6b's checklist and band)
   | 'saved' // 6c
 
 // The child being checked (2a). ageMonths is a linked resident's age in whole
@@ -25,8 +26,9 @@ export type Child = { resident: LinkedResident | null; ageMonths: number | null;
 export const NO_CHILD: Child = { resident: null, ageMonths: null, calm: false }
 
 // 'camera' covers 3a–5d with the camera check's own fallbacks (3c, 3d, L9b,
-// L8a); 'hand' is L8b, reached from 3d and L8a.
-export type HingaStep = 'age' | 'camera' | 'hand'
+// L8a); 'hand' is L8b, reached from 3d and L8a; 'signs' is the danger-sign
+// check without a count, reached from every screen in DANGER_SIGN_ROUTE.
+export type HingaStep = 'age' | 'camera' | 'hand' | 'signs'
 
 // A second failed load leads to L8a (design: L9b's note).
 export const MAX_LOAD_FAILURES = 2
@@ -55,6 +57,8 @@ export function hingaScreen(input: FlowInput): HingaScreen {
       return 'age'
     case 'hand':
       return input.handDone ? 'result' : 'hand-count'
+    case 'signs':
+      return 'danger-signs'
     case 'camera':
       if (input.counted) return 'result'
       if (!input.webAssembly || input.loadFailures >= MAX_LOAD_FAILURES) return 'cant-run'
@@ -79,6 +83,14 @@ export function needsPrePermission(shownBefore: boolean, permission: PermissionS
 export const HAND_COUNT_AFTER_REFUSALS = 2
 
 export const offerHandCount = (refusalsInRow: number) => refusalsInRow >= HAND_COUNT_AFTER_REFUSALS
+
+// The screens where the count failed, was refused or can't run, and the hand
+// count: each offers "Danger sign seen? Refer now", so the danger signs are
+// never out of reach when there is no count (review fix). "None of these"
+// there goes back to the same screen.
+export const DANGER_SIGN_ROUTE: readonly HingaScreen[] = ['refused', 'camera-blocked', 'didnt-load', 'cant-run', 'hand-count']
+
+export const offersDangerSigns = (screen: HingaScreen) => DANGER_SIGN_ROUTE.includes(screen)
 
 // The danger-sign answer on 6a/6b/7a: ticked signs, or "None of these" (never
 // both). Save needs one of the two (design review decision 3).

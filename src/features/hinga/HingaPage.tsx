@@ -65,6 +65,9 @@ function HingaFlow({ session }: { session: CountSession }) {
   const [explained, setExplained] = useState(prePermissionShown)
   const [permission, setPermission] = useState<PermissionState | null>(null)
   const [handReading, setHandReading] = useState<Reading | null>(null)
+  // The danger signs without a count, and the step "None of these" goes back to.
+  const [signsReading, setSignsReading] = useState<Reading | null>(null)
+  const [signsFrom, setSignsFrom] = useState<HingaStep>('camera')
   const [saved, setSaved] = useState<SavedCheck | null>(null)
 
   useEffect(() => {
@@ -103,8 +106,16 @@ function HingaFlow({ session }: { session: CountSession }) {
   }, [cameraOn, state.camera.status, session])
 
   const band = child.ageMonths === null ? null : ageBand(child.ageMonths)
-  const reading = step === 'hand' ? handReading : cameraReading
+  const reading = step === 'hand' ? handReading : step === 'signs' ? signsReading : cameraReading
   const leave = () => navigate('/')
+
+  // From any screen in DANGER_SIGN_ROUTE (flow.ts). The camera's state (a
+  // refusal, a blocked camera, a failed load) is kept for the way back.
+  function toDangerSigns() {
+    setSignsReading({ perMin: null, at: new Date().toISOString(), method: step === 'hand' ? 'hand' : 'camera', cryOff: null })
+    setSignsFrom(step)
+    setStep('signs')
+  }
 
   function toHandCount() {
     session.clearOutcome()
@@ -116,6 +127,7 @@ function HingaFlow({ session }: { session: CountSession }) {
     session.resetRefusals()
     setChild(NO_CHILD)
     setHandReading(null)
+    setSignsReading(null)
     setSaved(null)
     setStep('age')
   }
@@ -152,7 +164,12 @@ function HingaFlow({ session }: { session: CountSession }) {
         />
       )}
       {screen === 'camera-blocked' && (
-        <CameraBlockedScreen onHandCount={toHandCount} onRetry={() => void session.startCamera()} onClose={() => setStep('age')} />
+        <CameraBlockedScreen
+          onHandCount={toHandCount}
+          onDangerSigns={toDangerSigns}
+          onRetry={() => void session.startCamera()}
+          onClose={() => setStep('age')}
+        />
       )}
       {(screen === 'framing' || screen === 'counting' || screen === 'refused') && (
         <CameraScreen
@@ -161,18 +178,27 @@ function HingaFlow({ session }: { session: CountSession }) {
           onCancel={leave}
           onRetry={() => session.clearOutcome()}
           onHandCount={offerHandCount(state.refusalsInRow) ? toHandCount : null}
+          onDangerSigns={toDangerSigns}
         />
       )}
-      {screen === 'didnt-load' && <DidntLoadScreen onRetry={() => session.reloadModel()} onHandCount={toHandCount} onBack={() => setStep('age')} />}
-      {screen === 'cant-run' && <CantRunScreen onHandCount={toHandCount} onBack={() => setStep('age')} />}
+      {screen === 'didnt-load' && (
+        <DidntLoadScreen
+          onRetry={() => session.reloadModel()}
+          onHandCount={toHandCount}
+          onDangerSigns={toDangerSigns}
+          onBack={() => setStep('age')}
+        />
+      )}
+      {screen === 'cant-run' && <CantRunScreen onHandCount={toHandCount} onDangerSigns={toDangerSigns} onBack={() => setStep('age')} />}
       {screen === 'hand-count' && band && (
         <HandCountScreen
           band={band}
           onStop={() => setStep('camera')}
+          onDangerSigns={toDangerSigns}
           onDone={(perMin) => setHandReading({ perMin, at: new Date().toISOString(), method: 'hand', cryOff: null })}
         />
       )}
-      {(screen === 'result' || screen === 'saved') && band && reading && child.ageMonths !== null && (
+      {(screen === 'result' || screen === 'danger-signs' || screen === 'saved') && band && reading && child.ageMonths !== null && (
         <ResultScreen
           key={reading.at}
           reading={reading}
@@ -181,7 +207,8 @@ function HingaFlow({ session }: { session: CountSession }) {
           resident={child.resident}
           saved={saved}
           onSaved={setSaved}
-          onClose={leave}
+          onNoSigns={() => setStep(signsFrom)}
+          onClose={screen === 'danger-signs' ? () => setStep(signsFrom) : leave}
           onAnother={another}
           onDone={leave}
         />

@@ -1,5 +1,18 @@
 import { describe, expect, it } from 'vitest'
-import { answered, hingaScreen, MAX_LOAD_FAILURES, needsPrePermission, offerHandCount, tickNone, tickSign, type DangerAnswer, type FlowInput } from './flow'
+import { hingaOutcome } from '../../rules/imci'
+import {
+  answered,
+  DANGER_SIGN_ROUTE,
+  hingaScreen,
+  MAX_LOAD_FAILURES,
+  needsPrePermission,
+  offerHandCount,
+  offersDangerSigns,
+  tickNone,
+  tickSign,
+  type DangerAnswer,
+  type FlowInput,
+} from './flow'
 
 // The camera step on a phone that runs everything: model ready, camera on.
 const camera: FlowInput = {
@@ -60,6 +73,41 @@ describe('Hinga routing', () => {
       expect(hingaScreen({ ...camera, ...from, step: 'hand', handDone: true, saved: true })).toBe('saved')
       // Stop goes back to where it came from.
       expect(hingaScreen({ ...camera, ...from, step: 'camera' })).toMatch(/^(camera-blocked|cant-run)$/)
+    }
+  })
+})
+
+describe('Hinga danger signs without a count', () => {
+  // Every way the count can fail, be refused or not run, and the hand count.
+  const noCount: [string, FlowInput][] = [
+    ['refused (motion, no chest, too few frames…)', { ...camera, refused: true }],
+    ['camera blocked or missing (3d)', { ...camera, camera: 'blocked' }],
+    ["the breathing check didn't load (L9b)", { ...camera, model: 'error', loadFailures: 1 }],
+    ["the phone can't run it (L8a), after two failed loads", { ...camera, model: 'error', loadFailures: MAX_LOAD_FAILURES }],
+    ["the phone can't run it (L8a), no WebAssembly", { ...camera, webAssembly: false }],
+    ['counting by hand (L8b)', { ...camera, camera: 'blocked', step: 'hand' }],
+  ]
+
+  it.each(noCount)('offers the danger signs when %s', (_, input) => {
+    const from = hingaScreen(input)
+    expect(offersDangerSigns(from)).toBe(true)
+    // "Danger sign seen? Refer now" opens the checklist, with no count…
+    expect(hingaScreen({ ...input, step: 'signs' })).toBe('danger-signs')
+    // …"None of these" goes back to the same screen and its options…
+    expect(hingaScreen(input)).toBe(from)
+    // …and a saved URGENT check shows 6c.
+    expect(hingaScreen({ ...input, step: 'signs', saved: true })).toBe('saved')
+  })
+
+  it('covers every screen without a count, and none with one', () => {
+    expect([...DANGER_SIGN_ROUTE].sort()).toEqual(['camera-blocked', 'cant-run', 'didnt-load', 'hand-count', 'refused'])
+    for (const screen of ['age', 'framing', 'counting', 'result', 'saved'] as const) expect(offersDangerSigns(screen)).toBe(false)
+  })
+
+  it('makes any sign ticked there URGENT, and no sign is not a result', () => {
+    for (const ageMonths of [0, 6, 24]) {
+      expect(hingaOutcome({ breathsPerMinute: null, ageMonths, dangerSigns: ['vomits-everything'] })).toBe('urgent')
+      expect(hingaOutcome({ breathsPerMinute: null, ageMonths, dangerSigns: [] })).toBe('refused')
     }
   })
 })
