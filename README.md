@@ -103,6 +103,7 @@ React + TypeScript, built with Vite as an installable web app (PWA: vite-plugin-
 - **Vercel:** static hosting of the app and the self-hosted model files. No server code, no API routes.
 - **Hugging Face and raw.githubusercontent.com:** only the first use of the optional AI wording on the municipal laptop downloads WebLLM's model weights and WebGPU library from them.
 - **GitHub:** the repository and CI (GitHub Actions); not used by the app.
+- **OpenAI Images API (gpt-image-2):** used during development only, for the placeholder photos and illustration listed under AI development tools; the app never calls it.
 - **No cloud AI API** is called by the app.
 
 ### Existing code and assets
@@ -123,6 +124,7 @@ Every AI session that touched this project:
 - **The owner's separate Claude session ("Account Admin", an AI):** drafted the pre-event process docs on Oct 8, sets up and monitors the laptop (starts the agent sessions, watches memory), relays briefing details, and runs read-only audits; it writes no product code.
 - **Claude** (chat, Research mode): research and idea selection.
 - **Claude Design**: all UI design.
+- **OpenAI gpt-image-2** (development only, not shipped in the app): placeholder photos inside the Claude Design mockups (a chest in a camera view, a hand holding a synthetic "SAMPLE" medicine box, a phone held up to a webcam), and one illustration of a flooded street for the video and pitch, labeled "AI illustration" wherever it appears. Prompts, model and dates are kept with the files; every image was checked by a person. Screenshots of the product in this README are real screenshots of the working app.
 
 A cloud "Jr. Builder" agent named in early commits was planned but never used.
 
