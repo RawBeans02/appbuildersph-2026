@@ -60,7 +60,7 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
         // The Tesseract.js worker and core are model files (prepared on
         // demand when that engine is on), not app shell.
-        globIgnores: ['**/worker.min-*.js', '**/tesseract-core-*.js', '**/webllm.worker-*.js', 'splash/**'],
+        globIgnores: ['**/worker.min-*.js', '**/tesseract-core-*.js', '**/webllm.worker-*.js', 'splash/**', 'og-image.png'],
         runtimeCaching: [
           {
             // The optional phase 2 backend (api/): always the network, never a
