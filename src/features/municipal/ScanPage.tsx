@@ -317,7 +317,8 @@ function ReceivedMeter({ slots, filled, onFilled }: { slots: Slots; filled: stri
             className={cx(styles.meterSeg, slot.thisWeek ? styles.meterIn : styles.meterWaiting, filled.includes(slot.barangay) && 'fill')}
             onAnimationEnd={() => onFilled(slot.barangay)}
           />
-          <span className={styles.meterName}>{slot.name}</span>
+          {/* A non-breaking hyphen, so "Santo Niño-D" wraps at the space, never before the D. */}
+          <span className={styles.meterName}>{slot.name.replaceAll('-', '\u2011')}</span>
         </div>
       ))}
     </div>
