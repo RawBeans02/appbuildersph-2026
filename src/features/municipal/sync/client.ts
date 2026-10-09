@@ -5,6 +5,7 @@ import {
   signEnvelope,
   type EnrollResponse,
   type HealthResponse,
+  type InboxResponse,
   type SyncData,
   type SyncResponse,
 } from '../../../../server/protocol'
@@ -90,6 +91,17 @@ export async function uploadSync(
 ): Promise<ApiResult<SyncResponse>> {
   const signed = await signEnvelope(identity.privateKey, identity.fingerprint, data, { now })
   return callApi<SyncResponse>(fetcher, '/api/sync', { method: 'POST', headers: jsonHeaders(signed.signature), body: signed.body })
+}
+
+// The approved alerts for this device: a laptop's for its municipality, a
+// phone's for its barangay. Signed like a sync; nothing is stored.
+export async function fetchInbox(
+  device: { privateKey: CryptoKey; fingerprint: string },
+  fetcher: Fetcher = fetch,
+  now = new Date(),
+): Promise<ApiResult<InboxResponse>> {
+  const signed = await signEnvelope(device.privateKey, device.fingerprint, {}, { now })
+  return callApi<InboxResponse>(fetcher, '/api/inbox', { method: 'POST', headers: jsonHeaders(signed.signature), body: signed.body })
 }
 
 // Whether the server has sync set up; null when it can't be reached.

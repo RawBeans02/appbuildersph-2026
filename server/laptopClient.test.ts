@@ -1,12 +1,14 @@
 import 'fake-indexeddb/auto'
 import { beforeEach, describe, expect, it } from 'vitest'
-import { handleEnroll, handleHealth, handleReports, handleSync } from './handlers.js'
+import { handleAlertsApprove, handleAlertsDraft, handleEnroll, handleHealth, handleInbox, handleReports, handleSync } from './handlers.js'
+import { VIEW_CODE_HEADER, type DraftAlertsResponse } from './protocol.js'
+import { post } from './test/fixtures.js'
 import { createMemoryStore, type MemoryStore } from './test/memoryStore.js'
 import { deps, ENROLL_CODE, makeDevice, NOW, qrText, VIEW_CODE } from './test/fixtures.js'
 import type { PairedDevice, ReceivedPayload } from '../src/data/db/types'
 import type { Handoff } from '../src/features/municipal/municipal'
 import { registerLaptop } from '../src/features/municipal/sync/actions'
-import { enrollLaptop, problemText, readHealth, uploadSync, type Fetcher } from '../src/features/municipal/sync/client'
+import { enrollLaptop, fetchInbox, problemText, readHealth, uploadSync, type Fetcher } from '../src/features/municipal/sync/client'
 import { buildSyncData, syncRows } from '../src/features/municipal/sync/results'
 import { openSyncStore } from '../src/features/municipal/sync/syncStore'
 import { dohView, fetchReports } from '../src/features/doh/view'
@@ -20,7 +22,7 @@ let server: MemoryStore
 function fetcherFor(store: MemoryStore, now = NOW): Fetcher {
   return async (path, init) => {
     const request = new Request(`https://agapay.test${path}`, { ...init, headers: { ...(init?.headers as object), 'x-real-ip': '192.0.2.4' } })
-    const route = { '/api/enroll': handleEnroll, '/api/sync': handleSync, '/api/health': handleHealth }[path] ??
+    const route = { '/api/enroll': handleEnroll, '/api/sync': handleSync, '/api/health': handleHealth, '/api/inbox': handleInbox }[path] ??
       (path.startsWith('/api/reports?') ? handleReports : undefined)
     if (!route) throw new TypeError('Failed to fetch')
     return route(request, deps(store, {}, now))
@@ -187,5 +189,31 @@ describe('DOH view client', () => {
     const view = dohView(result.value, NOW)
     expect(view.rows.map((row) => [row.name, row.week, row.from])).toEqual([['Maligaya-D', '2026-W41', identity.fingerprint]])
     expect(view.totals).toMatchObject({ week: '2026-W41', barangays: 1 })
+  })
+})
+
+describe('inbox client (laptop)', () => {
+  it('reads the approved alerts for its municipality, signed with the laptop key', async () => {
+    const store = await freshStore()
+    await registerLaptop(store, ENROLL_CODE, fetcherFor(server), NOW)
+    const identity = (await store.getIdentity())!
+    const { handoff } = await handoffOf({ barangay: 'SID-MAL', seq: 3 })
+    expect((await uploadSync(identity, buildSyncData(handoff).data, fetcherFor(server), NOW)).ok).toBe(true)
+
+    const empty = await fetchInbox(identity, fetcherFor(server), NOW)
+    expect(empty.ok && empty.value.alerts).toEqual([])
+
+    const view = { [VIEW_CODE_HEADER]: VIEW_CODE }
+    const draftResponse = await handleAlertsDraft(post('/api/alerts-draft', JSON.stringify({ municipality: 'SID' }), view), deps(server))
+    const drafted = (await draftResponse.json()) as DraftAlertsResponse
+    expect(drafted.alerts.length).toBeGreaterThan(0)
+    const first = drafted.alerts[0]
+    const approve = post('/api/alerts-approve', JSON.stringify({ id: first.id, approverRole: 'Provincial health officer' }), view)
+    expect((await handleAlertsApprove(approve, deps(server))).status).toBe(200)
+
+    const inbox = await fetchInbox(identity, fetcherFor(server), new Date(NOW.getTime() + 1000))
+    if (!inbox.ok) throw new Error('expected the inbox')
+    expect(inbox.value.scope).toEqual({ device: 'laptop', municipality: 'SID', barangays: null })
+    expect(inbox.value.alerts).toEqual([expect.objectContaining({ id: first.id, text: first.text, approvedByRole: 'Provincial health officer' })])
   })
 })

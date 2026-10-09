@@ -182,3 +182,24 @@
   font: var(--type-body-dense);
   color: var(--ink-2);
 }
+
+/* P2-C: the inbox of approved alerts. */
+.inbox {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+  padding: 0;
+  list-style: none;
+  font: var(--type-body);
+}
+
+.inboxMeta {
+  display: block;
+  font: var(--type-caption);
+  color: var(--ink-2);
+}
+
+.card .footnote {
+  margin-top: var(--space-3);
+}

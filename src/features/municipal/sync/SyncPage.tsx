@@ -7,6 +7,7 @@ import { useOnlineStatus } from '../../../lib/useOnlineStatus'
 import type { HealthResponse } from '../../../../server/protocol'
 import { formatReceivedAt } from '../counts'
 import { LaptopFrame } from '../LaptopFrame'
+import { Inbox } from './Inbox'
 import { registerLaptop, syncNow } from './actions'
 import { problemText, readHealth, type SyncProblem } from './client'
 import { SecretInput } from './SecretInput'
@@ -36,6 +37,8 @@ export default function SyncPage() {
   const [load, setLoad] = useState<Load>({ status: 'loading' })
   // undefined while asking; null when the server couldn't be reached.
   const [health, setHealth] = useState<HealthResponse | null | undefined>(undefined)
+  // Goes up after each sync, so the inbox is read again.
+  const [synced, setSynced] = useState(0)
 
   const reload = useCallback(async () => {
     try {
@@ -87,11 +90,18 @@ export default function SyncPage() {
           ) : health && !serverReady(health) ? (
             <StateBlock icon={CloudSlashIcon} title="Sync isn't set up on the server yet" body="Everything else works offline, as before." />
           ) : saved.enrollment ? (
-            <SyncCard saved={saved} onDone={() => void reload()} />
+            <SyncCard
+              saved={saved}
+              onDone={() => {
+                void reload()
+                setSynced((count) => count + 1)
+              }}
+            />
           ) : (
             <RegisterCard onDone={() => void reload()} />
           ))}
         {saved?.last && <LastSyncTable last={saved.last} />}
+        {online && saved?.enrollment && <Inbox refresh={synced} />}
         <p className={styles.footnote}>
           Sync sends the paired phones' public keys and the barangay QRs exactly as received: counts only, with small numbers
           as “&lt;5”. No names, birthdays or addresses are on this laptop to send.

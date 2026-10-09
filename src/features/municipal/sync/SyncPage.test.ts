@@ -1,6 +1,7 @@
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
+import { InboxList } from './Inbox'
 import { LastSyncTable } from './SyncPage'
 
 // Render check of the last sync's table (no browser on the build laptop).
@@ -27,6 +28,28 @@ describe('Sync screen', () => {
     expect(shown).toContain('Maligaya-D Sent Week 2026-W41 #3 uploaded')
     expect(shown).toContain('Riverside-D Sent Week 2026-W41 #1 not sent: not signed by the paired phone')
     expect(html.match(/<th scope="row">/g)).toHaveLength(2)
+  })
+
+  it('lists the inbox as plain text, with who approved it', () => {
+    const html = renderToStaticMarkup(
+      createElement(InboxList, {
+        alerts: [
+          {
+            id: '3',
+            kind: 'move-stock',
+            barangay: 'SID-BGS',
+            epiWeek: '2026-W41',
+            text: 'Move up to 30 doxycycline capsules from Bagong Silang-D to Maligaya-D.',
+            approvedAt: '2026-10-10T01:00:00.000Z',
+            approvedByRole: 'Provincial health officer',
+          },
+        ],
+      }),
+    )
+    const shown = text(html)
+    expect(shown).toContain('Stock move, Bagong Silang-D: Move up to 30 doxycycline capsules from Bagong Silang-D to Maligaya-D.')
+    expect(shown).toContain('Approved by Provincial health officer')
+    expect(text(renderToStaticMarkup(createElement(InboxList, { alerts: [] })))).toBe('No approved alerts yet.')
   })
 
   it('says when there was nothing to send', () => {
