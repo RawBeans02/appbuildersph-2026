@@ -7,6 +7,9 @@ export const WORDING_MODEL = {
   f32: 'Qwen2.5-0.5B-Instruct-q4f32_1-MLC',
 } as const
 
+// The model's name as the panel shows it ("Written on this laptop · …").
+export const WORDING_MODEL_NAME = 'Qwen2.5 0.5B'
+
 export function wordingModelId(shaderF16: boolean): string {
   return shaderF16 ? WORDING_MODEL.f16 : WORDING_MODEL.f32
 }

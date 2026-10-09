@@ -13,7 +13,8 @@ const gpu: WebGPUSupport = {
 }
 
 const TEMPLATE = 'Doctor teams: 1. Maligaya-D (12 residents in the watch window). This plan does not diagnose anyone and sets no dose.'
-const names = { priority: ['Maligaya-D'], known: ['Maligaya-D', 'Mabini-D'] }
+const PLAN = { priority: [{ name: 'Maligaya-D', score: { min: 12, max: 12 } }], moves: [] }
+const KNOWN = ['Maligaya-D', 'Mabini-D']
 const GOOD = 'Send the first doctor team to Maligaya-D, which has 12 residents in the watch window. This plan does not diagnose anyone and sets no dose.'
 
 function fakeEngine(reply: string | ((signal: AbortSignal) => Promise<string>)): LlmEngine {
@@ -48,7 +49,7 @@ describe('createWording', () => {
       const { wording, loadEngine } = setup(fakeEngine(GOOD), support)
       await wording.checkAvailable()
       expect(wording.getState().status).toBe('unavailable')
-      await wording.draft(TEMPLATE, names)
+      await wording.draft(TEMPLATE, PLAN, KNOWN)
       expect(loadEngine).not.toHaveBeenCalled()
     }
   })
@@ -56,7 +57,7 @@ describe('createWording', () => {
   it('downloads with the measured MB, loads, drafts, and accepts a faithful draft', async () => {
     const { wording, states, progress, finishLoad } = setup(fakeEngine(GOOD))
     await wording.checkAvailable()
-    const done = wording.draft(TEMPLATE, names)
+    const done = wording.draft(TEMPLATE, PLAN, KNOWN)
     await flush()
     progress({ progress: 0.4, fetchedMB: 120.5 })
     expect(wording.getState()).toEqual({ status: 'downloading', progress: 0.4, fetchedMB: 120.5 })
@@ -64,13 +65,13 @@ describe('createWording', () => {
     finishLoad()
     await done
     expect(states).toEqual(['idle', 'loading', 'downloading', 'loading', 'drafting', 'drafting', 'done'])
-    expect(wording.getState()).toEqual({ status: 'done', text: GOOD, check: { ok: true }, ms: 500 })
+    expect(wording.getState()).toEqual({ status: 'done', text: GOOD, check: { ok: true }, ms: 500, template: TEMPLATE })
   })
 
   it('marks a draft that adds a number or a dose as rejected, so the template stays', async () => {
     const { wording, finishLoad } = setup(fakeEngine(`${GOOD} Give 2 capsules per person.`))
     await wording.checkAvailable()
-    const done = wording.draft(TEMPLATE, names)
+    const done = wording.draft(TEMPLATE, PLAN, KNOWN)
     finishLoad()
     await done
     const state = wording.getState()
@@ -80,10 +81,10 @@ describe('createWording', () => {
   it('reuses the loaded model for the next draft', async () => {
     const { wording, loadEngine, finishLoad } = setup(fakeEngine(GOOD))
     await wording.checkAvailable()
-    const first = wording.draft(TEMPLATE, names)
+    const first = wording.draft(TEMPLATE, PLAN, KNOWN)
     finishLoad()
     await first
-    await wording.draft(TEMPLATE, names)
+    await wording.draft(TEMPLATE, PLAN, KNOWN)
     expect(loadEngine).toHaveBeenCalledOnce()
   })
 
@@ -95,7 +96,7 @@ describe('createWording', () => {
     }))
     const { wording, finishLoad } = setup(engine)
     await wording.checkAvailable()
-    const done = wording.draft(TEMPLATE, names)
+    const done = wording.draft(TEMPLATE, PLAN, KNOWN)
     finishLoad()
     await flush()
     expect(wording.getState().status).toBe('drafting')
@@ -108,7 +109,7 @@ describe('createWording', () => {
   it('reports a failed model load as an error', async () => {
     const wording = createWording({ gpu: async () => gpu, loadEngine: async () => Promise.reject(new Error('quota exceeded')) })
     await wording.checkAvailable()
-    await wording.draft(TEMPLATE, names)
+    await wording.draft(TEMPLATE, PLAN, KNOWN)
     expect(wording.getState()).toEqual({ status: 'error', message: 'quota exceeded' })
   })
 })

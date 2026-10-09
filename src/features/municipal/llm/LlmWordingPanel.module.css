@@ -1,0 +1,140 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 470px;
+  padding: var(--space-5);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-1);
+}
+
+.title {
+  font: 800 18px/24px var(--font-ui);
+}
+
+.device {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  font: var(--type-caption);
+  color: var(--device);
+}
+
+.stateTitle {
+  margin-top: var(--space-5);
+  font: 800 18px/26px var(--font-ui);
+}
+
+.body {
+  margin-top: var(--space-1);
+  font: var(--type-body);
+  color: var(--ink-2);
+  text-wrap: pretty;
+}
+
+.progress {
+  margin-top: var(--space-5);
+}
+
+.info {
+  display: flex;
+  gap: 10px;
+  margin-top: var(--space-5);
+  padding: var(--space-3) 14px;
+  border-radius: var(--r-md);
+  background: var(--sunken);
+  font: var(--type-body-dense);
+}
+
+.box {
+  flex: 1;
+  margin-top: 14px;
+  padding: 14px var(--space-4);
+  border: 2px solid var(--line-strong);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  font: 400 16px/25px var(--font-ui);
+  white-space: pre-wrap;
+}
+
+.streaming {
+  border-color: var(--line);
+  background: var(--paper);
+}
+
+.cursor {
+  display: inline-block;
+  width: 9px;
+  height: 19px;
+  margin-left: 2px;
+  vertical-align: -3px;
+  background: var(--ink);
+}
+
+.match {
+  padding: 0 3px;
+  border-radius: 4px;
+  background: var(--ok-tint);
+}
+
+.mismatch {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 3px;
+  border-radius: 4px;
+  outline: 2px solid var(--warn);
+  background: var(--warn-tint);
+  color: var(--warn);
+  font-weight: 700;
+}
+
+.checkRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+}
+
+.checkOk,
+.checkWarn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font: 700 15px/22px var(--font-ui);
+}
+
+.checkOk {
+  color: var(--ok);
+}
+
+.checkWarn {
+  color: var(--warn);
+}
+
+.reasons {
+  margin-top: var(--space-2);
+  padding-left: var(--space-5);
+  list-style: disc;
+  font: var(--type-body-dense);
+  color: var(--ink-2);
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  font: 700 15px/22px var(--font-ui);
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: auto;
+  padding-top: var(--space-3);
+}

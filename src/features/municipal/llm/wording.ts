@@ -1,5 +1,5 @@
 import type { WebGPUSupport } from '../../../lib/capabilities'
-import { checkDraft, type DraftCheck } from './check'
+import { checkDraft, type DraftCheck, type PlanFacts } from './check'
 import { buildMessages, MAX_DRAFT_TOKENS, type ChatMessage } from './prompt'
 
 // The AI panel's states (screen 19): the optional local model rewords the
@@ -28,8 +28,9 @@ export type WordingState =
   | { status: 'idle' }
   | { status: 'downloading'; progress: number; fetchedMB: number | null }
   | { status: 'loading' }
-  | { status: 'drafting'; text: string }
-  | { status: 'done'; text: string; check: DraftCheck; ms: number }
+  // template: the plan text the draft rewords, to tell when the plan changed.
+  | { status: 'drafting'; text: string; template: string }
+  | { status: 'done'; text: string; check: DraftCheck; ms: number; template: string }
   | { status: 'error'; message: string }
 
 export const DRAFT_TIMEOUT_MS = 90_000
@@ -70,7 +71,7 @@ export function createWording(deps: WordingDeps) {
     return engine
   }
 
-  async function draft(template: string, names: { priority: readonly string[]; known: readonly string[] }) {
+  async function draft(template: string, plan: PlanFacts, knownNames: readonly string[]) {
     if (state.status === 'unavailable' || state.status === 'checking') return
     if (['downloading', 'loading', 'drafting'].includes(state.status)) return
     const abort = new AbortController()
@@ -82,14 +83,20 @@ export function createWording(deps: WordingDeps) {
       const llm = await getEngine()
       if (abort.signal.aborted) throw abort.signal.reason
       const started = now()
-      update({ status: 'drafting', text: '' })
+      update({ status: 'drafting', text: '', template })
       const text = await llm.complete(buildMessages(template), {
         maxTokens: MAX_DRAFT_TOKENS,
         signal: abort.signal,
-        onText: (soFar) => update({ status: 'drafting', text: soFar }),
+        onText: (soFar) => update({ status: 'drafting', text: soFar, template }),
       })
       if (abort.signal.aborted) throw abort.signal.reason
-      update({ status: 'done', text: text.trim(), check: checkDraft(text, template, names), ms: now() - started })
+      update({
+        status: 'done',
+        text: text.trim(),
+        check: checkDraft(text, template, plan, knownNames),
+        ms: now() - started,
+        template,
+      })
     } catch (error) {
       if (abort.signal.reason instanceof Error && abort.signal.reason.message === 'timeout') {
         setState({ status: 'error', message: 'The model took too long. Use the template wording.' })
