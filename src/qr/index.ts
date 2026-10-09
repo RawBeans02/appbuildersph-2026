@@ -35,3 +35,12 @@ export {
 } from './sign'
 export { QR_PREFIX, QrError, decodeQr, encodeQr, type DecodeResult, type QrErrorCode } from './codec'
 export { mergePayloads, type BarangayRow, type DuplicateReport, type MergeErrorCode, type MergeResult } from './merge'
+export {
+  PAIRING_PREFIX,
+  decodePairing,
+  encodePairing,
+  isPairingText,
+  type Pairing,
+  type PairingErrorCode,
+  type PairingResult,
+} from './pairing'

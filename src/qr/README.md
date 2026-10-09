@@ -78,7 +78,34 @@ if (merged.ok) {
 
 `mergePayloads` fails with `empty`, `mixed-epi-weeks` or `mixed-municipalities`.
 
+## Pairing: a phone's key reaches the laptop once (`pairing.ts`)
+Before its first counts QR, a barangay phone shows a **pairing QR** with its public key; the municipal laptop scans it, both screens show `keyFingerprint`, and the officer pairs the phone only after checking that the two match. The pairing QR has no signature (anyone could make one), so the fingerprint check is the trust step.
+
+`AGPK1.` + base64url(compact JSON `{"x","y","b","m"}`): the P-256 public key's `x` and `y` (`kty` `EC` and `crv` `P-256` are implied), the barangay code `b` and the municipality code `m`, in that key order. Nothing else: no names, no private key (`encodePairing` reads only the public members, so even a private JWK's `d` never gets in). Every pairing QR is **173 characters** for any P-256 key and these code lengths (measured in `pairing.test.ts`, Vitest, Node 20).
+
+```ts
+// Phone (A6), once per device: show the pairing QR and the fingerprint.
+import { encodePairing, keyFingerprint } from '../../qr'
+const pairingText = encodePairing({ barangay: 'SID-MAL', municipality: 'SID', publicJwk: identity.publicJwk })
+const fingerprint = await keyFingerprint(identity.publicJwk) // show it under the QR
+
+// Laptop (B5): scan, show result.fingerprint, pair only after the officer confirms it matches.
+import { decodePairing, isPairingText } from '../../qr'
+if (isPairingText(scanned)) {
+  const result = await decodePairing(scanned)
+  if (result.ok) confirmThenStore(result.pairing.barangay, result.pairing.publicJwk, result.fingerprint)
+}
+```
+
+| `decodePairing` error code | Meaning |
+|---|---|
+| `not-pairing` | Not a pairing QR (a counts QR, a URL...) |
+| `bad-version` | A pairing QR of a version other than 1 |
+| `invalid-pairing` | Malformed, extra or missing keys, not in canonical form, codes outside their patterns, or not a P-256 point |
+
+`decodeQr` reads only `AGP<n>.` texts, so a pairing QR given to it is `not-agapay`; check `isPairingText` first.
+
 ## Limits
 - Web Crypto needs a secure context (HTTPS or localhost); the live URL is HTTPS.
-- The registry has to come from somewhere: the seed's pre-made QRs come with their public keys (B4); a live phone's `publicJwk` has to reach the laptop once, with the fingerprint shown on both screens to compare. That enrollment step isn't built here.
+- The registry has to come from somewhere: the seed's pre-made QRs come with their public keys (B4); a live phone's `publicJwk` reaches the laptop once through the pairing QR above, with the fingerprint shown on both screens to compare.
 - When an old and a newer QR from the same barangay are both scanned for the same week, the higher `seq` wins; a QR from another week is refused by the merge. There is no expiry beyond the week.
