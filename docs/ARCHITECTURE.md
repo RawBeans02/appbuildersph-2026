@@ -1,6 +1,6 @@
 # Architecture
 
-AgapayMo is one offline-first web app (a PWA: Vite, React, TypeScript, `vite-plugin-pwa`) served as static files from Vercel. The barangay health worker uses the phone screens; the municipal health officer uses the laptop screens of the same app. The core has no server and no cloud AI: every model runs in the browser, and the only link between the phone and the laptop is a QR code shown on one screen and scanned by the other. An optional phase 2, built only with `VITE_PHASE2=1`, adds a small sync backend for when the internet returns (see "Phase 2: sync when the internet returns"); the offline core never calls it.
+AgapayMo is one offline-first web app (a PWA: Vite, React, TypeScript, `vite-plugin-pwa`) served as static files from Cloudflare Pages (Vercel until Fri night's deployment cap). The barangay health worker uses the phone screens; the municipal health officer uses the laptop screens of the same app. The core has no server and no cloud AI: every model runs in the browser, and the only link between the phone and the laptop is a QR code shown on one screen and scanned by the other. An optional phase 2, built only with `VITE_PHASE2=1`, adds a small sync backend for when the internet returns (see "Phase 2: sync when the internet returns"); the offline core never calls it.
 
 Sizes, hashes, sources and licenses of every file are in the [README](../README.md) (Models used, What requires internet). This document links to them rather than repeating them.
 
