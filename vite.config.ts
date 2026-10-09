@@ -32,12 +32,24 @@ export default defineConfig({
         icons: [],
       },
       workbox: {
-        // Precache the whole app shell; any navigation offline gets index.html.
-        // Also the on-device AI: runtime .wasm/.mjs files and the model files in
-        // public/models/ (ONNX, MediaPipe .task, TFLite) and their dictionaries.
-        globPatterns: ['**/*.{js,mjs,css,html,svg,png,ico,woff2,wasm,onnx,task,tflite,txt}'],
-        // The ONNX Runtime .wasm is about 14 MB; Workbox skips files over 2 MiB by default.
-        maximumFileSizeToCacheInBytes: 20 * 1024 * 1024,
+        // The precache is the app shell only. Models and runtime .wasm files are
+        // downloaded by the "Prepare for offline" step into the model caches
+        // (src/lib/modelCache.ts), not here, so the first visit stays light.
+        globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
+        runtimeCaching: [
+          {
+            // Serve model and .wasm files from whichever model cache holds them,
+            // else from the network (online only, and nothing is stored here).
+            // Workbox inlines this function into sw.js, so it may only use
+            // service worker globals.
+            urlPattern: ({ url, sameOrigin }) =>
+              sameOrigin && (url.pathname.startsWith('/models/') || url.pathname.endsWith('.wasm')),
+            handler: async ({ request }) => {
+              const scope = globalThis as unknown as { caches: { match(request: Request): Promise<Response | undefined> } }
+              return (await scope.caches.match(request)) ?? fetch(request)
+            },
+          },
+        ],
         navigateFallback: '/index.html',
         cleanupOutdatedCaches: true,
       },

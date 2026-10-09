@@ -17,6 +17,7 @@ export type PlannedRoute = { path: string; title: string; device: 'phone' | 'lap
 
 export const PLANNED_ROUTES: PlannedRoute[] = [
   { path: '/', title: 'Agapay', device: 'phone' },
+  { path: '/prepare', title: 'Prepare for offline', device: 'phone' },
   { path: '/hinga', title: 'Hinga breathing check', device: 'phone' },
   { path: '/watch', title: 'Flood exposure watch', device: 'phone' },
   { path: '/stock', title: 'Medicine stock', device: 'phone' },

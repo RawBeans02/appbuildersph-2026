@@ -6,6 +6,7 @@ import {
   evictOtherVersions,
   isModelCached,
   listCachedModels,
+  loadModelFile,
   ModelCacheError,
   readModelFile,
   type CacheStorageLike,
@@ -296,5 +297,30 @@ describe('eviction', () => {
   it('refuses a version containing @, which would make names ambiguous', () => {
     expect(() => cacheNameFor('model', 'v1@x')).toThrow(RangeError)
     expect(cacheNameFor('org/model', 'v1')).toBe('model-cache:org/model@v1')
+  })
+})
+
+describe('loadModelFile', () => {
+  it('reads a cached file without the network', async () => {
+    const { caches } = fakeCaches()
+    await ensureModelCached(spec, { caches, fetch: fakeFetch({ [weights.url]: bytes(10), [tokenizer.url]: bytes(6, 3) }) })
+    const offline = fakeFetch({})
+    const data = await loadModelFile(spec, tokenizer, { caches, fetch: offline })
+    expect(new Uint8Array(data)).toEqual(bytes(6, 3))
+    expect(offline).not.toHaveBeenCalled()
+  })
+
+  it('falls back to the network when the file is not cached, and stores nothing', async () => {
+    const { caches, store } = fakeCaches()
+    const data = await loadModelFile(spec, weights, { caches, fetch: fakeFetch({ [weights.url]: bytes(10, 2) }) })
+    expect(new Uint8Array(data)).toEqual(bytes(10, 2))
+    expect(store.size).toBe(0)
+  })
+
+  it('reports a missing file with no connection as a network error', async () => {
+    const error = await loadModelFile(spec, weights, { caches: fakeCaches().caches, fetch: fakeFetch({}) }).catch(
+      (e: unknown) => e,
+    )
+    expect(error).toMatchObject({ code: 'network', url: weights.url })
   })
 })

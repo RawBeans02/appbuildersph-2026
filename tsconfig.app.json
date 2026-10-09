@@ -19,5 +19,5 @@
     "erasableSyntaxOnly": true
   },
   "include": ["src", "spikes"],
-  "exclude": ["spikes/**/*.model.test.ts"]
+  "exclude": ["spikes/**/*.model.test.ts", "src/**/*.node.test.ts"]
 }

@@ -1,6 +1,7 @@
 import * as ort from 'onnxruntime-web/wasm'
-import wasmUrl from 'onnxruntime-web/ort-wasm-simd-threaded.wasm?url'
+import { ORT_WASM, PP_OCR } from '../../src/inference/ocr/models'
 import type { Runtime } from '../../src/inference/protocol'
+import { loadModelFile } from '../../src/lib/modelCache'
 import { buildCharset } from './ctc'
 import type { RGBAImage } from './imageOps'
 import { runOcr, type OcrLine, type OcrModels, type OcrTimings } from './pipeline'
@@ -8,19 +9,12 @@ import { runOcr, type OcrLine, type OcrModels, type OcrTimings } from './pipelin
 // PP-OCRv5 mobile on onnxruntime-web, inside the spike's worker. WASM only and
 // single-threaded whatever the device check picks: no WebGPU (iPhone), and no
 // threads without cross-origin isolation. The plain wasm build keeps the
-// WebGPU/JSEP code out of the bundle. Model files are self-hosted under
-// /models/ppocr/ and precached by the service worker, so this works offline.
+// WebGPU/JSEP code out of the bundle. The model files and the ORT .wasm come
+// from the model cache ("Prepare for offline"), read here directly, so this
+// works offline; before they're downloaded it falls back to the network.
 
 export type OcrInput = { width: number; height: number; data: Uint8ClampedArray }
 export type OcrOutput = { lines: OcrLine[]; timings: OcrTimings }
-
-const MODEL_DIR = '/models/ppocr/'
-
-async function fetchOk(file: string): Promise<Response> {
-  const response = await fetch(MODEL_DIR + file)
-  if (!response.ok) throw new Error(`Could not load ${file}: HTTP ${response.status}`)
-  return response
-}
 
 function isOcrInput(value: unknown): value is OcrInput {
   const input = value as Partial<OcrInput> | null
@@ -39,15 +33,14 @@ export function createOcrRuntime(): Runtime<OcrInput, OcrOutput> {
 
   return {
     async init(_backend, onProgress) {
+      const [wasm, det, rec, dictionary] = await Promise.all([
+        loadModelFile(ORT_WASM, ORT_WASM.files[0]),
+        ...PP_OCR.files.map((file) => loadModelFile(PP_OCR, file)),
+      ])
       ort.env.wasm.numThreads = 1
       ort.env.wasm.proxy = false
-      ort.env.wasm.wasmPaths = { wasm: wasmUrl }
-
-      const [det, rec, dictionary] = await Promise.all([
-        fetchOk('det.onnx').then((r) => r.arrayBuffer()),
-        fetchOk('rec-en.onnx').then((r) => r.arrayBuffer()),
-        fetchOk('dict-en.txt').then((r) => r.text()),
-      ])
+      // The .wasm bytes from the cache, so ORT never fetches it itself.
+      ort.env.wasm.wasmBinary = new Uint8Array(wasm)
       onProgress(0.4)
       const options: ort.InferenceSession.SessionOptions = {
         executionProviders: ['wasm'],
@@ -56,7 +49,7 @@ export function createOcrRuntime(): Runtime<OcrInput, OcrOutput> {
       const detSession = await ort.InferenceSession.create(new Uint8Array(det), options)
       onProgress(0.7)
       const recSession = await ort.InferenceSession.create(new Uint8Array(rec), options)
-      charset = buildCharset(dictionary)
+      charset = buildCharset(new TextDecoder().decode(dictionary))
 
       models = {
         async detect(tensor, width, height) {

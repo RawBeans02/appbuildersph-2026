@@ -278,3 +278,30 @@ export async function evictOtherVersions(
   await Promise.all(stale.map((model) => storage.delete(cacheNameFor(model.id, model.version))))
   return stale.map((model) => model.version)
 }
+
+// For a runtime loading its files (in a worker too): the bytes from the model
+// cache, or from the network when the file isn't cached yet (online only;
+// nothing is stored). Reading the cache directly keeps offline inference from
+// depending on the service worker seeing a worker's requests.
+export async function loadModelFile(
+  spec: ModelSpec,
+  file: ModelFile,
+  options: Pick<ModelCacheOptions, 'caches' | 'fetch'> = {},
+): Promise<ArrayBuffer> {
+  let cached: Response | null = null
+  try {
+    cached = await readModelFile(spec, file, options)
+  } catch {
+    // No Cache API here: fall back to the network.
+  }
+  if (cached) return cached.arrayBuffer()
+  const doFetch = options.fetch ?? ((url, init) => fetch(url, init))
+  let response: Response
+  try {
+    response = await doFetch(file.url, {})
+  } catch (error) {
+    throw new ModelCacheError('network', 'This model is not downloaded yet and there is no connection.', file.url, error)
+  }
+  if (!response.ok) throw new ModelCacheError('http', `Loading failed with HTTP ${response.status}.`, file.url)
+  return response.arrayBuffer()
+}

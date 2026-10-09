@@ -3,7 +3,9 @@ import type { StorageCheck } from './storage'
 
 // The model-loading flow behind the designed states:
 // idle → checking-storage → downloading → verifying → ready, or error.
-// Pure logic with injected dependencies; useModelDownload.ts wires the real ones.
+// Takes one model or several (the "Prepare for offline" step downloads every
+// phone model in one go). Pure logic with injected dependencies;
+// useModelDownload.ts wires the real ones.
 
 export type ModelDownloadErrorCode =
   | ModelCacheErrorCode
@@ -18,8 +20,11 @@ export type ModelDownloadState =
   | { status: 'checking-storage' }
   | {
       status: 'downloading'
+      // Across every model still to download.
       loadedBytes: number
       totalBytes: number
+      // The model and file downloading now; null before the first byte.
+      modelId: string | null
       file: DownloadProgress['file']
     }
   | { status: 'verifying' }
@@ -44,8 +49,11 @@ export type ModelDownloadDeps = {
 
 const BUSY = new Set<ModelDownloadState['status']>(['checking-storage', 'downloading', 'verifying'])
 
-export function createModelDownload(spec: ModelSpec, deps: ModelDownloadDeps) {
-  const totalBytes = spec.files.reduce((sum, file) => sum + file.bytes, 0)
+const specBytes = (spec: ModelSpec) => spec.files.reduce((sum, file) => sum + file.bytes, 0)
+
+export function createModelDownload(models: ModelSpec | ModelSpec[], deps: ModelDownloadDeps) {
+  const specs = Array.isArray(models) ? models : [models]
+  const allCached = async () => (await Promise.all(specs.map((spec) => deps.isModelCached(spec)))).every(Boolean)
   let state: ModelDownloadState = { status: 'idle' }
   let controller: AbortController | null = null
   const listeners = new Set<() => void>()
@@ -59,7 +67,7 @@ export function createModelDownload(spec: ModelSpec, deps: ModelDownloadDeps) {
   async function checkCached(): Promise<void> {
     if (state.status !== 'idle') return
     try {
-      if ((await deps.isModelCached(spec)) && state.status === 'idle') setState({ status: 'ready' })
+      if ((await allCached()) && state.status === 'idle') setState({ status: 'ready' })
     } catch {
       // Stay idle; start() reports the error if the user tries.
     }
@@ -77,14 +85,17 @@ export function createModelDownload(spec: ModelSpec, deps: ModelDownloadDeps) {
     const release = deps.holdReload()
     update({ status: 'checking-storage' })
     try {
-      if (await deps.isModelCached(spec)) return update({ status: 'ready' })
+      const missing: ModelSpec[] = []
+      for (const spec of specs) if (!(await deps.isModelCached(spec))) missing.push(spec)
+      if (missing.length === 0) return update({ status: 'ready' })
+      const totalBytes = missing.reduce((sum, spec) => sum + specBytes(spec), 0)
 
       const storage = await deps.prepareStorage(totalBytes)
       if (storage.fits === false) {
         return update({
           status: 'error',
           code: 'insufficient-storage',
-          message: 'Not enough free storage for the model.',
+          message: 'Not enough free storage for the models.',
           storage,
         })
       }
@@ -92,26 +103,32 @@ export function createModelDownload(spec: ModelSpec, deps: ModelDownloadDeps) {
       // Progress arrives per network chunk; pass on at most one update per 0.1%,
       // plus every change of file.
       let lastStep = -1
-      let lastFile = -1
-      update({ status: 'downloading', loadedBytes: 0, totalBytes, file: null })
-      await deps.ensureModelCached(spec, {
-        signal: abort.signal,
-        onProgress: ({ loadedBytes, file }) => {
-          const step = totalBytes === 0 ? 1000 : Math.floor((loadedBytes / totalBytes) * 1000)
-          const fileIndex = file?.index ?? -1
-          if (step === lastStep && fileIndex === lastFile) return
-          lastStep = step
-          lastFile = fileIndex
-          update({ status: 'downloading', loadedBytes, totalBytes, file })
-        },
-      })
+      let lastFile = ''
+      let doneBytes = 0
+      update({ status: 'downloading', loadedBytes: 0, totalBytes, modelId: null, file: null })
+      for (const spec of missing) {
+        const before = doneBytes
+        await deps.ensureModelCached(spec, {
+          signal: abort.signal,
+          onProgress: ({ loadedBytes, file }) => {
+            const loaded = before + loadedBytes
+            const step = totalBytes === 0 ? 1000 : Math.floor((loaded / totalBytes) * 1000)
+            const fileKey = `${spec.id}|${file?.index ?? -1}`
+            if (step === lastStep && fileKey === lastFile) return
+            lastStep = step
+            lastFile = fileKey
+            update({ status: 'downloading', loadedBytes: loaded, totalBytes, modelId: spec.id, file })
+          },
+        })
+        doneBytes += specBytes(spec)
+      }
 
       update({ status: 'verifying' })
-      if (!(await deps.isModelCached(spec))) {
+      if (!(await allCached())) {
         return update({
           status: 'error',
           code: 'verify-failed',
-          message: 'The model downloaded but is not in the cache.',
+          message: 'The models downloaded but are not all in the cache.',
           storage: null,
         })
       }

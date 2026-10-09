@@ -76,6 +76,7 @@ describe('createModelDownload', () => {
       status: 'downloading',
       loadedBytes: 300,
       totalBytes: 1000,
+      modelId: 'org/tiny-model',
       file: { url: spec.files[0].url, index: 0, count: 2 },
     })
     expect(fake.release).not.toHaveBeenCalled()
@@ -210,6 +211,40 @@ describe('createModelDownload', () => {
     await second
     expect(download.getState()).toEqual({ status: 'ready' })
     expect(fake.deps.ensureModelCached).toHaveBeenCalledTimes(2)
+  })
+
+  it('downloads several models in one go, skipping the cached ones, with progress across all', async () => {
+    const other: ModelSpec = { id: 'org/runtime', version: '1', files: [{ url: 'https://models.example/rt.wasm', bytes: 500 }] }
+    const cached = new Set<string>([spec.id])
+    const ensured: string[] = []
+    const download = createModelDownload([spec, other], {
+      isModelCached: vi.fn(async (s: ModelSpec) => cached.has(s.id)),
+      prepareStorage: vi.fn(async (bytes: number) => ({ ...roomy, requiredBytes: bytes })),
+      ensureModelCached: vi.fn(async (s: ModelSpec, { onProgress }) => {
+        ensured.push(s.id)
+        onProgress({ loadedBytes: 250, totalBytes: 500, file: { url: s.files[0].url, index: 0, count: 1 } })
+        cached.add(s.id)
+      }),
+      holdReload: () => () => {},
+    })
+    const states = record(download)
+    await download.start()
+    expect(ensured).toEqual(['org/runtime'])
+    expect(states.find((s) => s.status === 'downloading' && s.loadedBytes === 250)).toMatchObject({
+      totalBytes: 500,
+      modelId: 'org/runtime',
+    })
+    expect(download.getState()).toEqual({ status: 'ready' })
+  })
+
+  it('goes ready on mount only when every model is cached', async () => {
+    const other: ModelSpec = { id: 'org/runtime', version: '1', files: [{ url: 'x', bytes: 1 }] }
+    const partly = createModelDownload([spec, other], {
+      ...fakeDeps().deps,
+      isModelCached: vi.fn(async (s: ModelSpec) => s.id === spec.id),
+    })
+    await partly.checkCached()
+    expect(partly.getState()).toEqual({ status: 'idle' })
   })
 
   it('ignores start() while a download is running or after ready', async () => {

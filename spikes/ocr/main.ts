@@ -2,7 +2,11 @@ import { createInferenceClient } from '../../src/inference/client'
 import { appShell, startServiceWorker } from '../../src/lib/appShell'
 import { detectPlatform, pickBackend, type Backend } from '../../src/lib/backend'
 import { checkCapabilities } from '../../src/lib/capabilities'
+import { ORT_WASM, PP_OCR } from '../../src/inference/ocr/models'
 import { downscaleImage } from '../../src/lib/image'
+import { createModelDownload } from '../../src/lib/modelDownload'
+import { modelBytes } from '../../src/lib/offlineModels'
+import { browserModelDownloadDeps } from '../../src/lib/useModelDownload'
 import type { OcrOutput } from './ocrRuntime'
 
 // The OCR spike page (spike-ocr.html): pick or take a photo, then see the
@@ -17,6 +21,8 @@ const canvas = $<HTMLCanvasElement>('canvas')
 const linesEl = $('lines')
 const reportEl = $('report')
 const inputs = [$<HTMLInputElement>('camera'), $<HTMLInputElement>('file')]
+const prepareButton = $<HTMLButtonElement>('prepare')
+const prepareStatus = $('prepare-status')
 
 const SPIKE_BACKEND: Backend = {
   kind: 'wasm',
@@ -37,10 +43,37 @@ void checkCapabilities().then((caps) => {
   backendEl.textContent = `${deviceLine} This spike always runs WASM, single-threaded.`
 })
 
+// Download the models into the model cache first ("Prepare for offline"), so
+// the spike runs in airplane mode after that.
+const models = [ORT_WASM, PP_OCR]
+const download = createModelDownload(models, browserModelDownloadDeps)
+const mb = (bytes: number) => `${(bytes / 1e6).toFixed(1)} MB`
+prepareButton.textContent = `Download the models (${mb(modelBytes(models))})`
+download.subscribe(() => {
+  const state = download.getState()
+  prepareButton.hidden = state.status !== 'idle' && state.status !== 'error'
+  prepareStatus.textContent =
+    state.status === 'downloading'
+      ? `Downloading ${mb(state.loadedBytes)} of ${mb(state.totalBytes)}`
+      : state.status === 'error'
+        ? `Download failed (${state.code}): ${state.message}`
+        : state.status === 'ready'
+          ? 'Models downloaded: works offline.'
+          : state.status
+})
+prepareButton.addEventListener('click', () => void download.start())
+const modelsReady = new Promise<void>((resolve) => {
+  const check = () => download.getState().status === 'ready' && resolve()
+  download.subscribe(check)
+  void download.checkCached().then(check)
+})
+
 const worker = new Worker(new URL('./ocr.worker.ts', import.meta.url), { type: 'module' })
 const client = createInferenceClient(worker)
 let initMs = 0
 const ready = (async () => {
+  statusEl.textContent = 'Download the models to start.'
+  await modelsReady
   statusEl.textContent = 'Loading the OCR models…'
   const start = performance.now()
   await client.init(SPIKE_BACKEND, {

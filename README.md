@@ -42,7 +42,8 @@ _TBD: the target user, the problem, and why it matters._
 ## What requires internet
 | Part | Why it needs internet | What happens offline |
 |---|---|---|
-| First visit to the live URL | Downloads the app shell, which the service worker then caches. For now this includes the OCR spike's model files and the ONNX Runtime WebAssembly file: the precache totals 26,594 KiB (Workbox's figure in the build output) | After the first visit, the app shell and the OCR spike open offline |
+| First visit to the live URL | Downloads the app shell (HTML, JS, CSS: 333 KiB, Workbox's precache figure in the build), which the service worker caches | After the first visit, the app opens offline |
+| "Prepare for offline" (one tap, once) | Downloads the on-device AI into the browser's Cache Storage: the ONNX Runtime WebAssembly file (14,239,897 bytes) and the PP-OCRv5 models with their dictionary (12,658,822 bytes), 26,898,719 bytes in all | After it, the models load from the device; without it, AI features need the network |
 | _TBD_ | | |
 
 ## Why does this product benefit from running AI locally?
