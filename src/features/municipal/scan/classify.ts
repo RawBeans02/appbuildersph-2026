@@ -49,7 +49,7 @@ export function compareExports(a: { epiWeek: string; seq: number }, b: { epiWeek
   return a.seq - b.seq
 }
 
-export function registryOf(devices: readonly PairedDevice[]): KeyRegistry {
+export function registryOf(devices: readonly { barangay: string; publicJwk: JsonWebKey }[]): KeyRegistry {
   return Object.fromEntries(devices.map((device) => [device.barangay, device.publicJwk]))
 }
 
