@@ -1,5 +1,5 @@
-import { ClockCounterClockwiseIcon, LockSimpleIcon, WarningCircleIcon } from '@phosphor-icons/react'
-import { Button, StateBlock } from '../../components'
+import { ClockCounterClockwiseIcon, ListNumbersIcon, LockSimpleIcon, WarningCircleIcon } from '@phosphor-icons/react'
+import { Button, ButtonLink, StateBlock } from '../../components'
 import { useDbQuery } from '../../data/db/useDbQuery'
 import { LaptopFrame } from './LaptopFrame'
 import styles from './LogPage.module.css'
@@ -35,7 +35,16 @@ export default function LogPage() {
         </StateBlock>
       )}
       {data.status === 'ready' && data.data.length === 0 && (
-        <StateBlock icon={ClockCounterClockwiseIcon} title="No plans approved yet." body="Approved plans show here." />
+        // 20b: one action, back to the plan.
+        <StateBlock
+          icon={ClockCounterClockwiseIcon}
+          title="No plans approved yet"
+          body="Approved plans show here, with who approved them and when."
+        >
+          <ButtonLink to="/municipal/plan" icon={<ListNumbersIcon size={22} weight="bold" aria-hidden />}>
+            Go to the plan
+          </ButtonLink>
+        </StateBlock>
       )}
       {data.status === 'ready' && data.data.length > 0 && <LogTable rows={data.data.map(logRow)} />}
     </LaptopFrame>
