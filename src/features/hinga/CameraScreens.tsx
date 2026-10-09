@@ -72,7 +72,7 @@ export function CameraScreen(props: {
           <>
             <FlowTopBar
               dark
-              backKind="close"
+              backKind="text"
               backLabel="Cancel"
               onBack={() => session.cancelCount()}
               step={{ text: 'step 3 of 3', current: 3, total: 3 }}

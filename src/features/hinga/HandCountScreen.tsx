@@ -42,7 +42,7 @@ export function HandCountScreen({ band, onDone, onStop }: { band: AgeBand; onDon
   return (
     <div className={styles.screen}>
       <FlowTopBar
-        backKind="close"
+        backKind="text"
         backLabel="Stop"
         onBack={onStop}
         right={
