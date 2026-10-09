@@ -49,6 +49,12 @@ describe('createPayload', () => {
     })
   })
 
+  it('leaves the raw counts untouched', () => {
+    const counts = structuredClone(SAMPLE_COUNTS)
+    createPayload(sampleInput({ counts }))
+    expect(counts).toEqual(SAMPLE_COUNTS)
+  })
+
   it('refuses raw counts with extra keys, so nothing else rides along', () => {
     const counts = { ...SAMPLE_COUNTS, names: 'Residente 001' } as unknown as typeof SAMPLE_COUNTS
     expect(() => createPayload(sampleInput({ counts }))).toThrow(/counts: has unknown keys/)
