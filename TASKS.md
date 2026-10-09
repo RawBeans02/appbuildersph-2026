@@ -34,12 +34,12 @@ Every task names the files or folders it **owns**, so agents pushing straight to
   - Model weights: fetched on first load (e.g. from Hugging Face), then cached. Check Vercel's file-size limits before self-hosting weights. The first-load download goes under "What requires internet".
   - Put the live URL at the top of this file and of the README. The README also keeps run/recreate instructions: judges and verifiers may run it from the repo.
 - [x] done · CI: GitHub Actions on every push to `main` (npm ci, typecheck, lint, build, test) · [lead] · owns: `.github/workflows/` · f9129fc (first green run on fa66af8)
-- [ ] doing · Offline-ready signal: register the service worker via `virtual:pwa-register` and expose the app-shell status (unsupported / installing / ready / error) as a hook, with tests · [sr] · owns: `src/lib/pwa.ts`, `src/lib/appShell.ts`, `src/main.tsx`
-- [ ] doing · Storage-persistence request flow for a later model-download screen: ask for persistent storage, check free space against the download size (logic only, no UI), with tests · [sr] · owns: `src/lib/storage.ts`
-- [ ] doing · Runtime-agnostic model cache: Cache API, keyed by model id + version, download progress callback, size integrity check, eviction of old versions, with mocked tests · [sr] · owns: `src/lib/modelCache.ts`
-- [ ] doing · Device-check page shows the inference backend the app would pick and why: WebGPU only where safe, WASM single-threaded on iPhone/iOS Safari, WASM threads only when cross-origin isolated (pure, unit-tested function) · [sr] · owns: `src/lib/backend.ts`, `src/App.tsx` (placeholder)
+- [x] done · Offline-ready signal: register the service worker via `virtual:pwa-register` and expose the app-shell status (unsupported / installing / ready / error) as a hook, with tests · [sr] · owns: `src/lib/pwa.ts`, `src/lib/appShell.ts`, `src/main.tsx` · b57722a
+- [x] done · Storage-persistence request flow for a later model-download screen: ask for persistent storage, check free space against the download size (logic only, no UI), with tests · [sr] · owns: `src/lib/storage.ts` · aac81b7
+- [x] done · Runtime-agnostic model cache: Cache API, keyed by model id + version, download progress callback, size integrity check, eviction of old versions, with mocked tests · [sr] · owns: `src/lib/modelCache.ts` · d27441c
+- [x] done · Device-check page shows the inference backend the app would pick and why: WebGPU only where safe, WASM single-threaded on iPhone/iOS Safari, WASM threads only when cross-origin isolated (pure, unit-tested function) · [sr] · owns: `src/lib/backend.ts`, `src/App.tsx` (placeholder) · f1502e8
 - [ ] doing · Image downscale helper (long side ≤ 1280 px, OffscreenCanvas with a canvas fallback) for any vision input, unit-tested · [sr] · owns: `src/lib/image.ts`
-- [ ] doing · `docs/OFFLINE-SMOKE-TEST.md`: a section for when a runtime exists (its `.wasm` and the model file both load after a reload in airplane mode) · [sr] · owns: `docs/OFFLINE-SMOKE-TEST.md`
+- [x] done · `docs/OFFLINE-SMOKE-TEST.md`: a section for when a runtime exists (its `.wasm` and the model file both load after a reload in airplane mode) · [sr] · owns: `docs/OFFLINE-SMOKE-TEST.md` · c2e47e6
 - [ ] todo · Theme from the `design/README.md` tokens, applied once; component library customized, no defaults · [sr] · owns: theme files
 - [ ] todo · _task_ · [owner] · owns: `<files/folders>` · design: `design/<screen>`
 
