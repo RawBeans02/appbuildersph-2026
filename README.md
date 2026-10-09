@@ -241,12 +241,13 @@ Measured with Lighthouse 12.8.2 (mobile emulation, simulated throttling), the sa
 
 | Run | Performance | Accessibility | Best Practices | SEO |
 |---|---|---|---|---|
+| [Sat Oct 10, 5:42 AM PH](https://github.com/RawBeans02/appbuildersph-2026/actions/runs/37995030632), https://agapaymo.pages.dev at `849628e`, the final UI (after the Codex-review fixes), median of 3 runs (Performance 82, 88, 87; median LCP 3.8 s) | 87 | 100 | 100 | 100 |
 | [Sat Oct 10, 4:53 AM PH](https://github.com/RawBeans02/appbuildersph-2026/actions/runs/37989864218), https://agapaymo.pages.dev at `ef7af1c` (the intro loads with Home), median of 3 runs (Performance 79, 89, 90; median LCP 3.5 s) | 89 | 100 | 100 | 100 |
 | [Sat Oct 10, 4:35 AM PH](https://github.com/RawBeans02/appbuildersph-2026/actions/runs/37987917415), https://agapaymo.pages.dev at `0432022` (after design pass 2), median of 3 runs (Performance 80, 87, 89; median LCP 4.0 s) | 87 | 100 | 100 | 100 |
 | [Fri Oct 9, 6:09 PM PH](https://github.com/RawBeans02/appbuildersph-2026/actions/runs/37915694829), median of 3 runs (Performance 66, 99, 99) | 99 | 100 | 100 | 100 |
 | [Fri Oct 9, 5:58 PM PH](https://github.com/RawBeans02/appbuildersph-2026/actions/runs/37914606334), single run, before the `robots.txt` and first-load fixes | 86 | 100 | 100 | 91 |
 
-Single runs vary on GitHub's shared runners (one of the three runs above scored 66, with 2,120 ms of blocking time), so we report the median of three and show every run. Each row names its date, host and build; the newest median counts. The Friday rows were measured on the first host (Vercel), before design pass 2. Accessibility is also checked on every push by axe-core on 16 screens, plus the phase 2 lock screen (`docs/MEASUREMENTS.md`, method 6).
+Single runs vary on GitHub's shared runners (one of the three runs above scored 66, with 2,120 ms of blocking time), so we report the median of three and show every run. Each row names its date, host and build; the newest median (the final UI) counts, and the rows above it show how much single runs vary. The Friday rows were measured on the first host (Vercel), before design pass 2. Accessibility is also checked on every push by axe-core on 16 screens, plus the phase 2 lock screen (`docs/MEASUREMENTS.md`, method 6).
 
 ## Team
 
