@@ -1,0 +1,184 @@
+/* Phase 2 Sync screen (NEEDS DESIGN: TASKS.md P2-B). Tokens only, on the
+   patterns of screens 16 and 18 (ScanPage, MergedPage). */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  max-width: 880px;
+  margin-top: 28px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-6);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-1);
+}
+
+.heading {
+  font: var(--type-heading);
+}
+
+.lead {
+  margin-top: 6px;
+  font: var(--type-body);
+  color: var(--ink-2);
+}
+
+.note {
+  font: var(--type-body);
+  color: var(--ink-2);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 480px;
+  margin-top: var(--space-5);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+
+.form .actions {
+  margin-top: 0;
+}
+
+/* Buttons size to their words here (one element selector outweighs
+   Button's full-width class). */
+.actions > button,
+.actions > a {
+  width: auto;
+}
+
+.fingerprint {
+  font: var(--type-mono);
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.status {
+  margin-top: var(--space-4);
+  font: var(--type-body-lg);
+  font-weight: 700;
+}
+
+.problem {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--r-md);
+  background: var(--bad-tint);
+  color: var(--bad);
+  font: var(--type-body);
+}
+
+.problem svg {
+  flex: none;
+  margin-top: 1px;
+}
+
+.form .problem {
+  margin-top: 0;
+}
+
+/* The code input with its show/hide toggle. */
+.secret {
+  position: relative;
+  display: block;
+}
+
+.secretInput {
+  padding-right: 56px;
+}
+
+.reveal {
+  position: absolute;
+  top: 50%;
+  right: var(--space-1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: none;
+  color: var(--ink-2);
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.reveal:hover {
+  background: var(--sunken);
+  color: var(--ink);
+}
+
+.results {
+  display: flex;
+  flex-direction: column;
+}
+
+.table {
+  width: 100%;
+  margin-top: var(--space-4);
+  border-collapse: collapse;
+  font: var(--type-body);
+}
+
+.table th,
+.table td {
+  padding: 0 var(--space-3);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.table thead th {
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--ink);
+  font: var(--type-caption);
+  font-weight: 700;
+  color: var(--ink-2);
+}
+
+.table tbody th,
+.table tbody td {
+  height: 56px;
+  border-bottom: 1px solid var(--line);
+}
+
+.table tbody th {
+  font-weight: 700;
+}
+
+.result {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.ok svg {
+  color: var(--ok);
+}
+
+.bad {
+  color: var(--bad);
+  font-weight: 600;
+}
+
+.footnote {
+  font: var(--type-body-dense);
+  color: var(--ink-2);
+}

@@ -182,6 +182,7 @@ Never on the offline demo path: the core works with no network, the offline e2e 
   - CI runs the API tests against a Postgres service container (no secrets)
   - the laptop gets "Sync now" when online, and there's a `/doh` view
   · [lead] · owns: `api/`, `server/`, `src/features/doh/`, the sync parts of `src/features/municipal/`
+  - NEEDS DESIGN: the laptop's Sync screen (`/municipal/sync`, phase 2 only) and its LaptopNav item "Sync": register with the enroll code (hidden input with show/hide), "Sync now", "Last synced {time}", the last sync by barangay (phone key, report), offline "Sync waits for internet. Everything else works offline.", server not set up, and the problems (wrong code, not registered, clock off, too many tries, unreachable). Built on tokens and shared components meanwhile
 - [ ] todo · P2-C GPT-6 Luna operations manager (after P2-B):
   - drafts alerts and redistribution suggestions from the aggregates only, through the same positional number check
   - `LUNA_ENABLED` kill switch, `LUNA_DAILY_LIMIT`, per-IP limits, max tokens, a timeout
