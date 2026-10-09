@@ -214,6 +214,16 @@ Never on the offline demo path: the core works with no network, the offline e2e 
 1. **The core offline flow:** Hinga → flood-exposure watch → medicine OCR → de-identified QR → municipal plan (rules + optional local LLM).
 2. **Phase 2, only if 1 is solid at the 12:00 AM scope check:** a cloud "operations manager" assistant (OpenAI GPT-6 Luna, server-side) that drafts alerts from the de-identified aggregate counts after sync; the MHO approves every alert. The key stays in Vercel env vars (added by the owner) with rate limits and a spend cap; disclosed under "What requires internet". Never part of the offline demo path.
    - Added by the owner, Fri ~11:20 PM: the signed offline return QR (R1, PR #7), part of the offline flow, no cloud needed.
+   - **Midnight scope check (Lead, Fri ~11:50 PM):**
+     - The core offline flow passes end to end in CI (37951857949, chromium and webkit, phase 2 off and on). The live check waits on Cloudflare Pages: Vercel refused f74e6a1 with "retry in 24 hours".
+     - Phase 2 stays in the repo, tested in CI, and **off on the live site**. No cloud backend port tonight.
+     - Next, from the team's phone-test feedback ("feels dead", "feels like a mock-up", "say the goal early"): Claude Design pass 2 "alive + goal-first", in priority order:
+       1. first-run intro;
+       2. story-led Home from real records;
+       3. the laptop as the live hub (merge and plan motion);
+       4. visible on-device AI (real OCR boxes, the live breathing wave);
+       5. the 32 missing states.
+     - Built by the Lead, the Sr. Builder and Syd until the 4 AM freeze.
 3. **Parking lot (don't build unless everything else is done and polished):** a consultation explainer (Whisper), offline first-aid cards ("Unang Lunas"), an emergency mode.
 
 ## Ideas (not now — only after the wow flow is done)
