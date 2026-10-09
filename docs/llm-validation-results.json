@@ -428,5 +428,48 @@
         "ok": true
       }
     }
-  ]
+  ],
+  "integratedUi": {
+    "sourceCommit": "2e8dd44",
+    "worker": "webllm.worker-Dp8auOiO.js",
+    "device": {
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/154.0.0.0 Safari/537.36",
+      "memory": 16,
+      "adapter": {
+        "vendor": "intel",
+        "architecture": "gen-12lp",
+        "device": "",
+        "description": "",
+        "isFallbackAdapter": false
+      },
+      "f16": true
+    },
+    "runs": [
+      {
+        "offline": false,
+        "online": true,
+        "panel": "Draft wording by the on-device AI: check before approving\n\nWritten on this laptop · Qwen2.5 0.5B · 12.6 s\n\nCheck this short action summary against the full plan before approving.\n\nThe doctor team for Maligaya-D has priority score 11–17.\nThe doctor team for Bagong Silang-D has priority score 6.\nThe doctor team for Mabini-D has priority score 0.\nThe doctor team for Riverside-D has priority score 0.\nThe doctor team for Santo Niño-D has priority score 0.\nConsider moving from Riverside-D to Maligaya-D: up to 30 capsules, for the MHO to decide.\n\nPaalala: this plan does not diagnose anyone and sets no dose; doxycycline only after consultation with a health professional.\n\nNo new numbers found; check each number against the plan steps\n\nWrite it again",
+        "wording": "The doctor team for Maligaya-D has priority score 11–17.\nThe doctor team for Bagong Silang-D has priority score 6.\nThe doctor team for Mabini-D has priority score 0.\nThe doctor team for Riverside-D has priority score 0.\nThe doctor team for Santo Niño-D has priority score 0.\nConsider moving from Riverside-D to Maligaya-D: up to 30 capsules, for the MHO to decide.\n\nPaalala: this plan does not diagnose anyone and sets no dose; doxycycline only after consultation with a health professional."
+      },
+      {
+        "offline": true,
+        "online": false,
+        "panel": "Draft wording by the on-device AI: check before approving\n\nWritten on this laptop · Qwen2.5 0.5B · 12.4 s\n\nCheck this short action summary against the full plan before approving.\n\nThe doctor team for Maligaya-D has priority score 11–17.\nThe doctor team for Bagong Silang-D has priority score 6.\nThe doctor team for Mabini-D has priority score 0.\nThe doctor team for Riverside-D has priority score 0.\nThe doctor team for Santo Niño-D has priority score 0.\nConsider moving from Riverside-D to Maligaya-D: up to 30 capsules, for the MHO to decide.\n\nPaalala: this plan does not diagnose anyone and sets no dose; doxycycline only after consultation with a health professional.\n\nNo new numbers found; check each number against the plan steps\n\nWrite it again",
+        "wording": "The doctor team for Maligaya-D has priority score 11–17.\nThe doctor team for Bagong Silang-D has priority score 6.\nThe doctor team for Mabini-D has priority score 0.\nThe doctor team for Riverside-D has priority score 0.\nThe doctor team for Santo Niño-D has priority score 0.\nConsider moving from Riverside-D to Maligaya-D: up to 30 capsules, for the MHO to decide.\n\nPaalala: this plan does not diagnose anyone and sets no dose; doxycycline only after consultation with a health professional."
+      },
+      {
+        "offline": true,
+        "online": false,
+        "panel": "Draft wording by the on-device AI: check before approving\n\nWritten on this laptop · Qwen2.5 0.5B · 12.6 s\n\nCheck this short action summary against the full plan before approving.\n\nThe doctor team for Maligaya-D has priority score 11–17.\nThe doctor team for Bagong Silang-D has priority score 6.\nThe doctor team for Mabini-D has priority score 0.\nThe doctor team for Riverside-D has priority score 0.\nThe doctor team for Santo Niño-D has priority score 0.\nConsider moving from Riverside-D to Maligaya-D: up to 30 capsules, for the MHO to decide.\n\nPaalala: this plan does not diagnose anyone and sets no dose; doxycycline only after consultation with a health professional.\n\nNo new numbers found; check each number against the plan steps\n\nWrite it again",
+        "wording": "The doctor team for Maligaya-D has priority score 11–17.\nThe doctor team for Bagong Silang-D has priority score 6.\nThe doctor team for Mabini-D has priority score 0.\nThe doctor team for Riverside-D has priority score 0.\nThe doctor team for Santo Niño-D has priority score 0.\nConsider moving from Riverside-D to Maligaya-D: up to 30 capsules, for the MHO to decide.\n\nPaalala: this plan does not diagnose anyone and sets no dose; doxycycline only after consultation with a health professional."
+      },
+      {
+        "offline": true,
+        "online": false,
+        "panel": "Draft wording by the on-device AI: check before approving\n\nWritten on this laptop · Qwen2.5 0.5B · 12.0 s\n\nCheck this short action summary against the full plan before approving.\n\nThe doctor team for Maligaya-D has priority score 11–17.\nThe doctor team for Bagong Silang-D has priority score 6.\nThe doctor team for Mabini-D has priority score 0.\nThe doctor team for Riverside-D has priority score 0.\nThe doctor team for Santo Niño-D has priority score 0.\nConsider moving from Riverside-D to Maligaya-D: up to 30 capsules, for the MHO to decide.\n\nPaalala: this plan does not diagnose anyone and sets no dose; doxycycline only after consultation with a health professional.\n\nNo new numbers found; check each number against the plan steps\n\nWrite it again",
+        "wording": "The doctor team for Maligaya-D has priority score 11–17.\nThe doctor team for Bagong Silang-D has priority score 6.\nThe doctor team for Mabini-D has priority score 0.\nThe doctor team for Riverside-D has priority score 0.\nThe doctor team for Santo Niño-D has priority score 0.\nConsider moving from Riverside-D to Maligaya-D: up to 30 capsules, for the MHO to decide.\n\nPaalala: this plan does not diagnose anyone and sets no dose; doxycycline only after consultation with a health professional."
+      }
+    ],
+    "failedRequests": []
+  }
 }

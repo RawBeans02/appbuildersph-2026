@@ -91,6 +91,13 @@ Raw texts, facts, times and guard results are in
   took 9.6 / 8.9 / 9.1 seconds. This trial used the incomplete four-barangay
   preview, whose transfer wording was rejected on every run. Inference/cache
   completion and wording acceptance are separate results.
+- After integration with main `e274eef`, the complete demo was paired and its
+  signed counts received through the actual laptop UI. One online draft and
+  three full offline-reload drafts were **4/4 accepted**, with the fixed
+  reminder in the officer's wording box. Offline generation took
+  **12.4 / 12.6 / 12.0 seconds**, with no failed dependency requests. Integrated
+  UI texts and hardware/browser details are also in the results JSON. Build,
+  lint, app/E2E typechecks and the clean **950-test** unit run passed.
 - Chromium production suite: 26 passed, 7 skipped (opt-in real-model and
   phase-2-only cases included). The independent-context signed return loop,
   reset/trust/duplicate/stale receipt checks, offline OCR and axe checks passed.
