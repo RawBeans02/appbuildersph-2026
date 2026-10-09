@@ -153,7 +153,8 @@ test('the full demo offline: phone wow flow, then pair, receive, merge and appro
     // Cells after the name: received, exposed, in watch window, fast breathing,
     // doxycycline on hand, expiring in 6 weeks.
     const maligaya = desk.getByRole('row', { name: /^Maligaya-D/ }).getByRole('cell')
-    await expect(maligaya.nth(0)).toHaveText(/#1$/)
+    // 18c: the QR just scanned on this laptop is marked "Just now".
+    await expect(maligaya.nth(0)).toHaveText(/#1\s*Just now$/)
     await expect(maligaya.nth(2)).toHaveText('9')
     await expect(maligaya.nth(4)).toHaveText('40')
     await expect(maligaya.nth(5)).toHaveText('30')
