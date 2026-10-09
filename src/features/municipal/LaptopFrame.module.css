@@ -1,0 +1,140 @@
+/* The laptop frame and LaptopNav (design/LaptopNav.dc.html, design/README.md
+   "LaptopNav"). Tokens only. */
+
+.frame {
+  display: flex;
+  min-height: 100vh;
+}
+
+.nav {
+  position: sticky;
+  top: 0;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  width: 248px;
+  height: 100vh;
+  padding: var(--space-6) var(--space-4) var(--space-5);
+  border-right: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 var(--space-2);
+}
+
+.tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding-bottom: var(--space-1);
+  border-radius: var(--r-sm);
+  background: var(--ink);
+  color: var(--paper);
+  font: 800 30px/30px var(--font-ui);
+}
+
+.name {
+  font: var(--type-heading);
+  font-weight: 800;
+}
+
+.role,
+.place {
+  font: var(--type-caption);
+  font-weight: 400;
+  color: var(--ink-2);
+}
+
+.place {
+  margin: 18px var(--space-2) 0;
+}
+
+.items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-top: 18px;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  height: 48px;
+  padding: 0 var(--space-3);
+  border-radius: 10px;
+  color: var(--ink-2);
+  font: var(--type-body);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.item:hover {
+  color: var(--ink);
+}
+
+.active {
+  background: var(--sunken);
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.foot {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: auto;
+  padding: 0 var(--space-2);
+}
+
+.privacy {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 48px;
+  color: var(--ink);
+  font: var(--type-body-dense);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.privacy:hover {
+  color: var(--ink-2);
+}
+
+.screen {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 36px 44px;
+}
+
+.header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-6);
+}
+
+.title {
+  font: var(--type-title);
+}
+
+.sub {
+  margin-top: var(--space-1);
+  font: var(--type-body);
+  color: var(--ink-2);
+}
+
+.action {
+  flex: none;
+  width: max-content;
+}
