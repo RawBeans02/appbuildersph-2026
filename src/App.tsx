@@ -6,6 +6,7 @@ import {
   type WebGPUSupport,
 } from './lib/capabilities'
 import { useShellStatus } from './lib/appShell'
+import { detectPlatform, pickBackend, type Backend } from './lib/backend'
 import type { ShellStatus } from './lib/pwa'
 import { useOnlineStatus } from './lib/useOnlineStatus'
 
@@ -39,6 +40,17 @@ const shellStatusText: Record<ShellStatus, string> = {
   installing: 'Saving for offline use…',
   ready: 'Ready, opens offline',
   error: 'Could not save for offline use',
+}
+
+function describeBackend(backend: Backend): string {
+  switch (backend.kind) {
+    case 'webgpu':
+      return `WebGPU${backend.f16 ? ' (f16)' : ' (f32 only)'}. Why: ${backend.reason}.`
+    case 'wasm':
+      return `WASM, ${backend.threads === 1 ? 'single-threaded' : `${backend.threads} threads`}. Why: ${backend.reason}. ${backend.threadsReason}.`
+    case 'none':
+      return `None. Why: ${backend.reason}.`
+  }
 }
 
 function describePersisted(persisted: boolean | null): string {
@@ -78,6 +90,8 @@ export default function App() {
         <p>Checking this device…</p>
       ) : (
         <dl>
+          <dt>Inference backend the app would pick</dt>
+          <dd>{describeBackend(pickBackend(caps, detectPlatform()))}</dd>
           <dt>WebGPU</dt>
           <dd>{describeWebGPU(caps.webgpu)}</dd>
           <dt>Device memory</dt>
