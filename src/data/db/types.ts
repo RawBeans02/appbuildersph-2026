@@ -109,3 +109,53 @@ export type SeedData = {
   hingaChecks?: Seeded<HingaCheck>[]
   stockLots?: Seeded<StockLot>[]
 }
+
+// Version 2: the QR handoff (src/qr/). On the phone, its signing identity; on
+// the municipal laptop, what it received, from whom, and the plans.
+
+// The phone's own identity, a single row. The private key is a non-extractable
+// CryptoKey, stored as is (IndexedDB keeps it usable but unreadable).
+export type DeviceIdentity = {
+  id: 'self'
+  barangay: string
+  privateKey: CryptoKey
+  publicJwk: JsonWebKey
+  fingerprint: string
+  // The next export number, from 1; see takeExportSeq().
+  nextSeq: number
+  createdAt: string
+}
+
+export type ReceivedPayload = {
+  // `${barangay}:${epiWeek}:${seq}`
+  id: string
+  barangay: string
+  municipality: string
+  // ISO week, e.g. 2026-W41
+  epiWeek: string
+  seq: number
+  // The raw QR text, as scanned.
+  text: string
+  keyFingerprint: string
+  receivedAt: string
+}
+
+export type PairedDevice = {
+  barangay: string
+  publicJwk: JsonWebKey
+  fingerprint: string
+  pairedAt: string
+  source: 'seed' | 'pairing'
+}
+
+export type Plan = {
+  id: string
+  epiWeek: string
+  createdAt: string
+  // The rule outputs the plan was built from (JSON).
+  rules: unknown
+  draftText: string | null
+  draftSource: 'llm' | 'template' | null
+  finalText: string
+  status: 'draft' | 'approved'
+}

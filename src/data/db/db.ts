@@ -1,5 +1,19 @@
 import { openDB, type DBSchema, type IDBPDatabase, type IndexNames, type StoreNames, type StoreValue } from 'idb'
-import type { Approval, Exposure, Flag, FloodEvent, HingaCheck, Resident, SeedData, SeedInfo, StockLot } from './types'
+import type {
+  Approval,
+  DeviceIdentity,
+  Exposure,
+  Flag,
+  FloodEvent,
+  HingaCheck,
+  PairedDevice,
+  Plan,
+  ReceivedPayload,
+  Resident,
+  SeedData,
+  SeedInfo,
+  StockLot,
+} from './types'
 
 // The on-device database. Every list is bounded (QUALITY.md): pass a limit, or
 // get DEFAULT_LIMIT. Writes notify subscribers of that store, so screens can
@@ -18,12 +32,17 @@ interface AgapaySchema extends DBSchema {
   flags: { key: string; value: Flag; indexes: { byStatus: string; byCreatedAt: string } }
   approvals: { key: string; value: Approval; indexes: { byApprovedAt: string } }
   meta: { key: string; value: unknown }
+  // Version 2
+  deviceIdentity: { key: string; value: DeviceIdentity }
+  receivedPayloads: { key: string; value: ReceivedPayload; indexes: { byEpiWeek: string; byBarangay: string } }
+  pairedDevices: { key: string; value: PairedDevice }
+  plans: { key: string; value: Plan; indexes: { byEpiWeek: string } }
 }
 
 export type RecordStore = Exclude<StoreNames<AgapaySchema>, 'meta'>
 
 export const DB_NAME = 'agapay'
-export const DB_VERSION = 1
+export const DB_VERSION = 2
 export const DEFAULT_LIMIT = 100
 export const MAX_LIMIT = 1000
 
@@ -99,6 +118,14 @@ export async function openAgapayDb(name = DB_NAME) {
         database.createObjectStore('approvals', { keyPath: 'id' }).createIndex('byApprovedAt', 'approvedAt')
         database.createObjectStore('meta')
       }
+      if (oldVersion < 2) {
+        database.createObjectStore('deviceIdentity', { keyPath: 'id' })
+        const received = database.createObjectStore('receivedPayloads', { keyPath: 'id' })
+        received.createIndex('byEpiWeek', 'epiWeek')
+        received.createIndex('byBarangay', 'barangay')
+        database.createObjectStore('pairedDevices', { keyPath: 'barangay' })
+        database.createObjectStore('plans', { keyPath: 'id' }).createIndex('byEpiWeek', 'epiWeek')
+      }
     },
   })
 
@@ -113,6 +140,32 @@ export async function openAgapayDb(name = DB_NAME) {
     stockLots: createRepository(db, 'stockLots', notify),
     flags: createRepository(db, 'flags', notify),
     approvals: createRepository(db, 'approvals', notify),
+    receivedPayloads: createRepository(db, 'receivedPayloads', notify),
+    pairedDevices: createRepository(db, 'pairedDevices', notify),
+    plans: createRepository(db, 'plans', notify),
+
+    // The phone's signing identity, or null before it's made.
+    async getDeviceIdentity(): Promise<DeviceIdentity | null> {
+      return (await db.get('deviceIdentity', 'self')) ?? null
+    },
+    async putDeviceIdentity(identity: DeviceIdentity): Promise<void> {
+      await db.put('deviceIdentity', identity)
+      notify('deviceIdentity')
+    },
+    // Hands out this phone's next export number and moves the counter on, in
+    // one transaction, so two exports never share a number.
+    async takeExportSeq(): Promise<number> {
+      const tx = db.transaction('deviceIdentity', 'readwrite')
+      const identity = await tx.store.get('self')
+      if (!identity) {
+        await tx.done
+        throw new Error('This phone has no device identity yet.')
+      }
+      await tx.store.put({ ...identity, nextSeq: identity.nextSeq + 1 })
+      await tx.done
+      notify('deviceIdentity')
+      return identity.nextSeq
+    },
 
     async getSeedInfo(): Promise<SeedInfo | null> {
       return ((await db.get('meta', 'seed')) as SeedInfo | undefined) ?? null
