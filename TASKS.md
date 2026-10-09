@@ -19,7 +19,7 @@ Every task names the files or folders it **owns**, so agents pushing straight to
 
 ## Now (the wow flow)
 - [ ] todo · Claude Design pass 1: design system (tokens) + every wow-flow screen in all states (default, loading, empty, error), **plus the model download/initialization progress, "running on this device" and offline indicator states** → `design/` + `design/README.md` · [lead] · owns: `design/`
-- [ ] todo · Scaffold + first deploy, **idea-agnostic, no designed UI** (~30–45 min) · [sr] · owns: `package.json`, the lockfile, `vite.config.ts`, `tsconfig*.json`, the ESLint config, `index.html`, `vercel.json`, `public/`, `src/main.tsx`, `src/App.tsx` (placeholder), `src/lib/`, `docs/OFFLINE-SMOKE-TEST.md`
+- [ ] doing · Scaffold + first deploy, **idea-agnostic, no designed UI** (~30–45 min) · [sr] · owns: `package.json`, the lockfile, `vite.config.ts`, `tsconfig*.json`, the ESLint config, `index.html`, `vercel.json`, `public/`, `src/main.tsx`, `src/App.tsx` (placeholder), `src/lib/`, `docs/OFFLINE-SMOKE-TEST.md`
   - Vite + React + TS; npm scripts `dev`, `build`, `preview`, `typecheck`, `lint`, `test` (Vitest, with at least one real test) so CI can call them.
   - PWA shell with `vite-plugin-pwa`: manifest, service worker precaching the app shell, and an offline fallback. The hello page is a plain, unstyled placeholder (no product name, no theme, no shadcn).
   - `src/lib/capabilities.ts`: WebGPU present (and an adapter available), `navigator.deviceMemory` where supported, storage estimate, `navigator.storage.persist()`. Unit-tested.
