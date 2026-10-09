@@ -54,7 +54,7 @@ export function StockList({ onScan, onTypeIn }: { onScan: () => void; onTypeIn: 
         <div className={screen.content}>
           <ScreenHeader title="Stock" place={<span className={styles.skeletonPlace} aria-hidden />} />
           <p className={styles.loading} role="status">
-            <CircleNotchIcon size={18} weight="bold" aria-hidden />
+            <CircleNotchIcon className="spin" size={18} weight="bold" aria-hidden />
             Opening the records on this phone…
           </p>
           <div className={styles.skeletonLink} aria-hidden />

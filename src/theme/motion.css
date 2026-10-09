@@ -1,0 +1,67 @@
+/* Motion (design pass 2, A4). Global classes, one meaning each; add the class
+   when the real event happens (or set it on an element that mounts with the
+   event). The resting CSS is the final state: keyframes only play the way in
+   (fill-mode backwards), and base.css's reduced-motion block turns every one
+   into its still. Only transform, opacity, clip-path and stroke-dashoffset
+   animate. */
+
+/* This just opened for you: sheets, toast, intro cards, result panels. */
+@keyframes rise {
+  from { transform: translateY(var(--rise)); opacity: 0; }
+}
+.rise { animation: rise var(--dur-base) var(--ease-out) backwards; }
+
+/* A record just arrived: a received report, the instructions row. */
+@keyframes land {
+  from { transform: translateY(-8px); opacity: 0; }
+}
+.land { animation: land var(--dur-base) var(--ease-out) backwards; }
+
+/* This number changed because of you (in a clipped box). */
+@keyframes tick {
+  from { transform: translateY(100%); opacity: 0; }
+}
+.tick { display: inline-block; animation: tick var(--dur-quick) var(--ease-out) backwards; }
+
+/* One more of a set is done: a meter segment, a step bar segment. */
+@keyframes fill {
+  from { transform: scaleX(0); }
+}
+.fill { transform-origin: left center; animation: fill var(--dur-slow) var(--ease-out) backwards; }
+
+/* Checked, or connected: on an SVG path with pathLength="1". */
+@keyframes draw {
+  from { stroke-dashoffset: 1; }
+}
+.draw { stroke-dasharray: 1; animation: draw var(--dur-quick) var(--ease-out) backwards; }
+.draw-long { stroke-dasharray: 1; animation: draw var(--dur-draw) var(--ease-in-out) backwards; }
+
+/* Made on this device just now: OCR boxes (stagger with animation-delay). */
+@keyframes reveal {
+  from { transform: scale(0.96); opacity: 0; }
+}
+.reveal { transform-box: fill-box; transform-origin: center; animation: reveal var(--dur-quick) var(--ease-out) backwards; }
+
+/* A QR made on this device: drawn from the top once. */
+@keyframes reveal-qr {
+  from { clip-path: inset(0 0 100% 0); }
+}
+.reveal-qr { animation: reveal-qr var(--dur-draw) var(--ease-in-out) backwards; }
+
+/* Saved, verified, approved: on the icon only. */
+@keyframes stamp {
+  from { transform: scale(1.08); opacity: 0; }
+}
+.stamp { animation: stamp var(--dur-base) var(--ease-out) backwards; }
+
+/* Real work is running: every circle-notch. Still: the icon and its words. */
+@keyframes spin {
+  to { transform: rotate(1turn); }
+}
+.spin { animation: spin var(--dur-loop) linear infinite; }
+
+/* The AI is still writing: the wording cursor, only while tokens stream. */
+@keyframes blink {
+  50% { opacity: 0; }
+}
+.blink { animation: blink var(--dur-loop) steps(1, end) infinite; }

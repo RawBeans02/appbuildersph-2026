@@ -170,7 +170,7 @@ export function MarkExposed({
 
         {data.status === 'loading' && (
           <p className={styles.loading} role="status">
-            <CircleNotchIcon size={18} weight="bold" aria-hidden />
+            <CircleNotchIcon className="spin" size={18} weight="bold" aria-hidden />
             Opening the records on this phone…
           </p>
         )}

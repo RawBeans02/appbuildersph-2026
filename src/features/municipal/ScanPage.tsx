@@ -190,7 +190,7 @@ export default function ScanPage() {
                 state.status === 'scanning' && (
                   <>
                     <p role="status" className={styles.looking}>
-                      <CircleNotchIcon size={22} weight="bold" aria-hidden />
+                      <CircleNotchIcon className="spin" size={22} weight="bold" aria-hidden />
                       Looking for a QR
                     </p>
                     <p className={styles.hint}>Hold the phone's QR inside the square, about a hand's length from the camera.</p>

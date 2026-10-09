@@ -6,6 +6,7 @@ import { usePath } from './app/router'
 import { resolveRoute } from './app/routes'
 // Straight from the file, not the components barrel: the barrel would pull
 // every shared component into the first-load chunk.
+import { RouteLoading } from './components/RouteLoading'
 import { ToastProvider } from './components/Toast'
 import { isLockedPath, useLock } from './features/lock/useLock'
 
@@ -16,7 +17,7 @@ const pages = new Map<string, ReactElement>(
     const Page = lazy(route.load)
     return [
       route.path,
-      <Suspense key={route.path} fallback={<p>Loading…</p>}>
+      <Suspense key={route.path} fallback={<RouteLoading />}>
         <Page />
       </Suspense>,
     ]
@@ -34,7 +35,7 @@ const lockScreens = (
 // The 404 is its own chunk too: only a wrong address needs it.
 const NotFound = lazy(() => import('./app/NotFoundPage').then((module) => ({ default: module.NotFoundPage })))
 const notFoundPage = (
-  <Suspense fallback={<p>Loading…</p>}>
+  <Suspense fallback={<RouteLoading />}>
     <NotFound />
   </Suspense>
 )

@@ -21,7 +21,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       {children}
       <div className={styles.region} role="status" aria-live="polite">
         {toast && (
-          <div key={toast.key} className={styles.toast}>
+          <div key={toast.key} className={`${styles.toast} rise`}>
             <CheckCircleIcon className={styles.icon} size={22} weight="bold" aria-hidden />
             <span className={styles.message}>{toast.message}</span>
             {toast.action && (

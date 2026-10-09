@@ -140,7 +140,7 @@ export function CameraScreen(props: {
                 </>
               ) : (
                 <>
-                  <CircleNotchIcon size={20} weight="bold" aria-hidden className={styles.spin} />
+                  <CircleNotchIcon size={20} weight="bold" aria-hidden className="spin" />
                   Looking for the chest…
                 </>
               )}

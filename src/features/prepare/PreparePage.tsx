@@ -44,7 +44,7 @@ function PartRows({ parts, states }: { parts: PartWithModels[]; states: PartStat
               {state === 'done' ? (
                 <CheckCircleIcon size={22} weight="bold" />
               ) : state === 'downloading' ? (
-                <CircleNotchIcon size={22} weight="bold" />
+                <CircleNotchIcon className="spin" size={22} weight="bold" />
               ) : (
                 <ClockIcon size={22} weight="bold" />
               )}

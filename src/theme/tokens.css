@@ -53,4 +53,22 @@
   --type-caption: 600 14px/20px var(--font-ui);
   --type-mono: 500 16px/22px var(--font-mono);
   --type-mono-lg: 700 34px/40px var(--font-mono);
+
+  /* motion (design pass 2, A4): only real events move */
+  --dur-press: 90ms;    /* a button, row or chip is pressed */
+  --dur-quick: 160ms;   /* a check drawn, a number changing, an icon stamp */
+  --dur-base: 200ms;    /* something arrives: sheet, toast, panel, card */
+  --dur-slow: 400ms;    /* data lands: a meter segment fills, a row lands */
+  --dur-draw: 600ms;    /* a drawing completes: QR, loop, rail, OCR boxes */
+  --dur-loop: 1400ms;   /* real work running: spinner, cursor */
+  --stagger: 40ms;      /* between items of one real result, total within --dur-draw */
+  --rise: 8px;          /* how far an arrival travels */
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --stagger: 0ms;
+  }
 }

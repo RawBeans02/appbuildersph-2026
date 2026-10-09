@@ -418,16 +418,6 @@
   color: var(--ok-on-night);
 }
 
-.spin {
-  animation: spin 1.4s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
 .countTop {
   display: flex;
   align-items: center;

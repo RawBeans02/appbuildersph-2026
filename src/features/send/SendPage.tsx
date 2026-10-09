@@ -162,7 +162,7 @@ export default function SendPage() {
       <div className={styles.screen}>
         {header}
         <p role="status" className={styles.loading}>
-          <CircleNotchIcon size={18} weight="bold" aria-hidden />
+          <CircleNotchIcon className="spin" size={18} weight="bold" aria-hidden />
           Opening the records on this phone…
         </p>
         <div className={styles.skeleton} aria-hidden />

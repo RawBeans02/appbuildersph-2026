@@ -124,10 +124,10 @@ export function LlmWordingPanel({ plan, draft, onUse, children }: LlmWordingPane
         </p>
         <div className={`${styles.box} ${styles.streaming}`} aria-live="polite">
           {state.text}
-          <span className={styles.cursor} aria-hidden />
+          <span className={`${styles.cursor} blink`} aria-hidden />
         </div>
         <p className={styles.status} role="status">
-          <CircleNotchIcon size={18} weight="bold" aria-hidden />
+          <CircleNotchIcon className="spin" size={18} weight="bold" aria-hidden />
           Writing from the plan's numbers…
         </p>
         <div className={styles.actions}>

@@ -77,7 +77,7 @@ export default function ComparePage() {
         <div className={styles.content}>
           {header}
           <p className={styles.loading} role="status">
-            <CircleNotchIcon size={18} weight="bold" aria-hidden />
+            <CircleNotchIcon className="spin" size={18} weight="bold" aria-hidden />
             Opening the records on this phone…
           </p>
           <div className={styles.rows} aria-hidden>
