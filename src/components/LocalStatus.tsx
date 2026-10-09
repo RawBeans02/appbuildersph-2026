@@ -19,10 +19,13 @@ import styles from './LocalStatus.module.css'
 export function LocalStatus({
   device = 'phone',
   dark,
+  stacked,
   ready,
 }: {
   device?: 'phone' | 'laptop'
   dark?: boolean
+  // The two parts one above the other (the laptop's sidebar, LaptopNav).
+  stacked?: boolean
   // Override when the screen knows (the laptop's AI); otherwise the device's
   // models are checked in the model cache.
   ready?: boolean
@@ -38,7 +41,7 @@ export function LocalStatus({
   const parts = partsWithModels(offlineModels.filter((model) => model.device === device))
 
   return (
-    <div className={cx(styles.status, dark && styles.dark)}>
+    <div className={cx(styles.status, dark && styles.dark, stacked && styles.stacked)}>
       <button type="button" aria-haspopup="dialog" className={cx(styles.part, styles.device)} onClick={() => setSheet('device')}>
         <DeviceIcon size={16} weight="bold" aria-hidden />
         <span className={styles.word}>{label}</span>
