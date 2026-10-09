@@ -150,6 +150,23 @@ Until `design/` lands, build the logic plus plain, unstyled screens and write `N
 
 **Wow-flow acceptance (every wow-flow task):** works end to end in airplane mode after the first load (the test: load once, go offline, reload, use the core feature) · model weights cached (Cache API/OPFS, persistent storage) so the second load is instant · user data stays on the device (IndexedDB/SQLite/OPFS) · inference off the main thread · capability check with a designed fallback · any cloud feature is optional and shows a clear offline state.
 
+## Pass 2 "alive + goal-first" (Sat, 12:00 AM to the 4:00 AM freeze)
+The brief (from the team's phone-test feedback) goes to Claude Design. Build from its frames in `design/` when they land, with frame IDs as in the brief. If time runs short, cut from the bottom. Hard rules:
+- Every number from real records.
+- CSS and inline SVG only: no animation or chart library, nothing new in `public/`.
+- Every animation has a reduced-motion still.
+- Nothing animates a Hinga result.
+- Lighthouse about 99, axe 0.
+
+- [ ] doing · P1 Motion foundation: tokens, keyframes (`rise`, `land`, `tick`, `fill`, `draw`, `reveal`, `stamp`, `spin`, `blink`), the reduced-motion delay fix, M1 shared `.spin` on every `circle-notch`, M2 press states, M3 toast `rise`, M4 route loading, 19c cursor `blink`, I1 `BrandTile` · [lead] · owns: `src/theme/`, `src/components/` (Button, ChoiceRow, BottomNav, Toast, RouteLoading, BrandTile), `src/App.tsx`
+- [ ] todo · P2 11b box-reader boxes drawn on the photo (`scan.frames` is wired: e63a237), field tags and focus · [lead] · owns: `src/features/stock/`
+- [ ] todo · P3 Home 1e/1f/1g: brand row, purpose line, task rows from `useHomeSummary()`, the instructions row and sheet, the "Got a QR from the RHU? Scan it" link, the date fix (`lib/format.ts`) · [sr] · owns: `src/features/home/`, `src/lib/format.ts`
+- [ ] todo · P4 Intro 0a–0c (lazy chunk, seen flag; never on deep links or /municipal) and L10b; e2e sets the seen flag and axe checks the intro · [sr] · owns: `src/features/home/Intro*`, `src/features/privacy/`, `e2e/`
+- [ ] todo · P5 Laptop core: LaptopNav v2 (BrandTile), LoopStrip, 16b received meter, 17g/17h check lines (shared `components/CheckLines.tsx`), 19g approved panel · [human:Gabriel] (Syd) · owns: `src/features/municipal/` (except `llm/`), `src/components/CheckLines.tsx`
+- [ ] todo · P6 21a Receive restyle (uses CheckLines), and 22a Return QR · [human:Gabriel] (Syd) · owns: `src/features/return/`
+- [ ] todo · P7 Laptop rest: 18c newest row + B22 pill variant, 19f rule rail, 19h AI-off row · [lead] after P2 · owns: `MergedPage`, `PlanPage` `PlanSteps`, `llm/LlmWordingPanel.tsx`
+- [ ] todo · P8 I2 loop art on 0c (ordered-list fallback until then) · [sr] after P4
+
 ## Next
 - [ ] todo · Claude Design pass 2: remaining screens, 404, og:image, video title card · [lead] · owns: `design/`
 - [ ] todo · PIN lock + AES-GCM encryption of the on-device records (Web Crypto, PBKDF2 from the PIN) · [sr] or [lead], after the wow flow works end to end
