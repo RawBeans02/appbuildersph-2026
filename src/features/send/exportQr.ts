@@ -1,5 +1,5 @@
 import type { AgapayDb } from '../../data/db/db'
-import { createPayload, encodeQr, isoWeek, type QrPayloadV1 } from '../../qr'
+import { createPayload, encodePairing, encodeQr, isoWeek, type QrPayloadV1 } from '../../qr'
 import { collectRawCounts } from './counts'
 import { ensureDeviceIdentity, resolvePlace } from './identity'
 
@@ -37,4 +37,16 @@ export async function createExport(db: AgapayDb, today: string, now = new Date()
     counts,
   })
   return { ok: true, payload, text: await encodeQr(payload, identity.privateKey), fingerprint: identity.fingerprint }
+}
+
+export type PairingQr = { ok: true; text: string; fingerprint: string; barangay: string } | { ok: false; reason: string }
+
+// The one-time pairing QR: this phone's public key and codes, no signature.
+// The officer checks that the laptop shows the same fingerprint before pairing.
+export async function createPairingQr(db: AgapayDb, now = new Date()): Promise<PairingQr> {
+  const place = resolvePlace(await db.getSeedInfo())
+  if (!place.ok) return place
+  const identity = await ensureDeviceIdentity(db, place.barangay, now)
+  const text = encodePairing({ barangay: place.barangay, municipality: place.municipality, publicJwk: identity.publicJwk })
+  return { ok: true, text, fingerprint: identity.fingerprint, barangay: place.barangay }
 }

@@ -5,7 +5,7 @@ import { useDbQuery } from '../../data/db/useDbQuery'
 import { AGE_BANDS, formatCount, HINGA_AGE_BANDS, suppress, type AgeBand, type QrPayloadV1 } from '../../qr'
 import { localToday } from '../../rules/dates'
 import { collectRawCounts } from './counts'
-import { createExport, readPhoneRecords } from './exportQr'
+import { createExport, createPairingQr, readPhoneRecords, type PairingQr } from './exportQr'
 import { resolvePlace } from './identity'
 import { QrImage } from './QrImage'
 
@@ -34,6 +34,7 @@ export default function SendPage() {
   const [today] = useState(localToday)
   const [sent, setSent] = useState<{ payload: QrPayloadV1; text: string; fingerprint: string } | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [pairing, setPairing] = useState<Extract<PairingQr, { ok: true }> | null>(null)
 
   if (data.status === 'loading') return <p>Loading…</p>
   if (data.status === 'error') return <p role="alert">Could not read the records on this phone.</p>
@@ -55,6 +56,17 @@ export default function SendPage() {
     try {
       const result = await createExport(await getDb(), today)
       if (result.ok) setSent(result)
+      else setError(result.reason)
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : String(cause))
+    }
+  }
+
+  async function onPair() {
+    setError(null)
+    try {
+      const result = await createPairingQr(await getDb())
+      if (result.ok) setPairing(result)
       else setError(result.reason)
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : String(cause))
@@ -109,6 +121,26 @@ export default function SendPage() {
             </button>
           )}
           {data.data.fingerprint && !sent && <p>This phone's key: {data.data.fingerprint}</p>}
+
+          <h2>Pair with the RHU laptop (once)</h2>
+          {pairing ? (
+            <>
+              <QrImage text={pairing.text} label={`Pairing QR for ${pairing.barangay}`} />
+              <p>
+                The laptop must show this code: <strong>{pairing.fingerprint}</strong>. Pair only if it matches.
+              </p>
+              <button type="button" onClick={() => setPairing(null)}>
+                Done
+              </button>
+            </>
+          ) : (
+            <>
+              <p>The laptop needs this phone's public key once, before it can trust this phone's QR codes.</p>
+              <button type="button" onClick={() => void onPair()}>
+                Show the pairing QR
+              </button>
+            </>
+          )}
         </>
       )}
       {error && <p role="alert">Could not create the QR: {error}</p>}

@@ -2,9 +2,9 @@ import 'fake-indexeddb/auto'
 import { describe, expect, it } from 'vitest'
 import { openAgapayDb } from '../../data/db/db'
 import type { Exposure, HingaCheck, Resident, StockLot } from '../../data/db/types'
-import { decodeQr } from '../../qr'
+import { decodePairing, decodeQr } from '../../qr'
 import { ageBand, ageInMonths, collectRawCounts, hingaBand } from './counts'
-import { createExport } from './exportQr'
+import { createExport, createPairingQr } from './exportQr'
 import { ensureDeviceIdentity, resolvePlace } from './identity'
 
 const TODAY = '2026-10-10'
@@ -146,6 +146,23 @@ describe('createExport', () => {
     const identity = await ensureDeviceIdentity(db, 'SID-MAL')
     expect((await ensureDeviceIdentity(db, 'SID-MAL')).fingerprint).toBe(identity.fingerprint)
     await expect(ensureDeviceIdentity(db, 'SID-BGS')).rejects.toThrow('set up for SID-MAL')
+    db.close()
+  })
+})
+
+describe('createPairingQr', () => {
+  it('shows the same key the counts QR is signed with, and the fingerprint the laptop will show', async () => {
+    const db = await openAgapayDb('send-test-3')
+    await db.loadSeed({ version: 't', municipality: 'San Isidro Demo', barangay: 'Maligaya-D', residents: [] })
+    const pairing = await createPairingQr(db)
+    if (!pairing.ok) throw new Error(pairing.reason)
+    const decoded = await decodePairing(pairing.text)
+    expect(decoded).toMatchObject({ ok: true, fingerprint: pairing.fingerprint, pairing: { barangay: 'SID-MAL', municipality: 'SID' } })
+
+    const exported = await createExport(db, TODAY)
+    if (!exported.ok || !decoded.ok) throw new Error('failed')
+    expect(exported.fingerprint).toBe(pairing.fingerprint)
+    expect(await decodeQr(exported.text, { 'SID-MAL': decoded.pairing.publicJwk })).toMatchObject({ ok: true })
     db.close()
   })
 })
