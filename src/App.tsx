@@ -5,6 +5,8 @@ import {
   type DeviceCapabilities,
   type WebGPUSupport,
 } from './lib/capabilities'
+import { useShellStatus } from './lib/appShell'
+import type { ShellStatus } from './lib/pwa'
 import { useOnlineStatus } from './lib/useOnlineStatus'
 
 // Placeholder until the designed screens land from design/. Unstyled on purpose.
@@ -32,6 +34,13 @@ function describeWebGPU(webgpu: WebGPUSupport): string {
   }
 }
 
+const shellStatusText: Record<ShellStatus, string> = {
+  unavailable: 'Not available here (needs the network on every load)',
+  installing: 'Saving for offline use…',
+  ready: 'Ready, opens offline',
+  error: 'Could not save for offline use',
+}
+
 function describePersisted(persisted: boolean | null): string {
   if (persisted === null) return 'Not supported'
   return persisted ? 'Yes' : 'No'
@@ -39,6 +48,7 @@ function describePersisted(persisted: boolean | null): string {
 
 export default function App() {
   const online = useOnlineStatus()
+  const shellStatus = useShellStatus()
   const [caps, setCaps] = useState<DeviceCapabilities | null>(null)
 
   useEffect(() => {
@@ -61,6 +71,7 @@ export default function App() {
       <h1>Placeholder</h1>
       <p>The app shell is live. The designed screens replace this page.</p>
       <p>Network: {online ? 'Online' : 'Offline'}</p>
+      <p>Offline app shell: {shellStatusText[shellStatus]}</p>
 
       <h2>Device check</h2>
       {caps === null ? (

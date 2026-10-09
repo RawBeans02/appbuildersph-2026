@@ -34,7 +34,7 @@ Every task names the files or folders it **owns**, so agents pushing straight to
   - Model weights: fetched on first load (e.g. from Hugging Face), then cached. Check Vercel's file-size limits before self-hosting weights. The first-load download goes under "What requires internet".
   - Put the live URL at the top of this file and of the README. The README also keeps run/recreate instructions: judges and verifiers may run it from the repo.
 - [x] done · CI: GitHub Actions on every push to `main` (npm ci, typecheck, lint, build, test) · [lead] · owns: `.github/workflows/` · f9129fc (first green run on fa66af8)
-- [ ] doing · Offline-ready signal: register the service worker via `virtual:pwa-register` and expose the app-shell status (unsupported / installing / ready / error) as a hook, with tests · [sr] · owns: `src/lib/pwa.ts`, `src/main.tsx`
+- [ ] doing · Offline-ready signal: register the service worker via `virtual:pwa-register` and expose the app-shell status (unsupported / installing / ready / error) as a hook, with tests · [sr] · owns: `src/lib/pwa.ts`, `src/lib/appShell.ts`, `src/main.tsx`
 - [ ] doing · Storage-persistence request flow for a later model-download screen: ask for persistent storage, check free space against the download size (logic only, no UI), with tests · [sr] · owns: `src/lib/storage.ts`
 - [ ] doing · Runtime-agnostic model cache: Cache API, keyed by model id + version, download progress callback, size integrity check, eviction of old versions, with mocked tests · [sr] · owns: `src/lib/modelCache.ts`
 - [ ] todo · Theme from the `design/README.md` tokens, applied once; component library customized, no defaults · [sr] · owns: theme files
