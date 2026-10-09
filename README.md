@@ -36,6 +36,7 @@ _TBD: the target user, the problem, and why it matters._
 |---|---|---|
 | App shell (HTML, JS, CSS), cached by a service worker | The user's browser | No model yet |
 | Records (residents, flood exposures, breathing checks, medicine stock, flags, approvals) | IndexedDB in the user's browser; they never leave the device except as the de-identified QR | No model |
+| De-identified QR payload (`src/qr/`, not yet used by a screen): small-cell suppression ("<5"), signing on the phone, verification and merge on the laptop | The user's browser, with the built-in Web Crypto API (ECDSA P-256) | No model |
 | OCR spike (`spike-ocr.html`, a test page not linked from the app): text detection and recognition on a photo | The user's browser, in a Web Worker, WebAssembly, single-threaded | PP-OCRv5 mobile detection + English recognition on ONNX Runtime Web 1.30 |
 | _TBD: the on-device AI_ | | |
 
