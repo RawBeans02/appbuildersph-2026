@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<title>AgapayMo · Motion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;500;700&family=Atkinson+Hyperlegible+Next:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+<style>
+body{margin:0;background:#E4DED3;color:#221D18;font-family:'Atkinson Hyperlegible Next',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#221D18;text-decoration:underline;text-underline-offset:3px}
+a:hover{color:#4D463F;text-decoration-thickness:2px}
+button{font-family:inherit}
+@keyframes am-rise{from{transform:translateY(8px);opacity:0}}
+@keyframes am-land{from{transform:translateY(-8px);opacity:0}}
+@keyframes am-tick-out{to{transform:translateY(-100%)}}
+@keyframes am-tick-in{from{transform:translateY(100%)}}
+@keyframes am-fill{from{transform:scaleX(0)}}
+@keyframes am-draw{from{stroke-dashoffset:1}}
+@keyframes am-wipe{from{clip-path:inset(0 100% 0 0)}}
+@keyframes am-reveal-qr{from{clip-path:inset(0 0 100% 0)}}
+@keyframes am-reveal-box{from{opacity:0;transform:scale(.96)}}
+@keyframes am-stamp{from{transform:scale(1.08);opacity:0}}
+@keyframes am-spin{to{transform:rotate(360deg)}}
+@keyframes am-blink{0%,49.99%{opacity:1}50%,100%{opacity:0}}
+@keyframes am-slide{from{transform:translateX(-100%)}to{transform:translateX(333%)}}
+@keyframes am-pulse{0%,100%{opacity:.35}50%{opacity:1}}
+@keyframes am-show-step{from{visibility:hidden}to{visibility:visible}}
+</style>
+</helmet>
+
+<section data-screen-label="Motion header" style="padding:64px 72px 16px;width:1800px">
+<h1 style="margin:0 0 10px;font-size:48px;line-height:54px;font-weight:800">AgapayMo Motion</h1>
+<p style="margin:0;max-width:1040px;font-size:19px;line-height:28px;color:#4D463F">Pass 2, A4. Motion has one job: to answer something real that just happened. Tokens, every keyframe running next to its reduced-motion still, the M1–M4 fixes, press states, where each keyframe is used, and the I1–I3 art. Specimens here replay every 2.6 s so you can watch them; in the app each plays once, on its real event. Tweaks: stop the replay, or preview the whole page as reduced motion.</p>
+<p style="margin:12px 0 0;font-size:16px;line-height:24px;color:#4D463F">{{ reduceNote }}</p>
+</section>
+
+<section data-screen-label="Tokens" style="width:2200px;padding:32px 72px 56px">
+<div style="display:flex;align-items:baseline;gap:14px;margin-bottom:20px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:18px;font-weight:700;color:#4D463F">A4.1</span><h2 style="margin:0;font-size:32px;line-height:38px;font-weight:800">Tokens</h2></div>
+<div style="display:grid;grid-template-columns:620px 1fr;gap:40px;align-items:start;max-width:1660px">
+<div style="background:#F7F4ED;border-radius:16px;padding:8px 24px 16px;box-shadow:0 1px 2px rgba(34,29,24,0.08)">
+<div style="display:grid;grid-template-columns:150px 120px minmax(0,1fr);gap:12px;padding:12px 0;border-bottom:2px solid #221D18;font-size:14px;font-weight:700;color:#4D463F"><span>Token</span><span>Value</span><span>Used for</span></div>
+<div style="display:grid;grid-template-columns:150px 120px minmax(0,1fr);gap:12px;padding:10px 0;border-bottom:1px solid #D9D3CA;font-size:15px;line-height:22px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-weight:700">--dur-press</span><span style="font-family:'Atkinson Hyperlegible Mono',monospace">90ms</span><span>A button, row or chip is pressed</span></div>
+<div style="display:grid;grid-template-columns:150px 120px minmax(0,1fr);gap:12px;padding:10px 0;border-bottom:1px solid #D9D3CA;font-size:15px;line-height:22px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-weight:700">--dur-quick</span><span style="font-family:'Atkinson Hyperlegible Mono',monospace">160ms</span><span>A check drawn, a number changing, a tag stamp</span></div>
+<div style="display:grid;grid-template-columns:150px 120px minmax(0,1fr);gap:12px;padding:10px 0;border-bottom:1px solid #D9D3CA;font-size:15px;line-height:22px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-weight:700">--dur-base</span><span style="font-family:'Atkinson Hyperlegible Mono',monospace">200ms</span><span>Something arrives: sheet, toast, panel, card (pass 1's sheet is 0.2 s)</span></div>
+<div style="display:grid;grid-template-columns:150px 120px minmax(0,1fr);gap:12px;padding:10px 0;border-bottom:1px solid #D9D3CA;font-size:15px;line-height:22px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-weight:700">--dur-slow</span><span style="font-family:'Atkinson Hyperlegible Mono',monospace">400ms</span><span>Data lands: a meter segment fills, a row lands</span></div>
+<div style="display:grid;grid-template-columns:150px 120px minmax(0,1fr);gap:12px;padding:10px 0;border-bottom:1px solid #D9D3CA;font-size:15px;line-height:22px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-weight:700">--dur-draw</span><span style="font-family:'Atkinson Hyperlegible Mono',monospace">600ms</span><span>A drawing completes: QR, loop, rail, OCR boxes. The longest anything runs</span></div>
+<div style="display:grid;grid-template-columns:150px 120px minmax(0,1fr);gap:12px;padding:10px 0;border-bottom:1px solid #D9D3CA;font-size:15px;line-height:22px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-weight:700">--dur-loop</span><span style="font-family:'Atkinson Hyperlegible Mono',monospace">1400ms</span><span>Real work running: spinner, indeterminate bar, cursor</span></div>
+<div style="display:grid;grid-template-columns:150px 120px minmax(0,1fr);gap:12px;padding:10px 0;border-bottom:1px solid #D9D3CA;font-size:15px;line-height:22px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-weight:700">--stagger</span><span style="font-family:'Atkinson Hyperlegible Mono',monospace">40ms</span><span>Gap between items drawn from one real result; total capped at --dur-draw. 0ms under reduced motion</span></div>
+<div style="display:grid;grid-template-columns:150px 120px minmax(0,1fr);gap:12px;padding:10px 0;border-bottom:1px solid #D9D3CA;font-size:15px;line-height:22px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-weight:700">--rise</span><span style="font-family:'Atkinson Hyperlegible Mono',monospace">8px</span><span>How far an arrival travels</span></div>
+<div style="display:grid;grid-template-columns:150px 120px minmax(0,1fr);gap:12px;padding:10px 0;border-bottom:1px solid #D9D3CA;font-size:15px;line-height:22px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-weight:700">--ease-out</span><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">.2, .8, .2, 1</span><span>Arrivals and fills</span></div>
+<div style="display:grid;grid-template-columns:150px 120px minmax(0,1fr);gap:12px;padding:10px 0;font-size:15px;line-height:22px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-weight:700">--ease-in-out</span><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">.4, 0, .2, 1</span><span>Lines and QR reveals</span></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<div><div style="font-size:15px;font-weight:700;margin-bottom:6px">tokens.css</div><pre style="margin:0;padding:16px 18px;background:#221D18;color:#F7F4ED;border-radius:12px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;line-height:21px;white-space:pre-wrap">:root {
+  --dur-press: 90ms;  --dur-quick: 160ms;  --dur-base: 200ms;
+  --dur-slow: 400ms;  --dur-draw: 600ms;   --dur-loop: 1400ms;
+  --stagger: 40ms;    --rise: 8px;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+}
+@media (prefers-reduced-motion: reduce) { :root { --stagger: 0ms; } }</pre></div>
+<div><div style="font-size:15px;font-weight:700;margin-bottom:6px">base.css: the reduced-motion fix (delays as well as durations)</div><pre style="margin:0;padding:16px 18px;background:#221D18;color:#F7F4ED;border-radius:12px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;line-height:21px;white-space:pre-wrap">@media (prefers-reduced-motion: reduce) {
+  *:not(.motion-safe), *:not(.motion-safe)::before, *:not(.motion-safe)::after {
+    animation-delay: 0s !important;
+    transition-delay: 0s !important;
+  }
+}</pre></div>
+<div><div style="font-size:15px;font-weight:700;margin-bottom:6px">Trigger pattern</div><pre style="margin:0;padding:16px 18px;background:#221D18;color:#F7F4ED;border-radius:12px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;line-height:21px;white-space:pre-wrap">// when the real event fires (saved, received, read, approved):
+el.dataset.just = 'land';
+el.addEventListener('animationend', () => delete el.dataset.just, { once: true });
+/* keyframes only play the way in: the resting CSS is the final state */
+[data-just="land"] { animation: land var(--dur-base) var(--ease-out) backwards; }</pre></div>
+</div>
+</div>
+</section>
+
+<section data-screen-label="Keyframes" style="width:2200px;padding:32px 72px 56px">
+<div style="display:flex;align-items:baseline;gap:14px;margin-bottom:6px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:18px;font-weight:700;color:#4D463F">A4.2</span><h2 style="margin:0;font-size:32px;line-height:38px;font-weight:800">Keyframes, one meaning each</h2></div>
+<p style="margin:0 0 24px;max-width:1040px;font-size:17px;line-height:26px;color:#4D463F">Only transform, opacity, clip-path and stroke-dashoffset animate. Meters use scaleX, never width. Left box: live. Right box: what reduced motion shows.</p>
+<div style="display:grid;grid-template-columns:repeat(3,520px);gap:28px">
+
+<div style="background:#FFFDFA;border-radius:16px;padding:18px 20px;box-shadow:0 1px 2px rgba(34,29,24,0.08)"><div style="display:flex;align-items:baseline;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:20px;font-weight:700">rise</span><span style="font-size:16px;color:#4D463F">This just opened for you</span></div><div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px">{{ rise }}<div style="height:120px;border-radius:12px;background:#F7F4ED;border:1px dashed #7B7369;display:flex;align-items:center;justify-content:center"><div style="background:#FFFDFA;border:1px solid #D9D3CA;border-radius:12px;padding:14px 18px;font-size:16px;font-weight:700">Sheet, toast, card</div></div></div><p style="margin:12px 0 0;font-size:14px;line-height:20px;color:#4D463F">translateY(var(--rise)) → 0, opacity 0 → 1, --dur-base, --ease-out. Sheets, toast, intro cards, 17g and 19g panels, 19f steps. Still: appears in place.</p></div>
+
+<div style="background:#FFFDFA;border-radius:16px;padding:18px 20px;box-shadow:0 1px 2px rgba(34,29,24,0.08)"><div style="display:flex;align-items:baseline;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:20px;font-weight:700">land</span><span style="font-size:16px;color:#4D463F">A record just arrived</span></div><div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px">{{ land }}<div style="height:120px;border-radius:12px;background:#F7F4ED;border:1px dashed #7B7369;display:flex;align-items:center;justify-content:center"><div style="background:#DFF6E2;border-radius:8px;padding:10px 14px;width:200px"><div style="font-size:16px;font-weight:800">Maligaya-D</div><div style="font-size:14px;font-weight:700;color:#1D6835">Just now</div></div></div></div><p style="margin:12px 0 0;font-size:14px;line-height:20px;color:#4D463F">translateY(-8px) → 0 and opacity, --dur-base. The --ok-tint and “Just now” are static state for the visit. 16b, 18c, 20c rows, 1g row, 9a new rows. Still: no movement.</p></div>
+
+<div style="background:#FFFDFA;border-radius:16px;padding:18px 20px;box-shadow:0 1px 2px rgba(34,29,24,0.08)"><div style="display:flex;align-items:baseline;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:20px;font-weight:700">tick</span><span style="font-size:16px;color:#4D463F">This number changed because of you</span></div><div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px">{{ tick }}<div style="height:120px;border-radius:12px;background:#F7F4ED;border:1px dashed #7B7369;display:flex;align-items:center;justify-content:center;gap:8px;font-size:18px;font-weight:700"><span style="font-size:32px;font-weight:800;font-variant-numeric:tabular-nums">5</span>of 5</div></div><p style="margin:12px 0 0;font-size:14px;line-height:20px;color:#4D463F">Old value up and out, new one in from below, in a clipped box, --dur-quick. P1: Home numbers, 8d count, meter labels. Never a clinical result. Still: swaps in place.</p></div>
+
+<div style="background:#FFFDFA;border-radius:16px;padding:18px 20px;box-shadow:0 1px 2px rgba(34,29,24,0.08)"><div style="display:flex;align-items:baseline;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:20px;font-weight:700">fill</span><span style="font-size:16px;color:#4D463F">One more of a set is done</span></div><div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px">{{ fill }}<div style="height:120px;border-radius:12px;background:#F7F4ED;border:1px dashed #7B7369;display:flex;align-items:center;justify-content:center"><span style="display:flex;gap:4px"><span style="width:32px;height:8px;border-radius:3px;background:#221D18"></span><span style="width:32px;height:8px;border-radius:3px;background:#221D18"></span><span style="width:32px;height:8px;border-radius:3px;background:#221D18"></span><span style="width:32px;height:8px;border-radius:3px;background:#221D18"></span><span style="width:32px;height:8px;border-radius:3px;background:#221D18"></span></span></div></div><p style="margin:12px 0 0;font-size:14px;line-height:20px;color:#4D463F">scaleX 0 → 1 from the left, --dur-slow, --ease-out. The segment just received, intro step bar, 18d bar just landed. Still: drawn filled.</p></div>
+
+<div style="background:#FFFDFA;border-radius:16px;padding:18px 20px;box-shadow:0 1px 2px rgba(34,29,24,0.08)"><div style="display:flex;align-items:baseline;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:20px;font-weight:700">draw</span><span style="font-size:16px;color:#4D463F">Checked, or connected</span></div><div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px">{{ draw }}<div style="height:120px;border-radius:12px;background:#F7F4ED;border:1px dashed #7B7369;display:flex;align-items:center;justify-content:center;gap:14px"><i class="ph-bold ph-check-circle" style="font-size:28px;color:#1D6835"></i><svg width="120" height="20" viewBox="0 0 120 20" style="fill:none;stroke:#221D18;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M2 10H116M110 4l6 6-6 6"></path></svg></div></div><p style="margin:12px 0 0;font-size:14px;line-height:20px;color:#4D463F">stroke-dashoffset 1 → 0 on pathLength="1" paths: --dur-quick for checks, --dur-draw for lines. Phosphor icons are filled shapes, so a check icon “draws” as a clip-path wipe, left to right. 17g, 17h, 21a checks (all together), 0c loop, LoopStrip connector, 19f rail, 19c underlines (P1). Still: drawn.</p></div>
+
+<div style="background:#FFFDFA;border-radius:16px;padding:18px 20px;box-shadow:0 1px 2px rgba(34,29,24,0.08)"><div style="display:flex;align-items:baseline;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:20px;font-weight:700">reveal</span><span style="font-size:16px;color:#4D463F">Made on this device just now</span></div><div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px">{{ reveal }}<div style="height:120px;border-radius:12px;background:#F7F4ED;border:1px dashed #7B7369;display:flex;align-items:center;justify-content:center;gap:18px"><span style="background:#FFFFFF;padding:6px;border-radius:4px"><img src="assets/sample-qr.png" alt="" style="display:block;width:64px;height:64px;image-rendering:pixelated"></span><span style="display:flex;flex-direction:column;gap:8px"><span style="width:84px;height:16px;border-radius:2px;outline:2px solid #FFFDFA;box-shadow:0 0 0 3px #221D18"></span><span style="width:60px;height:16px;border-radius:2px;outline:2px solid #FFFDFA;box-shadow:0 0 0 3px #221D18"></span></span></div></div><p style="margin:12px 0 0;font-size:14px;line-height:20px;color:#4D463F">QR: clip-path inset from the top to none, --dur-draw, once, then still. OCR boxes: opacity and scale .96 → 1, --stagger apart. 11b boxes, 14e and 22a QRs. Still: shown at once.</p></div>
+
+<div style="background:#FFFDFA;border-radius:16px;padding:18px 20px;box-shadow:0 1px 2px rgba(34,29,24,0.08)"><div style="display:flex;align-items:baseline;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:20px;font-weight:700">stamp</span><span style="font-size:16px;color:#4D463F">Saved, verified, approved</span></div><div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px">{{ stamp }}<div style="height:120px;border-radius:12px;background:#F7F4ED;border:1px dashed #7B7369;display:flex;align-items:center;justify-content:center"><i class="ph-bold ph-seal-check" style="font-size:40px;color:#1D6835"></i></div></div><p style="margin:12px 0 0;font-size:14px;line-height:20px;color:#4D463F">scale 1.08 → 1 and opacity, --dur-base, on the icon only. 19g seal, LoopStrip step 4, 11b tags, 21a success; P1: 6c, 13b, 14c, Prepare “Done”. Still: static icon.</p></div>
+
+<div style="background:#FFFDFA;border-radius:16px;padding:18px 20px;box-shadow:0 1px 2px rgba(34,29,24,0.08)"><div style="display:flex;align-items:baseline;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:20px;font-weight:700">spin</span><span style="font-size:16px;color:#4D463F">Real work is running (M1)</span></div><div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px">{{ spin }}<div style="height:120px;border-radius:12px;background:#F7F4ED;border:1px dashed #7B7369;display:flex;align-items:center;justify-content:center;gap:8px;font-size:17px;font-weight:700"><i class="ph-bold ph-circle-notch" style="font-size:22px"></i>Looking for a QR</div></div><p style="margin:12px 0 0;font-size:14px;line-height:20px;color:#4D463F">rotate, --dur-loop, linear. One shared .spin class on every circle-notch while its work is real: records loading (Home, Watch, Stock, Compare), Prepare's “Downloading” rows, “Writing from the plan's numbers…”, “Looking for a QR”, “Looking for the chest…”. Still: static icon plus the words.</p></div>
+
+<div style="background:#FFFDFA;border-radius:16px;padding:18px 20px;box-shadow:0 1px 2px rgba(34,29,24,0.08)"><div style="display:flex;align-items:baseline;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:20px;font-weight:700">blink</span><span style="font-size:16px;color:#4D463F">The AI is still writing</span></div><div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px">{{ blink }}<div style="height:120px;border-radius:12px;background:#F7F4ED;border:1px dashed #7B7369;display:flex;align-items:center;justify-content:center;font-size:16px">…the watch<span style="display:inline-block;width:9px;height:19px;background:#221D18;margin-left:2px"></span></div></div><p style="margin:12px 0 0;font-size:14px;line-height:20px;color:#4D463F">opacity in two steps over --dur-loop (0.7 s on, 0.7 s off), only while tokens stream. The 19c cursor. Still: solid block.</p></div>
+
+<div style="background:#FFFDFA;border-radius:16px;padding:18px 20px;box-shadow:0 1px 2px rgba(34,29,24,0.08)"><div style="display:flex;align-items:baseline;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:20px;font-weight:700">slide / pulse</span><span style="font-size:16px;color:#4D463F">Indeterminate progress (existing)</span></div><div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px">{{ slide }}{{ pulse }}</div><p style="margin:12px 0 0;font-size:14px;line-height:20px;color:#4D463F">As now: a 30% segment slides on a --dur-loop loop; under reduced motion it pulses (right). Progress.</p></div>
+
+<div style="background:#FFFDFA;border-radius:16px;padding:18px 20px;box-shadow:0 1px 2px rgba(34,29,24,0.08)"><div style="display:flex;align-items:baseline;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:20px;font-weight:700">M3 · toast</span><span style="font-size:16px;color:#4D463F">Rises in, leaves without motion</span></div><div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px">{{ toast }}<div style="height:120px;border-radius:12px;background:#F7F4ED;border:1px dashed #7B7369;display:flex;align-items:flex-end;justify-content:center;padding-bottom:16px"><div style="display:flex;align-items:center;gap:8px;padding:12px 16px;background:#221D18;color:#FFFDFA;border-radius:12px;font-size:15px;font-weight:600"><i class="ph-bold ph-check-circle" style="font-size:18px"></i>Saved on this phone.</div></div></div><p style="margin:12px 0 0;font-size:14px;line-height:20px;color:#4D463F">rise on the way in (--dur-base). Exit is instant. The toast is also the role="status" text twin.</p></div>
+
+<div style="background:#FFFDFA;border-radius:16px;padding:18px 20px;box-shadow:0 1px 2px rgba(34,29,24,0.08)"><div style="display:flex;align-items:baseline;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:20px;font-weight:700">M4 · first paint</span><span style="font-size:16px;color:#4D463F">Only after 300 ms</span></div><div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px">{{ firstPaint }}<div style="height:120px;border-radius:12px;background:#F7F4ED;border:1px dashed #7B7369;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px"><dc-import name="BrandTile" size="40" hint-size="40px,40px"></dc-import><span style="display:flex;align-items:center;gap:6px;font-size:15px;color:#4D463F"><i class="ph-bold ph-circle-notch" style="font-size:18px;color:#221D18"></i>Opening AgapayMo…</span></div></div><p style="margin:12px 0 0;font-size:14px;line-height:20px;color:#4D463F">A stepped visibility delay (animation: show 0s 300ms both), never a fade. Mark it .motion-safe so the delay survives reduced motion. Still: static icon plus the words.</p></div>
+
+</div>
+</section>
+
+<section data-screen-label="Press states" style="width:2200px;padding:32px 72px 56px">
+<div style="display:flex;align-items:baseline;gap:14px;margin-bottom:6px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:18px;font-weight:700;color:#4D463F">M2</span><h2 style="margin:0;font-size:32px;line-height:38px;font-weight:800">Press states (try them)</h2></div>
+<p style="margin:0 0 24px;max-width:1040px;font-size:17px;line-height:26px;color:#4D463F">Primary on :active: --night fill (on dark screens: --on-night-2). Secondary buttons, rows, chips and tabs on :active: --sunken. Buttons only: scale(0.98) over --dur-press. Hover stays a solid color change. Reduced motion: the color change only. Left: rest. Right: pressed.</p>
+<div style="display:grid;grid-template-columns:repeat(2,minmax(0,800px));gap:28px">
+<div style="background:#F7F4ED;border-radius:16px;padding:20px;display:grid;grid-template-columns:150px 1fr 1fr;gap:14px 16px;align-items:center;box-shadow:0 1px 2px rgba(34,29,24,0.08)">
+<span style="font-size:15px;font-weight:700">Primary</span><button style="height:56px;border-radius:12px;background:#221D18;color:#FFFDFA;border:0;font-size:18px;font-weight:700;transition:transform 90ms cubic-bezier(0.2,0.8,0.2,1)" style-active="background:#161310;transform:scale(0.98)">Save<span style="color:#C7C3BD;font-weight:600"> · I-save</span></button><button style="height:56px;border-radius:12px;background:#161310;color:#FFFDFA;border:0;font-size:18px;font-weight:700;transform:scale(0.98)">Save<span style="color:#C7C3BD;font-weight:600"> · I-save</span></button>
+<span style="font-size:15px;font-weight:700">Secondary</span><button style="height:56px;border-radius:12px;background:#FFFDFA;color:#221D18;border:2px solid #221D18;font-size:18px;font-weight:700;transition:transform 90ms cubic-bezier(0.2,0.8,0.2,1)" style-active="background:#EBE6DD;transform:scale(0.98)">Choose a QR image</button><button style="height:56px;border-radius:12px;background:#EBE6DD;color:#221D18;border:2px solid #221D18;font-size:18px;font-weight:700;transform:scale(0.98)">Choose a QR image</button>
+<span style="font-size:15px;font-weight:700">Text button</span><button style="height:48px;background:none;border:0;color:#221D18;font-size:17px;font-weight:700;text-decoration:underline;text-underline-offset:4px;transition:transform 90ms" style-active="color:#4D463F;text-decoration-thickness:2px;transform:scale(0.98)">How it works</button><button style="height:48px;background:none;border:0;color:#4D463F;font-size:17px;font-weight:700;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px;transform:scale(0.98)">How it works</button>
+<span style="font-size:15px;font-weight:700">Chip (8b)</span><span><button style="height:48px;padding:0 16px;border-radius:999px;background:#FFFDFA;border:2px solid #7B7369;color:#221D18;font-size:16px;font-weight:700" style-active="background:#EBE6DD">Open wound</button></span><span><button style="height:48px;padding:0 16px;border-radius:999px;background:#EBE6DD;border:2px solid #7B7369;color:#221D18;font-size:16px;font-weight:700">Open wound</button></span>
+<span style="font-size:13px;line-height:18px;color:#4D463F;grid-column:1 / -1">Text button :active is our addition (the brief names no text-button press): --ink-2 and a 2 px underline, plus the button scale.</span>
+</div>
+<div style="background:#2A2621;border-radius:16px;padding:20px;display:grid;grid-template-columns:150px 1fr 1fr;gap:14px 16px;align-items:center">
+<span style="font-size:15px;font-weight:700;color:#F7F4ED">Primary on dark</span><button style="height:56px;border-radius:12px;background:#F7F4ED;color:#221D18;border:0;font-size:18px;font-weight:700;transition:transform 90ms cubic-bezier(0.2,0.8,0.2,1)" style-active="background:#C7C3BD;transform:scale(0.98)">Start counting</button><button style="height:56px;border-radius:12px;background:#C7C3BD;color:#221D18;border:0;font-size:18px;font-weight:700;transform:scale(0.98)">Start counting</button>
+<span style="font-size:13px;line-height:18px;color:#C7C3BD;grid-column:1 / -1">Ink on --on-night-2 is 11.1:1. Camera screens only.</span>
+</div>
+<div style="background:#F7F4ED;border-radius:16px;padding:20px;display:grid;grid-template-columns:150px 1fr 1fr;gap:14px 16px;align-items:center;box-shadow:0 1px 2px rgba(34,29,24,0.08)">
+<span style="font-size:15px;font-weight:700">Row</span><a style="display:flex;align-items:center;gap:12px;min-height:72px;padding:12px 14px;border-top:1px solid #D9D3CA;border-bottom:1px solid #D9D3CA;color:#221D18;text-decoration:none" style-active="background:#EBE6DD"><i class="ph-bold ph-users-three" style="font-size:24px"></i><span style="flex:1;font-size:17px;font-weight:700">9 people in the watch window today</span><i class="ph-bold ph-caret-right" style="font-size:22px;color:#696259"></i></a><span style="display:flex;align-items:center;gap:12px;min-height:72px;padding:12px 14px;border-top:1px solid #D9D3CA;border-bottom:1px solid #D9D3CA;background:#EBE6DD"><i class="ph-bold ph-users-three" style="font-size:24px"></i><span style="flex:1;font-size:17px;font-weight:700">9 people in the watch window today</span><i class="ph-bold ph-caret-right" style="font-size:22px;color:#696259"></i></span>
+<span style="font-size:13px;line-height:18px;color:#4D463F;grid-column:1 / -1">Rows don't scale; only the fill changes.</span>
+</div>
+<div style="background:#F7F4ED;border-radius:16px;padding:20px;display:grid;grid-template-columns:150px 1fr 1fr;gap:14px 16px;align-items:center;box-shadow:0 1px 2px rgba(34,29,24,0.08)">
+<span style="font-size:15px;font-weight:700">Tab (BottomNav)</span><button style="height:78px;background:#FFFDFA;border:0;border-top:1px solid #D9D3CA;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#696259;font-size:14px;font-weight:600" style-active="background:#EBE6DD"><i class="ph-bold ph-package" style="font-size:26px"></i>Stock</button><span style="height:78px;background:#EBE6DD;border-top:1px solid #D9D3CA;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#696259;font-size:14px;font-weight:600"><i class="ph-bold ph-package" style="font-size:26px"></i>Stock</span>
+<span style="font-size:13px;line-height:18px;color:#4D463F;grid-column:1 / -1">--ink-3 on --sunken is 4.8:1. The laptop nav items use the same --sunken press.</span>
+</div>
+</div>
+</section>
+
+<section data-screen-label="Where used" style="width:2200px;padding:32px 72px 56px">
+<div style="display:flex;align-items:baseline;gap:14px;margin-bottom:20px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:18px;font-weight:700;color:#4D463F">A4.3</span><h2 style="margin:0;font-size:32px;line-height:38px;font-weight:800">Where used, and the rules</h2></div>
+<div style="display:grid;grid-template-columns:minmax(0,1020px) minmax(0,600px);gap:40px;align-items:start">
+<div role="table" style="background:#F7F4ED;border-radius:16px;padding:8px 24px 16px;font-size:15px;line-height:22px;box-shadow:0 1px 2px rgba(34,29,24,0.08)">
+<div role="row" style="display:grid;grid-template-columns:90px 1fr 1.6fr 1fr;gap:14px;padding:12px 0;border-bottom:2px solid #221D18;font-size:14px;font-weight:700;color:#4D463F"><span>Keyframe</span><span>Means</span><span>Where</span><span>Reduced-motion still</span></div>
+<div role="row" style="display:grid;grid-template-columns:90px 1fr 1.6fr 1fr;gap:14px;padding:10px 0;border-bottom:1px solid #D9D3CA"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-weight:700">rise</span><span>This just opened for you</span><span>Sheets, toast, intro cards, 17g and 19g panels, 19f steps</span><span>Appears in place</span></div>
+<div role="row" style="display:grid;grid-template-columns:90px 1fr 1.6fr 1fr;gap:14px;padding:10px 0;border-bottom:1px solid #D9D3CA"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-weight:700">land</span><span>A record just arrived</span><span>16b, 18c, 20c rows; 1g row; 9a new rows</span><span>No movement; tint and “Just now” stay</span></div>
+<div role="row" style="display:grid;grid-template-columns:90px 1fr 1.6fr 1fr;gap:14px;padding:10px 0;border-bottom:1px solid #D9D3CA"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-weight:700">tick</span><span>This number changed because of you</span><span>P1: Home numbers, 8d count, meter labels</span><span>Swaps in place</span></div>
+<div role="row" style="display:grid;grid-template-columns:90px 1fr 1.6fr 1fr;gap:14px;padding:10px 0;border-bottom:1px solid #D9D3CA"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-weight:700">fill</span><span>One more of a set is done</span><span>The meter segment just received, intro step bar, 18d bar just landed</span><span>Drawn filled</span></div>
+<div role="row" style="display:grid;grid-template-columns:90px 1fr 1.6fr 1fr;gap:14px;padding:10px 0;border-bottom:1px solid #D9D3CA"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-weight:700">draw</span><span>Checked, or connected</span><span>Check lines on 17g, 17h, 21a (all together), 0c loop, LoopStrip connector, 19f rail, 19c underlines (P1)</span><span>Drawn</span></div>
+<div role="row" style="display:grid;grid-template-columns:90px 1fr 1.6fr 1fr;gap:14px;padding:10px 0;border-bottom:1px solid #D9D3CA"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-weight:700">reveal</span><span>Made on this device just now</span><span>11b boxes, 14e and 22a QRs</span><span>Shown at once</span></div>
+<div role="row" style="display:grid;grid-template-columns:90px 1fr 1.6fr 1fr;gap:14px;padding:10px 0;border-bottom:1px solid #D9D3CA"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-weight:700">stamp</span><span>Saved, verified, approved</span><span>19g seal, LoopStrip step 4, 11b tags, 21a success; P1: 6c, 13b, 14c, Prepare “Done”</span><span>Static icon</span></div>
+<div role="row" style="display:grid;grid-template-columns:90px 1fr 1.6fr 1fr;gap:14px;padding:10px 0;border-bottom:1px solid #D9D3CA"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-weight:700">spin</span><span>Real work is running</span><span>Every circle-notch (M1)</span><span>Static icon plus the words</span></div>
+<div role="row" style="display:grid;grid-template-columns:90px 1fr 1.6fr 1fr;gap:14px;padding:10px 0;border-bottom:1px solid #D9D3CA"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-weight:700">blink</span><span>The AI is still writing</span><span>The 19c cursor, only while tokens stream</span><span>Solid block</span></div>
+<div role="row" style="display:grid;grid-template-columns:90px 1fr 1.6fr 1fr;gap:14px;padding:10px 0"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-weight:700">slide / pulse</span><span>Indeterminate progress</span><span>Progress</span><span>Pulse, as now</span></div>
+</div>
+<ol style="margin:0;padding:20px 24px 20px 44px;background:#F7F4ED;border-radius:16px;font-size:15px;line-height:22px;display:flex;flex-direction:column;gap:8px;box-shadow:0 1px 2px rgba(34,29,24,0.08)">
+<li><b>Only real events move:</b> a tap that landed, data that arrived, work that is running, a drawing made from real output. Nothing on load, scroll or hover; nothing loops unless work runs; rows never enter one by one.</li>
+<li><b>Only</b> transform, opacity, clip-path and stroke-dashoffset. Meters use scaleX.</li>
+<li><b>The resting CSS is the final state.</b> data-just on the real event, removed on animationend. No JS animation loops, no new rAF loops, no libraries.</li>
+<li><b>Never delay input or results.</b> No fake “Verifying…”. Stagger only real output sets, within --dur-draw.</li>
+<li><b>Never animate a clinical result.</b> 6a, 6b, 7a appear at once; 6a turns into 6b instantly. Only 6c's saved check may stamp. During the 60 s count only the timer, fill bar and trace move.</li>
+<li><b>Text twin:</b> every motion that reports news has its words in role="status".</li>
+<li><b>Flashing:</b> never more than 3 a second.</li>
+<li><b>One region at a time;</b> a screen's arrival ends within --dur-draw. Exits instant. Page changes are hard cuts.</li>
+<li><b>Banned:</b> confetti, fake progress, invented waits, scanning-line sweeps, “AI thinking” when nothing runs, sound.</li>
+<li><b>Haptics (P1):</b> navigator.vibrate(15), feature-detected, on save, confirm, start the watch, flag, receive. Never during Hinga. Never the only signal.</li>
+</ol>
+</div>
+</section>
+
+<section data-screen-label="Illustrations" style="width:2200px;padding:32px 72px 96px">
+<div style="display:flex;align-items:baseline;gap:14px;margin-bottom:6px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:18px;font-weight:700;color:#4D463F">A5</span><h2 style="margin:0;font-size:32px;line-height:38px;font-weight:800">I1, I2, I3 specimens</h2></div>
+<p style="margin:0 0 24px;max-width:1040px;font-size:17px;line-height:26px;color:#4D463F">Inline SVG, pasted into components, never into <span style="font-family:'Atkinson Hyperlegible Mono',monospace">public/</span>. One 2 px ink line weight, round caps and joins. Fills only --paper, --surface, --sunken; the logo's amber for one dot. No gradients, filters, raster, text or SMIL. aria-hidden; labels are HTML. Files in <span style="font-family:'Atkinson Hyperlegible Mono',monospace">svg/</span>.</p>
+<div style="display:grid;grid-template-columns:420px 520px 1080px;gap:28px;align-items:start">
+<div style="background:#F7F4ED;border-radius:16px;padding:20px;box-shadow:0 1px 2px rgba(34,29,24,0.08)"><div style="display:flex;align-items:baseline;justify-content:space-between"><span style="font-size:18px;font-weight:800">I1 · Brand tile</span><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px;font-weight:700">P0 · 863 B</span></div><div style="margin-top:18px;display:flex;align-items:flex-end;gap:16px"><dc-import name="BrandTile" size="28" hint-size="28px,28px"></dc-import><dc-import name="BrandTile" size="32" hint-size="32px,32px"></dc-import><dc-import name="BrandTile" size="36" hint-size="36px,36px"></dc-import><dc-import name="BrandTile" size="40" hint-size="40px,40px"></dc-import><dc-import name="BrandTile" size="96" hint-size="96px,96px"></dc-import></div><div style="margin-top:8px;display:flex;gap:16px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:12px;color:#4D463F"><span style="width:28px">28</span><span style="width:32px">32</span><span style="width:36px">36</span><span style="width:40px">40</span><span>96</span></div><p style="margin:14px 0 0;font-size:14px;line-height:20px;color:#4D463F">Ink rounded square (r 24 of 96), the paper “a” as an outlined path from Atkinson Hyperlegible Next 800 (OFL), the amber dot. No font needed. Home brand row 28, 0a 32, LaptopNav 36, M4 40, 0a fallback 96, og-image and video cards.</p></div>
+<div style="background:#F7F4ED;border-radius:16px;padding:20px;box-shadow:0 1px 2px rgba(34,29,24,0.08)"><div style="display:flex;align-items:baseline;justify-content:space-between"><span style="font-size:18px;font-weight:800">I2 · The loop, compact</span><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px;font-weight:700">P0 · 1.4 KB</span></div><div style="margin-top:16px;display:flex;flex-direction:column;gap:18px"><div><div style="font-size:13px;font-weight:700;color:#4D463F;margin-bottom:6px">All lit (0c, L10b)</div><dc-import name="LoopDrawing" hint-size="335px,96px"></dc-import></div><div><div style="font-size:13px;font-weight:700;color:#4D463F;margin-bottom:6px">“This phone” lit (Home report strip, P1, before instructions)</div><dc-import name="LoopDrawing" lit="phone" hint-size="335px,96px"></dc-import></div></div><p style="margin:14px 0 0;font-size:14px;line-height:20px;color:#4D463F">335 × 56. Nodes in the Phosphor Bold shapes of device-mobile, qr-code, laptop. Connectors 2 px with small arrowheads, pathLength 1 so they can draw. Unlit nodes and connectors are --line-strong (4.3:1 on paper), dashed.</p></div>
+<div style="display:flex;flex-direction:column;gap:28px">
+<div style="background:#F7F4ED;border-radius:16px;padding:20px;box-shadow:0 1px 2px rgba(34,29,24,0.08)"><div style="display:flex;align-items:baseline;justify-content:space-between"><span style="font-size:18px;font-weight:800">I2 · The loop, wide</span><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px;font-weight:700">P1 · 2.1 KB</span></div><img src="svg/loop-wide.svg" alt="" style="display:block;margin-top:16px;width:1040px;height:120px"><ol style="margin:4px 0 0;padding:0;list-style:none;width:1040px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));text-align:center;font-size:20px;line-height:26px;font-weight:700"><li>This phone</li><li>QR</li><li>RHU laptop</li><li>QR</li><li>This phone</li></ol><p style="margin:12px 0 0;font-size:14px;line-height:20px;color:#4D463F">1040 × 120. og-image, end card, pitch slide. Nodes scaled 1.75× with non-scaling 2 px strokes.</p></div>
+<div style="background:#F7F4ED;border-radius:16px;padding:20px;box-shadow:0 1px 2px rgba(34,29,24,0.08);display:grid;grid-template-columns:335px 1fr;gap:24px;align-items:center"><img src="svg/intro-barangay.svg" alt="" style="display:block;width:335px;height:160px"><div><div style="display:flex;align-items:baseline;justify-content:space-between"><span style="font-size:18px;font-weight:800">I3 · After the flood</span><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px;font-weight:700">P1 · 1.5 KB</span></div><p style="margin:10px 0 0;font-size:14px;line-height:20px;color:#4D463F">335 × 160. A house on stilts, the barangay health station with its amber lamp lit, a second house, the waterline across the posts over --sunken with a few hatch strokes, a fallen branch, a cell tower with a slash (no signal). Calm, not dramatic. No people, no rain, no red crosses. 0a and the video title card. Never moves.</p></div></div>
+</div>
+</div>
+<p style="margin:20px 0 0;max-width:1040px;font-size:14px;line-height:20px;color:#4D463F">Sizes are the drawing itself. The exported files in <span style="font-family:'Atkinson Hyperlegible Mono',monospace">svg/</span> also carry a content-credentials &lt;metadata&gt; block; paste only the drawing, or strip it with svgo. Standalone files use var(--token, #fallback), so they follow the tokens inline and still render as files.</p>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;autoplay&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Preview&quot;},&quot;previewReduced&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Preview&quot;}}">
+class Component extends DCLogic {
+  state = { cycle: 0 };
+  componentDidMount() {
+    this.t = setInterval(() => {
+      const ap = this.props.autoplay;
+      if (ap !== false && ap !== 'false') this.setState((s) => ({ cycle: s.cycle + 1 }));
+    }, 2600);
+  }
+  componentWillUnmount() { clearInterval(this.t); }
+  renderVals() {
+    const h = React.createElement;
+    const tr = (v) => v === true || v === 'true';
+    const sys = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const reduce = sys || tr(this.props.previewReduced);
+    const k = 'c' + this.state.cycle;
+    const EO = 'cubic-bezier(0.2,0.8,0.2,1)', EIO = 'cubic-bezier(0.4,0,0.2,1)';
+    const a = (n, ms, ease = EO, delay = 0, fill = 'backwards') => (reduce ? 'none' : n + ' ' + ms + 'ms ' + ease + ' ' + delay + 'ms ' + fill);
+    const loop = (n, ms, ease = 'linear') => (reduce ? 'none' : n + ' ' + ms + 'ms ' + ease + ' infinite');
+    const box = (kids, extra) => h('div', { style: Object.assign({ height: 120, borderRadius: 12, background: '#F7F4ED', border: '1px solid #D9D3CA', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, overflow: 'hidden', position: 'relative' }, extra || {}) }, kids);
+    const seg = (anim) => h('span', { style: { width: 32, height: 8, borderRadius: 3, background: anim ? '#EBE6DD' : '#221D18', position: 'relative', overflow: 'hidden' } }, anim ? h('span', { key: k, style: { position: 'absolute', inset: 0, background: '#221D18', transformOrigin: 'left', animation: a('am-fill', 400) } }) : null);
+    const rise = box(h('div', { key: k, style: { background: '#FFFDFA', border: '1px solid #D9D3CA', borderRadius: 12, padding: '14px 18px', fontSize: 16, fontWeight: 700, animation: a('am-rise', 200) } }, 'Sheet, toast, card'));
+    const land = box(h('div', { key: k, style: { background: '#DFF6E2', borderRadius: 8, padding: '10px 14px', width: 200, animation: a('am-land', 200) } }, h('div', { style: { fontSize: 16, fontWeight: 800 } }, 'Maligaya-D'), h('div', { style: { fontSize: 14, fontWeight: 700, color: '#1D6835' } }, 'Just now')));
+    const tick = box([
+      h('span', { key: 't' + k, style: { position: 'relative', display: 'inline-block', width: 22, height: 40, overflow: 'hidden', fontSize: 32, lineHeight: '40px', fontWeight: 800, fontVariantNumeric: 'tabular-nums' } },
+        reduce ? null : h('span', { style: { position: 'absolute', inset: 0, animation: a('am-tick-out', 160, EO, 300, 'forwards') } }, '4'),
+        h('span', { style: { position: 'absolute', inset: 0, animation: reduce ? 'none' : 'am-tick-in 160ms ' + EO + ' 300ms backwards' } }, '5')),
+      h('span', { key: 'of', style: { fontSize: 18, fontWeight: 700, marginLeft: -6 } }, 'of 5'),
+    ]);
+    const fill = box(h('span', { style: { display: 'flex', gap: 4 } }, seg(false), seg(false), seg(false), seg(false), seg(true)));
+    const draw = box([
+      h('i', { key: 'i' + k, className: 'ph-bold ph-check-circle', style: { fontSize: 28, color: '#1D6835', animation: a('am-wipe', 160) } }),
+      h('svg', { key: 's' + k, width: 120, height: 20, viewBox: '0 0 120 20', style: { fill: 'none', stroke: '#221D18', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' } },
+        h('path', { d: 'M2 10H116M110 4l6 6-6 6', pathLength: 1, style: { strokeDasharray: 1, animation: a('am-draw', 600, EIO, 160) } })),
+    ]);
+    const reveal = box([
+      h('span', { key: 'q' + k, style: { background: '#FFFFFF', padding: 6, borderRadius: 4 } }, h('img', { src: 'assets/sample-qr.png', alt: '', style: { display: 'block', width: 64, height: 64, imageRendering: 'pixelated', animation: a('am-reveal-qr', 600, EIO) } })),
+      h('span', { key: 'b' + k, style: { display: 'flex', flexDirection: 'column', gap: 8 } },
+        h('span', { style: { width: 84, height: 16, borderRadius: 2, outline: '2px solid #FFFDFA', boxShadow: '0 0 0 3px #221D18', animation: a('am-reveal-box', 200, EO, 0) } }),
+        h('span', { style: { width: 60, height: 16, borderRadius: 2, outline: '2px solid #FFFDFA', boxShadow: '0 0 0 3px #221D18', animation: a('am-reveal-box', 200, EO, 40) } })),
+    ]);
+    const stamp = box(h('i', { key: k, className: 'ph-bold ph-seal-check', style: { fontSize: 40, color: '#1D6835', animation: a('am-stamp', 200) } }));
+    const spin = box([h('i', { key: 'sp', className: 'ph-bold ph-circle-notch', style: { fontSize: 22, display: 'inline-block', animation: loop('am-spin', 1400) } }), h('span', { key: 'tx', style: { fontSize: 17, fontWeight: 700, marginLeft: -6 } }, 'Looking for a QR')]);
+    const blink = box(h('span', { style: { fontSize: 16 } }, '…the watch', h('span', { style: { display: 'inline-block', width: 9, height: 19, background: '#221D18', marginLeft: 2, verticalAlign: -3, animation: loop('am-blink', 1400) } })));
+    const track = (anim) => h('span', { style: { width: 180, height: 14, borderRadius: 999, background: '#EBE6DD', boxShadow: 'inset 0 0 0 1px #D9D3CA', overflow: 'hidden', position: 'relative', display: 'block' } }, h('span', { style: { position: 'absolute', top: 0, bottom: 0, left: 0, width: '30%', borderRadius: 999, background: '#221D18', animation: anim } }));
+    const slide = box(track(reduce ? loop('am-pulse', 1400, EIO) : loop('am-slide', 1400, EIO)));
+    const pulse = box(track(loop('am-pulse', 1400, EIO)), { border: '1px dashed #7B7369' });
+    const toast = box(h('div', { key: k, style: { display: 'flex', alignItems: 'center', gap: 8, padding: '12px 16px', background: '#221D18', color: '#FFFDFA', borderRadius: 12, fontSize: 15, fontWeight: 600, animation: a('am-rise', 200) } }, h('i', { className: 'ph-bold ph-check-circle', style: { fontSize: 18 } }), 'Saved on this phone.'), { alignItems: 'flex-end', paddingBottom: 16 });
+    const firstPaint = box(h('div', { key: k, style: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, animation: reduce ? 'none' : 'am-show-step 0s 300ms both' } },
+      h('svg', { width: 40, height: 40, viewBox: '0 0 96 96', 'aria-hidden': 'true' }, h('rect', { width: 96, height: 96, rx: 24, fill: '#221D18' }), h('path', { fill: '#F7F4ED', d: 'M42 69Q38.1 69 35 67.6Q32 66.3 30.2 63.7Q28.5 61.2 28.5 57.8Q28.5 53.2 31.6 50.3Q34.7 47.4 40.4 45.9Q46.2 44.4 54 44L54 42.9Q54 39.8 52.3 38.6Q50.6 37.4 47.7 37.4Q45.5 37.4 43.8 38.5Q42 39.6 41.4 41.5L30.6 37.8Q32.6 34.1 37.1 31.5Q41.6 28.9 48.4 28.9Q56.8 28.9 61.5 32.5Q66.2 36.2 66.2 44.1L66.2 53.9Q66.2 56.6 66.4 59.3Q66.5 62 66.8 64.3Q67.1 66.6 67.5 68.1L55.6 68.1L54.3 63.6Q52.2 66.7 49 67.9Q45.9 69 42 69ZM46.5 60.5Q48.8 60.5 50.5 59.8Q52.2 59.1 53.1 57.3Q54 55.6 54 52.4L54 51.4Q47.1 51.8 44.4 53.2Q41.8 54.7 41.8 56.7Q41.8 58.4 43.1 59.5Q44.5 60.5 46.5 60.5Z' }), h('circle', { cx: 76, cy: 63.8, r: 5.5, fill: '#F4C352' })),
+      h('span', { style: { display: 'flex', alignItems: 'center', gap: 6, fontSize: 15, color: '#4D463F' } }, h('i', { className: 'ph-bold ph-circle-notch', style: { fontSize: 18, color: '#221D18', display: 'inline-block', animation: loop('am-spin', 1400) } }), 'Opening AgapayMo…')), { flexDirection: 'column' });
+    const reduceNote = reduce ? 'Reduced motion is on (system setting or the Tweak): every live box shows its still.' : 'Specimens replay every 2.6 s. Turn on “previewReduced” in Tweaks to see every still.';
+    return { rise, land, tick, fill, draw, reveal, stamp, spin, blink, slide, pulse, toast, firstPaint, reduceNote };
+  }
+}
+</script>
+</body>
+</html>

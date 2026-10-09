@@ -1,8 +1,178 @@
-# AgapayMo design, pass 1 (Claude Design)
+# AgapayMo design, pass 1 + pass 2 (Claude Design)
 
 The product was renamed from Agapay to AgapayMo on Oct 9 (owner decision); the `.dc.html` canvases still show the old name, and COPY.md and this README use the new one.
 
 Handoff for Claude Code. Drop this folder into the repo as `design/`. Made with Claude Design during the event (Oct 9–10, 2026); list it in the repo README's "Designs" disclosure.
+
+## Pass 2: start here
+
+Pass 2 adds life and purpose on top of pass 1. It is not a redesign: every pass 1 rule, token and component still holds. New frames carry IDs that continue pass 1's numbering and a P0 / P1 / P2 tag. Each animated frame has a “·m” companion showing start, end and the reduced-motion still, and a note with the keyframe, token, data source and still. Pass 2 sections sit at the top of each page, above pass 1.
+
+### P0 build order (about 3 hours across three builders; if time runs short, cut from the bottom)
+
+1. Motion foundation, CSS only: the tokens and keyframes below, the base.css delay fix, M1 `.spin`, M2 press states, M3 toast `rise`, M4 first paint, the 19c cursor `blink`, the I1 brand tile. See `AgapayMo Motion.dc.html`, M4 in `Agapay Local AI States.dc.html`, `BrandTile.dc.html`.
+2. 11b: the box reader's line boxes on the photo (Phone 3).
+3. Home: 1e story-led Home, 1f (AI not downloaded), 1g (instructions row and sheet), the date fix, the “Got a QR from the RHU? Scan it” link (Phone 1).
+4. Intro 0a–0c and L10b (`AgapayMo Phone 0 Intro.dc.html`, Phone 4). Until I3 ships, 0a shows the I1 tile at 96 px.
+5. Laptop core: LaptopNav v2, the LoopStrip, 16b, 17g, 17h, 19g (Laptop).
+6. 21a: minimum restyle of Receive RHU instructions, the demo's last beat (Phone 4).
+7. Laptop rest: 18c (with the B22 pill variant), 19f, 19h.
+8. I2: the loop drawing on 0c (`LoopDrawing.dc.html`). Until it ships, 0c shows its labels as an ordered list joined by `arrow-right` icons.
+
+### Settled
+
+- **Name:** “AgapayMo” in all copy, page titles (`{Screen} · AgapayMo`), LaptopNav and the 404. Every pass 1 string is renamed in the frames and COPY.md. Design file names stay as they are.
+- **Age bands:** `Under 2 months`, `2 to 11 months`, `1 to 4 years` everywhere (see Age bands below).
+- **--device** keeps its pass 1 scope: only the local-AI indicator and its sheet. AI output drawn on screen (box-reader boxes, the breathing trace) is paper and ink.
+- **Lead corrections (Oct 10):**
+  - 19c P1: the number underlines are ink (they may play `draw`); the check line stays `info` “No new numbers found; check each number against the plan steps”. No --ok, no green tint, never “All numbers match”.
+  - 4b: the trace panel's midline is 1 px --disabled-night-bg. No raw hex, no new colors.
+  - LocalStatus v2 is dropped. LocalStatus stays as in pass 1, shown only once the AI is ready; 1f's AI row covers a phone without the AI.
+- **No mascot.** The live URL is written `{live URL}` until hosting is up. Hinga in the live demo is the Lead's call; nothing in the intro, Home or the laptop depends on it.
+- **Numbers** are computed from records on the device; samples are in braces in COPY.md. The sample timeline: four barangays in by 9:20 AM, Maligaya-D lands at 10:48 AM, approval at 10:52 AM, the phone receives at 11:05 AM.
+
+### New files
+
+| File | What |
+|---|---|
+| `AgapayMo Phone 0 Intro.dc.html` | 0a (I1 fallback), 0a·I3, 0b, 0c (AI ready), 0c·2 (AI not downloaded), with motion |
+| `AgapayMo Motion.dc.html` | Tokens, every keyframe live next to its still, M1–M4, press states, where-used table, rules, I1–I3 specimens |
+| `BrandTile.dc.html` | I1. Build as one `BrandTile` component with a `size` prop (28 / 32 / 36 / 40 / 96) |
+| `LoopDrawing.dc.html` | I2 compact with its HTML labels. Props: `lit` (`all` / `phone`), `state` (`drawn` / `start`) |
+| `LoopStrip.dc.html` | The laptop LoopStrip. Props: `current` (1–5), `received` (0–5), `approved`, `approvedAt`, `planSteps`, `motion` (design-only) |
+| `svg/` | `brand-tile.svg` (P0), `loop-compact.svg` (P0), `loop-wide.svg` (P1), `intro-barangay.svg` (P1) |
+
+Pass 2 frames on existing pages: Phone 1 (1e, 1f, 1g, 1g·sheet, 1e·rows), Phone 3 (11b, 11b·2 “Please check”, 11b·3 field focus), Phone 4 (21a, 21a·2, 21a·3, L10b), Local AI States (M4), Laptop (Nav v2, LoopStrip states, 16b at 4 and 5 of 5, 17g, 17h, 18c, 19c·d, 19f, 19g, 19h).
+
+### Motion: tokens, the base.css fix, keyframes (paste as is)
+
+```css
+/* tokens.css */
+:root {
+  --dur-press: 90ms;    /* a button, row or chip is pressed */
+  --dur-quick: 160ms;   /* a check drawn, a number changing, an icon stamp */
+  --dur-base: 200ms;    /* something arrives: sheet, toast, panel, card */
+  --dur-slow: 400ms;    /* data lands: a meter segment fills, a row lands */
+  --dur-draw: 600ms;    /* a drawing completes; the longest anything runs */
+  --dur-loop: 1400ms;   /* real work running: spinner, indeterminate bar, cursor */
+  --stagger: 40ms;      /* between items drawn from one real result; total capped at --dur-draw */
+  --rise: 8px;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+}
+@media (prefers-reduced-motion: reduce) { :root { --stagger: 0ms; } }
+
+/* base.css: today the reduce block zeroes durations but not delays */
+@media (prefers-reduced-motion: reduce) {
+  *:not(.motion-safe), *:not(.motion-safe)::before, *:not(.motion-safe)::after {
+    animation-delay: 0s !important;
+    transition-delay: 0s !important;
+  }
+}
+
+/* keyframes: "from" only, so the resting CSS is always the final state */
+@keyframes rise       { from { transform: translateY(var(--rise)); opacity: 0; } }
+@keyframes land       { from { transform: translateY(calc(var(--rise) * -1)); opacity: 0; } }
+@keyframes tick-out   { to   { transform: translateY(-100%); } }
+@keyframes tick-in    { from { transform: translateY(100%); } }
+@keyframes fill       { from { transform: scaleX(0); } }
+@keyframes draw       { from { stroke-dashoffset: 1; } }            /* paths carry pathLength="1" */
+@keyframes wipe       { from { clip-path: inset(0 100% 0 0); } }    /* "draw" on a Phosphor icon */
+@keyframes reveal-qr  { from { clip-path: inset(0 0 100% 0); } }
+@keyframes reveal-box { from { opacity: 0; transform: scale(0.96); } }
+@keyframes stamp      { from { transform: scale(1.08); opacity: 0; } }
+@keyframes spin       { to   { transform: rotate(360deg); } }
+@keyframes blink      { 0%, 49.99% { opacity: 1; } 50%, 100% { opacity: 0; } }
+@keyframes show       { from { visibility: hidden; } to { visibility: visible; } }
+
+/* set data-just when the real event fires; remove it on animationend */
+[data-just="rise"]       { animation: rise var(--dur-base) var(--ease-out) backwards; }
+[data-just="land"]       { animation: land var(--dur-base) var(--ease-out) backwards; }
+[data-just="fill"]       { transform-origin: left; animation: fill var(--dur-slow) var(--ease-out) backwards; }
+[data-just="draw"]       { stroke-dasharray: 1; animation: draw var(--dur-quick) var(--ease-out) backwards; }
+[data-just="draw-line"]  { stroke-dasharray: 1; animation: draw var(--dur-draw) var(--ease-in-out) backwards; }
+[data-just="wipe"]       { animation: wipe var(--dur-quick) var(--ease-out) backwards; }
+[data-just="reveal"]     { animation: reveal-qr var(--dur-draw) var(--ease-in-out) backwards; }
+[data-just="reveal-box"] { animation: reveal-box var(--dur-base) var(--ease-out) backwards;
+                           animation-delay: calc(var(--i) * var(--stagger)); }
+[data-just="stamp"]      { animation: stamp var(--dur-base) var(--ease-out) backwards; }
+.tick { display: inline-grid; overflow: clip; }
+.tick > * { grid-area: 1 / 1; }
+.tick > [data-old] { animation: tick-out var(--dur-quick) var(--ease-out) forwards; }
+.tick > [data-new] { animation: tick-in var(--dur-quick) var(--ease-out) backwards; }
+.spin { animation: spin var(--dur-loop) linear infinite; }                 /* M1 */
+.cursor[data-streaming] { animation: blink var(--dur-loop) linear infinite; }
+.first-paint { animation: show 0s 300ms both; }                            /* M4: add .motion-safe */
+
+/* M2 press states */
+.btn { transition: transform var(--dur-press) var(--ease-out); }
+.btn:active { transform: scale(0.98); }
+.btn-primary:active { background: var(--night); }
+.on-night .btn-primary:active { background: var(--on-night-2); }
+.btn-secondary:active, .row:active, .chip:active, .tab:active { background: var(--sunken); }
+@media (prefers-reduced-motion: reduce) { .btn:active { transform: none; } }
+```
+
+### Motion rules (A4)
+
+1. Only real events move: a tap that landed, data that arrived, work that is running, a drawing made from real output. Nothing on load, scroll or hover (hover stays a solid color change). Nothing loops unless real work runs. Rows never enter one after another.
+2. Only transform, opacity, clip-path and stroke-dashoffset. Meters use scaleX, never width.
+3. The resting CSS is the final state; keyframes only play the way in. Trigger with `data-just`, remove on animationend. No JS animation loops, no new requestAnimationFrame loops, no libraries. The Hinga canvas and the LLM stream stay the only JS-driven drawing.
+4. Never delay input or results. No fake “Verifying…”. Stagger only real output sets (OCR boxes, the rule rail), within --dur-draw.
+5. Never animate a clinical result: 6a, 6b, 7a appear at once, 6a turns into 6b instantly. Only 6c's saved check may stamp. During the 60 s count only the timer, the fill bar and the trace move; LocalStatus does not pulse.
+6. Every motion that reports news has its words in a role="status" region (COPY.md lists them).
+7. Nothing flashes more than 3 times a second (blink is 0.7 s on, 0.7 s off).
+8. One moving region at a time; a screen's arrival finishes within --dur-draw. Exits are instant. Page changes stay hard cuts.
+9. Banned: confetti, fake progress, invented waits, scanning-line sweeps, “AI thinking” when nothing runs, sound.
+10. Haptics (P1): `navigator.vibrate(15)`, feature-detected, on save, confirm, start the watch, flag, receive. Never during Hinga framing or the count. Never the only signal.
+
+| Keyframe | Means | Where | Reduced-motion still |
+|---|---|---|---|
+| rise | This just opened for you | Sheets, toast, intro cards, 17g and 19g panels, 19f steps | Appears in place |
+| land | A record just arrived | 16b, 18c, 20c rows; 1g row; 9a new rows | No movement; tint and “Just now” stay |
+| tick | This number changed because of you | P1: Home numbers, 8d count, meter labels | Swaps in place |
+| fill | One more of a set is done | The segment just received, intro step bar, 18d bar just landed | Drawn filled |
+| draw | Checked, or connected | 17g, 17h, 21a checks (together), 0c loop, LoopStrip connector, 19f rail, 19c underlines (P1) | Drawn |
+| reveal | Made on this device just now | 11b boxes, 14e and 22a QRs | Shown at once |
+| stamp | Saved, verified, approved | 19g seal, LoopStrip step 4, 11b tags, 21a success; P1: 6c, 13b, 14c, Prepare “Done” | Static icon |
+| spin | Real work is running | Every circle-notch (M1) | Static icon plus the words |
+| blink | The AI is still writing | The 19c cursor, only while tokens stream | Solid block |
+| slide / pulse | Indeterminate progress | Progress | Pulse, as now |
+
+### Component specs (pass 2)
+
+- **LoopStrip** (laptop, every `/municipal` screen): a 64 px band under the h1 and sub line, the full width of the main column, --surface, 1 px --line bottom border. An `<ol>` of five steps, status only, never links. Each step: 22 px icon, label 14/20 600, status 14/20 --ink-2. Steps: `device-mobile` Reports in (“4 of 5” + a mini meter of 5 × 24 × 6 segments, 4 px gaps; received ink, waiting --sunken with a 1 px dashed --line-strong edge), `table` Merged, `list-numbers` Plan, `seal-check` Approved, `qr-code` Back to the barangay. Done: `check-circle` in --ok replaces the icon. Current screen: aria-current="step", label 700, a 32 × 4 ink bar on the band's bottom edge. Not reached: --ink-3. Connectors: 2 px --line-strong with an 8 px chevron; dashed while the next step isn't reached. Merged and Plan count as done once one report is in (the rules run instantly).
+- **Home task row** (1e): rows with dividers on paper, never cards. Min 72 px, 16 px vertical padding. Left: 40 px circle (--sunken; status rows use their tint) with a 24 px icon. Middle: a task sentence in body-lg 700 with the number inside it (tabular figures), meta in body --ink-2. Right: 22 px `caret-right`. The whole row is the link and presses to --sunken. A row shows only when its records call for it, in this order: AI, Instructions, Watch, Expired, Expiring, Flag, Send. The breathing line under the rows is not a row (no divider, caret or press). All variants with singular and plural: `1e·rows` on Phone 1.
+- **Check lines** (17g, 17h, 21a): a list in a --surface panel, one line per check in the order the device runs them, 22 px icon + 17/25 text. Passed: `check-circle` --ok. Failed: `x-circle` --bad, the line in 700, then the existing body copy with the next step. Info: `info` in ink. The list stops at the line that failed; never a check for a line that didn't run. Keys in mono 16/22 --ink-2 under their line. Results show the moment they exist; the icons draw together (clip-path wipe, --dur-quick); the panel rises. role="alert" for failures, role="status" otherwise.
+- **11b overlay:** an aria-hidden, non-interactive SVG over a 335 × 240 view (radius 12, --night-2 behind). One rectangle per line the reader returned, in reading order: 2 px --surface outline, 1 px --ink outer halo, radius 2. “Please check” field: its box is a 2 px dashed --warn-fill outline, same halo. “Not read”: no box, no tag. Tags: 24 px ink circles with 14/700 paper mono numerals in the view's left margin, centered on their line (field order 1 Medicine, 2 Strength, 3 Lot, 4 Expiry; two fields from one line share a stacked tag). The same tag sits before each field's label. Focusing a field: its box gets a 4 px ink outline with a 2 px paper halo and its tag inverts (paper, ink numeral, 2 px ink edge); other boxes and tags dim to 50%. Boxes are never tap targets. Reveal in reading order (--stagger), then tags stamp, all within --dur-draw; fields are editable from the start.
+
+### SVG art
+
+- One ink line weight (2 px at 1x), round caps and joins. Fills only --paper, --surface, --sunken; the logo's amber for one dot. No gradients, filters, blur, raster, text or SMIL. Colors as `var(--token, #fallback)` so they follow the tokens inline and still render as files. aria-hidden, labels in HTML. A fixed height so nothing shifts. Any draw-in is a CSS class on pathLength="1" paths, so reduced motion applies. Paste into components, never into `public/`.
+- The I1 “a” is the outline of Atkinson Hyperlegible Next 800 (SIL OFL 1.1), so the tile needs no font.
+
+| File | Drawing size | Used on | P |
+|---|---|---|---|
+| `svg/brand-tile.svg` (I1) | 863 B | Home brand row 28, 0a 32, LaptopNav 36, M4 40, 0a fallback 96, og-image, video cards | P0 |
+| `svg/loop-compact.svg` (I2, 335 × 56) | 1.4 KB | 0c (P0); Home report strip, L10b (P1) | P0 |
+| `svg/loop-wide.svg` (I2, 1040 × 120) | 2.1 KB | og-image, end card, pitch slide | P1 |
+| `svg/intro-barangay.svg` (I3, 335 × 160) | 1.5 KB | 0a, video title card | P1 |
+
+The exported files also carry a content-credentials `<metadata>` block (about 7.8 KB). Paste only the drawing, or strip it with svgo, to stay under 4 KB.
+
+### Flags (where pass 2 frames differ from the brief, or need the Lead)
+
+1. **11b zoom.** The brief letterboxes the whole photo. On a real box photo the label lines are about 10 px tall at 335 px, with no room for 24 px tags (11b·m shows it). The view fits the lines' bounding box plus a margin into 335 × 240, never past 2×; a photo that is already all label shows whole.
+2. **11b tag position.** A tag on the box's top-left corner covers the line's first letters and the line above, so tags sit in the view's left margin, centered on their line.
+3. **draw on icons.** Phosphor Bold glyphs are filled shapes, so `draw` on a check icon is a clip-path wipe; stroke-dashoffset is for real SVG lines.
+4. **M4 and reduced motion.** The new delay rule would zero M4's 300 ms wait; mark M4 `.motion-safe` (a visibility step, not motion).
+5. **Sample receive time.** The brief's sample “Received Fri, Oct 9, 10:45 PM” comes before the 10:52 AM approval; the frames use Sat, Oct 10, 11:05 AM.
+6. **Tinted rows.** On the 1g --ok-tint row the icon circle is --surface (--sunken reads muddy on green). On 16b·2 the Received pill on the tinted row takes the B22 edge, like the Priority pill.
+7. **Text-button press** is not in the brief; we use --ink-2 and a 2 px underline plus the button scale.
+
+### AI disclosure
+
+SVG art drawn with Claude Design.
 
 ## About these files
 
@@ -18,13 +188,13 @@ The `.dc.html` files are **design references built in HTML**, not production cod
 
 | File | Screens |
 |---|---|
-| `AgapayMo Design System.dc.html` | Tokens, contrast pairs, type scale, spacing, radius, elevation, focus and touch rules, icon list, components, app icon, manifest |
-| `AgapayMo Local AI States.dc.html` | L1a–L1b first-run download, L2 not enough space, L3 keep files, L4 getting ready, L5 ready sheet, L6a–L6b working, L7 offline sheet, L8a can't run, L8b count by hand, L9a–L9c errors, L10 Privacy & AI (brief screen 15) |
-| `AgapayMo Phone 1 Home and Hinga.dc.html` | 1a–1d Home (default, loading, empty, error), 2a age, 3a–3d framing and camera permission, 4a counting, 5a–5e refusals, 6a–6c fast / URGENT / saved, 7a not fast |
-| `AgapayMo Phone 2 Flood and Watch.dc.html` | 8a–8c log a flood, mark exposed, confirm · 9a–9c watch list, row sheet, empty |
-| `AgapayMo Phone 3 Stock.dc.html` | 10a scan · 11a review (L11, the AI result review) · 12a–12b stock list, empty · 13a–13b exposure and stock, flagged |
-| `AgapayMo Phone 4 Send and Privacy.dc.html` | 14a–14c what leaves, QR, shared · 404 |
-| `AgapayMo Laptop.dc.html` | 16 home · 17a–17f scan and its results · 18–18b merged view · 19a–19e plan and AI panel states · 20–20b approval log |
+| `Agapay Design System.dc.html` | Tokens, contrast pairs, type scale, spacing, radius, elevation, focus and touch rules, icon list, components, app icon, manifest |
+| `Agapay Local AI States.dc.html` | L1a–L1b first-run download, L2 not enough space, L3 keep files, L4 getting ready, L5 ready sheet, L6a–L6b working, L7 offline sheet, L8a can't run, L8b count by hand, L9a–L9c errors, L10 Privacy & AI (brief screen 15) |
+| `Agapay Phone 1 Home and Hinga.dc.html` | 1a–1d Home (default, loading, empty, error), 2a age, 3a–3d framing and camera permission, 4a counting, 5a–5e refusals, 6a–6c fast / URGENT / saved, 7a not fast |
+| `Agapay Phone 2 Flood and Watch.dc.html` | 8a–8c log a flood, mark exposed, confirm · 9a–9c watch list, row sheet, empty |
+| `Agapay Phone 3 Stock.dc.html` | 10a scan · 11a review (L11, the AI result review) · 12a–12b stock list, empty · 13a–13b exposure and stock, flagged |
+| `Agapay Phone 4 Send and Privacy.dc.html` | 14a–14c what leaves, QR, shared · 404 |
+| `Agapay Laptop.dc.html` | 16 home · 17a–17f scan and its results · 18–18b merged view · 19a–19e plan and AI panel states · 20–20b approval log |
 | `StatusBar`, `BottomNav`, `LocalStatus`, `LaptopNav` `.dc.html` | Shared pieces the screens import. They map to app components (see below) |
 | `support.js` | Preview runtime only. Not part of the app |
 | `COPY.md` | Every string, by screen |
@@ -57,7 +227,7 @@ L5, L7, 8c and 9b are sheets over their screen, not routes. Loading and error st
 - **LocalStatus**: one quiet text line, icon + word, no pill and no border. Two buttons: `Runs on this phone` (laptop: `Runs on this laptop`) in --device with `device-mobile` / `laptop`, and `Offline` in --ink-2 with `cloud-slash`. 14/20 600, icons 16, 16 px apart, dotted underline (1 px, offset 4 px) because each opens a sheet (L5 / L7). Each has a 48 px tap area: the 20 px line plus 14 px of invisible padding above and below (negative margin, so the layout doesn't move). Shown only once the AI is ready. When online, only the device part shows. On camera screens: --device-on-night and --on-night-2.
 - **BottomNav**: 78 px tall, --surface, 1 px --line top border, 5 equal flat tabs: Home (`house`), Watch list (`users-three`), Hinga (`wind`), Stock (`package`), Send (`qr-code`). Labels 14 px. Active: ink, Fill icon, 700, a 32 × 4 ink bar at the top. Inactive: --ink-3, Bold icon, 600. Nothing is raised: Home's Check breathing button is the big way into Hinga. Hidden inside the Hinga, scan and send flows.
 - **Camera screens**: the status bar and top bar sit on a solid --night band (96 px; 132 px on the counting screen, which has the timer). Never put text or the indicator straight over the camera image.
-- **LaptopNav**: 248 px sidebar, --surface, 1 px --line right border. Brand block (36 px ink "a" tile + "AgapayMo" / "Municipal view"), then items (48 px tall, radius 10): Scan QR codes (`scan`), Merged view (`table`), Plan (`list-numbers`), Approval log (`clock-counter-clockwise`). Active item gets a --sunken fill and 700. LocalStatus and a Privacy & AI link at the bottom.
+- **LaptopNav**: 248 px sidebar, --surface, 1 px --line right border. Brand block (pass 2: the I1 brand tile at 36 px + "AgapayMo" / "Municipal view"), then items (48 px tall, radius 10): Scan QR codes (`scan`), Merged view (`table`), Plan (`list-numbers`), Approval log (`clock-counter-clockwise`). Active item gets a --sunken fill and 700. LocalStatus and a Privacy & AI link at the bottom.
 - **Screen header (main phone screens)**: title 26/32 700, then a place line 16/24 --ink-2 (`San Isidro Demo · Sample data`), then LocalStatus 8 px below. 20 px side padding. Home adds a 48 px shield button (`shield-check`) on the right that opens Privacy & AI.
 - **Flow top bar**: 56 px. A 48 px back or close button on the left, LocalStatus on the right. Step text under it, 15 px 700 --ink-2, with a small segmented step bar (28 × 6 segments).
 - **Buttons**: 56 px tall, radius 12, 18/24 700, full width on phone.
@@ -92,7 +262,7 @@ L5, L7, 8c and 9b are sheets over their screen, not routes. Loading and error st
 - **Compare:** the reasons are the `reviewExposureStock()` strings, verbatim. One action, flag. Never a dose.
 - **Send:** 14a lists all 14 schema counts already suppressed (`src/qr/`). The QR is pure black on white with a quiet zone; keep the screen awake while it shows. 14c is the BHW's own confirmation (the phone can't know it was scanned).
 - **Laptop:** the webcam stays on between scans. The banner outcomes are success, already received, not valid, and newer replaces older. Merged totals add the age bands, so any total that includes "<5" cells is a range with an en dash (`formatRange`).
-  - The plan comes from fixed rules and always works. The AI panel only drafts wording. Every number in the draft is checked against the plan: matches are tinted --ok-tint and underlined 2 px --ok. A mismatch gets a dashed --warn outline and a warning icon, the check line turns amber and names it, and Approve is disabled until it matches or the draft is written again (19e).
+  - The plan comes from fixed rules and always works. The AI panel only drafts wording. Every number in the draft is checked against the plan. A number the plan has gets a 2 px ink underline, never --ok or a tint (being in the plan doesn't prove it sits in the right place). With no new number the check line is `info` “No new numbers found; check each number against the plan steps” in --ink-2; it never says that all numbers match. A mismatch gets a dashed --warn outline and a warning icon, the check line turns amber and names it, and Approve is disabled until it matches or the draft is written again (19e).
   - Approve saves the plan and the final text to the log. The approver is a role, never a name.
 
 ## Tokens

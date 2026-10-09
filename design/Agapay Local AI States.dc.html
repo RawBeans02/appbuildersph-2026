@@ -9,7 +9,7 @@
 <x-dc>
 <helmet>
 <meta name="design_doc_mode" content="canvas">
-<title>Agapay · Local AI states</title>
+<title>AgapayMo · Local AI states</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;500;700&family=Atkinson+Hyperlegible+Next:wght@400;500;600;700;800&display=swap">
 <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
@@ -25,7 +25,22 @@ button{font-family:inherit}
 
 <section data-screen-label="Local AI header" style="padding:64px 72px 16px;width:1800px">
 <h1 style="margin:0 0 10px;font-size:48px;line-height:54px;font-weight:800">Local AI states</h1>
-<p style="margin:0;max-width:940px;font-size:19px;line-height:28px;color:#4D463F">The states every on-device model goes through, applied to Agapay's three phone models. Route <span style="font-family:'Atkinson Hyperlegible Mono',monospace">/prepare</span> for L1–L4. The “Runs on this phone” line appears only once the AI is ready (L5 onward). MB figures come from the model registry (<span style="font-family:'Atkinson Hyperlegible Mono',monospace">offlineModels.ts</span>); only the box reader's 26.9 MB is measured so far, the other two sizes are placeholders. Laptop model states are in <a href="Agapay Laptop.dc.html">Laptop</a>, screen 19.</p>
+<p style="margin:0;max-width:940px;font-size:19px;line-height:28px;color:#4D463F">The states every on-device model goes through, applied to AgapayMo's three phone models. Route <span style="font-family:'Atkinson Hyperlegible Mono',monospace">/prepare</span> for L1–L4. The “Runs on this phone” line appears only once the AI is ready (L5 onward). MB figures come from the model registry (<span style="font-family:'Atkinson Hyperlegible Mono',monospace">offlineModels.ts</span>); only the box reader's 26.9 MB is measured so far, the other two sizes are placeholders. Laptop model states are in <a href="Agapay Laptop.dc.html">Laptop</a>, screen 19.</p>
+</section>
+
+<section data-screen-label="Pass 2 First paint" style="padding:32px 72px 56px">
+<div style="display:flex;align-items:baseline;gap:14px;margin-bottom:6px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:18px;font-weight:700;color:#4D463F">M4</span><h2 style="margin:0;font-size:32px;line-height:38px;font-weight:800">Pass 2 · First paint</h2></div>
+<p style="margin:0 0 28px;max-width:1000px;font-size:17px;line-height:26px;color:#4D463F">The bare “Loading…” route fallback becomes a paper screen. It appears only if loading takes longer than 300 ms, by a stepped visibility delay, never a fade. Phone and laptop share it (centered in the window on the laptop).</p>
+<div style="display:flex;flex-wrap:wrap;gap:56px 48px;align-items:flex-start;filter:{{ artFilter }}">
+<figure id="M4" style="margin:0;width:375px;display:flex;flex-direction:column;gap:14px">
+<figcaption><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700;background:#221D18;color:#F7F4ED;padding:3px 8px;border-radius:6px">M4</span><span style="font-size:18px;font-weight:800">Opening AgapayMo</span><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px;font-weight:700;border:1.5px solid #221D18;border-radius:6px;padding:1px 6px">P0</span></div><div style="margin-top:6px;font-size:14px;line-height:20px;color:#4D463F">I1 tile at 40 px, a spinning circle-notch, “Opening AgapayMo…” in 16/24 --ink-2. Nothing else, no nav.</div></figcaption>
+<div data-screen-label="M4 First paint" style="width:375px;height:812px;position:relative;overflow:hidden;background:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<dc-import name="StatusBar" online="{{ online }}" hint-size="375px,40px"></dc-import>
+<div role="status" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding-bottom:40px"><dc-import name="BrandTile" size="40" hint-size="40px,40px"></dc-import><span style="display:flex;align-items:center;gap:8px;font-size:16px;line-height:24px;color:#4D463F"><i class="ph-bold ph-circle-notch" style="font-size:20px;color:#221D18"></i>Opening AgapayMo…</span></div>
+</div>
+<dl style="margin:0;display:grid;grid-template-columns:64px minmax(0,1fr);gap:4px 10px;font-size:14px;line-height:20px;color:#4D463F"><dt style="font-weight:700;color:#221D18">Delay</dt><dd style="margin:0"><span style="font-family:'Atkinson Hyperlegible Mono',monospace">animation: show 0s 300ms both</span> with <span style="font-family:'Atkinson Hyperlegible Mono',monospace">@keyframes show { from { visibility: hidden } to { visibility: visible } }</span>. Fast loads never flash it.</dd><dt style="font-weight:700;color:#221D18">Motion</dt><dd style="margin:0">M1 spin (--dur-loop, linear) while the chunk loads. Still: static icon plus the words.</dd><dt style="font-weight:700;color:#221D18">Flag</dt><dd style="margin:0">The global reduced-motion rule zeroes delays, which would make it show at once under reduced motion. Mark it <span style="font-family:'Atkinson Hyperlegible Mono',monospace">.motion-safe</span> so the 300 ms wait (a visibility step, not motion) survives.</dd></dl>
+</figure>
+</div>
 </section>
 
 <section data-screen-label="L1-L4 Download" style="padding:32px 72px 56px">
@@ -38,8 +53,8 @@ button{font-family:inherit}
 <div data-screen-label="L1a Prepare intro" style="width:375px;height:812px;position:relative;overflow:hidden;background:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
 <dc-import name="StatusBar" online="{{ true }}" hint-size="375px,40px"></dc-import>
 <div style="flex:1;min-height:0;overflow:hidden;padding:28px 20px 0">
-<h1 style="margin:0;font-size:28px;line-height:34px;font-weight:800">Get Agapay ready for no signal</h1>
-<p style="margin:10px 0 0;font-size:18px;line-height:26px;text-wrap:pretty">Download the AI once, so Agapay works without internet. After this, nothing you do needs a signal.</p>
+<h1 style="margin:0;font-size:28px;line-height:34px;font-weight:800">Get AgapayMo ready for no signal</h1>
+<p style="margin:10px 0 0;font-size:18px;line-height:26px;text-wrap:pretty">Download the AI once, so AgapayMo works without internet. After this, nothing you do needs a signal.</p>
 <div style="margin-top:24px;border-top:1px solid #D9D3CA">
 <div style="display:flex;justify-content:space-between;gap:12px;padding:14px 0;border-bottom:1px solid #D9D3CA"><div><div style="font-size:18px;line-height:24px;font-weight:700">Breathing check (Hinga)</div><div style="font-size:15px;line-height:22px;color:#4D463F">Counts breaths with the camera</div></div><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:16px;font-weight:500;white-space:nowrap">15.2 MB</span></div>
 <div style="display:flex;justify-content:space-between;gap:12px;padding:14px 0;border-bottom:1px solid #D9D3CA"><div><div style="font-size:18px;line-height:24px;font-weight:700">Crying check</div><div style="font-size:15px;line-height:22px;color:#4D463F">Hears if the child is crying</div></div><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:16px;font-weight:500;white-space:nowrap">13.0 MB</span></div>
@@ -58,7 +73,7 @@ button{font-family:inherit}
 <dc-import name="StatusBar" online="{{ true }}" hint-size="375px,40px"></dc-import>
 <div style="flex:1;min-height:0;overflow:hidden;padding:28px 20px 0">
 <h1 style="margin:0;font-size:28px;line-height:34px;font-weight:800">Downloading the AI</h1>
-<p style="margin:10px 0 0;font-size:18px;line-height:26px">So Agapay works without internet. Keep this screen open.</p>
+<p style="margin:10px 0 0;font-size:18px;line-height:26px">So AgapayMo works without internet. Keep this screen open.</p>
 <div style="margin-top:28px;display:flex;justify-content:space-between;align-items:baseline;gap:12px"><span style="font-size:17px;font-weight:700">1 of 3: Breathing check</span><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:16px;font-weight:500;white-space:nowrap">9.8 / 55.1 MB</span></div>
 <div role="progressbar" aria-valuenow="17" aria-label="Download progress" style="margin-top:10px;height:14px;border-radius:999px;background:#EBE6DD;overflow:hidden;box-shadow:inset 0 0 0 1px #D9D3CA"><div style="width:17%;height:100%;background:#221D18;border-radius:999px"></div></div>
 <div style="margin-top:8px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:28px;line-height:32px;font-weight:700">17%</div>
@@ -80,12 +95,12 @@ button{font-family:inherit}
 <span style="width:64px;height:64px;border-radius:999px;background:#FDEEC5;color:#805216;display:flex;align-items:center;justify-content:center"><i class="ph-bold ph-hard-drives" style="font-size:32px"></i></span>
 <h1 style="margin:18px 0 0;font-size:28px;line-height:34px;font-weight:800">Not enough space on this phone</h1>
 <div style="margin-top:24px;display:grid;grid-template-columns:1fr 1fr;border-top:1px solid #D9D3CA;border-bottom:1px solid #D9D3CA">
-<div style="padding:14px 0"><div style="font-size:15px;font-weight:600;color:#4D463F">Agapay needs</div><div style="margin-top:2px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:28px;line-height:34px;font-weight:700">55.1 MB</div></div>
+<div style="padding:14px 0"><div style="font-size:15px;font-weight:600;color:#4D463F">AgapayMo needs</div><div style="margin-top:2px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:28px;line-height:34px;font-weight:700">55.1 MB</div></div>
 <div style="padding:14px 0 14px 16px;border-left:1px solid #D9D3CA"><div style="font-size:15px;font-weight:600;color:#4D463F">Free now</div><div style="margin-top:2px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:28px;line-height:34px;font-weight:700;color:#805216">21.4 MB</div></div>
 </div>
 <p style="margin:18px 0 0;font-size:18px;line-height:26px;text-wrap:pretty">Free up about 34 MB, then check again. Deleting old videos or an app you don't use is usually enough.</p>
 </div>
-<div style="padding:12px 20px 12px"><button style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border-radius:12px;background:#221D18;color:#FFFDFA;border:0;font-size:18px;font-weight:700"><i class="ph-bold ph-arrow-clockwise" style="font-size:22px"></i>Check again</button><button style="display:block;margin:4px auto 0;height:48px;padding:0 8px;background:none;border:0;color:#221D18;font-size:17px;font-weight:700;text-decoration:underline;text-underline-offset:4px">Use Agapay without the AI for now</button></div>
+<div style="padding:12px 20px 12px"><button style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border-radius:12px;background:#221D18;color:#FFFDFA;border:0;font-size:18px;font-weight:700"><i class="ph-bold ph-arrow-clockwise" style="font-size:22px"></i>Check again</button><button style="display:block;margin:4px auto 0;height:48px;padding:0 8px;background:none;border:0;color:#221D18;font-size:17px;font-weight:700;text-decoration:underline;text-underline-offset:4px">Use AgapayMo without the AI for now</button></div>
 </div>
 </figure>
 
@@ -93,11 +108,11 @@ button{font-family:inherit}
 <figcaption><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700;background:#221D18;color:#F7F4ED;padding:3px 8px;border-radius:6px">L3</span><span style="font-size:18px;font-weight:800">Keep-the-download prompt</span></div><div style="margin-top:6px;font-size:14px;line-height:20px;color:#4D463F">Continue calls navigator.storage.persist(). Some browsers decide silently; the download starts either way.</div></figcaption>
 <div data-screen-label="L3 Keep the download" style="width:375px;height:812px;position:relative;overflow:hidden;background:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
 <dc-import name="StatusBar" online="{{ true }}" hint-size="375px,40px"></dc-import>
-<div style="padding:28px 20px 0"><h1 style="margin:0;font-size:28px;line-height:34px;font-weight:800">Get Agapay ready for no signal</h1><p style="margin:10px 0 0;font-size:18px;line-height:26px">Download the AI once, so Agapay works without internet.</p></div>
+<div style="padding:28px 20px 0"><h1 style="margin:0;font-size:28px;line-height:34px;font-weight:800">Get AgapayMo ready for no signal</h1><p style="margin:10px 0 0;font-size:18px;line-height:26px">Download the AI once, so AgapayMo works without internet.</p></div>
 <div style="position:absolute;inset:0;background:rgba(22,19,16,0.5)"></div>
 <div style="position:absolute;left:0;right:0;bottom:0;background:#FFFDFA;border-radius:24px 24px 0 0;padding:12px 20px 24px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
 <div style="width:40px;height:5px;border-radius:999px;background:#D9D3CA;margin:0 auto 18px"></div>
-<h2 style="margin:0;font-size:22px;line-height:28px;font-weight:800">Next, your browser may ask to keep Agapay's files</h2>
+<h2 style="margin:0;font-size:22px;line-height:28px;font-weight:800">Next, your browser may ask to keep AgapayMo's files</h2>
 <p style="margin:8px 0 20px;font-size:18px;line-height:26px">Tap Allow, so the AI isn't deleted when the phone runs low on space.</p>
 <button style="display:flex;align-items:center;justify-content:center;width:100%;height:56px;border-radius:12px;background:#221D18;color:#FFFDFA;border:0;font-size:18px;font-weight:700">Continue</button>
 </div>
@@ -318,7 +333,7 @@ button{font-family:inherit}
 <div style="display:flex;gap:10px"><i class="ph-bold ph-warning" style="font-size:20px;color:#805216;margin-top:3px;flex:none"></i><span>It can misread a lot number or expiry. You check every field before anything is saved.</span></div>
 <div style="display:flex;gap:10px"><i class="ph-bold ph-warning" style="font-size:20px;color:#805216;margin-top:3px;flex:none"></i><span>On the municipal laptop, AI drafts the plan's wording. The officer checks it before approving.</span></div>
 </div>
-<p style="margin:24px 0 0;font-size:18px;line-height:26px;font-weight:800">Agapay never diagnoses and never suggests a dose. It counts, flags and refers.</p>
+<p style="margin:24px 0 0;font-size:18px;line-height:26px;font-weight:800">AgapayMo never diagnoses and never suggests a dose. It counts, flags and refers.</p>
 <div style="margin-top:24px;padding-top:16px;border-top:1px solid #D9D3CA;font-size:15px;line-height:22px;color:#4D463F">Research prototype, not a registered medical device. San Isidro Demo and every record in it are invented sample data.</div>
 </div>
 </div>

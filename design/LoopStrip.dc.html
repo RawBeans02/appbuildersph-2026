@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
+</helmet>
+<ol aria-label="This week's reports" style="list-style:none;margin:0;padding:0 44px;height:64px;display:flex;align-items:center;background:#FFFDFA;border-bottom:1px solid #D9D3CA;font-family:'Atkinson Hyperlegible Next',system-ui,sans-serif;color:#221D18">
+<sc-for list="{{ steps }}" as="s" hint-placeholder-count="5">
+<li aria-current="{{ s.aria }}" style="flex:{{ s.flex }};min-width:0;display:flex;align-items:center;height:64px">
+<span style="position:relative;flex:none;display:flex;align-items:center;gap:8px;height:64px">
+<sc-if value="{{ s.done }}"><i class="ph-bold ph-check-circle" style="font-size:22px;color:#1D6835"></i></sc-if>
+<sc-if value="{{ s.stampStart }}"><i class="ph-bold ph-check-circle" style="font-size:22px;color:#1D6835;opacity:0;transform:scale(1.08)"></i></sc-if>
+<sc-if value="{{ s.reached }}"><i class="ph-bold {{ s.icon }}" style="font-size:22px;color:#221D18"></i></sc-if>
+<sc-if value="{{ s.mute }}"><i class="ph-bold {{ s.icon }}" style="font-size:22px;color:#696259"></i></sc-if>
+<span style="display:flex;flex-direction:column">
+<sc-if value="{{ s.current }}"><span style="font-size:14px;line-height:20px;font-weight:700;white-space:nowrap">{{ s.label }}</span></sc-if>
+<sc-if value="{{ s.inkLabel }}"><span style="font-size:14px;line-height:20px;font-weight:600;white-space:nowrap">{{ s.label }}</span></sc-if>
+<sc-if value="{{ s.muteLabel }}"><span style="font-size:14px;line-height:20px;font-weight:600;color:#696259;white-space:nowrap">{{ s.label }}</span></sc-if>
+<span style="display:flex;align-items:center;gap:8px;font-size:14px;line-height:20px;color:#4D463F;white-space:nowrap">
+<sc-if value="{{ s.inkStatus }}"><span style="font-variant-numeric:tabular-nums">{{ s.status }}</span></sc-if>
+<sc-if value="{{ s.muteStatus }}"><span style="color:#696259">{{ s.status }}</span></sc-if>
+<sc-if value="{{ s.meter }}"><span aria-hidden="true" style="display:flex;gap:4px">
+<sc-for list="{{ segs }}" as="g" hint-placeholder-count="5">
+<sc-if value="{{ g.in }}"><span style="width:24px;height:6px;border-radius:2px;background:#221D18"></span></sc-if>
+<sc-if value="{{ g.landing }}"><span style="width:24px;height:6px;border-radius:2px;background:#EBE6DD;position:relative;overflow:hidden"><span style="position:absolute;inset:0;background:#221D18;transform:scaleX(0);transform-origin:left"></span></span></sc-if>
+<sc-if value="{{ g.waiting }}"><span style="width:24px;height:6px;border-radius:2px;background:#EBE6DD;border:1px dashed #7B7369;box-sizing:border-box"></span></sc-if>
+</sc-for>
+</span></sc-if>
+</span>
+</span>
+<sc-if value="{{ s.current }}"><span aria-hidden="true" style="position:absolute;left:0;bottom:0;width:32px;height:4px;border-radius:2px 2px 0 0;background:#221D18"></span></sc-if>
+</span>
+<sc-if value="{{ s.connSolid }}"><span aria-hidden="true" style="flex:1;min-width:20px;display:flex;align-items:center;margin:0 12px"><span style="flex:1;height:2px;background:#7B7369;border-radius:1px"></span><svg width="8" height="10" viewBox="0 0 8 10" style="flex:none;margin-left:-6px"><path d="M2 1l4 4-4 4" fill="none" stroke="#7B7369" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></sc-if>
+<sc-if value="{{ s.connDashed }}"><span aria-hidden="true" style="flex:1;min-width:20px;display:flex;align-items:center;margin:0 12px"><span style="flex:1;height:0;border-top:2px dashed #7B7369"></span><svg width="8" height="10" viewBox="0 0 8 10" style="flex:none;margin-left:-6px"><path d="M2 1l4 4-4 4" fill="none" stroke="#7B7369" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></sc-if>
+<sc-if value="{{ s.connStart }}"><span aria-hidden="true" style="flex:1;min-width:20px;margin:0 12px"></span></sc-if>
+</li>
+</sc-for>
+</ol>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1032,&quot;height&quot;:64},&quot;current&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,&quot;4&quot;,&quot;5&quot;],&quot;default&quot;:&quot;1&quot;,&quot;tsType&quot;:&quot;1|2|3|4|5&quot;},&quot;received&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;min&quot;:0,&quot;max&quot;:5,&quot;default&quot;:4,&quot;tsType&quot;:&quot;number&quot;},&quot;approved&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;approvedAt&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;10:52 AM&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;planSteps&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:3,&quot;tsType&quot;:&quot;number&quot;},&quot;motion&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;none&quot;,&quot;fill-start&quot;,&quot;stamp-start&quot;],&quot;default&quot;:&quot;none&quot;,&quot;tsType&quot;:&quot;'none'|'fill-start'|'stamp-start'&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const t = (v) => v === true || v === 'true';
+    const cur = Number(this.props.current) || 1;
+    const rec = this.props.received == null ? 4 : Number(this.props.received);
+    const approved = t(this.props.approved);
+    const motion = this.props.motion || 'none';
+    const time = this.props.approvedAt || '10:52 AM';
+    const nSteps = Number(this.props.planSteps) || 3;
+    const base = [
+      { icon: 'ph-device-mobile', label: 'Reports in', status: rec + ' of 5', st: rec >= 5 ? 'done' : 'reached', meter: true },
+      { icon: 'ph-table', label: 'Merged', status: rec > 0 ? rec + (rec === 1 ? ' barangay' : ' barangays') : 'Waiting for reports', st: rec > 0 ? 'done' : 'not' },
+      { icon: 'ph-list-numbers', label: 'Plan', status: rec > 0 ? nSteps + ' steps' : 'No reports yet', st: rec > 0 ? 'done' : 'not' },
+      { icon: 'ph-seal-check', label: 'Approved', status: approved ? time : 'Not yet', st: approved ? 'done' : 'not' },
+      { icon: 'ph-qr-code', label: 'Back to the barangay', status: approved ? 'Return QR ready' : 'After approval', st: approved ? 'reached' : 'not' },
+    ];
+    const steps = base.map((s, i) => {
+      const isCur = cur === i + 1;
+      const stamp = motion === 'stamp-start' && i === 3 && s.st === 'done';
+      const next = base[i + 1];
+      const last = i === base.length - 1;
+      const connStart = !last && motion === 'stamp-start' && i === 3;
+      return {
+        ...s, aria: isCur ? 'step' : 'false', flex: last ? 'none' : '1 1 auto',
+        done: s.st === 'done' && !stamp, stampStart: stamp, reached: s.st === 'reached', mute: s.st === 'not',
+        current: isCur, inkLabel: !isCur && s.st !== 'not', muteLabel: !isCur && s.st === 'not',
+        inkStatus: s.st !== 'not', muteStatus: s.st === 'not',
+        connSolid: !last && !connStart && next.st !== 'not',
+        connDashed: !last && !connStart && next.st === 'not',
+        connStart,
+      };
+    });
+    const segs = [0, 1, 2, 3, 4].map((i) => {
+      const landing = motion === 'fill-start' && i === rec - 1;
+      return { in: i < rec && !landing, landing, waiting: i >= rec };
+    });
+    return { steps, segs };
+  }
+}
+</script>
+</body>
+</html>

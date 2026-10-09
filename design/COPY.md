@@ -1,6 +1,6 @@
-# AgapayMo copy deck, pass 1
+# AgapayMo copy deck, pass 1 and pass 2
 
-Every string, by screen. Use word for word. `{x}` = filled by the app. Sample values are in brackets after the placeholder. Tagalog on main actions and results is part of the label, after a middle dot (·), in a lighter color. No em dashes; ranges use an en dash (–).
+Every string, by screen. Use word for word. Pass 2 strings are at the end, by frame ID. Every pass 1 “Agapay” is now “AgapayMo”. `{x}` = filled by the app. Sample values are in brackets after the placeholder. Tagalog on main actions and results is part of the label, after a middle dot (·), in a lighter color. No em dashes; ranges use an en dash (–).
 
 ## Shared
 
@@ -239,7 +239,7 @@ Every string, by screen. Use word for word. `{x}` = filled by the app. Sample va
 - Steps (rule output): `Send a doctor team to {Maligaya-D} first.` · `Move {60} capsules from {Bagong Silang-D} to {Maligaya-D}.` · `Use the {40} capsules that expire within 6 weeks first.` + their reason lines
 - Note: `No doses. Doxycycline is given only after consultation with a health professional (DOH guideline).`
 - Panel title (all states): `Draft wording by the on-device AI: check before approving`
-- Done: `Written on this laptop · {Qwen2.5 0.5B} · {6.2} s` · `No new numbers found; check each number against the plan steps` · mismatch (19e): `{1} number doesn't match the plan: {70}. The plan says {60}.` · approve hint `Fix the number to approve.` · link `Write it again`
+- Done: `Written on this laptop · {Qwen2.5 0.5B} · {6.2} s` · `info` `No new numbers found; check each number against the plan steps` (never “all numbers match”) · mismatch (19e): `{1} number doesn't match the plan: {70}. The plan says {60}.` · approve hint `Fix the number to approve.` · link `Write it again`
 - Loading: `Downloading the writing AI` · `First time only. After this it runs on this laptop with no internet.` · `{412} / {879} MB · {46}%` · `The plan on the left works without it. You can approve now and skip the wording.` · secondary `Cancel the download`
 - Drafting: `Writing on this laptop` · `Writing from the plan's numbers…` · secondary `Stop`
 - Off: `The writing AI is off on this laptop` · `This laptop can't run it. The plan still works: approve it as listed, or write the wording yourself.` · field label `Wording` `(optional)`
@@ -257,3 +257,190 @@ Every string, by screen. Use word for word. `{x}` = filled by the app. Sample va
 
 - `404` · `Walang ganitong page.` · `This page isn't part of AgapayMo. Your records are safe on this phone.` · primary `Go to Home · Pumunta sa Home` (laptop: `Go to the municipal home`)
 - Page title: `Page not found · AgapayMo`
+
+
+---
+
+# Pass 2
+
+Sample values follow the demo timeline: four barangays in by 9:20 AM, Maligaya-D's QR lands at 10:48 AM, approval at 10:52 AM, the phone receives at 11:05 AM (Sat, Oct 10, 2026, week 2026-W41). Every date and time goes through the app's date helpers.
+
+## Settled
+
+- Name: `AgapayMo` in all copy, LaptopNav and the 404. Page titles: `{Screen} · AgapayMo`.
+- Age bands: `Under 2 months` · `2 to 11 months` · `1 to 4 years` (residents also `5 to 17 years` · `18 to 59 years` · `60 and over`).
+
+## 0 · Intro (0a–0c)
+
+- Every card: `Skip` · read with each h1: `Step {1} of 3`
+- 0a: brand `AgapayMo` · h1 `Health checks after a typhoon, kahit walang signal.` · `AgapayMo is for barangay health workers. It helps you keep track of who to check, what medicine you have, and what your barangay needs from the RHU.` · primary `Next · Susunod`
+- 0b: h1 `What you can do with AgapayMo` · primary `Next · Susunod`
+  - `Keep a flood watch list` / `Mark who waded in floodwater. The list shows who to ask about fever, muscle pain or red eyes, from day 5 to day 15.`
+  - `Read medicine boxes` / `Take a photo of the box. The phone reads the lot and expiry, and you check them before saving.`
+  - `Check a child's breathing · Hinga` / `The camera counts breaths for one minute and applies the cut-off for the child's age. Screening aid only.`
+  - `Report to the municipality by QR` / `Show a QR to the RHU laptop. Only counts leave, never names. Instructions come back the same way.`
+- 0c: h1 `Works with no signal` · loop labels `This phone` · `QR` · `RHU laptop` · `QR` · `This phone`
+  - `The AI runs on this phone and your records stay here. Only name-free counts leave, in a QR you show to the RHU laptop. The approved plan comes back the same way. After the one-time download, none of it needs internet.`
+  - Status, AI ready: `Runs on this phone` (LocalStatus) · AI not downloaded: `Get the AI ready first: {55.1} MB, once, on Wi-Fi`
+  - Primary `Start · Simulan`
+  - Caption (sample data only): `You'll start in {Maligaya-D}, a sample barangay in {San Isidro Demo}. Every name and number in it is made up. Sample data (DEMO).`
+
+## 1e–1i · Home, story-led
+
+- Brand row: `AgapayMo` · shield (screen readers) `Privacy and AI`
+- Purpose: `Health checks for your barangay after a typhoon, kahit walang signal.` · link `How it works`
+- Section: `Today, {weekday Mon D}` [Today, Sat Oct 10]
+- AI row (1f): `Get ready for no signal` / `Download the AI once on Wi-Fi: {55.1} MB. Then the breathing check and the box reader work offline.`
+- Instructions row (1g): `Instructions from the RHU` / `Received {weekday, Mon D, h:mm AM} · {2} actions` [Received Sat, Oct 10, 11:05 AM · 2 actions] (1: `· 1 action`). The visit right after saving: `Received just now · {2} actions`
+- Watch row: `{9} people in the watch window today` (1: `1 person in the watch window today`) / `{2} higher risk · Ask about fever, muscle pain or red eyes.` (none higher risk: `Ask about fever, muscle pain or red eyes.`)
+- Watch row, nobody in the window yet: `{3} people start their watch {Thu, Oct 15}` (1: `1 person starts their watch {Thu, Oct 15}`) / `Their watch window opens on day 5 after the flood.`
+- Expired row: `{10} capsules are past expiry` (1: `1 capsule is past expiry`) / `Set aside, not counted as on hand.`
+- Expiring row: `{30} doxycycline capsules expire within 6 weeks` (1: `1 doxycycline capsule expires within 6 weeks`) / `Use these first · {40} on hand`
+- None expiring: `{40} doxycycline capsules on hand` / `None expire within 6 weeks.`
+- Flag row: `{1} flag waiting for clinician review` / `It goes in the next QR as a count.` · plural `{2} flags waiting for clinician review` / `They go in the next QR as counts.`
+- Send row: `Send this week's counts to the RHU` / `Week {2026-W41} · only counts leave, by QR`
+- Breathing line: `{1} child referred this week after a breathing check · last {Tue, Oct 6}` (plural `children`) · second line when any were URGENT: `{1} of them URGENT`
+- Receive link: `Got a QR from the RHU? Scan it`
+- 1g live region: `Instructions from the RHU saved on this phone.`
+- 1g sheet: `Approved instructions for {Maligaya-D}` · `Week {2026-W41} · Municipal health officer · approved {Sat, Oct 10, 10:52 AM}` · actions in B31 wording · `Stock logistics only, never doses. Receiving instructions does not change inventory or mark actions completed.` · `Close`
+- 1h sheet (P1): `Breathing checks this week` · row `{8:31 AM} · {1 to 4 years}` · pills `Refer today` · `URGENT` · `Not fast` · `Count stopped` · extra `Counted by hand` · `Close`
+- 1e P1 watch meta: `{6} not checked yet today` / `All checked today`
+- 1e P1 flood card bracket: `Watch window {Oct 9 to 19}`
+- 1e P1 report strip: before instructions `Next: show your QR to the RHU laptop.` · after `Instructions back from the RHU · {Sat, Oct 10, 11:05 AM}`
+- 1i (P1): `Nothing recorded yet` · h2 `Start here` · `Log a flood` / `Mark who waded in, to start the 15-day leptospirosis watch.` · `Scan a medicine box` / `Reads the lot and expiry on this phone.` · plus the AI row when not downloaded
+
+## Purpose lines (P1)
+
+- 2a: `Counts a child's breaths with the camera, on this phone.`
+- 9a: `Who to visit today, from the flood records on this phone.`
+- 12a: `Know which doxycycline to use first, before it expires.`
+- 13a: `The watch list and the medicine on hand, for a clinician to review.`
+- 14a: `Tell the RHU what your barangay needs. Only counts leave, by QR.`
+- 18: `Every barangay side by side, so the doctor team goes where it's needed first.`
+- 19: `A plan from fixed rules. Check it, approve it, send it back by QR.`
+
+## L10b · Privacy & AI
+
+- New top row: `How AgapayMo works` / `What it does, and how it works with no signal`
+
+## M4 · First paint
+
+- `Opening AgapayMo…`
+
+## 11b · Box reader on the photo
+
+- Measured: `Read on this phone in {1.2} s, after {3.4} s getting the AI ready.`
+- Caption: `{4} lines found. Each box is a line the phone read. The numbers match the fields below.` then `The photo is deleted when you leave.` (1 line: `1 line found. The box is the line the phone read. The number matches the field below.`)
+- Photo alt: `The box you photographed, with the {4} lines the reader found outlined.`
+- Disclosure `All text read from the box`: the lines in order, then `Read by {PP-OCRv5} on this phone` (the engine actually used)
+- Live region: `Read {4} lines on this phone. Check the numbered fields.`
+
+## 4b · 3b · Hinga (P1)
+
+- 4b trace label `Breathing` · under it `The line follows the chest. The count shows after the minute.`
+- 3b: `Chest here` becomes `Chest found`
+
+## 8c · 8d · 9a · 13 · 14 (P1)
+
+- 8c bar: `Watch window: days 5 to 15` · `{Fri, Oct 9}` under segment 5 · `{Mon, Oct 19}` under segment 15
+- 8d footer: `{9} people marked · {3} households` (1: `1 person marked · 1 household`)
+- 9a new rows: `Added today`
+- 13b: `Flagged for clinician review` (as pass 1)
+- 14d receipt: `This QR holds {14} counts and no names.` · `{282} bytes · signed on this phone · export #{3}` · `Key {3109-7D1D-0CAB-216B}`
+- 14c: `Marked as shared` (as pass 1)
+- 13a bar (P2): `Expire within 6 weeks {30}` · `Usable after that {10}` · `Set aside, not counted {10}`
+
+## Laptop: LoopStrip, 16b, 17g, 17h
+
+- LoopStrip (list label, screen readers `This week's reports`): `Reports in` · `{4} of 5` · `Merged` · `{4} barangays` / `Waiting for reports` · `Plan` · `{3} steps` / `No reports yet` · `Approved` · `{10:52 AM}` / `Not yet` · `Back to the barangay` · `Return QR ready` / `After approval`
+- 16b: `Barangay reports` · `Week {2026-W41} · {Oct 5 to 11} · Sample data` · `Scan each barangay's QR. This laptop checks it, merges the counts and makes a plan for you to approve. None of it needs internet.` · `Received this week` · `{4} of 5` · newest row `Just now · {10:48 AM} · export #{4}` · 5 of 5 primary `Open the merged view (5 of 5)`
+- 16b live: `{Maligaya-D} received. {5} of 5 barangays in.`
+- 17g: h2 `{Maligaya-D} received`
+  - `Read the QR: counts only, no names`
+  - `Signed by the paired {Maligaya-D} phone` · `Key {3109-7D1D-0CAB-216B}`
+  - `Week {2026-W41} · export #{4}, the newest from this phone` or `Export #{4} is newer, so it replaces #{3}.`
+  - `Added to the merged view · {5} of 5 in`
+  - Then `Ready for the next barangay.` · at 5 of 5: `All 5 barangays are in.` · primary `Open the merged view` · `Stop the camera`
+  - Under the webcam: `The camera stays on. Hold the next phone's QR inside the corners.`
+  - Live: `{Maligaya-D} received. {5} of 5 barangays in.`
+- 17h (the list stops at the failed line):
+  - Not an AgapayMo QR, damaged, or another version: h2 `Not a valid AgapayMo QR` · `Couldn't read this as AgapayMo counts` · `It isn't from a paired AgapayMo phone, so nothing was saved. Ask the health worker to open Send on AgapayMo.`
+  - Wrong signature: h2 `Not saved` · `Not signed by the phone paired for {Maligaya-D}. Nothing was saved.` · `If {Maligaya-D} has a new phone, pair it first.`
+  - No phone paired: h2 `Not saved` · `No phone is paired for {Maligaya-D} yet. Nothing was saved.` · `Scan the pairing QR on that phone's Send screen first, then its counts QR.`
+  - Another municipality: h2 `Not saved` · `From another municipality. Nothing was saved.`
+  - Already received: h2 `Already received` · `Already have export #{4} from {9:12 AM}. Nothing changed.`
+  - Older export (B19): h2 `Already received` · `Kept the newer export #{4}.`
+
+## Laptop: 18c, 18d, 19, 20, 22a
+
+- 18c: `Week {2026-W41} · {5} of 5 barangays · Sample data` · newest row `Just now`
+- 18d (P1): h2 `Doctor-team order` · `Made by fixed rules from the counts: URGENT referrals count 3 times, fast-breathing referrals 2 times, people in the watch window once.` · legend `URGENT referrals × 3` · `Fast-breathing referrals × 2` · `In the watch window × 1` · bar text alternative `{Maligaya-D}: score {14–17}. URGENT referrals {0}, fast-breathing referrals {1–4}, in the watch window {9}.` · `Priority changed: {Maligaya-D} is now first, after its report came in.`
+- 19f: `Made by fixed rules from {5} of 5 reports · updated {10:48 AM}` · `Why:` + the step's existing reason, word for word
+- 19c P1: no new strings. The check line stays `No new numbers found; check each number against the plan steps`.
+- 19g: button while saving `Approving…` · `Approved` · `By the Municipal health officer · {Sat, Oct 10, 10:52 AM}` · `Saved to the approval log on this laptop.` · primary `Make return QR` · link `Open the approval log` · toast and live region `Plan approved and saved to the log.`
+- 19h: `Wording is optional. The plan on the left is complete.` · link `Write the wording yourself`
+- 20c (P1): newest row `Just now`
+- 22a / B30 (P1): title `Return instructions QR` · `Week {2026-W41} · approved {Sat, Oct 10, 10:52 AM}` · field `Recipient barangay` · primary `Generate return QR` · next to the fingerprint `On the barangay phone, open Receive RHU instructions. Before first trust, compare this fingerprint:` · `Key {5E21-9A0C-77B4-D31F}` · empty `No doctor-team or stock-transfer actions apply to this approval.`
+
+## 21a / B31 · Receive RHU instructions (phone)
+
+- Title `Receive RHU instructions` · `Instructions from the RHU laptop, checked on this phone.` · primary `Scan the return QR · I-scan` · secondary `Choose a QR image` · field `Or paste the QR text` · helper `The phone checks it as soon as you paste.`
+- Check lines: `Read the QR` · `Signed by the RHU laptop` · `Key {5E21-9A0C-77B4-D31F}` · `For {Maligaya-D}, week {2026-W41}`
+- Preview: `Approved instructions for {Maligaya-D}` · `Week {2026-W41} · Municipal health officer · approved {Sat, Oct 10, 10:52 AM}`
+  - `Send a doctor team to {Maligaya-D} first. Watch window: {9} residents.`
+  - `Move up to {60} capsules from {Bagong Silang-D} to {Maligaya-D}.`
+  - `Stock logistics only, never doses. Receiving instructions does not change inventory or mark actions completed.`
+- First trust: `Compare with the RHU laptop` · `The first time, check that this fingerprint matches the one on the RHU laptop's screen.` · checkbox `The fingerprint matches the RHU laptop` · hint while unticked `Compare the fingerprint first.` · primary `Save on this phone · I-save`
+- Success: `Instructions saved on this phone` · `Week {2026-W41} · {2} actions for {Maligaya-D}` · primary `Back to Home · Bumalik sa Home` · duplicate `Already saved on this phone` · live `Instructions saved on this phone.`
+- Errors (B31), each one line plus one next step:
+  - Key changed: `The RHU laptop's key has changed` / `Nothing was saved. Ask the RHU to reset the pairing, then compare the new fingerprint.`
+  - Older approval: `This is an older approval` / `You already have a newer one from {Sat, Oct 10, 10:52 AM}. Nothing changed.`
+  - Another barangay: `This QR is for {Riverside-D}` / `Nothing was saved. Ask the RHU for the QR for {Maligaya-D}.`
+  - Unsupported version: `This QR is from another AgapayMo version` / `Nothing was saved. Ask the RHU to make the QR again.`
+  - No QR in the image: `No QR found in this image` / `Try a sharper photo with the whole QR in it, or scan it with the camera.`
+- Retired: `Signature verified. Review the instructions before saving.` · `This signature proves possession of a key.`
+
+## Section B strings
+
+- B1 (8b, earlier day): `waded {Sun, Oct 4}` · a tap adds today: `waded {Sun, Oct 4} and today` and the `Repeated` chip turns on
+- B2 (8b confirm): `Only today's marks change. Earlier days stay as they were.`
+- B3 (8b empty): `No residents on this phone yet.` (as pass 1)
+- B4 (9b): `Risk` · `Not higher risk` / `No open wound or repeated wading recorded.` · several days `Waded {Sun, Oct 4} and {Tue, Oct 6}` · `Watch window {Oct 9 to 21}` (dates from the watch rule)
+- B5 (9b toast): `Checked {8:15 AM}` · `Undo` · referred `Referred {8:15 AM}` · `Undo`
+- B6 (10a camera blocked): `The camera is blocked` / `Choose a photo of the box instead, or type it in.` · primary `Choose a photo of the box` · link `Type it in`
+- B7 (reader not prepared): `The box reader isn't on this phone yet` / `Get it ready once on Wi-Fi ({26.9} MB). After that it reads boxes with no signal.` · primary `Prepare for offline` · link `Type it in`
+- B8 (12a remove): `Remove lot {DEMO-LOT-24A}?` / `Its {30} capsules stop counting as on hand. This can't be undone.` · destructive `Remove the lot` · `Keep it`
+- B9 (expired lot): `Expired · set aside, not counted as on hand`
+- B10 (pairing QR sheet): `Pair with the RHU laptop` / `Show this QR to the RHU laptop once. The laptop must show this code: {3109-7D1D-0CAB-216B}` · `Done`
+- B11 (Send, no barangay): `No barangay on this phone yet` / `Counts are sent for a barangay. Ask the RHU to set up this phone for yours.`
+- B12: `The camera paused` / `Keep this screen open and on for the whole minute.`
+- B13: URGENT band line `Not fast for {1 to 4 years} (cut-off {40}), but {chest indrawing}.`
+- B14: `Saved to the record`
+- B15: `Couldn't save to the record. Try again.` · `Try again · Subukan ulit`
+- B16: `Cry check off: {reason}.` · reasons `microphone not allowed` · `no microphone` · `the microphone didn't open` · `the cry check couldn't start` · `it was still loading when the count started` · `no sound was checked` · `part of the sound wasn't checked`
+- B17: `No resident (just this check)`
+- B18 (laptop pairing): `Pair a barangay phone` · `Scan the pairing QR on that phone's Send screen.` · `Compare this code with the phone's screen` · fingerprint · checkbox `The code matches the phone's screen` · primary `Pair this phone` · result `Paired: {Maligaya-D}` · lines `Read the pairing QR` · `Key {3109-7D1D-0CAB-216B}` · `Matched on the phone's screen` · `{Maligaya-D} can now send counts`
+- B19: older export see 17h · already paired `{Maligaya-D} is already paired with this phone. Nothing changed.`
+- B20 (laptop camera): `No camera found` · `This browser can't use the camera here` · `The camera didn't start` / `Close other apps that use the camera, then try again.` · fallback for all three `Choose a photo of the QR` · `Paste the QR text`
+- B21 (18): older week under the time `Week {2026-W40}` · age-band detail headings `Under 2 months` · `2 to 11 months` · `1 to 4 years`
+- B22: Priority pill on a tinted row (no new copy)
+- B23: reason line `Why {Riverside-D} first: URGENT referrals ({1–4}), …`
+- B24 (19 empty): `No reports yet` / `The plan appears when the first barangay QR comes in.` · primary `Scan a barangay QR`
+- B25 (20 full text): `Approved plan · {Sat, Oct 10, 10:52 AM}` · `Approved by Municipal health officer` · Wording column `Written by the officer`
+- B29 (PIN, phase 2 only): `Set a PIN` / `4 to 6 digits.` · `Enter it again` · `Enter your PIN` · `Your records are locked with your PIN on this phone.` · wrong `Wrong PIN. Try again in {30} s.` · `Forgot PIN` · sheet `Forgot your PIN?` / `The only way in is to erase every record on this phone. Counts already sent to the RHU are not affected.` · destructive `Erase this phone's records` · `Cancel` · hint `Sample data PIN: {2468}`
+
+## Video, pitch and link previews
+
+- og-image: `AgapayMo` · `Offline health checks for barangay health workers after a typhoon`
+- Title card: `AgapayMo` · `When the typhoon takes the signal` · `Team Banana cue · AppBuildersPH Hackathon 2026`
+- End card: `{live URL}` · `QR to the live app` (placeholder label) · `Works offline after one visit` · `The AI downloads once, inside the app.`
+
+## Every live-region line (role="status")
+
+- `Instructions from the RHU saved on this phone.` (1g)
+- `Read {4} lines on this phone. Check the numbered fields.` (11b)
+- `{Maligaya-D} received. {5} of 5 barangays in.` (16b, 17g)
+- `Plan approved and saved to the log.` (19g)
+- `Instructions saved on this phone.` (21a)
+- `Checked {8:15 AM}` / `Referred {8:15 AM}` (B5 toast)
+- `Paired: {Maligaya-D}` (B18)
