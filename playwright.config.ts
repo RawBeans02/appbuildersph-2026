@@ -4,6 +4,9 @@ import { defineConfig, devices } from '@playwright/test'
 // The app is built and served with vite preview, so the real service worker
 // and precache are what get tested.
 const PORT = 4173
+// E2E_BASE_URL runs the tests against a deployed site (e.g. the live URL)
+// instead of a local build.
+const deployed = process.env.E2E_BASE_URL
 
 export default defineConfig({
   testDir: 'e2e',
@@ -12,14 +15,16 @@ export default defineConfig({
   workers: 1,
   reporter: process.env.CI ? [['list'], ['github']] : 'list',
   use: {
-    baseURL: `http://localhost:${PORT}`,
+    baseURL: deployed ?? `http://localhost:${PORT}`,
     trace: 'retain-on-failure',
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
-  webServer: {
-    command: `npm run build && npm run preview -- --port ${PORT} --strictPort`,
-    url: `http://localhost:${PORT}`,
-    reuseExistingServer: !process.env.CI,
-    timeout: 120_000,
-  },
+  webServer: deployed
+    ? undefined
+    : {
+        command: `npm run build && npm run preview -- --port ${PORT} --strictPort`,
+        url: `http://localhost:${PORT}`,
+        reuseExistingServer: !process.env.CI,
+        timeout: 120_000,
+      },
 })

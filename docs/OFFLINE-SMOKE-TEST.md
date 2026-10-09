@@ -30,6 +30,10 @@ The runtime's `.wasm` / `.mjs` files and the model weights are not part of the a
 ## The full wow flow
 Load once and wait until the model shows as ready, go offline, reload, and run the wow flow end to end.
 
+## Automated version
+`E2E_BASE_URL=<url> npx playwright test e2e/offline.spec.ts` runs the laptop steps 1-5 against a deployed site in headless Chromium: first visit, wait for the shell to report ready, go offline, reload, open a deep link. Without `E2E_BASE_URL` it builds and serves the app locally (that's what CI runs on every push).
+
 ## Results
 | Date and time (PH) | Commit | Device and OS | Browser and version | Result | Notes |
 |---|---|---|---|---|---|
+| Oct 9, 3:40 PM | `04ab7dd` (production at the time) | MacBook Air M2, macOS 26.6.2 | Playwright headless Chromium shell 156.0.8078.4 | Pass | Automated (`e2e/offline.spec.ts` against https://appbuildersph-2026.vercel.app): offline reload and an offline deep link both served by the service worker. curl checks: deep links return the shell, `/assets/missing.js` returns 404, `sw.js` is `max-age=0, must-revalidate`. The phone part is pending (owner, with the S2 OCR test). |
