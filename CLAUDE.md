@@ -25,7 +25,8 @@ They said so at the briefing: assume an AI reads every commit, every README clai
 - **Commit authors:** only the Lead and the Sr. Builder (both use the repo-local identity set by the owner; prefixes `lead:` and `sr:`) and our registered teammates under their own accounts. No one else.
 
 ## How we ship: one repo, one environment, push right away
-- One repo and one environment: `main` deploys straight to the live URL. No dev/staging/prod split, no long-lived branches.
+- One repo and one environment: `main` is what goes live. No dev/staging/prod split, no long-lived branches.
+- **Deploys are explicit** (Vercel's free plan caps deployments per day, and we hit it on Fri at 8:50 PM): Vercel builds only commits whose message contains `[deploy]` (`scripts/vercel-ignore.sh`). Only the Lead pushes those, batching everyone's work about hourly and at the freeze. Never put `[deploy]` in your own commits; push to `main` as usual and CI checks every push.
 - **Commit small and push straight to `main` as soon as a piece works.** Never sit on unpushed work for more than 30 minutes.
 - **Before every push, always `git pull --rebase`** (other agents and our human teammates push to `main` too), then typecheck + lint + the tests you touched, then push. No force-push, no `--no-verify`.
 - Commit messages start with who you are: `lead:`, `sr:`, or a human teammate's first name. Keep the AI co-author trailer. This is our record of who built what.
