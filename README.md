@@ -28,6 +28,7 @@ _TBD: the target user, the problem, and why it matters._
   npm run preview   # serve dist/ locally to test the PWA and offline mode
   npm run typecheck && npm run lint && npm test
   npx playwright install chromium && npm run test:e2e   # offline e2e test (builds, serves, runs Chromium)
+  npm run seed:municipal -- --week 2026-W42   # re-sign the 4 pre-made sample barangay QRs for another week (fresh keys, only public keys written)
   ```
 - Any demo data in the app is invented sample data and is labeled as such.
 

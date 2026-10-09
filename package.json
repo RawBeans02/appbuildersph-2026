@@ -16,6 +16,7 @@
     "lint": "eslint .",
     "test": "vitest run",
     "test:e2e": "playwright test",
+    "seed:municipal": "node scripts/seed/run.mjs scripts/seed/municipal.ts",
     "copy:mediapipe": "node -e \"const fs=require('node:fs');fs.mkdirSync('public/mediapipe/wasm',{recursive:true});for(const f of ['vision_wasm_internal.js','vision_wasm_internal.wasm'])fs.copyFileSync('node_modules/@mediapipe/tasks-vision/wasm/'+f,'public/mediapipe/wasm/'+f)\""
   },
   "dependencies": {
