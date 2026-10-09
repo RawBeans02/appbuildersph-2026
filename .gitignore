@@ -1,0 +1,12 @@
+# keys and local env — never commit
+.env
+.env.*
+!.env.example
+# deps / builds
+node_modules/
+.next/
+dist/
+build/
+.venv/
+__pycache__/
+.DS_Store
