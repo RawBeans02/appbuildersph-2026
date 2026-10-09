@@ -56,7 +56,7 @@ export function HandCountScreen({ band, onDone, onStop }: { band: AgeBand; onDon
       />
       <div className={styles.body}>
         <h1 className={styles.title}>Count by hand</h1>
-        <p className={styles.sub}>Watch the chest rise. Tap once for each breath.</p>
+        <p className={styles.handSub}>Watch the chest rise. Tap once for each breath.</p>
         <div className={styles.tapArea}>
           <button type="button" className={styles.tap} aria-label="Tap for each breath" onClick={onTap}>
             <span className={styles.tapCount}>{count.taps}</span>

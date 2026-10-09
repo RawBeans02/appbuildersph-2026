@@ -50,6 +50,13 @@
   color: var(--ink-2);
 }
 
+/* L8b's instruction line is a step larger (body-md). */
+.handSub {
+  margin-top: 6px;
+  font: var(--type-body-md);
+  color: var(--ink-2);
+}
+
 .sectionTitle {
   margin: var(--space-6) 0 var(--space-3);
   font: var(--type-heading);
@@ -152,7 +159,7 @@
 }
 
 .recheck {
-  font: var(--type-body-lg);
+  font: var(--type-body-md);
   text-wrap: pretty;
 }
 
