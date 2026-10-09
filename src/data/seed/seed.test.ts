@@ -1,6 +1,8 @@
 import 'fake-indexeddb/auto'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { currentFlood, groupHouseholds, markHouseholdExposed } from '../../features/flood/flood'
+import { UNITS, validateDraft } from '../../features/stock/stock'
+import { KNOWN_DRUGS } from '../../rules/label'
 import { watchedCount, watchList } from '../../rules/watch'
 import { openAppDb } from '../db/appDb'
 import type { ExposureKind, HingaOutcome, SeedData } from '../db/types'
@@ -204,13 +206,22 @@ describe('the demo story', () => {
     const doxycycline = (seed.stockLots ?? []).filter((lot) => lot.drug === 'Doxycycline')
     expect(doxycycline.map(({ lot, strength, quantity, unit, expiry }) => ({ lot, strength, quantity, unit, expiry })))
       .toEqual([
-        { lot: 'DEMO-LOT-24A', strength: '100 mg', quantity: 30, unit: 'capsules', expiry: '2026-11' },
-        { lot: 'DEMO-LOT-25B', strength: '100 mg', quantity: 10, unit: 'capsules', expiry: '2027-07' },
+        { lot: 'DEMO-LOT-24A', strength: '100 mg', quantity: 30, unit: 'capsule', expiry: '2026-11' },
+        { lot: 'DEMO-LOT-25B', strength: '100 mg', quantity: 10, unit: 'capsule', expiry: '2027-07' },
       ])
     // Other station stock, none of it expiring within 6 weeks.
     const others = (seed.stockLots ?? []).filter((lot) => lot.drug !== 'Doxycycline')
     expect(others.length).toBeGreaterThanOrEqual(2)
     for (const lot of others) expect(expiresWithin6Weeks(lot.expiry, '2026-10-09')).toBe(false)
+  })
+
+  it('records stock the way the stock screen would: known drug names, its units, valid drafts', () => {
+    for (const lot of seed.stockLots ?? []) {
+      expect(KNOWN_DRUGS).toContain(lot.drug)
+      expect(UNITS).toContain(lot.unit)
+      const { drug, strength, lot: lotNumber, expiry, quantity, unit } = lot
+      expect(validateDraft({ drug, strength, lot: lotNumber, expiry, quantity, unit })).toEqual([])
+    }
   })
 
   it('keeps 3 past Hinga checks (fast and not fast) that agree with the WHO IMCI cut-offs', () => {

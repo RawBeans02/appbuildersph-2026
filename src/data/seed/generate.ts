@@ -233,7 +233,7 @@ export function generateSeed(today: Date): SeedData {
       // The month 6 weeks from today.
       expiry: addDays(day, 42).slice(0, 7),
       quantity: 30,
-      unit: 'capsules',
+      unit: 'capsule',
     }, 12),
     lot(2, {
       drug: 'Doxycycline',
@@ -241,7 +241,7 @@ export function generateSeed(today: Date): SeedData {
       lot: 'DEMO-LOT-25B',
       expiry: addMonths(day, 9),
       quantity: 10,
-      unit: 'capsules',
+      unit: 'capsule',
     }, 2),
     lot(3, {
       drug: 'Paracetamol',
@@ -249,7 +249,7 @@ export function generateSeed(today: Date): SeedData {
       lot: 'DEMO-LOT-26C',
       expiry: addMonths(day, 14),
       quantity: 200,
-      unit: 'tablets',
+      unit: 'tablet',
     }, 12),
     lot(4, {
       drug: 'Amoxicillin',
@@ -257,7 +257,7 @@ export function generateSeed(today: Date): SeedData {
       lot: 'DEMO-LOT-23D',
       expiry: addMonths(day, 5),
       quantity: 100,
-      unit: 'capsules',
+      unit: 'capsule',
     }, 12),
     lot(5, {
       drug: 'Oral rehydration salts',
@@ -265,7 +265,7 @@ export function generateSeed(today: Date): SeedData {
       lot: 'DEMO-LOT-27E',
       expiry: addMonths(day, 3),
       quantity: 50,
-      unit: 'sachets',
+      unit: 'sachet',
     }, 2),
   ]
 
