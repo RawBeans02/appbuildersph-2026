@@ -149,7 +149,14 @@ describe('approval', () => {
 
     const first = await approvePlan(db, { plan, draftText: 'Draft', finalText: 'Draft', note: '', now: NOW })
     const later = new Date(NOW.getTime() + 60_000)
-    const second = await approvePlan(db, { plan, draftText: 'Draft', finalText: 'Draft, edited ', note: ' Call RHU ', now: later })
+    const second = await approvePlan(db, {
+      plan,
+      draftText: 'Draft',
+      draftSource: 'llm',
+      finalText: 'Draft, edited ',
+      note: ' Call RHU ',
+      now: later,
+    })
 
     const log = await readApprovalLog(db)
     expect(log.map((entry) => entry.approval.id)).toEqual([second, first])
@@ -161,7 +168,8 @@ describe('approval', () => {
     })
     expect(log[0].approval.planSummary).toContain('Text edited by the officer.')
     expect(log[1].approval.planSummary).not.toContain('edited')
-    expect(log[0].plan).toMatchObject({ status: 'approved', finalText: 'Draft, edited', draftSource: 'template', epiWeek: '2026-W41' })
+    expect(log[0].plan).toMatchObject({ status: 'approved', finalText: 'Draft, edited', draftSource: 'llm', epiWeek: '2026-W41' })
+    expect(log[1].plan?.draftSource).toBe('template')
     expect(log[0].plan?.rules).toEqual(plan)
     await expect(approvePlan(db, { plan, draftText: 'Draft', finalText: '  ', note: '' })).rejects.toThrow('empty')
     db.close()

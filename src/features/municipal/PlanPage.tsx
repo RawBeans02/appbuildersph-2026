@@ -256,7 +256,17 @@ function HowComputed() {
   )
 }
 
-export function PlanEditor({ plan, draft }: { plan: MunicipalPlan; draft: string }) {
+// `draft` is the template text; B6 may pass a local model's rewording with
+// draftSource 'llm'. Either way the officer edits and approves the final text.
+export function PlanEditor({
+  plan,
+  draft,
+  draftSource = 'template',
+}: {
+  plan: MunicipalPlan
+  draft: string
+  draftSource?: 'template' | 'llm'
+}) {
   const [text, setText] = useState(draft)
   const [note, setNote] = useState('')
   const [saving, setSaving] = useState(false)
@@ -269,7 +279,7 @@ export function PlanEditor({ plan, draft }: { plan: MunicipalPlan; draft: string
     setProblem(null)
     try {
       const now = new Date()
-      await approvePlan(await getDb(), { plan, draftText: draft, finalText: text, note, now })
+      await approvePlan(await getDb(), { plan, draftText: draft, draftSource, finalText: text, note, now })
       setApproved({ at: now.toLocaleTimeString('en-PH', { hour: 'numeric', minute: '2-digit' }), text, note })
     } catch {
       setProblem('Could not save the approval on this laptop. Try again.')

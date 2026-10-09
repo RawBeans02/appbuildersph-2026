@@ -144,7 +144,16 @@ export function planSummary(plan: MunicipalPlan, edited: boolean): string {
     .join(' ')
 }
 
-export type ApproveInput = { plan: MunicipalPlan; draftText: string; finalText: string; note: string; now?: Date }
+export type ApproveInput = {
+  plan: MunicipalPlan
+  draftText: string
+  // Where the draft came from: the template (planTemplateText), or the optional
+  // local model's rewording of it (B6).
+  draftSource?: Plan['draftSource']
+  finalText: string
+  note: string
+  now?: Date
+}
 
 // Saves the approved plan (rules, draft and final text) and logs the
 // approval. The plan and its approval share one id. Returns it.
@@ -160,7 +169,7 @@ export async function approvePlan(db: AgapayDb, input: ApproveInput): Promise<st
     createdAt: at,
     rules: input.plan,
     draftText: input.draftText,
-    draftSource: 'template',
+    draftSource: input.draftSource ?? 'template',
     finalText,
     status: 'approved',
   }
