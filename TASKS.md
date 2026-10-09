@@ -115,6 +115,11 @@ Until `design/` lands, build the logic plus plain, unstyled screens and write `N
 - [ ] todo · Demo Day prep: model already downloaded on every demo device; airplane-mode run rehearsed; on-site by 12:00 PM for the 12:15 PM AV check · [human]
 - [ ] todo · 5-minute pitch + Q&A drill, rehearsed ×3 (the questions will cover what runs locally and why) · [human]
 
+## Scope (locked by the owner, Fri ~3:45 PM)
+1. **The core offline flow:** Hinga → flood-exposure watch → medicine OCR → de-identified QR → municipal plan (rules + optional local LLM).
+2. **Phase 2, only if 1 is solid at the 12:00 AM scope check:** a cloud "operations manager" assistant (OpenAI GPT-6 Luna, server-side) that drafts alerts from the de-identified aggregate counts after sync; the MHO approves every alert. The key stays in Vercel env vars (added by the owner) with rate limits and a spend cap; disclosed under "What requires internet". Never part of the offline demo path.
+3. **Parking lot (don't build unless everything else is done and polished):** a consultation explainer (Whisper), offline first-aid cards ("Unang Lunas"), an emergency mode.
+
 ## Ideas (not now — only after the wow flow is done)
 - Cut list if behind at midnight, in order: dengue checks · hazard map layer · any DOH cloud view · Lemonade (unless working) · YAMNet (keep the motion gate) · Tagalog strings beyond the main labels
 - Not doing: dosing or diagnosis, accounts/login, real patient data, cloud AI in the shipped app
