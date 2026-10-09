@@ -170,6 +170,26 @@ Until `design/` lands, build the logic plus plain, unstyled screens and write `N
   - on the demo phone and the laptop, open `/device` and tap "Reset sample data" before Demo Day so the seed reloads with that day's dates (it keeps the downloaded models; never clear site data, which would delete them and force a re-download on venue Wi-Fi); show docs/demo/label-doxy-24A.png on the laptop screen (or print it) for the stock scan
 - [ ] todo · 5-minute pitch + Q&A drill, rehearsed ×3 (the questions will cover what runs locally and why) · [human]
 
+## Phase 2 (owner decision, Fri ~8:15 PM: start now)
+Never on the offline demo path: the core works with no network, the offline e2e stays green on every push, and phase 2 sits behind `VITE_PHASE2` (off = hidden). The owner's phone tests and any device bugs they find come first. Midnight check: if phase 2 isn't solid by ~2 AM, it ships behind the flag or is cut.
+- [ ] todo · P2-A PIN lock + encrypted records: a PIN (with a design-token stand-in until Claude Design pass 2) unlocks a non-extractable AES-GCM key derived with PBKDF2-SHA-256 (time the iterations on a mid-range phone; target ≤ 1.5 s) and a random salt. Personal fields (names, birth dates, households, puroks) are encrypted at rest in IndexedDB, each with a random 96-bit IV; ids, counts and index keys stay plain. The key lives in memory only, so the app locks on reload. Sample data has a demo PIN shown on the lock screen. Every e2e unlocks first · [sr] · owns: `src/data/db/`, `src/features/lock/`
+- [ ] todo · P2-B Backend core (Vercel functions in `api/`, shared code in `server/`, Postgres via `DATABASE_URL`):
+  - the laptop's device key enrolls once with `MUNICIPAL_ENROLL_CODE`
+  - laptop requests are signed (ECDSA P-256), time-boxed and replay-protected
+  - `POST /api/sync` uploads the received barangay QR texts plus the paired phone keys; the server re-verifies every signature with `src/qr` and keeps the newest seq per barangay and week, de-identified only
+  - `GET /api/reports` feeds the DOH/regional view (`DOH_VIEW_CODE`)
+  - rate limits, input validation, an audit log; `/api` excluded from the SPA rewrite and the SW fallback
+  - CI runs the API tests against a Postgres service container (no secrets)
+  - the laptop gets "Sync now" when online, and there's a `/doh` view
+  · [lead] · owns: `api/`, `server/`, `src/features/doh/`, the sync parts of `src/features/municipal/`
+- [ ] todo · P2-C GPT-6 Luna operations manager (after P2-B):
+  - drafts alerts and redistribution suggestions from the aggregates only, through the same positional number check
+  - `LUNA_ENABLED` kill switch, `LUNA_DAILY_LIMIT`, per-IP limits, max tokens, a timeout
+  - a human approves every alert, with an audit log; approved alerts reach the barangay's inbox on its next sync (laptop and phone pull, signed)
+  - disclosed under "What requires internet" and "APIs and cloud services"
+  · [lead] · owns: `server/luna/`, `api/alerts*`, `api/inbox*`, `src/features/doh/`, the inbox UI
+- [ ] todo · Owner: provision Neon via Vercel Storage and set the env vars (steps sent via Account Admin) · [human:Rovs]
+
 ## Scope (locked by the owner, Fri ~3:45 PM)
 1. **The core offline flow:** Hinga → flood-exposure watch → medicine OCR → de-identified QR → municipal plan (rules + optional local LLM).
 2. **Phase 2, only if 1 is solid at the 12:00 AM scope check:** a cloud "operations manager" assistant (OpenAI GPT-6 Luna, server-side) that drafts alerts from the de-identified aggregate counts after sync; the MHO approves every alert. The key stays in Vercel env vars (added by the owner) with rate limits and a spend cap; disclosed under "What requires internet". Never part of the offline demo path.
