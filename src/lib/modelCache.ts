@@ -4,10 +4,15 @@
 // that cache their own downloads (WebLLM, Transformers.js) don't need it.
 //
 // One cache per model id + version ("model-cache:<id>@<version>"), each file
-// keyed by its URL. Files stream straight into the cache, never whole in memory,
-// and an entry is only kept when its byte count matches the expected size.
-// This is not the service worker precache, which skips files over 2 MiB.
-// Call prepareStorageForDownload() (storage.ts) first, from the user's click.
+// keyed by its URL. An entry is only kept when its byte count matches the
+// expected size. This is not the service worker precache, which skips files
+// over 2 MiB. Call prepareStorageForDownload() (storage.ts) first, from the
+// user's click.
+//
+// Memory: Chrome streams each file into the cache. WebKit (Safari, and every
+// browser on iOS) collects a whole entry in memory before storing it, so on
+// iPhone a single huge weights file can get the tab killed. Prefer models split
+// into several smaller files, and test the real model on an iPhone.
 
 export type ModelFile = {
   url: string
@@ -129,6 +134,8 @@ async function downloadFile(
   try {
     const response = await doFetch(file.url, { signal: options.signal })
     if (!response.ok || !response.body) {
+      // Free the connection instead of leaving the error body unread.
+      await response.body?.cancel().catch(() => {})
       throw new ModelCacheError('http', `Download failed with HTTP ${response.status}.`, file.url)
     }
 
@@ -163,7 +170,9 @@ async function downloadFile(
   } catch (error) {
     if (sizeError) throw sizeError
     if (error instanceof ModelCacheError) throw error
-    if (options.signal?.aborted) throw error
+    // Chrome rejects cache.put with a NetworkError when the body stream is
+    // aborted midway, so rethrow the abort reason itself.
+    if (options.signal?.aborted) throw options.signal.reason ?? error
     if (isQuotaError(error)) {
       throw new ModelCacheError('quota', 'Not enough storage left for this download.', file.url, error)
     }

@@ -189,6 +189,43 @@ describe('ensureModelCached', () => {
     expect(await isModelCached(spec, { caches })).toBe(false)
   })
 
+  it('rethrows the AbortError when cancelled mid-download, not the cache error it causes', async () => {
+    const controller = new AbortController()
+    const { caches } = fakeCaches()
+    let sent = 0
+    const fetch = vi.fn(async (_url: string, init: RequestInit) => {
+      const body = new ReadableStream<Uint8Array>({
+        pull(stream) {
+          if (init.signal?.aborted) {
+            // What the cache sees when the body is aborted midway in Chrome.
+            return stream.error(new DOMException('Cache.put() encountered a network error', 'NetworkError'))
+          }
+          stream.enqueue(bytes(2))
+          sent += 2
+          if (sent === 4) controller.abort()
+        },
+      })
+      return new Response(body)
+    })
+    const error = await ensureModelCached(spec, { caches, fetch, signal: controller.signal }).catch(
+      (e: unknown) => e,
+    )
+    expect(error).toMatchObject({ name: 'AbortError' })
+    expect(await isModelCached(spec, { caches })).toBe(false)
+  })
+
+  it('cancels the body of an HTTP error response', async () => {
+    const cancel = vi.fn(async () => {})
+    const response = new Response('not found', { status: 404 })
+    vi.spyOn(response.body!, 'cancel').mockImplementation(cancel)
+    const error = await ensureModelCached(spec, {
+      caches: fakeCaches().caches,
+      fetch: async () => response,
+    }).catch((e: unknown) => e)
+    expect(error).toMatchObject({ code: 'http' })
+    expect(cancel).toHaveBeenCalledOnce()
+  })
+
   it('rejects invalid file sizes before downloading', async () => {
     const fetch = fakeFetch({})
     const bad = { ...spec, files: [{ url: weights.url, bytes: 0 }] }

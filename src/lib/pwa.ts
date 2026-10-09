@@ -82,6 +82,8 @@ export function createAppShell() {
 
     // Call while a reload would lose work (a model download, unsaved input).
     // A new version then reloads the page only after every hold is released.
+    // Load lazy chunks (the inference worker, the runtime) before holding: once
+    // a new version is active, the old version's chunks can be gone.
     holdReload(): () => void {
       holds += 1
       let released = false

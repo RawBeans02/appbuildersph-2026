@@ -48,6 +48,22 @@ describe('prepareStorageForDownload', () => {
     expect(await prepareStorageForDownload(1000, nav)).toMatchObject({ fits: true, persisted: false })
   })
 
+  it('does not wait more than the limit for an unanswered permission prompt', async () => {
+    const nav: NavigatorLike = {
+      storage: {
+        persisted: async () => false,
+        persist: () => new Promise(() => {}),
+        estimate: async () => ({ quota: 5000, usage: 0 }),
+      },
+    }
+    expect(await prepareStorageForDownload(1000, nav, 10)).toEqual({
+      requiredBytes: 1000,
+      availableBytes: 5000,
+      fits: true,
+      persisted: null,
+    })
+  })
+
   it('reports unknowns as null when the browser has no storage APIs', async () => {
     expect(await prepareStorageForDownload(1000, {})).toEqual({
       requiredBytes: 1000,
