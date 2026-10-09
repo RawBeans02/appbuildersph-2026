@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { checkDraft, numbersIn, PLAN_REMINDER, withReminder, type PlanFacts } from './check'
+import { checkDraft, numbersIn, PLAN_REMINDER, withPlanNotes, withReminder, type PlanFacts } from './check'
 
 const TEMPLATE = `Draft plan for week 2026-W41, San Isidro Demo (SID)
 Doctor teams, in priority order (unahin ang nasa itaas):
@@ -102,5 +102,51 @@ describe('withReminder', () => {
   it('adds the fixed no-dose, no-diagnosis reminder once', () => {
     expect(withReminder('A plan.')).toBe(`A plan.\n\n${PLAN_REMINDER}`)
     expect(withReminder(withReminder('A plan.'))).toBe(`A plan.\n\n${PLAN_REMINDER}`)
+  })
+})
+
+describe('a stock move stays the MHO\'s decision', () => {
+  it('accepts "for the MHO to decide" and "if the MHO approves", refuses a bare order', () => {
+    expect(reasons(GOOD)).toEqual([])
+    const copied = GOOD.replace(
+      'Consider moving up to 30 doxycycline capsules that expire within 6 weeks from Riverside-D to Maligaya-D, if the MHO approves.',
+      'Consider moving from Riverside-D to Maligaya-D: up to 30 capsules, for the MHO to decide.',
+    )
+    expect(reasons(copied)).toEqual([])
+    const order = GOOD.replace(
+      'Consider moving up to 30 doxycycline capsules that expire within 6 weeks from Riverside-D to Maligaya-D, if the MHO approves.',
+      'Move up to 30 capsules from Riverside-D to Maligaya-D.',
+    )
+    expect(reasons(order)).toEqual([
+      'It turns the move of up to 30 capsules from Riverside-D to Maligaya-D into an order; keep "for the MHO to decide".',
+    ])
+  })
+})
+
+describe('withPlanNotes', () => {
+  const template = [
+    'Doxycycline stock moves, for the MHO to decide (ilipat lamang kung aprubado):',
+    'No stock move suggested: no barangay has capsules expiring within 6 weeks.',
+    '',
+    'Batayan (based on): Maligaya-D export 4 (2026-W41); Riverside-D export 2 (2026-W40, sample data).',
+    'Older week: Riverside-D last sent week 2026-W40.',
+    'Paalala: counts only, no names. "<5" means 1 to 4, so scores and totals that include one are ranges.',
+  ].join('\n')
+  it('adds the rule notes a short summary leaves out, once', () => {
+    const noted = withPlanNotes('The doctor team for Maligaya-D has priority score 14–20.', template)
+    expect(noted).toBe(
+      [
+        'The doctor team for Maligaya-D has priority score 14–20.',
+        '',
+        'No stock move suggested: no barangay has capsules expiring within 6 weeks.',
+        'Batayan (based on): Maligaya-D export 4 (2026-W41); Riverside-D export 2 (2026-W40, sample data).',
+        'Older week: Riverside-D last sent week 2026-W40.',
+        '"<5" means 1 to 4, so scores and totals that include one are ranges.',
+      ].join('\n'),
+    )
+    expect(withPlanNotes(noted, template)).toBe(noted)
+  })
+  it('adds nothing when the template has no notes', () => {
+    expect(withPlanNotes('A plan.', 'Doctor teams:')).toBe('A plan.')
   })
 })
