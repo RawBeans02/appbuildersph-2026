@@ -3,6 +3,7 @@ import { useFlowMode } from '../../app/flow'
 import { Link } from '../../app/Link'
 import { navigate } from '../../app/router'
 import { FlowTopBar } from '../../components'
+import { PinLockSection } from './PinLockSection'
 import styles from './PrivacyPage.module.css'
 
 // Screen 15 / L10, Privacy & AI: what runs on this phone, what leaves it, and
@@ -73,6 +74,8 @@ export default function PrivacyPage() {
           See exactly what the QR holds
           <ArrowRightIcon size={18} weight="bold" aria-hidden />
         </Link>
+
+        <PinLockSection />
 
         <h2 className={styles.wrongHeading}>What the AI can get wrong</h2>
         <ul className={styles.wrong}>

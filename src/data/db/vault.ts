@@ -13,9 +13,7 @@
 // stop one; the wrong-PIN delay only limits guesses typed into the app.
 
 export const PBKDF2_ITERATIONS = 600_000
-// Sample data only: the demo's records are sealed with this PIN, shown on the
-// lock screen. Real records use the PIN the health worker sets.
-export const DEMO_PIN = '2468'
+export { DEMO_PIN } from './demoPin'
 const CHECK_TEXT = 'agapay-lock-check-v1'
 
 export type SealedBox = { iv: Uint8Array; data: ArrayBuffer }
@@ -33,8 +31,12 @@ export type LockRecord = {
   createdAt: string
 }
 
-// Wrong-PIN tries, kept across reloads.
-export type LockAttempts = { failures: number; waitUntil: number }
+// Wrong-PIN tries, kept across reloads. The wait itself is timed in the page
+// (performance.now), so moving the device clock doesn't skip it.
+export type LockAttempts = { failures: number }
+
+// Which lock a key belongs to: its salt, as hex.
+export const lockIdOf = (lock: Pick<LockRecord, 'salt'>) => [...lock.salt].map((byte) => byte.toString(16).padStart(2, '0')).join('')
 
 export class LockedError extends Error {
   constructor() {
@@ -100,14 +102,34 @@ export function wrongPinDelayMs(failures: number): number {
   return Math.min(5_000 * 2 ** (failures - 3), 5 * 60_000)
 }
 
-// The page's key while unlocked. Memory only: a reload starts locked.
+// The page's key while unlocked, and the lock it opens. Memory only: a
+// reload starts locked.
 let sessionKey: CryptoKey | null = null
+let sessionLockId: string | null = null
 export const session = {
   key: () => sessionKey,
-  set(key: CryptoKey) {
+  lockId: () => sessionLockId,
+  set(key: CryptoKey, lockId: string) {
     sessionKey = key
+    sessionLockId = lockId
   },
   clear() {
     sessionKey = null
+    sessionLockId = null
   },
+}
+
+// Tells this app's other tabs that the lock changed (a new PIN, a reset, an
+// erase), so they drop a key that no longer fits instead of writing records
+// nobody can read.
+export type LockMessage = { type: 'lock-changed'; lockId: string | null }
+const channel = typeof BroadcastChannel === 'undefined' ? null : new BroadcastChannel('agapay-lock')
+export function announceLockChange(lockId: string | null) {
+  channel?.postMessage({ type: 'lock-changed', lockId } satisfies LockMessage)
+}
+export function onLockChange(listener: (message: LockMessage) => void): () => void {
+  if (!channel) return () => {}
+  const handler = (event: MessageEvent<LockMessage>) => listener(event.data)
+  channel.addEventListener('message', handler)
+  return () => channel.removeEventListener('message', handler)
 }

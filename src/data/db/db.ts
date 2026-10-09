@@ -15,7 +15,17 @@ import type {
   StockLot,
   WatchCheck,
 } from './types'
-import { LockedError, openValue, sealValue, session, type LockAttempts, type LockRecord, type SealedBox } from './vault'
+import {
+  announceLockChange,
+  LockedError,
+  lockIdOf,
+  openValue,
+  sealValue,
+  session,
+  type LockAttempts,
+  type LockRecord,
+  type SealedBox,
+} from './vault'
 
 // The on-device database. Every list is bounded (QUALITY.md): pass a limit, or
 // get DEFAULT_LIMIT. Writes notify subscribers of that store, so screens can
@@ -77,27 +87,59 @@ export const SEALED_FIELDS: Partial<Record<RecordStore, readonly string[]>> = {
 
 type Stored = Record<string, unknown> & { sealed?: SealedBox }
 
-function createCodec(encryption: boolean) {
+function createCodec(db: IDBPDatabase<AgapaySchema>, state: { sealing: boolean }) {
   const keyOrThrow = () => {
     const key = session.key()
     if (!key) throw new LockedError()
     return key
   }
-  return {
-    async seal<T>(store: RecordStore, record: T): Promise<T> {
-      const fields = SEALED_FIELDS[store]
-      if (!encryption || !fields) return record
-      const rest: Stored = { ...(record as Stored) }
-      const secret: Record<string, unknown> = {}
-      for (const field of fields) {
-        if (field in rest) {
-          secret[field] = rest[field]
-          delete rest[field]
-        }
+
+  async function sealWith<T>(key: CryptoKey, store: RecordStore, record: T): Promise<T> {
+    const fields = SEALED_FIELDS[store] ?? []
+    const rest: Stored = { ...(record as Stored) }
+    delete rest.sealed
+    const secret: Record<string, unknown> = {}
+    for (const field of fields) {
+      if (field in rest) {
+        secret[field] = rest[field]
+        delete rest[field]
       }
-      rest.sealed = await sealValue(keyOrThrow(), secret)
-      return rest as T
+    }
+    rest.sealed = await sealValue(key, secret)
+    return rest as T
+  }
+
+  // The page's key must be the stored lock's: another tab may have set a new
+  // PIN or erased the records, and a stale key would write records nobody can
+  // read. pendingLock: the lock being written in the same transaction.
+  async function checkedKey(pendingLock?: LockRecord): Promise<CryptoKey> {
+    const key = keyOrThrow()
+    const lock = pendingLock ?? ((await db.get('meta', 'lock')) as LockRecord | undefined)
+    if (!lock || lockIdOf(lock) !== session.lockId()) {
+      session.clear()
+      throw new LockedError()
+    }
+    return key
+  }
+
+  // The demo PIN is shown on the lock screen only while every record is
+  // sample data: the first real record ends the hint.
+  let demoHintGone = false
+  async function noteWritten(records: readonly unknown[]) {
+    if (!state.sealing || demoHintGone || !records.some((record) => (record as Stored).sample === false)) return
+    const lock = (await db.get('meta', 'lock')) as LockRecord | undefined
+    if (lock?.demoPin) await db.put('meta', { ...lock, demoPin: null }, 'lock')
+    demoHintGone = true
+  }
+
+  return {
+    async sealAll<T>(store: RecordStore, records: readonly T[], pendingLock?: LockRecord): Promise<T[]> {
+      if (!state.sealing || !SEALED_FIELDS[store] || records.length === 0) return [...records]
+      const key = await checkedKey(pendingLock)
+      return Promise.all(records.map((record) => sealWith(key, store, record)))
     },
+    sealWith,
+    noteWritten,
     // Plain records (written with encryption off) are read as they are.
     async open<T>(record: T): Promise<T> {
       const stored = record as Stored | undefined
@@ -121,14 +163,17 @@ function createRepository<S extends RecordStore>(
   return {
     get: async (id: string): Promise<Value | undefined> => codec.open(await db.get(store, id)),
     async put(record: Value): Promise<void> {
-      await db.put(store, await codec.seal(store, record))
+      const [sealed] = await codec.sealAll(store, [record])
+      await db.put(store, sealed)
+      await codec.noteWritten([record])
       notify(store)
     },
     async putMany(records: Value[]): Promise<void> {
       // Sealed before the transaction: it would commit while awaiting crypto.
-      const sealed = await Promise.all(records.map((record) => codec.seal(store, record)))
+      const sealed = await codec.sealAll(store, records)
       const tx = db.transaction(store, 'readwrite')
       await Promise.all([...sealed.map((record) => tx.store.put(record)), tx.done])
+      await codec.noteWritten(records)
       notify(store)
     },
     async delete(id: string): Promise<void> {
@@ -153,7 +198,9 @@ function createRepository<S extends RecordStore>(
 export type Repository<S extends RecordStore> = ReturnType<typeof createRepository<S>>
 
 // encryption: seal SEALED_FIELDS with the session key (phase 2). Off, every
-// record is written plain, as before phase 2.
+// record is written plain, as before phase 2, unless a PIN lock is already
+// stored: then sealing stays on, so a phone that ran a phase-2 build keeps
+// its records sealed (and readable after unlocking) in any build.
 export async function openAgapayDb(name = DB_NAME, { encryption = false }: { encryption?: boolean } = {}) {
   const db = await openDB<AgapaySchema>(name, DB_VERSION, {
     upgrade(database, oldVersion) {
@@ -195,10 +242,13 @@ export async function openAgapayDb(name = DB_NAME, { encryption = false }: { enc
 
   const listeners = new Map<RecordStore, Set<() => void>>()
   const notify = (store: RecordStore) => listeners.get(store)?.forEach((listener) => listener())
-  const codec = createCodec(encryption)
+  const state = { sealing: encryption || (await db.get('meta', 'lock')) !== undefined }
+  const codec = createCodec(db, state)
 
   return {
-    encryption,
+    get encryption() {
+      return state.sealing
+    },
     residents: createRepository(db, 'residents', notify, codec),
     floodEvents: createRepository(db, 'floodEvents', notify, codec),
     exposures: createRepository(db, 'exposures', notify, codec),
@@ -215,29 +265,66 @@ export async function openAgapayDb(name = DB_NAME, { encryption = false }: { enc
     async getLock(): Promise<LockRecord | null> {
       return ((await db.get('meta', 'lock')) as LockRecord | undefined) ?? null
     },
+    // Saved before any record is sealed with its key, so an interrupted save
+    // never leaves records under a key with no lock to open it.
     async putLock(lock: LockRecord): Promise<void> {
       await db.put('meta', lock, 'lock')
+      state.sealing = true
+      announceLockChange(lockIdOf(lock))
     },
     async getLockAttempts(): Promise<LockAttempts> {
-      return ((await db.get('meta', 'lockAttempts')) as LockAttempts | undefined) ?? { failures: 0, waitUntil: 0 }
+      const stored = (await db.get('meta', 'lockAttempts')) as LockAttempts | undefined
+      return { failures: stored?.failures ?? 0 }
     },
-    async putLockAttempts(attempts: LockAttempts): Promise<void> {
-      await db.put('meta', attempts, 'lockAttempts')
+    // Counts a try before the slow key derivation, in one transaction, so tries
+    // at the same moment (two tabs) each count. Returns the new count.
+    async bumpLockAttempts(): Promise<number> {
+      const tx = db.transaction('meta', 'readwrite')
+      const stored = (await tx.store.get('lockAttempts')) as LockAttempts | undefined
+      const failures = (stored?.failures ?? 0) + 1
+      await Promise.all([tx.store.put({ failures } satisfies LockAttempts, 'lockAttempts'), tx.done])
+      return failures
     },
-    // Seals every plain record in the sealed stores with the session key (a
-    // PIN set on a phone that already has records).
+    async resetLockAttempts(): Promise<void> {
+      await db.put('meta', { failures: 0 } satisfies LockAttempts, 'lockAttempts')
+    },
+    // Seals every plain record in the sealed stores with the session key: a
+    // PIN set on a phone that already has records, or records an interrupted
+    // save left plain (run after every unlock).
     async sealExisting(): Promise<number> {
       let count = 0
       for (const store of Object.keys(SEALED_FIELDS) as RecordStore[]) {
         const plain = ((await db.getAll(store)) as Stored[]).filter((record) => !record.sealed)
         if (!plain.length) continue
-        const sealed = await Promise.all(plain.map((record) => codec.seal(store, record)))
+        const sealed = await codec.sealAll(store, plain)
         const tx = db.transaction(store, 'readwrite')
         await Promise.all([...sealed.map((record) => tx.store.put(record as never)), tx.done])
         count += sealed.length
         notify(store)
       }
       return count
+    },
+    // A new PIN: every sealed record is opened with the page's key and sealed
+    // with the new one, and the new lock is saved, all in one transaction, so
+    // an interruption leaves the old PIN working.
+    async rekey(lock: LockRecord, key: CryptoKey): Promise<void> {
+      const stores = Object.keys(SEALED_FIELDS) as RecordStore[]
+      const rewritten: [RecordStore, unknown[]][] = []
+      for (const store of stores) {
+        const records = await Promise.all(((await db.getAll(store)) as Stored[]).map((record) => codec.open(record)))
+        rewritten.push([store, await Promise.all(records.map((record) => codec.sealWith(key, store, record)))])
+      }
+      const tx = db.transaction([...stores, 'meta'], 'readwrite')
+      await Promise.all([
+        ...rewritten.flatMap(([store, records]) => records.map((record) => tx.objectStore(store).put(record as never))),
+        tx.objectStore('meta').put(lock, 'lock'),
+        tx.objectStore('meta').put({ failures: 0 } satisfies LockAttempts, 'lockAttempts'),
+        tx.done,
+      ])
+      session.set(key, lockIdOf(lock))
+      state.sealing = true
+      announceLockChange(lockIdOf(lock))
+      stores.forEach(notify)
     },
 
     // The phone's signing identity, or null before it's made.
@@ -278,11 +365,14 @@ export async function openAgapayDb(name = DB_NAME, { encryption = false }: { enc
 
     // First run only: writes the synthetic seed, every record marked as sample
     // data, in one transaction. Returns whether it wrote anything.
-    async loadSeed(seed: SeedData, now = new Date()): Promise<boolean> {
+    // lock (phase 2): the lock the sample is sealed under, saved in the same
+    // transaction as the records.
+    async loadSeed(seed: SeedData, now = new Date(), lock?: LockRecord): Promise<boolean> {
       if (await db.get('meta', 'seed')) return false
+      if (lock) state.sealing = true
       // Sealed first: a transaction commits while awaiting crypto.
       const sample = <T>(store: RecordStore, records: T[] = []) =>
-        Promise.all(records.map((record) => codec.seal(store, { ...record, sample: true })))
+        codec.sealAll(store, records.map((record) => ({ ...record, sample: true })), lock)
       const [residents, floodEvents, exposures, hingaChecks, stockLots] = await Promise.all([
         sample('residents', seed.residents),
         sample('floodEvents', seed.floodEvents),
@@ -312,7 +402,14 @@ export async function openAgapayDb(name = DB_NAME, { encryption = false }: { enc
         loadedAt: now.toISOString(),
       }
       writes.push(tx.objectStore('meta').put(info, 'seed'))
+      if (lock) {
+        writes.push(
+          tx.objectStore('meta').put(lock, 'lock'),
+          tx.objectStore('meta').put({ failures: 0 } satisfies LockAttempts, 'lockAttempts'),
+        )
+      }
       await Promise.all([...writes, tx.done])
+      if (lock) announceLockChange(lockIdOf(lock))
       for (const store of ['residents', 'floodEvents', 'exposures', 'hingaChecks', 'stockLots'] as const) notify(store)
       return true
     },
@@ -351,6 +448,7 @@ export async function openAgapayDb(name = DB_NAME, { encryption = false }: { enc
         }
       }
       await Promise.all([...work, tx.done])
+      if (resetLock) announceLockChange(null)
       for (const store of [...records, 'pairedDevices', 'deviceIdentity'] as const) notify(store)
     },
 
