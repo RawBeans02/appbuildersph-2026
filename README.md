@@ -44,7 +44,7 @@ _TBD: the target user, the problem, and why it matters._
 ## What requires internet
 | Part | Why it needs internet | What happens offline |
 |---|---|---|
-| First visit to the live URL | Downloads the app shell (HTML, JS, CSS: 840.93 KiB, Workbox's precache figure in the build), which the service worker caches. 485.88 KiB of it is the Hinga spike page and its MediaPipe loader script (`ls -l` on the build output) | After the first visit, the app opens offline |
+| First visit to the live URL | Downloads the app shell (HTML, JS, CSS: 845.09 KiB, Workbox's precache figure in the build), which the service worker caches. 485.88 KiB of it is the Hinga spike page and its MediaPipe loader script (`ls -l` on the build output) | After the first visit, the app opens offline |
 | "Prepare for offline" (one tap, once) | Downloads the on-device AI into the browser's Cache Storage: the ONNX Runtime WebAssembly file (14,239,897 bytes) and the PP-OCRv5 models with their dictionary (12,658,822 bytes), 26,898,719 bytes in all | After it, the models load from the device; without it, AI features need the network |
 | Hinga spike, "Download for offline" (one tap on `spike-hinga.html`) | Downloads the MediaPipe WebAssembly file (11,756,954 bytes) and the pose model (5,777,746 bytes), 17,534,700 bytes in all, into the browser's Cache Storage | After it, the spike page works in airplane mode; without it, the pose model needs the network |
 | _TBD_ | | |
