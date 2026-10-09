@@ -15,6 +15,12 @@
 
 **Where the AI is, and why it matters (not just a chatbot):**
 
+**What runs locally (model, size, runtime, devices):**
+
+**What requires internet (and what happens offline):**
+
+**Why does this product benefit from running AI locally? (the official question; privacy, offline, latency, cost or something impossible in the cloud):**
+
 **Design brief (for the Lead's Claude Design pass → `design/`):** _wow-flow screens, visual direction, palette, demo data to show_
 
 **Why we win (vs. other teams / existing apps):**
@@ -29,7 +35,11 @@
 
 **Business in one line (who pays, how it grows — ties to our startup):**
 
-**Rubric check (score 1–5 against the judging criteria in RULES.md, or our inferred ones if none are published):**
-| Criterion | Score | How we show it in the demo |
+**Rubric check (score 1–5 against the official judging criteria in RULES.md):**
+| Criterion (weight) | Score | How we show it in the demo |
 |---|---|---|
-| | | |
+| Problem & Usefulness (25%) | | |
+| Local AI Implementation (25%) | | |
+| Technical Execution (20%) | | |
+| Innovation (15%) | | |
+| Product & Demo Quality (15%) | | |
