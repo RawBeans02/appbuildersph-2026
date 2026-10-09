@@ -1,11 +1,12 @@
 import type { AgapayDb } from './db'
 import type { SeedData } from './types'
-import { createLock, DEMO_PIN, PBKDF2_ITERATIONS, session } from './vault'
+import { createLock, DEMO_PIN, lockIdOf, PBKDF2_ITERATIONS, session } from './vault'
 
 // Loads the synthetic seed. With encryption on (phase 2), the sample records
-// are sealed with the demo PIN under a fresh salt, and the lock is saved with
-// them; stayUnlocked keeps that key in this page (a reset while unlocked),
-// else the app starts locked (first run, "Forgot the PIN?").
+// are sealed with the demo PIN under a fresh salt, and the lock is saved in
+// the same transaction as them; stayUnlocked keeps that key in this page (a
+// reset while unlocked), else the app starts locked (first run, "Forgot the
+// PIN?").
 export async function loadSampleSeed(
   db: AgapayDb,
   seed: SeedData,
@@ -13,18 +14,14 @@ export async function loadSampleSeed(
 ): Promise<boolean> {
   if (!db.encryption) return db.loadSeed(seed)
   const { lock, key } = await createLock(DEMO_PIN, { demoPin: DEMO_PIN, iterations })
-  const previous = session.key()
-  session.set(key)
+  const previous = { key: session.key(), lockId: session.lockId() }
+  session.set(key, lockIdOf(lock))
   let wrote = false
   try {
-    wrote = await db.loadSeed(seed)
-    if (wrote) {
-      await db.putLock(lock)
-      await db.putLockAttempts({ failures: 0, waitUntil: 0 })
-    }
+    wrote = await db.loadSeed(seed, new Date(), lock)
   } finally {
     if (!wrote) {
-      if (previous) session.set(previous)
+      if (previous.key && previous.lockId) session.set(previous.key, previous.lockId)
       else session.clear()
     } else if (!stayUnlocked) session.clear()
   }

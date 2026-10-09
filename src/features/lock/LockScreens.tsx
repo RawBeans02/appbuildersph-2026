@@ -6,6 +6,7 @@ import { BottomSheet } from '../../components/BottomSheet'
 import { Button } from '../../components/Button'
 import { cx } from '../../components/cx'
 import { Field, type FieldInputProps } from '../../components/Field'
+import { RecordsError } from '../../components/StateBlock'
 import { isValidPin } from '../../data/db/vault'
 import type { LockView } from './lock'
 import { lock, useLock } from './useLock'
@@ -26,6 +27,13 @@ export default function LockScreens() {
   const view = useLock()
   if (view.status === 'setup') return <SetupScreen busy={view.busy} />
   if (view.status === 'locked') return <LockedScreen view={view} />
+  if (view.status === 'error') {
+    return (
+      <div className={styles.page}>
+        <RecordsError onRetry={() => void lock.init()} />
+      </div>
+    )
+  }
   if (view.status === 'checking') {
     return (
       <div className={styles.page}>
@@ -107,7 +115,8 @@ function LockedScreen({ view }: { view: LockedView }) {
   // Read out after each try: the input may already have focus, so its
   // description alone wouldn't be announced again.
   const [announcement, setAnnouncement] = useState('')
-  const [now, setNow] = useState(() => Date.now())
+  // The controller's waits are on performance.now(), so the device clock can't skip them.
+  const [now, setNow] = useState(() => performance.now())
   const [forgetOpen, setForgetOpen] = useState(false)
   const [erasing, setErasing] = useState(false)
   const [eraseFailed, setEraseFailed] = useState(false)
@@ -121,7 +130,7 @@ function LockedScreen({ view }: { view: LockedView }) {
     const until = view.waitUntil
     let timer: number | undefined
     const tick = () => {
-      const time = Date.now()
+      const time = performance.now()
       setNow(time)
       if (time < until) timer = window.setTimeout(tick, (until - time) % 1000 || 1000)
     }
@@ -150,7 +159,7 @@ function LockedScreen({ view }: { view: LockedView }) {
       const result = await lock.unlock(pin)
       // Unlocked: App swaps this screen for the app.
       if (result === 'ok') return
-      const time = Date.now()
+      const time = performance.now()
       setNow(time)
       const current = lock.getView()
       const until = current.status === 'locked' ? current.waitUntil : 0
@@ -254,7 +263,25 @@ function LockedScreen({ view }: { view: LockedView }) {
   )
 }
 
-function SetupScreen({ busy }: { busy: boolean }) {
+// A new PIN, twice: the first PIN on a phone (setup) and "Set your own PIN".
+export function NewPinForm({
+  busy,
+  onSubmit,
+  submitLabel,
+  busyLabel,
+  failText,
+  heading,
+  lead,
+}: {
+  busy: boolean
+  onSubmit: (pin: string) => Promise<void>
+  submitLabel: string
+  busyLabel: string
+  failText: string
+  // The screen's h1 (setup); a sheet brings its own title.
+  heading?: string
+  lead: string
+}) {
   const [pin, setPin] = useState('')
   const [again, setAgain] = useState('')
   const [pinError, setPinError] = useState<string | null>(null)
@@ -288,8 +315,7 @@ function SetupScreen({ busy }: { busy: boolean }) {
     setPinError(null)
     setAgainError(null)
     try {
-      // Done: App swaps this screen for the app.
-      await lock.setPin(pin)
+      await onSubmit(pin)
     } catch {
       // The alert reads it out.
       setFailed(true)
@@ -297,52 +323,67 @@ function SetupScreen({ busy }: { busy: boolean }) {
   }
 
   return (
+    <form className={styles.form} noValidate onSubmit={(event) => void submit(event)}>
+      {heading && <Heading>{heading}</Heading>}
+      <p className={styles.lead}>{lead}</p>
+      <div className={styles.fields}>
+        <Field label="PIN" error={pinError}>
+          {(input) => (
+            <PinInput
+              input={input}
+              name="PIN"
+              inputRef={pinRef}
+              value={pin}
+              autoComplete="new-password"
+              onChange={(value) => {
+                setPin(value)
+                setPinError(null)
+              }}
+            />
+          )}
+        </Field>
+        <Field label="PIN again" error={againError}>
+          {(input) => (
+            <PinInput
+              input={input}
+              name="PIN again"
+              inputRef={againRef}
+              value={again}
+              autoComplete="new-password"
+              onChange={(value) => {
+                setAgain(value)
+                setAgainError(null)
+              }}
+            />
+          )}
+        </Field>
+      </div>
+      <div className={styles.actions}>
+        {failed && <Alert>{failText}</Alert>}
+        <Button type="submit" disabled={busy}>
+          {busy ? busyLabel : submitLabel}
+        </Button>
+      </div>
+      <p role="status" className="visually-hidden">
+        {announcement}
+      </p>
+    </form>
+  )
+}
+
+function SetupScreen({ busy }: { busy: boolean }) {
+  return (
     <div className={styles.page}>
-      <form className={styles.form} noValidate onSubmit={(event) => void submit(event)}>
-        <Heading>Set a PIN for this phone</Heading>
-        <p className={styles.lead}>4 to 6 digits. It locks the records on this phone, and nobody can recover it if it's forgotten.</p>
-        <div className={styles.fields}>
-          <Field label="PIN" error={pinError}>
-            {(input) => (
-              <PinInput
-                input={input}
-                name="PIN"
-                inputRef={pinRef}
-                value={pin}
-                autoComplete="new-password"
-                onChange={(value) => {
-                  setPin(value)
-                  setPinError(null)
-                }}
-              />
-            )}
-          </Field>
-          <Field label="PIN again" error={againError}>
-            {(input) => (
-              <PinInput
-                input={input}
-                name="PIN again"
-                inputRef={againRef}
-                value={again}
-                autoComplete="new-password"
-                onChange={(value) => {
-                  setAgain(value)
-                  setAgainError(null)
-                }}
-              />
-            )}
-          </Field>
-        </div>
-        <div className={styles.actions}>
-          {failed && <Alert>Couldn't lock the records. Try again.</Alert>}
-          <Button type="submit" disabled={busy}>
-            {busy ? 'Locking the records…' : 'Set the PIN'}
-          </Button>
-        </div>
-        <p role="status" className="visually-hidden">
-          {announcement}
-        </p>
-      </form>
+      <NewPinForm
+        busy={busy}
+        heading="Set a PIN for this phone"
+        lead="4 to 6 digits. It locks the records on this phone, and nobody can recover it if it's forgotten."
+        submitLabel="Set the PIN"
+        busyLabel="Locking the records…"
+        failText="Couldn't lock the records. Try again."
+        // Done: App swaps this screen for the app.
+        onSubmit={(pin) => lock.setPin(pin)}
+      />
     </div>
   )
 }
