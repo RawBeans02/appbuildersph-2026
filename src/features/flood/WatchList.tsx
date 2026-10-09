@@ -135,7 +135,7 @@ function RowSheet({
       ? `${weekdayMonthDay(entry.firstExposedOn)} to ${weekdayMonthDay(entry.lastExposedOn)}`
       : entry && weekdayMonthDay(entry.firstExposedOn)
   return (
-    <BottomSheet open={entry !== null} onClose={onClose} title={resident?.name ?? entry?.residentId}>
+    <BottomSheet open={entry !== null} onClose={onClose} showClose title={resident?.name ?? entry?.residentId}>
       {entry && (
         <div>
           {resident && (

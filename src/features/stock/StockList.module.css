@@ -40,8 +40,16 @@
 }
 
 .heading {
-  margin: 22px var(--space-5) 6px;
+  margin: var(--space-6) var(--space-5) 6px;
   font: var(--type-heading);
+}
+
+/* The expiring group: an amber heading with the clock (its rows carry no pill). */
+.headingExpiring {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--warn);
 }
 
 .rows {

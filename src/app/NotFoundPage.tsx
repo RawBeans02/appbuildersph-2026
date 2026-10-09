@@ -29,7 +29,7 @@ export function NotFoundPage() {
             Go to the municipal home
           </ButtonLink>
         ) : (
-          <ButtonLink to="/" tagalog="Bumalik sa Home" icon={<HouseIcon size={22} weight="bold" aria-hidden />}>
+          <ButtonLink to="/" tagalog="Pumunta sa Home" icon={<HouseIcon size={22} weight="bold" aria-hidden />}>
             Go to Home
           </ButtonLink>
         )}

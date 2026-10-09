@@ -43,9 +43,11 @@
   --type-metric: 800 56px/56px var(--font-ui);
   --type-display: 800 34px/40px var(--font-ui);
   --type-title: 700 26px/32px var(--font-ui);
+  --type-heading-lg: 800 22px/28px var(--font-ui);
   --type-heading: 700 20px/26px var(--font-ui);
   --type-body-lg: 500 18px/26px var(--font-ui);
   --type-button: 700 18px/24px var(--font-ui);
+  --type-body-md: 500 17px/25px var(--font-ui);
   --type-body: 400 16px/24px var(--font-ui);
   --type-body-dense: 400 15px/22px var(--font-ui);
   --type-caption: 600 14px/20px var(--font-ui);

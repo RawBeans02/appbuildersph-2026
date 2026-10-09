@@ -23,9 +23,7 @@
 }
 
 .status {
-  /* LocalStatus's buttons are 48 px tall for touch; the text line sits 8 px
-     under the place line, as designed. */
-  margin: calc(var(--space-2) - 14px) 0 -14px;
+  margin-top: var(--space-2);
 }
 
 .iconButton {

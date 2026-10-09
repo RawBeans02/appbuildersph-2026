@@ -12,9 +12,9 @@ const ON_THIS_PHONE: { icon: Icon; title: string; text: string }[] = [
   {
     icon: CameraIcon,
     title: 'Breathing check (Hinga)',
-    text: 'Uses the camera to count breaths. The video is never recorded or saved.',
+    text: 'Uses the camera to count breaths. The video is never saved.',
   },
-  { icon: MicrophoneIcon, title: 'Crying check', text: 'Listens for crying during a count. Sound is never recorded.' },
+  { icon: MicrophoneIcon, title: 'Crying check', text: 'Listens for crying during a count. Sound is never saved.' },
   {
     icon: ScanIcon,
     title: 'Medicine-box reader',

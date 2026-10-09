@@ -11,7 +11,8 @@ import styles from './Watch.module.css'
 import { householdWords, peopleWords } from './words'
 
 // 8b: who waded in floodwater. A tap marks a whole household; tap again to
-// undo. "Waded" is on for every mark; "Open wound" and "Repeated" are optional.
+// undo. Only the checkbox row marks a household; "Waded in floodwater" is on
+// for every mark (plain text), "Open wound" and "Repeated" are 48 px toggles.
 // Marks stay on this screen until Confirm (8c) writes them. Only today's
 // contact can be undone here: a household exposed on an earlier day of this
 // flood shows that day, and marking it again adds today as a second day.
@@ -67,26 +68,28 @@ function HouseholdRow({
         <span className={styles.householdCount}>{peopleWords(household.members.length)}</span>
       </button>
       {marked && (
-        <div role="group" aria-labelledby={labelId} className={styles.details}>
-          <span className={cx(styles.detail, styles.detailOn)}>
-            <CheckIcon size={15} weight="bold" aria-hidden />
-            Waded
-          </span>
-          {OPTIONAL_DETAILS.map(({ kind, label }) => {
-            const on = kinds.includes(kind)
-            return (
-              <button
-                key={kind}
-                type="button"
-                aria-pressed={on}
-                className={cx(styles.detail, on && styles.detailOn)}
-                onClick={() => onToggleKind(kind)}
-              >
-                {on && <CheckIcon size={15} weight="bold" aria-hidden />}
-                {label}
-              </button>
-            )
-          })}
+        <div className={styles.details}>
+          <p className={styles.waded}>
+            <CheckIcon size={16} weight="bold" aria-hidden />
+            Waded in floodwater
+          </p>
+          <div role="group" aria-labelledby={labelId} className={styles.chips}>
+            {OPTIONAL_DETAILS.map(({ kind, label }) => {
+              const on = kinds.includes(kind)
+              return (
+                <button
+                  key={kind}
+                  type="button"
+                  aria-pressed={on}
+                  className={cx(styles.detail, on && styles.detailOn)}
+                  onClick={() => onToggleKind(kind)}
+                >
+                  {on && <CheckIcon size={16} weight="bold" aria-hidden />}
+                  {label}
+                </button>
+              )
+            })}
+          </div>
         </div>
       )}
     </li>

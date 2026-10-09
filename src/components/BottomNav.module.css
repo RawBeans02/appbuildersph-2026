@@ -50,25 +50,3 @@
   border-radius: 0 0 3px 3px;
   background: var(--ink);
 }
-
-.hinga {
-  color: var(--ink);
-  font-weight: 700;
-}
-
-.circle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 62px;
-  height: 62px;
-  margin-top: -20px;
-  border-radius: var(--r-full);
-  background: var(--ink);
-  color: var(--surface);
-  box-shadow: 0 0 0 5px var(--paper), var(--shadow-1);
-}
-
-.hinga:hover .circle {
-  background: var(--ink-2);
-}

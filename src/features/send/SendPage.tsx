@@ -136,7 +136,7 @@ export default function SendPage() {
         {header}
         <div className={styles.shared}>
           <span className={styles.sharedIcon} aria-hidden>
-            <CheckCircleIcon size={40} weight="bold" />
+            <CheckCircleIcon size={34} weight="bold" />
           </span>
           {/* The screen's h1 is the header's; the design draws this one as the headline. */}
           <h2 ref={focusHeading} tabIndex={-1} className={styles.sharedTitle}>

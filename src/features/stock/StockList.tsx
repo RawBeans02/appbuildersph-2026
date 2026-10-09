@@ -126,7 +126,8 @@ export function StockList({ onScan, onTypeIn }: { onScan: () => void; onTypeIn: 
 
         {expiring.length > 0 && (
           <section aria-labelledby="stock-expiring">
-            <h2 id="stock-expiring" className={styles.heading}>
+            <h2 id="stock-expiring" className={cx(styles.heading, styles.headingExpiring)}>
+              <ClockIcon size={22} weight="bold" aria-hidden />
               Expires within 6 weeks
             </h2>
             <LotRows lots={expiring} onRemove={setRemoving} />
@@ -169,13 +170,6 @@ function LotRows({ lots, onRemove }: { lots: ListedLot[]; onRemove: (lot: Listed
             <p className={styles.rowMeta}>
               <span className={styles.lotCode}>{lot.lot}</span> · EXP {monthYear(lot.expiry)}
             </p>
-            {lot.status === 'expiring' && (
-              <span className={styles.pill}>
-                <Pill tone="warn" icon={<ClockIcon size={16} weight="bold" aria-hidden />}>
-                  Expires within 6 weeks
-                </Pill>
-              </span>
-            )}
             {lot.status === 'expired' && (
               <span className={styles.pill}>
                 <Pill tone="bad" icon={<XCircleIcon size={16} weight="bold" aria-hidden />}>

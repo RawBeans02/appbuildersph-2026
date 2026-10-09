@@ -14,11 +14,12 @@ import {
 // Screen 14a's "What leaves this phone": the 14 counts of the QR, already
 // suppressed, in the order and wording of design/COPY.md.
 
-// WHO IMCI wording (design/README.md, pass 1 review decision 1).
+// Non-overlapping bands in completed months or years (design/README.md, Age
+// bands): a 12-month-old is "1 to 4 years".
 export const BAND_LABELS: Record<AgeBand, string> = {
   under2m: 'Under 2 months',
-  m2to12: '2 up to 12 months',
-  y1to5: '12 months up to 5 years',
+  m2to12: '2 to 11 months',
+  y1to5: '1 to 4 years',
   y5to17: '5 to 17 years',
   y18to59: '18 to 59 years',
   y60plus: '60 and over',

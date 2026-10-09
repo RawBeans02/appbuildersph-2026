@@ -9,15 +9,14 @@
   min-height: calc(100dvh - var(--nav-offset, 0px));
 }
 
-/* The primary's bar, pinned above the nav while 14a scrolls. The bottom
-   padding keeps the button clear of the raised Hinga tab, which rises 25 px
-   above the nav (review decision 6; the same bar as Home). */
+/* The primary's bar, pinned above the nav while 14a scrolls (the same bar
+   as Home). */
 .footer {
   position: sticky;
   bottom: var(--nav-offset, 0px);
   z-index: 1;
   margin-top: auto;
-  padding: var(--space-3) var(--space-5) var(--space-8);
+  padding: var(--space-3) var(--space-5) 14px;
   background: var(--paper);
 }
 
@@ -32,7 +31,7 @@
 /* 14a */
 
 .heading {
-  margin: 22px var(--space-5) var(--space-1);
+  margin: var(--space-6) var(--space-5) var(--space-1);
   font: 800 22px/28px var(--font-ui);
 }
 
@@ -156,7 +155,7 @@
 }
 
 .qrBoxShown {
-  margin-top: 22px;
+  margin-top: var(--space-6);
 }
 
 .code {
@@ -196,8 +195,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 72px;
-  height: 72px;
+  width: 64px;
+  height: 64px;
   border-radius: var(--r-full);
   background: var(--ok-tint);
   color: var(--ok);

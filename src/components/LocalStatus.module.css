@@ -1,22 +1,30 @@
 .status {
+  flex: none;
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-1) 14px;
+  column-gap: var(--space-4);
   font: var(--type-caption);
 }
 
 .part {
+  flex: none;
   display: inline-flex;
   align-items: center;
   gap: 5px;
   min-height: 48px;
+  margin: -14px 0;
   padding: 0;
   border: 0;
   background: none;
   font: inherit;
   white-space: nowrap;
   cursor: pointer;
+}
+
+.word {
+  text-decoration: underline dotted;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
 }
 
 .device {
@@ -60,8 +68,9 @@
 }
 
 .sheetBody {
-  font: var(--type-body);
-  color: var(--ink-2);
+  font: var(--type-body-lg);
+  font-weight: 400;
+  text-wrap: pretty;
 }
 
 .lead {
@@ -75,14 +84,20 @@
 }
 
 .sheetIcon {
+  flex: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
   border-radius: var(--r-full);
   background: var(--device-tint);
   color: var(--device);
+}
+
+.sheetIconOffline {
+  background: var(--sunken);
+  color: var(--ink);
 }
 
 .more {

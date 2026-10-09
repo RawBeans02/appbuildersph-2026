@@ -12,7 +12,9 @@ import styles from './LocalStatus.module.css'
 
 // The local-AI indicator: one quiet line, icon + word, never a pill. "Runs on
 // this phone" shows once the AI is ready; "Offline" joins it with no signal.
-// Tapping either opens its sheet (L5, L7). On camera screens, pass dark.
+// Each is a button with a dotted underline that opens its sheet (L5, L7),
+// with a 48 px tap area that doesn't move the 20 px line (negative margin).
+// On camera screens, pass dark.
 
 export function LocalStatus({
   device = 'phone',
@@ -37,32 +39,33 @@ export function LocalStatus({
 
   return (
     <div className={cx(styles.status, dark && styles.dark)}>
-      <button type="button" className={cx(styles.part, styles.device)} onClick={() => setSheet('device')}>
+      <button type="button" aria-haspopup="dialog" className={cx(styles.part, styles.device)} onClick={() => setSheet('device')}>
         <DeviceIcon size={16} weight="bold" aria-hidden />
-        {label}
+        <span className={styles.word}>{label}</span>
       </button>
       {!online && (
-        <button type="button" className={cx(styles.part, styles.offline)} onClick={() => setSheet('offline')}>
+        <button type="button" aria-haspopup="dialog" className={cx(styles.part, styles.offline)} onClick={() => setSheet('offline')}>
           <CloudSlashIcon size={16} weight="bold" aria-hidden />
-          Offline
+          <span className={styles.word}>Offline</span>
         </button>
       )}
 
       <BottomSheet
         open={sheet === 'device'}
         onClose={() => setSheet(null)}
+        showClose
         title={
           <span className={styles.sheetTitle}>
             <span className={styles.sheetIcon} aria-hidden>
-              <DeviceIcon size={22} weight="bold" />
+              <DeviceIcon size={26} weight="bold" />
             </span>
             {label}
           </span>
         }
       >
         <p className={styles.sheetBody}>
-          The AI is saved on this {device} and works with no signal. What you record stays here.
-          {device === 'phone' && ' Only counts leave, in the QR you choose to show.'}
+          The AI is saved on this {device} and works with no signal. Your records stay here.
+          {device === 'phone' && ' Only counts leave, in the QR.'}
         </p>
         <ul className={styles.rows}>
           {parts.map((part) => (
@@ -81,7 +84,16 @@ export function LocalStatus({
         </Link>
       </BottomSheet>
 
-      <BottomSheet open={sheet === 'offline'} onClose={() => setSheet(null)} title="Offline. Everything here still works.">
+      <BottomSheet open={sheet === 'offline'} onClose={() => setSheet(null)} showClose
+        title={
+          <span className={styles.sheetTitle}>
+            <span className={cx(styles.sheetIcon, styles.sheetIconOffline)} aria-hidden>
+              <CloudSlashIcon size={26} weight="bold" />
+            </span>
+            Offline. Everything here still works.
+          </span>
+        }
+      >
         <p className={styles.sheetBody}>
           Breathing checks, the watch list, stock and the QR all work with no signal. Only the first download and app
           updates need internet.

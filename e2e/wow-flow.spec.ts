@@ -53,7 +53,7 @@ test('tap exposed, add the scanned box, flag for review, create the QR', async (
   await expect(metric('people exposed to floodwater')).toHaveText(/^12\D/)
   await expect(metric('doxycycline capsules on hand')).toHaveText(/^40\D/)
   await expect(metric('of them expire within 6 weeks')).toHaveText(/^30\D/)
-  await expect(page.getByText(/dose/i)).toHaveText(['Agapay never suggests a dose. Doxycycline is given only after consultation with a health professional (DOH).'])
+  await expect(page.getByText(/dose/i)).toHaveText(['Agapay never suggests a dose. Doxycycline is given only after consultation with a health professional (DOH guideline).'])
   await page.getByRole('button', { name: 'Flag for clinician review' }).click()
   await expect(page.getByText('Flagged for clinician review', { exact: true })).toBeVisible()
 

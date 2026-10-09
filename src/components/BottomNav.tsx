@@ -3,9 +3,10 @@ import { Link } from '../app/Link'
 import styles from './BottomNav.module.css'
 import { cx } from './cx'
 
-// The phone's bottom nav: Home, Watch list, Hinga (a raised ink circle),
-// Stock, Send. Active: ink, Fill icon, 700, a bar at the top. Hidden inside
-// the Hinga, scan and send flows (the layout decides).
+// The phone's bottom nav: five flat tabs, Home, Watch list, Hinga, Stock,
+// Send. Active: ink, Fill icon, 700, a bar at the top. Nothing is raised
+// (Home's Check breathing is the big way into Hinga). Hidden inside the
+// Hinga, scan and send flows (the layout decides).
 
 const TABS: { path: string; label: string; icon: Icon }[] = [
   { path: '/', label: 'Home', icon: HouseIcon },
@@ -22,16 +23,6 @@ export function BottomNav({ path }: { path: string }) {
     <nav className={styles.nav} aria-label="Main">
       {TABS.map(({ path: to, label, icon: IconComponent }) => {
         const active = path === to
-        if (to === '/hinga') {
-          return (
-            <Link key={to} to={to} className={cx(styles.tab, styles.hinga)} aria-current={active ? 'page' : undefined}>
-              <span className={styles.circle} aria-hidden>
-                <IconComponent size={30} weight="bold" />
-              </span>
-              {label}
-            </Link>
-          )
-        }
         return (
           <Link key={to} to={to} className={cx(styles.tab, active && styles.active)} aria-current={active ? 'page' : undefined}>
             <span className={styles.bar} aria-hidden />

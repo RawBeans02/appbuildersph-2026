@@ -25,7 +25,7 @@ export function UnreadableScreen({
         {photoUrl && <img src={photoUrl} alt="The box you photographed" className={cx(screen.photo, screen.photoShort)} />}
         <div className={styles.block}>
           <span className={styles.icon} aria-hidden>
-            <WarningCircleIcon size={30} weight="bold" />
+            <WarningCircleIcon size={32} weight="bold" />
           </span>
           <h1 ref={headingRef} tabIndex={-1} className={cx(screen.title, screen.titleStrong, styles.title)}>
             Couldn't read the label

@@ -170,7 +170,7 @@ export default function ComparePage() {
 
         <p className={styles.doseNote}>
           <InfoIcon size={22} weight="bold" aria-hidden className={styles.doseIcon} />
-          <span>Agapay never suggests a dose. Doxycycline is given only after consultation with a health professional (DOH).</span>
+          <span>Agapay never suggests a dose. Doxycycline is given only after consultation with a health professional (DOH guideline).</span>
         </p>
       </div>
 

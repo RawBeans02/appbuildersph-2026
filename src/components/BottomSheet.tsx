@@ -1,14 +1,19 @@
+import { XIcon } from '@phosphor-icons/react'
 import { useEffect, useId, useRef, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import styles from './BottomSheet.module.css'
 
 // A bottom sheet over the screen: top radius 24, a grabber, scrim behind.
 // Escape or a tap on the scrim closes it; focus moves in and back out.
+// Dismissible sheets (L5, L7, 9b) also show a 48 px Close top right. The
+// title is an h2, or the screen's h1 when the sheet is the whole screen.
 export function BottomSheet({
   open,
   onClose,
   title,
   icon,
+  showClose,
+  titleLevel = 'h2',
   children,
 }: {
   open: boolean
@@ -17,8 +22,11 @@ export function BottomSheet({
   // A Phosphor icon element (about 30 px, Bold), shown in a 56 px circle
   // above the title.
   icon?: ReactNode
+  showClose?: boolean
+  titleLevel?: 'h1' | 'h2'
   children: ReactNode
 }) {
+  const Title = titleLevel
   const titleId = useId()
   const sheetRef = useRef<HTMLDivElement>(null)
 
@@ -56,9 +64,16 @@ export function BottomSheet({
             {icon}
           </span>
         )}
-        <h2 id={titleId} className={styles.title}>
-          {title}
-        </h2>
+        <div className={styles.head}>
+          <Title id={titleId} className={styles.title}>
+            {title}
+          </Title>
+          {showClose && (
+            <button type="button" className={styles.close} aria-label="Close" onClick={onClose}>
+              <XIcon size={24} weight="bold" aria-hidden />
+            </button>
+          )}
+        </div>
         <div className={styles.body}>{children}</div>
       </div>
     </div>,

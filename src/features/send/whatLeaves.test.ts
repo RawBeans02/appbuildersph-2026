@@ -24,8 +24,8 @@ describe('whatLeaves', () => {
         heading: 'Exposed, watch not started yet, by age',
         rows: [
           { label: 'Under 2 months', value: '0' },
-          { label: '2 up to 12 months', value: '0' },
-          { label: '12 months up to 5 years', value: '0' },
+          { label: '2 to 11 months', value: '0' },
+          { label: '1 to 4 years', value: '0' },
           { label: '5 to 17 years', value: '<5' },
           { label: '18 to 59 years', value: '6' },
           { label: '60 and over', value: '<5' },
@@ -36,8 +36,8 @@ describe('whatLeaves', () => {
         heading: 'Fast-breathing referrals, by age',
         rows: [
           { label: 'Under 2 months', value: '0' },
-          { label: '2 up to 12 months', value: '0' },
-          { label: '12 months up to 5 years', value: '<5' },
+          { label: '2 to 11 months', value: '0' },
+          { label: '1 to 4 years', value: '<5' },
         ],
       },
       { heading: null, rows: [{ label: 'URGENT referrals', value: '0' }] },
