@@ -49,7 +49,7 @@ export function LaptopNav({ active }: { active: LaptopSection }) {
         ))}
       </ul>
       <div className={styles.foot}>
-        <LocalStatus device="laptop" ready={aiReady} />
+        <LocalStatus device="laptop" stacked ready={aiReady} />
         <Link to="/privacy" className={styles.privacy}>
           <ShieldCheckIcon size={18} weight="bold" aria-hidden />
           Privacy &amp; AI
