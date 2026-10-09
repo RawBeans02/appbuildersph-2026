@@ -41,8 +41,9 @@ export function CantRunScreen({ onHandCount, onBack }: { onHandCount(): void; on
 }
 
 // L9b: the files are on the phone but the breathing check didn't load. A
-// second failure leads to L8a.
-export function DidntLoadScreen({ onRetry, onBack }: { onRetry(): void; onBack(): void }) {
+// second failure leads to L8a. Counting by hand is offered here too, so a
+// check never gets stuck on a phone whose camera AI won't start.
+export function DidntLoadScreen({ onRetry, onHandCount, onBack }: { onRetry(): void; onHandCount(): void; onBack(): void }) {
   return (
     <div className={styles.screen}>
       <FlowTopBar onBack={onBack} right={NO_STATUS} />
@@ -58,6 +59,9 @@ export function DidntLoadScreen({ onRetry, onBack }: { onRetry(): void; onBack()
       <div className={styles.footer}>
         <Button icon={<ArrowClockwiseIcon size={22} weight="bold" aria-hidden />} tagalog="Subukan ulit" onClick={onRetry}>
           Try again
+        </Button>
+        <Button variant="secondary" icon={<TimerIcon size={22} weight="bold" aria-hidden />} onClick={onHandCount}>
+          Count by hand with a timer
         </Button>
       </div>
     </div>

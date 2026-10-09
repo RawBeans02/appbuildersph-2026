@@ -163,7 +163,7 @@ function HingaFlow({ session }: { session: CountSession }) {
           onHandCount={offerHandCount(state.refusalsInRow) ? toHandCount : null}
         />
       )}
-      {screen === 'didnt-load' && <DidntLoadScreen onRetry={() => session.reloadModel()} onBack={() => setStep('age')} />}
+      {screen === 'didnt-load' && <DidntLoadScreen onRetry={() => session.reloadModel()} onHandCount={toHandCount} onBack={() => setStep('age')} />}
       {screen === 'cant-run' && <CantRunScreen onHandCount={toHandCount} onBack={() => setStep('age')} />}
       {screen === 'hand-count' && band && (
         <HandCountScreen
