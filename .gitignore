@@ -11,6 +11,8 @@ build/
 __pycache__/
 .DS_Store
 .vercel/
+# local agent worktrees
+.claude/worktrees/
 # model weights: never committed by accident (list any we commit on purpose in the README, with source and license)
 *.gguf
 *.onnx

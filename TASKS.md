@@ -57,6 +57,7 @@ Until `design/` lands, build the logic plus plain, unstyled screens and write `N
 - [ ] doing · A4 Medicine-box OCR in the app: PP-OCR moves into the real inference worker; parse drug / lot (`LOT`, `Lot No`, `Batch`) / expiry (`EXP`, `Exp. Date`; MM/YYYY, YYYY-MM, MMM YYYY) with a confidence per field, unit-tested; review + confirm → stock lot; screens 10–12 · [sr] · owns: `src/features/stock/`, `src/inference/ocr/`, `src/rules/label.ts`
 - [ ] todo · A5 Exposure × stock: rules (exposed count, capsules on hand, expiring within 6 weeks → "flag for clinician review", never a dose) unit-tested; screen 13 · [sr] · owns: `src/rules/stock.ts`, `src/features/compare/`
 - [ ] todo · A6 Send: "What leaves this phone" table + the QR, using the Lead's `src/qr/` encoder; screen 14 · [sr] · owns: `src/features/send/`
+  - Pairing (decided): the phone shows a one-time "pair" QR with its public key (from `generateDeviceKeyPair`); the laptop scans it, both screens show `keyFingerprint`, and the officer confirms they match. Store the device's export number `seq` and add 1 on every export (see `src/qr/README.md`).
 - [ ] todo · A7 Theme from the `design/README.md` tokens, applied once; component library customized, no defaults; the "Runs on this phone" and "Offline" indicators · [sr] · owns: `src/theme/`, `src/components/`
 - [ ] todo · A8 Privacy & AI page (screen 15), 404, app icons + manifest (after design) · [sr] · owns: `src/features/privacy/`, `public/icons/`
 
@@ -67,6 +68,7 @@ Until `design/` lands, build the logic plus plain, unstyled screens and write `N
   - API and wire format for A6 and B5: `src/qr/README.md`. Measured in `src/qr/codec.test.ts` (Vitest, Node 20): a realistic payload is 282 bytes of QR text, the largest valid one 343.
 - [ ] doing · B4 Synthetic data: "San Isidro Demo" (Maligaya-D, Bagong Silang-D, Santo Niño-D, Mabini-D, Riverside-D), residents "Residente 001…", lots "DEMO-LOT-…", plus 4 pre-made signed barangay QRs for the laptop demo; the generator and seed are in the repo · [lead] (→ [devin] PR 2 if confirmed) · owns: `src/data/seed/`, `scripts/seed/`
 - [ ] todo · B5 Municipal laptop view: scan a QR (BarcodeDetector, with a JS decoder fallback), verify, merge the 5 barangays, merged table, rule-based plan (doctor-team priority, stock moves), approve + log; screens 16–20 except the AI panel · [lead] · owns: `src/features/municipal/`, `src/rules/plan.ts`
+  - Needs DB v2 stores from the Sr. Builder (`db.ts` owns the schema): received payloads and paired device keys. Pre-made barangays' keys come from the seed (B4 part 2).
 - [ ] todo · B6 Local LLM wording (optional): WebLLM Llama-3.2-1B on the laptop, prompt constrained to the plan's numbers, output checked so it can't change a count, template fallback when WebGPU or the model isn't available. No WebLLM test on the 8 GB Mac without messaging Account Admin first · [lead] · owns: `src/features/municipal/llm/`
 - [ ] todo · B7 `docs/ARCHITECTURE.md` + the README sections as features land · [lead]
 
@@ -122,6 +124,7 @@ Until `design/` lands, build the logic plus plain, unstyled screens and write `N
 3. **Parking lot (don't build unless everything else is done and polished):** a consultation explainer (Whisper), offline first-aid cards ("Unang Lunas"), an emergency mode.
 
 ## Ideas (not now — only after the wow flow is done)
+- Roadmap only (parking lot): offline first-aid cards, consultation explainer, emergency mode.
 - Cut list if behind at midnight, in order: dengue checks · hazard map layer · any DOH cloud view · Lemonade (unless working) · YAMNet (keep the motion gate) · Tagalog strings beyond the main labels
 - Not doing: dosing or diagnosis, accounts/login, real patient data, cloud AI in the shipped app
 
