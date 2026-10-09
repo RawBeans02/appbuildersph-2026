@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Button, Field, FlowTopBar, RecordsError, useToast, type FieldTag } from '../../components'
 import { cx } from '../../components/cx'
 import { getDb } from '../../data/db/appDb'
+import type { LineFrame } from '../../inference/ocr/ocrClient'
 import { useHoldReload } from '../../lib/useHoldReload'
 import type { LabelReading } from '../../rules/label'
 import styles from './Review.module.css'
@@ -30,6 +31,9 @@ export type ScanResult = {
   reading: LabelReading
   // Every line the reader found, for "All text read from the box".
   lines: string[]
+  // Where each of those lines is on the photo (same order; a field's
+  // reading.*.line indexes both), for drawing the reader's boxes over it.
+  frames: LineFrame[]
   // Measured on this phone: the reading, and the reader load before it.
   readMs: number
   loadMs: number | null

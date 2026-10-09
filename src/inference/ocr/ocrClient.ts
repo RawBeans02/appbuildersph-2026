@@ -1,7 +1,8 @@
 import type { Backend } from '../../lib/backend'
-import { downscaleImage, imageToPixels } from '../../lib/image'
+import { downscaleImage, imageToPixels, type FittedSize } from '../../lib/image'
 import { createInferenceClient, createInferenceWorker, type InferenceClient } from '../client'
 import { OCR_ENGINE } from './engine'
+import type { Box } from './dbPostprocess'
 import type { OcrLine } from './pipeline'
 import type { OcrOutput } from './runtime'
 
@@ -66,8 +67,22 @@ export type ReadOptions = {
   onProgress?: (progress: ReadProgress) => void
 }
 
+// A line's place on the photo as fractions (0..1) of the image the reader
+// saw, so a screen can draw the reader's real boxes over the photo at any size.
+export type LineFrame = { left: number; top: number; width: number; height: number }
+
+export type ReadLine = OcrLine & { frame: LineFrame }
+
+const fraction = (value: number, size: number) => Math.min(1, Math.max(0, value / size))
+
+export function lineFrame(box: Box, size: Pick<FittedSize, 'width' | 'height'>): LineFrame {
+  const left = fraction(box.x0, size.width)
+  const top = fraction(box.y0, size.height)
+  return { left, top, width: fraction(box.x1, size.width) - left, height: fraction(box.y1, size.height) - top }
+}
+
 // Reads a photo of a medicine box with this device's engine (engine.ts).
-export async function readBox(photo: Blob, { signal, onProgress }: ReadOptions = {}): Promise<OcrLine[]> {
+export async function readBox(photo: Blob, { signal, onProgress }: ReadOptions = {}): Promise<ReadLine[]> {
   onProgress?.({ stage: 'detect', fraction: null })
   if (OCR_ENGINE === 'tesseract') {
     // Tesseract reports no stages here: it stays on the first one.
@@ -75,12 +90,12 @@ export async function readBox(photo: Blob, { signal, onProgress }: ReadOptions =
       import('../tesseract/reader'),
       downscaleImage(photo, { type: 'image/png' }),
     ])
-    return readWithTesseract(small.blob)
+    return (await readWithTesseract(small.blob)).map((line) => ({ ...line, frame: lineFrame(line.box, small) }))
   }
   const pixels = await imageToPixels(photo)
   const client = await getOcrClient()
   const output = await client.run<OcrOutput>(pixels, { signal, onProgress: onProgress && stageTracker(onProgress) })
-  return output.lines
+  return output.lines.map((line) => ({ ...line, frame: lineFrame(line.box, pixels) }))
 }
 
 // Turns the worker's 0..1 progress into stages. The pipeline reports once

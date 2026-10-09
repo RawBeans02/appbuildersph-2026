@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState, type RefObject } from 'react'
 import { useFlowMode } from '../../app/flow'
-import { isReaderLoaded, readBox, warmUpReader } from '../../inference/ocr/ocrClient'
-import type { OcrLine } from '../../inference/ocr/pipeline'
+import { isReaderLoaded, readBox, warmUpReader, type ReadLine } from '../../inference/ocr/ocrClient'
 import { useModelsPrepared } from '../../lib/useModelsPrepared'
 import { parseLabel } from '../../rules/label'
 import { ReaderFailedScreen, UnreadableScreen } from './ReadFailedScreen'
@@ -84,7 +83,7 @@ export default function StockPage() {
     if (!live()) return
 
     const start = performance.now()
-    let lines: OcrLine[]
+    let lines: ReadLine[]
     try {
       lines = await readBox(source.blob, {
         signal: controller.signal,
@@ -106,7 +105,10 @@ export default function StockPage() {
     setStep(
       nothingRead(reading)
         ? { name: 'unreadable' }
-        : { name: 'review', scan: { reading, lines: lines.map((line) => line.text), readMs, loadMs } },
+        : {
+            name: 'review',
+            scan: { reading, lines: lines.map((line) => line.text), frames: lines.map((line) => line.frame), readMs, loadMs },
+          },
     )
   }
 
