@@ -24,6 +24,50 @@
   border-bottom: 1px solid var(--line);
 }
 
+/* L10b: the top row that reopens the intro. The page's row (icon, bold
+   title, a line in --ink-2), full width with dividers, and a caret. */
+.introRow {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) 22px;
+  align-items: center;
+  gap: 14px;
+  min-height: 72px;
+  margin: var(--space-4) calc(-1 * var(--space-5)) 0;
+  padding: 14px var(--space-4) 14px var(--space-5);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.introRow:hover,
+.introRow:active {
+  background: var(--sunken);
+}
+
+.introRow:focus-visible {
+  outline-offset: -3px;
+}
+
+.introRow .partIcon {
+  align-self: start;
+}
+
+.introTitle {
+  display: block;
+  font: 700 18px/24px var(--font-ui);
+}
+
+.introText {
+  display: block;
+  font: var(--type-body);
+  color: var(--ink-2);
+}
+
+.caret {
+  color: var(--ink-3);
+}
+
 .partIcon {
   flex: none;
   margin-top: 2px;

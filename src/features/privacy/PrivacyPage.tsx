@@ -1,4 +1,14 @@
-import { ArrowRightIcon, CameraIcon, LockSimpleIcon, MicrophoneIcon, ScanIcon, WarningIcon, type Icon } from '@phosphor-icons/react'
+import {
+  ArrowRightIcon,
+  CameraIcon,
+  CaretRightIcon,
+  InfoIcon,
+  LockSimpleIcon,
+  MicrophoneIcon,
+  ScanIcon,
+  WarningIcon,
+  type Icon,
+} from '@phosphor-icons/react'
 import { useFlowMode } from '../../app/flow'
 import { Link } from '../../app/Link'
 import { navigate } from '../../app/router'
@@ -51,6 +61,16 @@ export default function PrivacyPage() {
       <FlowTopBar onBack={goBack} />
       <div className={styles.body}>
         <h1 className={styles.title}>Privacy &amp; AI</h1>
+
+        {/* L10b: reopens the first-run intro at 0a, over Home. */}
+        <Link to="/?intro" className={styles.introRow}>
+          <InfoIcon className={styles.partIcon} size={24} weight="bold" aria-hidden />
+          <span>
+            <span className={styles.introTitle}>How AgapayMo works</span>
+            <span className={styles.introText}>What it does, and how it works with no signal</span>
+          </span>
+          <CaretRightIcon className={styles.caret} size={22} weight="bold" aria-hidden />
+        </Link>
 
         <h2 className={styles.heading}>What runs on this phone</h2>
         <ul className={styles.parts}>
