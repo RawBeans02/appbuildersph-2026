@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, test, type Locator, type Page } from '@playwright/test'
+import { openPage } from './lock'
 
 // Automated accessibility check (axe-core, WCAG 2.0/2.1 A and AA rules) on
 // every screen with the sample data loaded: phone screens at 375 × 812, the
@@ -33,11 +34,14 @@ const LAPTOP: Screen[] = [
 const SERIOUS = new Set(['serious', 'critical'])
 
 async function checkScreen(page: Page, { path, ready }: Screen) {
-  await page.goto(path)
+  await openPage(page, path)
   await expect(page.locator('html')).toHaveAttribute('data-shell-status', 'ready', { timeout: 30_000 })
   // Each screen's loaded state (not its skeleton or loading line).
   await expect(ready(page)).toBeVisible({ timeout: 30_000 })
+  await runAxe(page, path)
+}
 
+async function runAxe(page: Page, path: string) {
   const { violations, passes, incomplete } = await new AxeBuilder({ page })
     .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
     .analyze()
@@ -61,6 +65,19 @@ test.describe('phone screens, 375 × 812', () => {
   for (const screen of PHONE) {
     test(`axe: ${screen.path}`, async ({ page }) => checkScreen(page, screen))
   }
+})
+
+// Phase 2's PIN lock screen, when this build has it (VITE_PHASE2).
+test.describe('PIN lock, 375 × 812', () => {
+  test.use({ viewport: { width: 375, height: 812 } })
+  test('axe: the lock screen', async ({ page }) => {
+    await page.goto('/')
+    const html = page.locator('html')
+    await expect(html).toHaveAttribute('data-lock-status', /^(off|setup|locked|unlocked)$/, { timeout: 30_000 })
+    test.skip((await html.getAttribute('data-lock-status')) !== 'locked', 'phase 2 is off in this build')
+    await expect(page.getByRole('heading', { level: 1, name: 'Enter your PIN' })).toBeVisible()
+    await runAxe(page, '/ (locked)')
+  })
 })
 
 test.describe('municipal laptop, 1280 × 800', () => {

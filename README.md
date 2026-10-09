@@ -109,6 +109,7 @@ The diagram, the pipelines, the key decisions and the limitations are in [`docs/
   - Records stay on the device, and nothing is sent to a server.
   - The QR carries counts only: no names, birth dates, households, puroks or exact dates. Counts from 1 to 4 show as "<5", and the fields don't overlap, so a hidden cell can't be worked out by subtraction.
   - Photos, video and microphone audio are never stored or sent.
+  - With phase 2 on (`VITE_PHASE2`), a PIN locks the phone's records: names, birth dates, households, puroks, flood notes and health details are encrypted at rest (AES-GCM 256-bit, a key derived from the PIN with PBKDF2-HMAC-SHA-256 at 600,000 iterations, kept in memory only). The exact scheme and its limits are in `docs/ARCHITECTURE.md` (Data and privacy).
 - **Synthetic data only:** everything in the demo is invented ("San Isidro Demo", residents "Residente 001…") and labeled as sample data. We never tested on patients or children.
 - **Honest about limits:** no accuracy figure is claimed for any model. Thresholds are first settings, and the limitations are listed in `docs/ARCHITECTURE.md`.
 

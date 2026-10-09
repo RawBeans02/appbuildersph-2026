@@ -19,6 +19,8 @@ export type Measurements = {
   poseFps: number | null
   poseInferMedianMs: number | null
   cryStartMs: number | null
+  // One PBKDF2 run that derives the PIN key (phase 2's lock).
+  pinKeyMs: number | null
 }
 
 export const EMPTY_MEASUREMENTS: Omit<Measurements, 'deviceName' | 'userAgent' | 'backend' | 'ocrEngine'> = {
@@ -32,6 +34,7 @@ export const EMPTY_MEASUREMENTS: Omit<Measurements, 'deviceName' | 'userAgent' |
   poseFps: null,
   poseInferMedianMs: null,
   cryStartMs: null,
+  pinKeyMs: null,
 }
 
 export function median(values: readonly number[]): number | null {
@@ -44,8 +47,8 @@ export function median(values: readonly number[]): number | null {
 const ms = (value: number | null) => (value === null ? '–' : String(Math.round(value)))
 
 export const TABLE_HEADER = [
-  '| Date | Device | Browser (user agent) | Backend | OCR engine | OCR load ms | OCR first read ms | OCR warm read ms (median) | Label read right | Pose start cold ms | Pose start warm ms | Pose runs | Pose fps (10 s) | Pose infer ms (median) | Cry check start ms |',
-  '|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|',
+  '| Date | Device | Browser (user agent) | Backend | OCR engine | OCR load ms | OCR first read ms | OCR warm read ms (median) | Label read right | Pose start cold ms | Pose start warm ms | Pose runs | Pose fps (10 s) | Pose infer ms (median) | Cry check start ms | PIN key ms |',
+  '|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|',
 ].join('\n')
 
 // One Markdown table row, in TABLE_HEADER's order. Pipes in the text are
@@ -68,5 +71,6 @@ export function tableRow(m: Measurements, date: Date): string {
     m.poseFps === null ? '–' : m.poseFps.toFixed(1),
     ms(m.poseInferMedianMs),
     ms(m.cryStartMs),
+    ms(m.pinKeyMs),
   ].join(' | ')} |`
 }

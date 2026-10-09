@@ -25,11 +25,12 @@ describe('tableRow', () => {
         poseColdMs: 6894,
         poseWhere: 'worker',
         poseFps: 12.345,
+        pinKeyMs: 512.6,
       },
       new Date('2026-10-09T20:15:00Z'),
     )
     expect(row).toBe(
-      '| 2026-10-09 20:15 UTC | iPhone 14 Pro Max | Mozilla/5.0 (iPhone\\|test) | wasm, 1 thread | PP-OCRv5 (ONNX Runtime Web) | already loaded | 1234 | 988 | yes | 6894 | – | worker | 12.3 | – | – |',
+      '| 2026-10-09 20:15 UTC | iPhone 14 Pro Max | Mozilla/5.0 (iPhone\\|test) | wasm, 1 thread | PP-OCRv5 (ONNX Runtime Web) | already loaded | 1234 | 988 | yes | 6894 | – | worker | 12.3 | – | – | 513 |',
     )
     const columns = (line: string) => line.split(/(?<!\\)\|/).length
     expect(columns(row)).toBe(columns(TABLE_HEADER.split('\n')[0]))

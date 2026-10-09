@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test'
 import { prepareForOffline } from './prepare'
 import { DEMO_SCAN_LABEL } from '../src/data/seed/demoLabel'
+import { openPage } from './lock'
 
 // The Local AI proof: after "Prepare for offline", with no network at all,
 // the real PP-OCRv5 models read the demo box's label in the browser (WASM, in
@@ -11,7 +12,7 @@ test('reads the demo doxycycline box offline with the on-device OCR', async ({ p
   await prepareForOffline(page)
 
   await context.setOffline(true)
-  await page.goto('/stock')
+  await openPage(page, '/stock')
   // No camera in headless Chromium: the scan screen offers a photo instead.
   await page.getByRole('button', { name: 'Scan a box' }).click()
   await page.getByLabel('Scan a medicine box', { exact: true }).setInputFiles('docs/demo/label-doxy-24A.png')

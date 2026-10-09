@@ -15,6 +15,7 @@ import type {
   StockLot,
   WatchCheck,
 } from './types'
+import { LockedError, openValue, sealValue, session, type LockAttempts, type LockRecord, type SealedBox } from './vault'
 
 // The on-device database. Every list is bounded (QUALITY.md): pass a limit, or
 // get DEFAULT_LIMIT. Writes notify subscribers of that store, so screens can
@@ -60,21 +61,74 @@ export type ListOptions = {
   after?: string
 }
 
+// Phase 2 (vault.ts): the fields sealed at rest, per store, when the
+// database is opened with encryption on. They're the ones that identify a
+// person or describe their health. Ids, the fields indexes use (dates,
+// resident and flood ids) and stock, which isn't personal, stay plain, so
+// every index keeps working. A sealed record keeps its plain fields and
+// carries the rest in `sealed`, one AES-GCM box with its own random IV.
+export const SEALED_FIELDS: Partial<Record<RecordStore, readonly string[]>> = {
+  residents: ['name', 'birthDate', 'householdId', 'purok', 'sex'],
+  floodEvents: ['note', 'puroks'],
+  exposures: ['kinds'],
+  hingaChecks: ['ageMonths', 'breathsPerMinute', 'outcome', 'refusal', 'dangerSigns', 'method'],
+  watchChecks: ['result'],
+}
+
+type Stored = Record<string, unknown> & { sealed?: SealedBox }
+
+function createCodec(encryption: boolean) {
+  const keyOrThrow = () => {
+    const key = session.key()
+    if (!key) throw new LockedError()
+    return key
+  }
+  return {
+    async seal<T>(store: RecordStore, record: T): Promise<T> {
+      const fields = SEALED_FIELDS[store]
+      if (!encryption || !fields) return record
+      const rest: Stored = { ...(record as Stored) }
+      const secret: Record<string, unknown> = {}
+      for (const field of fields) {
+        if (field in rest) {
+          secret[field] = rest[field]
+          delete rest[field]
+        }
+      }
+      rest.sealed = await sealValue(keyOrThrow(), secret)
+      return rest as T
+    },
+    // Plain records (written with encryption off) are read as they are.
+    async open<T>(record: T): Promise<T> {
+      const stored = record as Stored | undefined
+      if (!stored?.sealed) return record
+      const { sealed, ...rest } = stored
+      return { ...rest, ...(await openValue<Record<string, unknown>>(keyOrThrow(), sealed)) } as T
+    },
+  }
+}
+
+type Codec = ReturnType<typeof createCodec>
+
 function createRepository<S extends RecordStore>(
   db: IDBPDatabase<AgapaySchema>,
   store: S,
   notify: (store: RecordStore) => void,
+  codec: Codec,
 ) {
   type Value = StoreValue<AgapaySchema, S>
+  const openAll = (records: Value[]) => Promise.all(records.map((record) => codec.open(record)))
   return {
-    get: (id: string): Promise<Value | undefined> => db.get(store, id),
+    get: async (id: string): Promise<Value | undefined> => codec.open(await db.get(store, id)),
     async put(record: Value): Promise<void> {
-      await db.put(store, record)
+      await db.put(store, await codec.seal(store, record))
       notify(store)
     },
     async putMany(records: Value[]): Promise<void> {
+      // Sealed before the transaction: it would commit while awaiting crypto.
+      const sealed = await Promise.all(records.map((record) => codec.seal(store, record)))
       const tx = db.transaction(store, 'readwrite')
-      await Promise.all([...records.map((record) => tx.store.put(record)), tx.done])
+      await Promise.all([...sealed.map((record) => tx.store.put(record)), tx.done])
       notify(store)
     },
     async delete(id: string): Promise<void> {
@@ -84,21 +138,23 @@ function createRepository<S extends RecordStore>(
     count: (): Promise<number> => db.count(store),
     async list(options: ListOptions = {}): Promise<Value[]> {
       const range = options.after === undefined ? undefined : IDBKeyRange.lowerBound(options.after, true)
-      return db.getAll(store, range, boundedLimit(options.limit))
+      return openAll(await db.getAll(store, range, boundedLimit(options.limit)))
     },
     async listBy(
       index: IndexNames<AgapaySchema, S>,
       value: string,
       options: { limit?: number } = {},
     ): Promise<Value[]> {
-      return db.getAllFromIndex(store, index, IDBKeyRange.only(value), boundedLimit(options.limit))
+      return openAll(await db.getAllFromIndex(store, index, IDBKeyRange.only(value), boundedLimit(options.limit)))
     },
   }
 }
 
 export type Repository<S extends RecordStore> = ReturnType<typeof createRepository<S>>
 
-export async function openAgapayDb(name = DB_NAME) {
+// encryption: seal SEALED_FIELDS with the session key (phase 2). Off, every
+// record is written plain, as before phase 2.
+export async function openAgapayDb(name = DB_NAME, { encryption = false }: { encryption?: boolean } = {}) {
   const db = await openDB<AgapaySchema>(name, DB_VERSION, {
     upgrade(database, oldVersion) {
       // One block per version, so later versions add stores without losing data.
@@ -139,19 +195,50 @@ export async function openAgapayDb(name = DB_NAME) {
 
   const listeners = new Map<RecordStore, Set<() => void>>()
   const notify = (store: RecordStore) => listeners.get(store)?.forEach((listener) => listener())
+  const codec = createCodec(encryption)
 
   return {
-    residents: createRepository(db, 'residents', notify),
-    floodEvents: createRepository(db, 'floodEvents', notify),
-    exposures: createRepository(db, 'exposures', notify),
-    hingaChecks: createRepository(db, 'hingaChecks', notify),
-    stockLots: createRepository(db, 'stockLots', notify),
-    flags: createRepository(db, 'flags', notify),
-    approvals: createRepository(db, 'approvals', notify),
-    receivedPayloads: createRepository(db, 'receivedPayloads', notify),
-    pairedDevices: createRepository(db, 'pairedDevices', notify),
-    plans: createRepository(db, 'plans', notify),
-    watchChecks: createRepository(db, 'watchChecks', notify),
+    encryption,
+    residents: createRepository(db, 'residents', notify, codec),
+    floodEvents: createRepository(db, 'floodEvents', notify, codec),
+    exposures: createRepository(db, 'exposures', notify, codec),
+    hingaChecks: createRepository(db, 'hingaChecks', notify, codec),
+    stockLots: createRepository(db, 'stockLots', notify, codec),
+    flags: createRepository(db, 'flags', notify, codec),
+    approvals: createRepository(db, 'approvals', notify, codec),
+    receivedPayloads: createRepository(db, 'receivedPayloads', notify, codec),
+    pairedDevices: createRepository(db, 'pairedDevices', notify, codec),
+    plans: createRepository(db, 'plans', notify, codec),
+    watchChecks: createRepository(db, 'watchChecks', notify, codec),
+
+    // Phase 2: the PIN lock's record and the wrong-PIN tries (vault.ts).
+    async getLock(): Promise<LockRecord | null> {
+      return ((await db.get('meta', 'lock')) as LockRecord | undefined) ?? null
+    },
+    async putLock(lock: LockRecord): Promise<void> {
+      await db.put('meta', lock, 'lock')
+    },
+    async getLockAttempts(): Promise<LockAttempts> {
+      return ((await db.get('meta', 'lockAttempts')) as LockAttempts | undefined) ?? { failures: 0, waitUntil: 0 }
+    },
+    async putLockAttempts(attempts: LockAttempts): Promise<void> {
+      await db.put('meta', attempts, 'lockAttempts')
+    },
+    // Seals every plain record in the sealed stores with the session key (a
+    // PIN set on a phone that already has records).
+    async sealExisting(): Promise<number> {
+      let count = 0
+      for (const store of Object.keys(SEALED_FIELDS) as RecordStore[]) {
+        const plain = ((await db.getAll(store)) as Stored[]).filter((record) => !record.sealed)
+        if (!plain.length) continue
+        const sealed = await Promise.all(plain.map((record) => codec.seal(store, record)))
+        const tx = db.transaction(store, 'readwrite')
+        await Promise.all([...sealed.map((record) => tx.store.put(record as never)), tx.done])
+        count += sealed.length
+        notify(store)
+      }
+      return count
+    },
 
     // The phone's signing identity, or null before it's made.
     async getDeviceIdentity(): Promise<DeviceIdentity | null> {
@@ -192,6 +279,17 @@ export async function openAgapayDb(name = DB_NAME) {
     // First run only: writes the synthetic seed, every record marked as sample
     // data, in one transaction. Returns whether it wrote anything.
     async loadSeed(seed: SeedData, now = new Date()): Promise<boolean> {
+      if (await db.get('meta', 'seed')) return false
+      // Sealed first: a transaction commits while awaiting crypto.
+      const sample = <T>(store: RecordStore, records: T[] = []) =>
+        Promise.all(records.map((record) => codec.seal(store, { ...record, sample: true })))
+      const [residents, floodEvents, exposures, hingaChecks, stockLots] = await Promise.all([
+        sample('residents', seed.residents),
+        sample('floodEvents', seed.floodEvents),
+        sample('exposures', seed.exposures),
+        sample('hingaChecks', seed.hingaChecks),
+        sample('stockLots', seed.stockLots),
+      ])
       const tx = db.transaction(
         ['meta', 'residents', 'floodEvents', 'exposures', 'hingaChecks', 'stockLots'],
         'readwrite',
@@ -200,13 +298,12 @@ export async function openAgapayDb(name = DB_NAME) {
         await tx.done
         return false
       }
-      const sample = <T>(records: T[] = []) => records.map((record) => ({ ...record, sample: true }))
       const writes: Promise<unknown>[] = [
-        ...sample(seed.residents).map((r) => tx.objectStore('residents').put(r)),
-        ...sample(seed.floodEvents).map((r) => tx.objectStore('floodEvents').put(r)),
-        ...sample(seed.exposures).map((r) => tx.objectStore('exposures').put(r)),
-        ...sample(seed.hingaChecks).map((r) => tx.objectStore('hingaChecks').put(r)),
-        ...sample(seed.stockLots).map((r) => tx.objectStore('stockLots').put(r)),
+        ...residents.map((r) => tx.objectStore('residents').put(r as Resident)),
+        ...floodEvents.map((r) => tx.objectStore('floodEvents').put(r as FloodEvent)),
+        ...exposures.map((r) => tx.objectStore('exposures').put(r as Exposure)),
+        ...hingaChecks.map((r) => tx.objectStore('hingaChecks').put(r as HingaCheck)),
+        ...stockLots.map((r) => tx.objectStore('stockLots').put(r as StockLot)),
       ]
       const info: SeedInfo = {
         version: seed.version,
@@ -224,7 +321,9 @@ export async function openAgapayDb(name = DB_NAME) {
     // in one transaction, so loadSeed() runs again. Keeps this phone's signing
     // identity and any phone the laptop paired for real, unless resetPairing.
     // Never touches Cache Storage, so downloaded models stay.
-    async clearForReset({ resetPairing }: { resetPairing: boolean }): Promise<void> {
+    // resetLock (phase 2): also drops the PIN lock and its tries, for "Reset
+    // sample data" (re-sealed with the demo PIN) and "Forgot the PIN?".
+    async clearForReset({ resetPairing, resetLock = false }: { resetPairing: boolean; resetLock?: boolean }): Promise<void> {
       const records = [
         'residents',
         'floodEvents',
@@ -243,6 +342,7 @@ export async function openAgapayDb(name = DB_NAME) {
         ...records.map((store) => tx.objectStore(store).clear()),
         tx.objectStore('meta').delete('seed'),
       ]
+      if (resetLock) work.push(tx.objectStore('meta').delete('lock'), tx.objectStore('meta').delete('lockAttempts'))
       if (resetPairing) {
         work.push(paired.clear(), tx.objectStore('deviceIdentity').clear())
       } else {

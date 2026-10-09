@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { prepareForOffline } from './prepare'
+import { openPage } from './lock'
 
 // "Prepare for offline" downloads the models and the runtime .wasm into the
 // model caches; with no network afterwards, the screen still says ready and
@@ -10,7 +11,7 @@ test('prepared models and the runtime .wasm load with no network', async ({ page
   await prepareForOffline(page)
 
   await context.setOffline(true)
-  await page.goto('/prepare')
+  await openPage(page, '/prepare')
   // Already cached: straight to ready, no download.
   await expect(page.locator('[data-prepare-status]')).toHaveAttribute('data-prepare-status', 'ready')
   await expect(page.getByRole('heading', { level: 1, name: 'Runs on this phone' })).toBeVisible()
