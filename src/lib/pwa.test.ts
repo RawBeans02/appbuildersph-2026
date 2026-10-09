@@ -2,15 +2,26 @@ import { describe, expect, it, vi } from 'vitest'
 import type { RegisterSWOptions } from 'vite-plugin-pwa/types'
 import { createAppShell } from './pwa'
 
-function startShell(supported = true) {
+function startShell(supported = true, ready: Promise<unknown> = new Promise(() => {})) {
   const shell = createAppShell()
   let options: RegisterSWOptions = {}
   const register = vi.fn((o: RegisterSWOptions) => {
     options = o
   })
   const reload = vi.fn()
-  shell.start({ register, supported, reload })
+  shell.start({ register, supported, reload, ready })
   return { shell, register, reload, options: () => options }
+}
+
+// A registration whose worker is still installing, like a first visit.
+function installingRegistration() {
+  const worker = Object.assign(new EventTarget(), { state: 'installing' as ServiceWorkerState })
+  const registration = { active: null, installing: worker } as unknown as ServiceWorkerRegistration
+  const setState = (state: ServiceWorkerState) => {
+    worker.state = state
+    worker.dispatchEvent(new Event('statechange'))
+  }
+  return { registration, setState }
 }
 
 const activeRegistration = { active: {} } as ServiceWorkerRegistration
@@ -36,6 +47,38 @@ describe('createAppShell', () => {
   it('is ready on a returning visit, when a worker is already active', () => {
     const { shell, options } = startShell()
     options().onRegisteredSW?.('/sw.js', activeRegistration)
+    expect(shell.getStatus()).toBe('ready')
+  })
+
+  it('is ready once serviceWorker.ready resolves, even if the page reloaded mid-install', async () => {
+    let resolveReady: (value: unknown) => void = () => {}
+    const ready = new Promise((resolve) => (resolveReady = resolve))
+    const { shell, options } = startShell(true, ready)
+    // The reloaded page sees the install already under way: no onOfflineReady comes.
+    options().onRegisteredSW?.('/sw.js', installingRegistration().registration)
+    expect(shell.getStatus()).toBe('installing')
+    resolveReady({})
+    await ready
+    await Promise.resolve()
+    expect(shell.getStatus()).toBe('ready')
+  })
+
+  it('reports an error when the first precache install fails', () => {
+    const { shell, options } = startShell()
+    const { registration, setState } = installingRegistration()
+    options().onRegisteredSW?.('/sw.js', registration)
+    setState('installed')
+    expect(shell.getStatus()).toBe('installing')
+    setState('redundant')
+    expect(shell.getStatus()).toBe('error')
+  })
+
+  it('keeps a cached shell ready when an update install fails', () => {
+    const { shell, options } = startShell()
+    const { registration, setState } = installingRegistration()
+    options().onRegisteredSW?.('/sw.js', { ...registration, active: {} } as ServiceWorkerRegistration)
+    expect(shell.getStatus()).toBe('ready')
+    setState('redundant')
     expect(shell.getStatus()).toBe('ready')
   })
 

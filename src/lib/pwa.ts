@@ -18,6 +18,8 @@ export type ShellStartOptions = {
   register: (options: RegisterSWOptions) => unknown
   supported: boolean
   reload: () => void
+  // navigator.serviceWorker.ready: resolves once this scope has an active worker.
+  ready: Promise<unknown>
 }
 
 export function createAppShell() {
@@ -49,13 +51,23 @@ export function createAppShell() {
         return
       }
       reload = options.reload
+      // workbox-window only follows workers that start installing after
+      // register(), so a reload in the middle of the first install would never
+      // see onOfflineReady. An active worker means the precache install succeeded.
+      void options.ready.then(() => setStatus('ready'))
       options.register({
         immediate: true,
         // First install finished: the whole shell is precached.
         onOfflineReady: () => setStatus('ready'),
-        // Returning visit: an active worker means the shell was cached before.
         onRegisteredSW: (_url, registration) => {
+          // Returning visit: an active worker means the shell was cached before.
           if (registration?.active) setStatus('ready')
+          // A failed precache install (a network blip, a missing file) makes the
+          // worker redundant, which workbox-window doesn't report.
+          const installing = registration?.installing
+          installing?.addEventListener('statechange', () => {
+            if (installing.state === 'redundant' && status !== 'ready') setStatus('error')
+          })
         },
         onRegisterError: () => {
           if (status !== 'ready') setStatus('error')
