@@ -280,14 +280,15 @@
   color: var(--paper);
 }
 
+/* The night band holds only the top bar (and, while counting, the indicator
+   under it); the step line is in the panel. */
 .cameraBar {
   flex: none;
-  padding-bottom: var(--space-3);
   background: var(--night);
 }
 
 .cameraStatus {
-  padding: 0 var(--space-5);
+  padding: 0 var(--space-5) var(--space-2);
 }
 
 .barTitle {
@@ -362,6 +363,36 @@
   font: var(--type-title);
 }
 
+.panelStep {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+  font: var(--type-body-dense);
+  font-weight: 700;
+  color: var(--on-night-2);
+}
+
+.segments {
+  display: flex;
+  gap: var(--space-1);
+}
+
+.segment {
+  width: 28px;
+  height: 6px;
+  border-radius: var(--r-full);
+  background: var(--disabled-night-bg);
+}
+
+.segmentsNarrow .segment {
+  width: 20px;
+}
+
+.segmentOn {
+  background: var(--paper);
+}
+
 .panelStatus {
   display: flex;
   align-items: center;
@@ -388,6 +419,17 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.countTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.countTop .panelStep {
+  margin-bottom: 0;
 }
 
 .countHead {

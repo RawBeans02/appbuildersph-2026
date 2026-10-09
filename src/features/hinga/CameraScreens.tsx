@@ -75,7 +75,6 @@ export function CameraScreen(props: {
               backKind="text"
               backLabel="Cancel"
               onBack={() => session.cancelCount()}
-              step={{ text: 'step 3 of 3', current: 3, total: 3 }}
               right={<CountdownClock secondsLeft={state.counting!.secondsLeft} />}
             />
             <div className={styles.cameraStatus}>
@@ -85,13 +84,7 @@ export function CameraScreen(props: {
         ) : refusal ? (
           <FlowTopBar dark backKind="close" onBack={props.onCancel} right={<h1 className={styles.barTitle}>Count stopped</h1>} />
         ) : (
-          <FlowTopBar
-            dark
-            backKind="close"
-            backLabel="Cancel the check"
-            onBack={props.onCancel}
-            step={{ text: 'Hinga · step 2 of 3', current: 2, total: 3 }}
-          />
+          <FlowTopBar dark backKind="close" backLabel="Cancel the check" onBack={props.onCancel} />
         )}
       </div>
 
@@ -117,7 +110,10 @@ export function CameraScreen(props: {
 
       {counting ? (
         <div className={styles.panel}>
-          <h1 className={styles.countHead}>Hold still</h1>
+          <div className={styles.countTop}>
+            <h1 className={styles.countHead}>Hold still</h1>
+            <PanelStep text="step 3 of 3" current={3} total={3} narrow />
+          </div>
           <div className={styles.trace}>
             <canvas ref={traceRef} role="img" aria-label="Breathing trace" />
           </div>
@@ -127,13 +123,14 @@ export function CameraScreen(props: {
           {state.cry.status === 'listening' && (
             <p className={styles.micLine}>
               <MicrophoneIcon size={18} weight="bold" aria-hidden />
-              Listening for crying. Nothing is recorded.
+              Listening for crying. No video or sound is saved.
             </p>
           )}
         </div>
       ) : (
         !refusal && (
           <div className={styles.panel}>
+            <PanelStep text="Hinga · step 2 of 3" current={2} total={3} />
             <h1>Point at the chest. Hold the phone still.</h1>
             <p role="status" className={cx(styles.panelStatus, found && styles.found)}>
               {found ? (
@@ -170,6 +167,21 @@ export function CameraScreen(props: {
         />
       )}
     </div>
+  )
+}
+
+// The step line sits in the panel, under the live image, never over it
+// (design pass 1b: only the top bar and the indicator are in the night band).
+function PanelStep({ text, current, total, narrow }: { text: string; current: number; total: number; narrow?: boolean }) {
+  return (
+    <p className={styles.panelStep}>
+      <span className={cx(styles.segments, narrow && styles.segmentsNarrow)} aria-hidden>
+        {Array.from({ length: total }, (_, i) => (
+          <span key={i} className={cx(styles.segment, i < current && styles.segmentOn)} />
+        ))}
+      </span>
+      {text}
+    </p>
   )
 }
 
@@ -219,14 +231,14 @@ function RefusalSheet(props: {
   )
 }
 
-// 3c and 3d: a dark screen with the top bar, and the sheet.
+// 3c and 3d: a dark screen with the top bar, and the sheet, whose title is
+// the screen's h1 (the sheet is the whole screen).
 function NoCameraScreen({ onCancel, backLabel, children }: { onCancel(): void; backLabel: string; children: ReactNode }) {
   return (
     <div className={cx(styles.camera, 'on-night')}>
       <div className={styles.cameraBar}>
         <FlowTopBar dark backKind="close" backLabel={backLabel} onBack={onCancel} />
       </div>
-      <h1 className="visually-hidden">Hinga breathing check</h1>
       {children}
     </div>
   )
@@ -241,9 +253,11 @@ export function PrePermissionScreen({ onContinue, onCancel }: { onContinue(): vo
         onClose={onCancel}
         icon={<CameraIcon size={32} weight="bold" />}
         title="Next, allow the camera and microphone"
+        titleLevel="h1"
       >
         <p className={styles.sheetText}>
-          The camera counts breaths. The microphone listens for crying. Nothing is recorded, and nothing leaves this phone.
+          The camera counts breaths. The microphone listens for crying. No video or sound is saved, and none of it leaves this
+          phone.
         </p>
         <Button onClick={onContinue}>Continue</Button>
       </BottomSheet>
@@ -255,7 +269,13 @@ export function PrePermissionScreen({ onContinue, onCancel }: { onContinue(): vo
 export function CameraBlockedScreen({ onHandCount, onRetry, onClose }: { onHandCount(): void; onRetry(): void; onClose(): void }) {
   return (
     <NoCameraScreen onCancel={onClose} backLabel="Close">
-      <BottomSheet open onClose={onClose} icon={<CameraSlashIcon size={32} weight="bold" />} title="The camera is blocked">
+      <BottomSheet
+        open
+        onClose={onClose}
+        icon={<CameraSlashIcon size={32} weight="bold" />}
+        title="The camera is blocked"
+        titleLevel="h1"
+      >
         <p className={styles.sheetText}>
           Hinga can't count without it. To allow it, open this site's settings in your browser and turn on Camera.
         </p>
