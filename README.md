@@ -67,7 +67,7 @@ _TBD_
 ### Existing code and assets
 - **Process docs only, no product code,** written Oct 8 before the event and committed unchanged in `b6c93e5` (Oct 9, 1:00:31 PM PH): `.gitignore`, `CLAUDE.md`, `TASKS.md`, `ONE-PAGER.md`, `RULES.md`, `QUALITY.md`. `QUALITY.md` was condensed from a generic build-quality checklist the team keeps (not from any product; not included here). Every commit from `8c5f100` on is work done during the event.
 - **Prepared beforehand and kept outside this repo, no product code:** planning notes, the instructions for our research chat and agents, and a laptop memory-guard script (not needed to build or run the product). The research itself ran after the 1:00 PM reveal.
-- **First product code:** commits before _TBD (hash)_ are process docs only; the first product code is _TBD (hash, time)_.
+- **First product code:** commits before `3f00b06` are process docs only; the first product code is `3f00b06` (Oct 9, 2:00:40 PM PH).
 - **Other products:** the team has built other products before this event; no code, data, prompts, designs or assets from them are used here.
 - **Designs:** the UI designs, tokens and images in `design/` were generated with Claude Design during the event.
 - **Fonts, icons, images and other third-party assets,** with their licenses: _TBD (listed as they are added)_.

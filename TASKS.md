@@ -33,8 +33,7 @@ Every task names the files or folders it **owns**, so agents pushing straight to
   - HTTPS (Vercel provides it) is required for WebGPU and service workers. If the model runtime uses threaded WASM or SharedArrayBuffer, set cross-origin isolation headers in `vercel.json` (COOP `same-origin`, COEP `require-corp` or `credentialless`) and check that the model/CDN hosts work with them.
   - Model weights: fetched on first load (e.g. from Hugging Face), then cached. Check Vercel's file-size limits before self-hosting weights. The first-load download goes under "What requires internet".
   - Put the live URL at the top of this file and of the README. The README also keeps run/recreate instructions: judges and verifiers may run it from the repo.
-- [ ] doing · CI: GitHub Actions on every push to `main` (npm ci, typecheck, lint, build, test) · [lead] · owns: `.github/workflows/`
-  - `npm test` fails until the first test file lands (the scaffold's capabilities test), so the first runs may be red on that step only.
+- [x] done · CI: GitHub Actions on every push to `main` (npm ci, typecheck, lint, build, test) · [lead] · owns: `.github/workflows/` · f9129fc (first green run on fa66af8)
 - [ ] todo · Theme from the `design/README.md` tokens, applied once; component library customized, no defaults · [sr] · owns: theme files
 - [ ] todo · _task_ · [owner] · owns: `<files/folders>` · design: `design/<screen>`
 
