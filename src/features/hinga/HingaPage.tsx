@@ -5,7 +5,17 @@ import type { AgapayDb } from '../../data/db/db'
 import type { HingaCheck, Resident } from '../../data/db/types'
 import { useDbQuery } from '../../data/db/useDbQuery'
 import { localToday } from '../../rules/dates'
-import { ageBandLabel, completedMonths, DANGER_SIGNS, fastBreathingCutoff, hingaOutcome, MAX_AGE_MONTHS, type DangerSign } from '../../rules/imci'
+import {
+  ageBandLabel,
+  completedMonths,
+  DANGER_SIGNS,
+  DANGER_SIGNS_NOTE,
+  DANGER_SIGNS_TITLE,
+  fastBreathingCutoff,
+  hingaOutcome,
+  MAX_AGE_MONTHS,
+  type DangerSign,
+} from '../../rules/imci'
 import { buildHingaCheck, newCheckId } from './check'
 import { outcomeText, READINESS, refusalText, SCREENING_NOTE } from './copy'
 import { createCountSession, type CountRefusal, type CountSession, type SessionState } from './countSession'
@@ -373,7 +383,8 @@ function Result(props: { child: Child; breathsPerMinute: number | null; refusal:
       {cutoff !== null && <p>Fast breathing at this age: {cutoff} breaths per minute or more (WHO IMCI 2014).</p>}
 
       <fieldset>
-        <legend>Danger signs: tick any you see</legend>
+        <legend>{DANGER_SIGNS_TITLE}. Tick any you see.</legend>
+        <p>{DANGER_SIGNS_NOTE}</p>
         {DANGER_SIGNS.map((sign) => (
           <p key={sign.id}>
             <label>

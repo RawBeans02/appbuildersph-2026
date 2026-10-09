@@ -1,8 +1,10 @@
 import type { HingaOutcome } from '../data/db/types'
 
-// WHO IMCI (2014 chart booklet): fast breathing by age, and the general danger
-// signs that make a referral urgent. Hinga's output is only "fast breathing for
-// age" or not; it is a screening aid, never a diagnosis.
+// WHO IMCI Chart Booklet, March 2014:
+// https://cdn.who.int/media/docs/default-source/mca-documents/child/imci-integrated-management-of-childhood-illness/imci-in-service-training/imci-chart-booklet.pdf
+// Fast breathing by age, and the signs that make Hinga refer urgently. Hinga's
+// output is only "fast breathing for age" or not; it is a screening aid, never
+// a diagnosis.
 //   under 2 months:            60 breaths per minute or more
 //   2 months up to 12 months:  50 or more
 //   12 months up to 5 years:   40 or more (a child of exactly 12 months uses 40)
@@ -33,17 +35,29 @@ export function completedMonths(birthDate: string, day: string): number {
   return (ty - by) * 12 + (tm - bm) - (td < bd ? 1 : 0)
 }
 
+// The four IMCI 2014 general danger signs, then two severe signs of the cough
+// or difficult breathing assessment. This app refers urgently on ANY of them.
+// For chest indrawing and stridor that is MORE cautious than IMCI 2014, by
+// design: there, stridor in a calm child is a severe sign, but chest indrawing
+// at 2-59 months alone classifies as "Pneumonia", not severe. Hinga is a
+// screening aid that only refers; it never treats or classifies.
+export const DANGER_SIGNS_TITLE = 'Danger signs and severe signs. This app refers urgently on any'
+
+export const DANGER_SIGNS_NOTE =
+  'Chest indrawing and stridor are referred urgently here, which is more cautious than WHO IMCI 2014: this app is a screening aid that only refers.'
+
 export const DANGER_SIGNS = [
-  { id: 'chest-indrawing', label: 'Chest indrawing' },
-  { id: 'stridor', label: 'Stridor (a harsh noise when breathing in, while calm)' },
-  { id: 'unable-to-drink', label: 'Unable to drink or breastfeed' },
-  { id: 'convulsions', label: 'Convulsions' },
-  { id: 'very-sleepy', label: 'Very sleepy or hard to wake' },
+  { id: 'unable-to-drink', kind: 'general', label: 'Not able to drink or breastfeed' },
+  { id: 'vomits-everything', kind: 'general', label: 'Vomits everything' },
+  { id: 'convulsions', kind: 'general', label: 'Convulsions (now or during this illness)' },
+  { id: 'lethargic', kind: 'general', label: 'Lethargic or unconscious' },
+  { id: 'chest-indrawing', kind: 'severe', label: 'Chest indrawing' },
+  { id: 'stridor', kind: 'severe', label: 'Stridor in a calm child' },
 ] as const
 
 export type DangerSign = (typeof DANGER_SIGNS)[number]['id']
 
-// The check's outcome: any danger sign makes it urgent, whatever the count;
+// The check's outcome: any sign in DANGER_SIGNS makes it urgent, whatever the count;
 // otherwise fast or not fast against the cut-off, or refused when the camera
 // could not count. null when the age is outside the IMCI range.
 export function hingaOutcome(input: {

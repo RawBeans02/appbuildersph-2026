@@ -35,7 +35,7 @@ export function refusalText(refusal: CountRefusal): { title: string; detail: str
 export function outcomeText(outcome: HingaOutcome): { title: string; tagalog: string | null } {
   switch (outcome) {
     case 'urgent':
-      return { title: 'Danger sign: refer to the midwife or RHU now, urgently', tagalog: 'I-refer ngayon' }
+      return { title: 'Danger or severe sign: refer to the midwife or RHU now, urgently', tagalog: 'I-refer ngayon' }
     case 'fast':
       return { title: 'Fast breathing for age: refer to the midwife or RHU now', tagalog: 'I-refer ngayon' }
     case 'not-fast':
