@@ -162,13 +162,15 @@ export default function ReceivePage() {
 
       {view === 'preview' && preview && <>
         <CheckLines lines={receiveChecks(preview)} animate />
-        <Instructions packet={preview.packet} />
+        {/* First trust comes before the preview, so the code and its check row
+            are in view above the sticky Save bar at phone height. */}
         {preview.needsTrust && <section className={styles.trust} aria-labelledby={trustId}>
           <h2 id={trustId} className={styles.trustTitle}>Compare with the RHU laptop</h2>
           <p>The first time, check that this code matches the one on the RHU laptop's screen.</p>
           <code className={styles.trustKey}><FingerprintLines value={preview.fingerprint} /></code>
           <CheckRow className={styles.trustRow} label="The fingerprint matches the RHU laptop" checked={compared} onChange={setCompared} />
         </section>}
+        <Instructions packet={preview.packet} />
       </>}
 
       {view === 'saved' && <div className={styles.done}>
