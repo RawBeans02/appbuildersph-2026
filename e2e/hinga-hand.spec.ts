@@ -46,18 +46,13 @@ test('no camera: 45 breaths counted by hand are fast for 1 to 4 years and saved 
   await expect(calm).toBeChecked()
   await page.getByRole('button', { name: /^Next/ }).click()
 
-  // 3d: the camera didn't open. Count by hand. In WebKit on Linux the pose
-  // model itself can't start (MediaPipe needs WebGL 2, which that headless
-  // WebKit lacks; a real iPhone has it), so the check lands on L9b "couldn't
-  // start", which offers the same Count by hand: the safety net either way.
-  if (browserName === 'webkit') {
-    await expect(hinga).toHaveAttribute('data-hinga-screen', 'didnt-load', { timeout: 30_000 })
-    await page.getByRole('button', { name: /^Count by hand/ }).click()
-  } else {
-    await expect(hinga).toHaveAttribute('data-hinga-screen', 'camera-blocked', { timeout: 30_000 })
-    await expect(hinga).toHaveAttribute('data-hinga-camera', 'blocked')
-    await page.getByRole('dialog').getByRole('button', { name: /^Count by hand/ }).click()
-  }
+  // 3d: the camera didn't open. Count by hand.
+  await expect(hinga).toHaveAttribute('data-hinga-screen', 'camera-blocked', { timeout: 30_000 })
+  await expect(hinga).toHaveAttribute('data-hinga-camera', 'blocked')
+  // On Safari/WebKit the pose model runs on the page itself, not in a worker
+  // (poseTracker.ts: its worker canvas isn't reliable there; A18).
+  if (browserName === 'webkit') await expect(hinga).toHaveAttribute('data-hinga-model', 'ready:main-thread', { timeout: 30_000 })
+  await page.getByRole('dialog').getByRole('button', { name: /^Count by hand/ }).click()
   await expect(hinga).toHaveAttribute('data-hinga-screen', 'hand-count')
 
   // L8b with time stopped: it moves only when the test moves it.
