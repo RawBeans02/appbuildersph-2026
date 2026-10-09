@@ -15,6 +15,7 @@ import {
   type PlanRow,
 } from '../../rules/plan'
 import { APPROVER, approvePlan, ensureMunicipalSample, readPlanInputs } from './municipal'
+import { LlmWordingPanel } from './llm'
 
 // Screens 18–19: the merged table, the rule-based plan with its reasons, and
 // the editable text the officer approves. Plain until design/ lands.
@@ -79,8 +80,7 @@ export default function PlanPage() {
       <Priority plan={plan} />
       <Moves plan={plan} />
       <HowComputed />
-      {/* TODO(B6): pass wordingPanel={LlmWordingPanel} from './llm' once it is on main. */}
-      <PlanEditor key={basis} plan={plan} draft={draft} />
+      <PlanEditor key={basis} plan={plan} draft={draft} wordingPanel={LlmWordingPanel} />
     </>
   )
 }
