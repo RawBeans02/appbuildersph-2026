@@ -132,7 +132,9 @@ async function downloadFile(
   const doFetch = options.fetch ?? ((url, init) => fetch(url, init))
   let sizeError: ModelCacheError | null = null
   try {
-    const response = await doFetch(file.url, { signal: options.signal })
+    // no-store: always the network's bytes, never an older version's copy
+    // (the service worker serves /models/ from any model cache otherwise).
+    const response = await doFetch(file.url, { signal: options.signal, cache: 'no-store' })
     if (!response.ok || !response.body) {
       // Free the connection instead of leaving the error body unread.
       await response.body?.cancel().catch(() => {})

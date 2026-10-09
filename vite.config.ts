@@ -61,7 +61,11 @@ export default defineConfig({
             // service worker globals.
             urlPattern: ({ url, sameOrigin }) =>
               sameOrigin && (url.pathname.startsWith('/models/') || url.pathname.endsWith('.wasm')),
+            // A download (modelCache asks for no-store) always goes to the
+            // network, so a new model version never gets an older version's
+            // file stored under the same URL.
             handler: async ({ request }) => {
+              if (request.cache === 'no-store') return fetch(request)
               const scope = globalThis as unknown as { caches: { match(request: Request): Promise<Response | undefined> } }
               return (await scope.caches.match(request)) ?? fetch(request)
             },

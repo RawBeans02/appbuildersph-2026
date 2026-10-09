@@ -176,6 +176,13 @@ describe('ensureModelCached', () => {
     expect(full).toMatchObject({ code: 'quota', url: weights.url })
   })
 
+  it('downloads with cache no-store, so the service worker never hands back an older version', async () => {
+    const { caches } = fakeCaches()
+    const fetch = fakeFetch({ [weights.url]: bytes(10), [tokenizer.url]: bytes(6) })
+    await ensureModelCached(spec, { caches, fetch })
+    expect(fetch.mock.calls.map(([, init]) => init.cache)).toEqual(['no-store', 'no-store'])
+  })
+
   it('passes the abort signal on and rethrows the AbortError untouched', async () => {
     const controller = new AbortController()
     controller.abort()
