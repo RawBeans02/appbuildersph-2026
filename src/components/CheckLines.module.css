@@ -1,0 +1,42 @@
+/* The check lines of a scanned QR (design pass 2: 17g, 17h, 21a): the checks
+   in the order the device ran them, each with its result. */
+.list {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.line {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  gap: var(--space-3);
+  align-items: start;
+  font: 500 17px/25px var(--font-ui);
+  color: var(--ink);
+}
+
+.icon {
+  margin-top: 1px;
+}
+
+.ok {
+  color: var(--ok);
+}
+
+.failed {
+  color: var(--bad);
+}
+
+.info {
+  color: var(--ink-2);
+}
+
+.detail {
+  display: block;
+  margin-top: var(--space-1);
+  font: var(--type-mono);
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
