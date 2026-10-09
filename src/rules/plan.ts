@@ -1,4 +1,4 @@
-import { barangayName } from '../data/places'
+import { barangayName } from '../data/places.js'
 import {
   countRange,
   formatCount,
@@ -9,9 +9,9 @@ import {
   type Counts,
   type CountsOf,
   type QrPayloadV1,
-} from '../qr'
-import { COUNT_FIELDS, flattenCounts, HINGA_AGE_BANDS, unflattenCounts } from '../qr/schema'
-import { SMALL_CELL_LIMIT } from '../qr/suppress'
+} from '../qr/index.js'
+import { COUNT_FIELDS, flattenCounts, HINGA_AGE_BANDS, unflattenCounts } from '../qr/schema.js'
+import { SMALL_CELL_LIMIT } from '../qr/suppress.js'
 
 // The municipal plan: deterministic, explainable rules over the verified,
 // de-identified barangay counts. The plan is a suggestion for the municipal
