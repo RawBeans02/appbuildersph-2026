@@ -8,7 +8,7 @@
 - the **barangay health worker (BHW)** or barangay health station midwife, using their own mid-range phone;
 - the **municipal health officer (MHO)** at the rural health unit, who decides which barangay gets doctor teams and stock.
 
-Context: DOH reported nearly 12,000 suspected leptospirosis cases in 2026, up 46% on 2025 ([Daily Tribune, Sept 29, 2026](https://tribune.net.ph/2026/09/29/leptospirosis-cases-dip-slightly-but-2026-total-still-up-46)), and a DOH memorandum asks for regular monitoring of doxycycline stocks in barangay health units ([Philstar, Sept 16, 2026](https://www.philstar.com/nation/2026/09/16/2556541/more-doxycycline-capsules-distributed-curb-leptospirosis-cases)).
+Context: DOH reported 11,965 leptospirosis cases as of Sept 9, 2026, 46% higher than the same period last year ([Daily Tribune, Sept 29, 2026](https://tribune.net.ph/2026/09/29/leptospirosis-cases-dip-slightly-but-2026-total-still-up-46)), and a DOH memorandum asks for regular monitoring of doxycycline stocks in barangay health units ([Philstar, Sept 16, 2026](https://www.philstar.com/nation/2026/09/16/2556541/more-doxycycline-capsules-distributed-curb-leptospirosis-cases)).
 
 **Our solution (one sentence):** Agapay is an offline web app. On the BHW's phone, it checks a child's breathing rate with the camera (Hinga), turns a logged flood event into a leptospirosis watch list, and reads medicine-box lot and expiry dates to compare stock against need. It then passes only de-identified counts to the MHO's laptop by QR code, where a rule-based plan, optionally drafted by a local language model, waits for the officer's approval.
 
@@ -32,23 +32,23 @@ Context: DOH reported nearly 12,000 suspected leptospirosis cases in 2026, up 46
   - YAMNet cry detection
   - PP-OCRv5 mobile (ONNX Runtime Web, WASM), with Tesseract.js as the iPhone fallback
   - records in IndexedDB, and QR generation
-- **Laptop:** QR scanning, the merge and plan rules, and the optional WebLLM model. The municipal laptop is our 8 GB M2 MacBook Air unless a teammate laptop is confirmed, so the default is Llama-3.2-1B, with Qwen2.5-1.5B only on a bigger machine. Lemonade on a Ryzen AI laptop only if one is confirmed by 7 PM.
+- **Laptop:** QR scanning, the merge and plan rules, and the optional AI wording: Qwen2.5-0.5B-Instruct (Apache-2.0) on WebLLM, WebGPU only; without WebGPU the template wording is used. The municipal laptop is our 8 GB M2 MacBook Air unless a teammate laptop is confirmed. An AMD (Lemonade on Ryzen AI) path only if a Ryzen AI laptop is confirmed by 7 PM.
 
 Sizes go in the README as measured in our build.
 
-**What requires internet (and what happens offline):** only the first visit, which downloads the app and models once (cached afterwards), and app updates. No AI inference needs the internet.
+**What requires internet (and what happens offline):** the first visit (the app) and "Prepare for offline" (the phone's models), both cached afterwards; on the laptop, the first use of the optional AI wording downloads its model from huggingface.co and raw.githubusercontent.com; and app updates. No AI inference needs the internet.
 
 **Why does this product benefit from running AI locally?** It's needed in the days after a typhoon, when there is no signal. The data is about children and patients and should never leave the barangay. And a breathing count has to be computed live from the camera in an evacuation center, at no cost per use.
 
 **Honest neighbors (never claim "first"):**
-- Camera breathing counters exist: Breathwise (Devpost, Oct 2026), an open-source Thai project, and AIRR research.
+- Camera breathing counters exist: Breathwise (Devpost, RevenueCat Shipaton 2026), an open-source pediatric respiratory-rate project on GitHub, AIRR research (Malaria Consortium) and Lucy et al. 2021; links in the README.
 - iClinicSys and SHINE OS+ have offline modes, and DOH runs eLMIS and a leptospirosis and dengue tracker.
 
 Our difference: an ML-based check that refuses bad readings, built into the post-typhoon barangay workflow (exposure → watch list → stock → de-identified handoff → an approved municipal plan). It feeds existing systems; it doesn't replace them.
 
 **Guardrails:**
 - An unregistered research prototype and screening aid: it never diagnoses or doses, and gives refer-only output.
-- DOH: doxycycline "only after consultation with a health professional".
+- DOH: doxycycline "may be given as prophylaxis to people exposed to floodwaters, but only after consultation with a health professional" ([Manila Times, Sept 3, 2026](https://www.manilatimes.net/2026/09/03/news/doh-leptospirosis-cases-in-ph-12-lower-than-last-year/2418017)); the same source gives symptoms 5–15 days after exposure, which sets the watch window.
 - Synthetic data only: "San Isidro Demo" with residents named "Residente 001…".
 
 **Design brief:** the Claude Design pass 1 brief (the Lead gives it to the owner); exports go into `design/`.
@@ -67,7 +67,7 @@ Our difference: an ML-based check that refuses bad readings, built into the post
 - accounts and login
 - real patient data
 - an iPhone share target
-- any cloud AI in the shipped app
+- any cloud AI in the core offline flow (a cloud assistant is phase 2 only: opt-in, de-identified counts only, disclosed, decided at the midnight scope check)
 
 **Business in one line (who pays, how it grows):** The MHO or LGU adopts it at no cost (a web app on BHWs' existing phones, no new hardware). It grows through a Local Health Board pilot, then the regional DOH center. A real pilot needs a privacy impact assessment and clinical validation of Hinga first.
 

@@ -65,6 +65,7 @@ Until `design/` lands, build the logic plus plain, unstyled screens and write `N
 - [ ] todo · A8 Privacy & AI page (screen 15), 404, app icons + manifest (after design) · [sr] · owns: `src/features/privacy/`, `public/icons/`
 - [x] done · A9 Reset sample data: a button (on `/device`, outside the nav) that clears and reseeds the IndexedDB records with today's dates and resets the municipal sample, but KEEPS the model cache and the service worker, so a rehearsal or Demo Day reset never re-downloads ~45 MB on venue Wi-Fi; replace "clear site data" in Demo Day prep with it · [sr] · owns: `src/data/db/`, `src/features/device/` · 5189cdf (unit + e2e: the seed comes back, a model cache survives)
 - [x] done · A10 Home summary logic (screen 1): one tested selector for the active flood event and its day of the watch window, residents on the watch list, this week's fast-breathing and urgent referrals, doxycycline on hand and expiring soon, open clinician flags, and model readiness; UI after design · [sr] · owns: `src/features/home/` · use `useHomeSummary()` from `src/features/home/useHomeSummary.ts` (selector: `summarizeHome`); NEEDS DESIGN: screen 1
+- [ ] todo · A11 Audit fixes (mock-verifier audit B, Fri ~4:30 PM): (1) a CI e2e that prepares, goes OFFLINE, uploads `docs/demo/label-doxy-24A.png` on `/stock` and expects Doxycycline / DEMO-LOT-24A / 2026-11 to be read, the strongest evidence for the Local AI criterion; (2) `/prepare` copy: "nothing you record leaves this phone except the de-identified QR you choose to show"; (3) the Send screen's age band reads "2 up to 12 months" (IMCI wording, same as `src/rules/imci.ts`); (4) the stock screen's time says whether it includes loading the model; (5) cite the day-5–15 window's source in `src/rules/watch.ts` (README "Medical sources") · [sr] · owns: `e2e/`, `src/features/prepare/`, `src/features/send/`, `src/features/stock/`, `src/rules/watch.ts`
 
 **Lead**
 - [ ] doing · B1 Hinga spike S1 (see "Spike" below) · [lead] · code done, ready for phone tests; kill call at 7:00 PM
@@ -133,6 +134,7 @@ Until `design/` lands, build the logic plus plain, unstyled screens and write `N
 - [ ] todo · mock-verifier self-audit (read-only, as the organizers' AI agents would check us): ~4 PM after the first deploy, 4:00 AM at the freeze, ~8:30 AM before submitting; fix P0s first · [lead]
 - [ ] todo · X/LinkedIn post **with the video attached** (its URL is the required "X / LinkedIn video URL"): #AppBuildersPH, tag Cognition and Devin · [human]
 - [ ] todo · submit on the Cerebral Valley event page: project name, short description, team members, repo, demo video, X/LinkedIn video URL, what runs locally, what requires internet, the five disclosures, and the "Why local?" answer (copy from the README) · [human:Rovs]
+- [ ] todo · Laptop AI warm-up: with the owner present (message Account Admin first), open `/municipal/plan` online on the demo laptop, run the AI wording once, then go offline, reload and draft again; record the device, browser, model MB and draft time in `docs/OFFLINE-SMOKE-TEST.md` and the README Models table · [human:Rovs] + [sr]
 - [ ] todo · Demo Day prep: model already downloaded on every demo device; airplane-mode run rehearsed; on-site by 12:00 PM for the 12:15 PM AV check · [human]
   - on the demo phone and the laptop, open `/device` and tap "Reset sample data" before Demo Day so the seed reloads with that day's dates (it keeps the downloaded models; never clear site data, which would delete them and force a re-download on venue Wi-Fi); show docs/demo/label-doxy-24A.png on the laptop screen (or print it) for the stock scan
 - [ ] todo · 5-minute pitch + Q&A drill, rehearsed ×3 (the questions will cover what runs locally and why) · [human]
@@ -145,7 +147,7 @@ Until `design/` lands, build the logic plus plain, unstyled screens and write `N
 ## Ideas (not now — only after the wow flow is done)
 - Roadmap only (parking lot): offline first-aid cards, consultation explainer, emergency mode.
 - Cut list if behind at midnight, in order: dengue checks · hazard map layer · any DOH cloud view · Lemonade (unless working) · YAMNet (keep the motion gate) · Tagalog strings beyond the main labels
-- Not doing: dosing or diagnosis, accounts/login, real patient data, cloud AI in the shipped app
+- Not doing: dosing or diagnosis, accounts/login, real patient data, cloud AI in the core offline flow (the phase 2 assistant above is opt-in and de-identified only)
 
 ## Done
 -
