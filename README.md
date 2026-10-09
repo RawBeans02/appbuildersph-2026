@@ -7,7 +7,7 @@ Built for the **AppBuildersPH Hackathon 2026** (Oct 9–10, 2026). Theme: **Loca
 | | |
 |---|---|
 | **Team name** | _TBD (exactly as on the official participant list)_ |
-| **Live URL** | _TBD_ |
+| **Live URL** | https://appbuildersph-2026.vercel.app |
 | **Repository** | https://github.com/RawBeans02/appbuildersph-2026 |
 | **Demo video** | _TBD_ |
 | **X / LinkedIn post (video)** | _TBD_ |
@@ -18,7 +18,7 @@ Built for the **AppBuildersPH Hackathon 2026** (Oct 9–10, 2026). Theme: **Loca
 _TBD: the target user, the problem, and why it matters._
 
 ## Try it
-- **Live URL:** _TBD_
+- **Live URL:** https://appbuildersph-2026.vercel.app
 - **Offline test:** open the live URL once and wait until the model shows as ready. Then turn on airplane mode, reload, and use it. _(Exact steps TBD.)_
 - **Run or recreate it locally:** needs Node.js 20.19+ (or 22.12+) and npm.
   ```sh

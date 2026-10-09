@@ -5,7 +5,7 @@ Status: `todo` → `doing` → `done` (pushed to `main`, with the commit hash)
 Under a task: `BLOCKED: <question>` · `NEEDS DESIGN: <screen/state>`
 Every task names the files or folders it **owns**, so agents pushing straight to `main` don't collide.
 
-**Live URL:** _(fill in after the first deploy)_  ·  **Scope check:** 12:00 AM  ·  **Feature freeze:** 4:00 AM  ·  **Submit by:** 9:00 AM (hard close 10:00 AM Sat, code freeze; no pushes after 9:45 AM)
+**Live URL:** https://appbuildersph-2026.vercel.app (Vercel production, first deploy Fri 3:37 PM; use only this domain)  ·  **Scope check:** 12:00 AM  ·  **Feature freeze:** 4:00 AM  ·  **Submit by:** 9:00 AM (hard close 10:00 AM Sat, code freeze; no pushes after 9:45 AM)
 
 **Designs:** all UI comes from Claude Design: `design/` (exports, tokens, copy + `design/README.md`). Link the screen on every UI task; no UI task starts before its screen exists.
 
