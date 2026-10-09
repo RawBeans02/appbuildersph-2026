@@ -13,6 +13,15 @@ Named Agapay until Oct 9, 9 PM, when the team renamed it AgapayMo (internal iden
 | **X / LinkedIn post (video)** | _TBD_ |
 
 
+## For judges, in one minute
+- **What it is:** an offline web app for barangay health workers after a typhoon. The phone keeps the flood watch list, reads medicine boxes with on-device AI and screens breathing; it reports de-identified counts to the municipal health officer's laptop by signed QR, and the approved actions come back the same way. No server is in that loop.
+- **Try it offline (3 steps):**
+  1. On a phone, open https://agapaymo.pages.dev, then `/prepare` → **Prepare for offline** (55.7 MB, once, on Wi-Fi).
+  2. Turn on airplane mode and reload. Home, Watch list, Stock (photograph [the demo label](docs/demo/label-doxy-24A.png)), Compare and Send all work.
+  3. On a laptop in Chrome, open `/municipal`: scan the phone's pairing QR, then its counts QR → Merged view → Plan → Approve → **Make return QR**; on the phone, **Got a QR from the RHU? Scan it**.
+- **What runs on the device:** PP-OCRv5 (the box reader), MediaPipe Pose and YAMNet (the breathing check), Qwen2.5-0.5B on WebLLM (optional plan wording on the laptop), ECDSA P-256 signing. Every AI step in this build runs on the device; the only cloud model in the repo is the optional phase 2 alert rewording, switched off in this build.
+- **Honest limits:** synthetic sample data only; the camera breathing count is a prototype, not validated on children; the full list is in [Limitations](docs/ARCHITECTURE.md#limitations).
+
 ## The problem
 After a typhoon, a flooded barangay can be without signal for days. That is exactly when its **barangay health workers** (BHWs, volunteers using their own phones) have the most to track:
 - **Leptospirosis:** who waded through floodwater, so they can be watched for symptoms 5 to 15 days later. DOH reported 12,654 leptospirosis cases as of Sept 30, 2026, 49% higher than the 8,511 in the same period of 2025 ([Manila Bulletin, Oct 6, 2026](https://mb.com.ph/2026/10/06/leptospirosis-cases-fall-36-areas-above-epidemic-thresholds-drop-to-18doh)).
@@ -90,7 +99,7 @@ prepared. The final video recording and posted submission link remain pending.
 | Inbox (phase 2, optional and secondary): approved alerts on the laptop's Sync screen (after each sync) and in the phone's "Messages from the municipality" card on Home | `POST /api/inbox`, signed by the laptop's enrolled key (its municipality's alerts) or by a phone's key that the laptop vouched for in a sync (its own barangay's alerts) | Nothing is pulled offline; nothing is stored, so offline there is nothing to show |
 
 ## Why does this product benefit from running AI locally?
-- **It's needed when there is no signal.** The days after a typhoon are when phones have no data, and the health worker still has to check children and log exposures. Every AI step runs on the device: the camera breathing count, the cry check, the medicine-box reading, and the laptop's plan wording. Our CI tests run the app with the network cut off (see `e2e/`).
+- **It's needed when there is no signal.** The days after a typhoon are when phones have no data, and the health worker still has to check children and log exposures. Every AI step in this build runs on the device: the camera breathing count, the cry check, the medicine-box reading, and the laptop's plan wording. The only cloud model in the repo is the optional phase 2 alert rewording, switched off in this build. Our CI tests run the app with the network cut off (see `e2e/`).
 - **The data is about children and patients.** Names, birth dates and households never leave the phone. Only signed, de-identified counts move, from one screen to the other by QR. The core has no server; the optional phase 2 sync uploads only those same signed counts from the laptop, never a record.
 - **The breathing count needs live video.** It reads a steady stream of camera frames for a full minute. Sending that to a server would be slow, costly on mobile data, and impossible offline.
 - **No cost per use.** There are no API bills for a municipality, and it runs on the phones health workers already have.

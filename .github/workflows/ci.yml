@@ -91,6 +91,14 @@ jobs:
         env:
           CI: true
           VITE_PHASE2: ${{ matrix.phase2 }}
+      # The README's screenshots (docs/demo/*.png): the e2e specs take them
+      # offline with synthetic data; this keeps the default build's set.
+      - if: success() && matrix.browser == 'chromium' && matrix.phase2 == ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: demo-screenshots
+          path: docs/demo/*.png
+          retention-days: 3
       - if: failure()
         uses: actions/upload-artifact@v4
         with:

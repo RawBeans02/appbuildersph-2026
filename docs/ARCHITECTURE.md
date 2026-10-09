@@ -235,6 +235,11 @@ Optional, after a sync. The DOH or regional officer drafts alerts on `/doh`; a p
 
 ## Limitations
 
+- **Records at rest**: the PIN lock that encrypts records on the phone is phase 2 only (`VITE_PHASE2`), so in the live build the records sit unencrypted in the browser's storage, on the phone only.
+- **Doctor-team priority**: it's a weighted score (URGENT referrals ×3, fast-breathing referrals ×2, people in the watch window ×1), so many people in a watch window can outrank a few urgent children. The officer sees every component and decides; the score only orders the list.
+- **Expiry**: a box's expiry is a month, so "expire within 6 weeks" means the expiry month starts within 6 weeks.
+- **Repeat checks**: a linked child counts once per week in the referrals (the most severe check); checks with no linked resident can't be told apart, so each counts.
+
 - **Offline return instructions**: trust depends on fingerprint comparison with
   the approving laptop, and recency depends on its clock. Only the latest
   approval is kept; receipt does not acknowledge completion or update stock.
