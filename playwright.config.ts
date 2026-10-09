@@ -1,4 +1,5 @@
 import { defineConfig, devices } from '@playwright/test'
+import { INTRO_SEEN_KEY } from './src/features/home/introKey'
 
 // End-to-end tests run in CI only; the 8 GB build laptop doesn't run browsers.
 // The app is built and served with vite preview, so the real service worker
@@ -7,6 +8,7 @@ const PORT = 4173
 // E2E_BASE_URL runs the tests against a deployed site (e.g. the live URL)
 // instead of a local build.
 const deployed = process.env.E2E_BASE_URL
+const baseURL = deployed ?? `http://localhost:${PORT}`
 
 export default defineConfig({
   testDir: 'e2e',
@@ -15,8 +17,15 @@ export default defineConfig({
   workers: 1,
   reporter: process.env.CI ? [['list'], ['github']] : 'list',
   use: {
-    baseURL: deployed ?? `http://localhost:${PORT}`,
+    baseURL,
     trace: 'retain-on-failure',
+    // Every test's browser context starts with the first-run intro (0a–0c)
+    // marked seen, so no spec meets it over Home. a11y.spec.ts opens it on
+    // purpose with /?intro, which shows it even when seen.
+    storageState: {
+      cookies: [],
+      origins: [{ origin: new URL(baseURL).origin, localStorage: [{ name: INTRO_SEEN_KEY, value: '1' }] }],
+    },
   },
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] }, testIgnore: ['webkit-pose.spec.ts'] },

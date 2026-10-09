@@ -10,11 +10,14 @@ import { localToday } from '../../rules/dates'
 import { WATCH_END_DAY } from '../../rules/watch'
 import type { HomeSummary } from './summary'
 import { useHomeSummary } from './useHomeSummary'
+import { useShowIntro } from './introSeen'
 import styles from './HomePage.module.css'
 import InstructionsCard from '../return/InstructionsCard'
 
 // Phase 2 only (P2-C): approved messages from the municipality, its own chunk.
 const MessagesCard = lazy(() => import('../inbox/MessagesCard'))
+// The first-run intro (0a–0c), its own chunk: loaded only when it shows.
+const Intro = lazy(() => import('./Intro'))
 
 // Screen 1: Home (1a default, 1b loading, 1c empty, 1d error). Every number
 // comes from the records on this phone (useHomeSummary).
@@ -141,6 +144,7 @@ export default function HomePage() {
   const place = usePlace()
   const [today] = useState(localToday)
   const failed = summary.status === 'error'
+  const showIntro = useShowIntro()
 
   return (
     <div className={styles.page}>
@@ -191,6 +195,11 @@ export default function HomePage() {
           </ButtonLink>
         )}
       </div>
+      {showIntro && (
+        <Suspense fallback={null}>
+          <Intro />
+        </Suspense>
+      )}
     </div>
   )
 }

@@ -1,0 +1,242 @@
+/* The first-run intro, 0a–0c (design pass 2, A1). A full-screen paper layer
+   over Home with no bottom nav: above the nav (30) and the toast (40), under
+   the sheets (50), so LocalStatus's sheet on 0c opens over it. */
+
+.layer {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.frame {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 560px;
+  min-height: 100%;
+  margin: 0 auto;
+}
+
+/* The step bar top left, Skip top right, in a 56 px bar like the flows'. */
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  height: 56px;
+  padding: 0 var(--space-3) 0 var(--space-5);
+}
+
+/* Pass 1's segmented step bar (FlowTopBar), 3 segments of 28 × 6. The ink
+   part of a segment is its own element, so it can fill over the track. */
+.segments {
+  display: flex;
+  gap: var(--space-1);
+}
+
+.segment {
+  position: relative;
+  width: 28px;
+  height: 6px;
+  border-radius: var(--r-full);
+  background: var(--line);
+}
+
+.segmentOn {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--ink);
+}
+
+/* FlowTopBar's 48 px text button. */
+.skip {
+  flex: none;
+  min-width: 48px;
+  height: 48px;
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--r-md);
+  background: none;
+  color: var(--ink);
+  font: var(--type-button);
+  cursor: pointer;
+}
+
+.skip:hover,
+.skip:active {
+  background: var(--sunken);
+}
+
+.card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.content {
+  flex: 1;
+  padding: var(--space-2) var(--space-5) var(--space-6);
+}
+
+/* The one primary, in the bottom third; it stays in view if a card scrolls. */
+.footer {
+  position: sticky;
+  bottom: 0;
+  padding: var(--space-3) var(--space-5) var(--space-5);
+  background: var(--paper);
+}
+
+/* The headline only takes focus from script (each card moves focus to it),
+   so it shows no focus ring; it can't be reached with Tab. */
+.display:focus,
+.title:focus {
+  outline: none;
+}
+
+/* 0a */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font: 800 20px/26px var(--font-ui);
+}
+
+.hero {
+  margin: var(--space-10) auto;
+}
+
+.display {
+  font: var(--type-display);
+}
+
+.body {
+  margin-top: var(--space-3);
+  font: var(--type-body-lg);
+  text-wrap: pretty;
+}
+
+/* 0b: rows with dividers, full width, never cards. */
+.title {
+  font: var(--type-title);
+}
+
+.rows {
+  margin: var(--space-4) calc(-1 * var(--space-5)) 0;
+  border-top: 1px solid var(--line);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) 22px;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 72px;
+  padding: var(--space-3) var(--space-4) var(--space-3) var(--space-5);
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.row:hover,
+.row:active {
+  background: var(--sunken);
+}
+
+.row:focus-visible {
+  outline-offset: -3px;
+}
+
+.rowIcon {
+  align-self: start;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--r-full);
+  background: var(--sunken);
+  color: var(--ink);
+}
+
+.row:hover .rowIcon,
+.row:active .rowIcon {
+  background: var(--surface);
+}
+
+.rowTitle {
+  display: block;
+  font: 700 18px/26px var(--font-ui);
+}
+
+.rowText {
+  display: block;
+  font: var(--type-body);
+  color: var(--ink-2);
+}
+
+.caret {
+  color: var(--ink-3);
+}
+
+/* 0c: the loop's labels in order, one calm row (stands in for I2). */
+.loop {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
+  margin-top: var(--space-4);
+  font: var(--type-caption);
+  color: var(--ink-2);
+}
+
+.loopStep {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  white-space: nowrap;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  margin-top: var(--space-3);
+}
+
+/* The 48 px text button to Prepare (L1a). */
+.prepare {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 48px;
+  margin: var(--space-3) 0 0 calc(-1 * var(--space-2));
+  padding: 0 var(--space-2);
+  border-radius: var(--r-md);
+  color: var(--ink);
+  font: var(--type-button);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.prepare:hover {
+  color: var(--ink-2);
+}
+
+.prepare:active {
+  background: var(--sunken);
+}
+
+.prepareIcon {
+  flex: none;
+}
+
+.caption {
+  margin-top: var(--space-3);
+  font: var(--type-caption);
+  color: var(--ink-3);
+}
