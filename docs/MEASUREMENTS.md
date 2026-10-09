@@ -49,6 +49,7 @@ Fill in from method 1 ("Copy as a table row"). One row per device and run.
 
 | When | Number | Where it came from | Device |
 |---|---|---|---|
+| Oct 9, CI run 37905772594 | "Measure this device" offline: OCR load 588 ms, first read 1155 ms, later reads 1092 ms (median), label read right; pose start 368 / 448 ms in a worker; 47.3 fps on the fake camera, 17 ms per detection (median); cry check start 207 ms | `e2e/measure.spec.ts` log (the copied table row) | GitHub Actions runner, headless Chromium 156, fake camera (not a phone) |
 | Oct 9, CI run 37905165994 | Demo label read offline: "Read on this phone in 1.2 s, after 0.6 s loading the reader for the first time" | `e2e/ocr-offline.spec.ts` log | GitHub Actions runner (not a phone) |
 | Oct 9, CI run 37904919331 | The same test: 1.4 s, after 0.7 s loading | `e2e/ocr-offline.spec.ts` log | GitHub Actions runner (not a phone) |
 | Oct 9, CI run 37897385876 | PP-OCRv5 on the synthetic label in Node: detection 366 ms, recognition 334 ms | `ocr.model.test.ts` log | GitHub Actions runner (not a phone) |
