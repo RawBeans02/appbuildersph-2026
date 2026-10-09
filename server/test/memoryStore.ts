@@ -118,6 +118,11 @@ export function createMemoryStore(): MemoryStore {
       return true
     },
 
+    async refundLunaCall(day) {
+      const calls = lunaUsage.get(day) ?? 0
+      if (calls > 0) lunaUsage.set(day, calls - 1)
+    },
+
     async lunaCalls(day) {
       return lunaUsage.get(day) ?? 0
     },

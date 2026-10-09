@@ -119,6 +119,9 @@ export interface Store {
   // Phase 2 alerts. One call to the model from the day's limit: false once
   // `limit` calls were taken on `day` (YYYY-MM-DD).
   takeLunaCall(day: string, limit: number): Promise<boolean>
+  // Gives a taken call back (OpenAI answered with an error, which isn't
+  // billed); never below 0.
+  refundLunaCall(day: string): Promise<void>
   lunaCalls(day: string): Promise<number>
   insertAlerts(alerts: NewAlert[]): Promise<AlertRecord[]>
   getAlert(id: string): Promise<AlertRecord | null>

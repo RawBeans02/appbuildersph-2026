@@ -186,6 +186,26 @@ describe('alerts on Postgres', () => {
     expect(row.rows[0]).toEqual({ text: `${edited}\n\n${WATCH_CAVEAT}`, status: 'approved' })
   })
 
+  it("counts only billed calls in luna_usage: a refused parameter's call is given back", async () => {
+    let calls = 0
+    const refusingOnce: Fetcher = async (_url, init) => {
+      calls += 1
+      if (calls === 1) return new Response(JSON.stringify({ error: { param: 'temperature' } }), { status: 400 })
+      const template = JSON.parse(JSON.parse(String(init!.body)).messages[1].content).template as string
+      return new Response(JSON.stringify({ choices: [{ message: { content: template } }] }))
+    }
+    const now = new Date((clock += 1000))
+    const deps: Deps = { env, openStore, now: () => now, ai: { fetch: refusingOnce, sleep: async () => undefined } }
+    const drafted = await body<DraftAlertsResponse>(await handleAlertsDraft(viewPost('/api/alerts-draft', { municipality: 'SID' }), deps))
+    // Daily limit 3: the refused call plus 3 billed ones; one alert (whichever
+    // asked last) keeps its template.
+    expect(calls).toBe(4)
+    expect(drafted.alerts[0].source).toBe('luna')
+    expect(drafted.alerts.map((alert) => alert.aiNote ?? alert.source).sort()).toEqual(['daily-limit', 'luna', 'luna', 'luna'])
+    const days = await getPool(databaseUrl).query<{ calls: number }>('SELECT calls FROM luna_usage')
+    expect(days.rows).toEqual([{ calls: 3 }])
+  })
+
   it('keeps the alert columns free of anything but codes, facts and roles', async () => {
     const columns = await getPool(databaseUrl).query<{ column_name: string }>(
       `SELECT column_name FROM information_schema.columns WHERE table_name = 'alerts' ORDER BY ordinal_position`,

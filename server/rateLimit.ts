@@ -12,8 +12,9 @@ export const LIMITS: Record<Route, { max: number; windowMs: number }> = {
   enroll: { max: 5, windowMs: 10 * 60_000 },
   sync: { max: 30, windowMs: 60_000 },
   reports: { max: 60, windowMs: 60_000 },
-  // Each draft request can call the model once per alert (at most 8), on top
-  // of the daily limit (LUNA_DAILY_LIMIT).
+  // Each draft request makes at most 9 calls to the model (one per alert, at
+  // most 8, plus one parameter renegotiation; luna/draft.ts), on top of the
+  // daily limit (LUNA_DAILY_LIMIT).
   'alerts-draft': { max: 5, windowMs: 10 * 60_000 },
   alerts: { max: 60, windowMs: 60_000 },
   'alerts-decide': { max: 30, windowMs: 60_000 },

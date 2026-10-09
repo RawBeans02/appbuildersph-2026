@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { scenarioPayloads } from '../test/lunaScenario.js'
-import { DRAFT_LIMITS, OPENAI_CHAT_URL, requestWording, SYSTEM_PROMPT, type Fetcher } from './draft.js'
+import { DRAFT_LIMITS, newSession, OPENAI_CHAT_URL, requestWording, SYSTEM_PROMPT, type Fetcher } from './draft.js'
 import { alertCandidates } from './facts.js'
 
 // OpenAI is mocked everywhere: these tests never reach the network.
@@ -91,16 +91,60 @@ describe('requestWording (GPT-6 Luna, mocked)', () => {
     expect(await requestWording(candidate, base(bad.fetcher).options)).toEqual({ ok: false, reason: 'rejected', attempts: 1 })
   })
 
-  it('drops a parameter the model refuses, and swaps the token cap to max_tokens', async () => {
-    const mock = mockFetch(
-      status(400, { error: { param: 'temperature' } }),
-      status(400, { error: { param: 'max_completion_tokens' } }),
-      reply('Adjusted.'),
-    )
-    expect(await requestWording(candidate, base(mock.fetcher).options)).toEqual({ ok: true, text: 'Adjusted.', attempts: 3 })
+  it('renegotiates once when the model refuses a parameter: both optional ones dropped, the token cap kept', async () => {
+    const mock = mockFetch(status(400, { error: { param: 'temperature' } }), reply('Adjusted.'))
+    expect(await requestWording(candidate, base(mock.fetcher).options)).toEqual({ ok: true, text: 'Adjusted.', attempts: 2 })
     expect(mock.body(1)).not.toHaveProperty('temperature')
-    expect(mock.body(2)).toMatchObject({ max_tokens: 200 })
-    expect(mock.body(2)).not.toHaveProperty('max_completion_tokens')
+    expect(mock.body(1)).not.toHaveProperty('reasoning_effort')
+    expect(mock.body(1)).toMatchObject({ max_completion_tokens: 200 })
+
+    // A refused max_completion_tokens becomes max_tokens.
+    const old = mockFetch(status(400, { error: { param: 'max_completion_tokens' } }), reply('Older model.'))
+    expect(await requestWording(candidate, base(old.fetcher).options)).toMatchObject({ ok: true, attempts: 2 })
+    expect(old.body(1)).toMatchObject({ max_tokens: 200 })
+    expect(old.body(1)).not.toHaveProperty('max_completion_tokens')
+  })
+
+  it("doesn't renegotiate a second time", async () => {
+    const mock = mockFetch(status(400, { error: { param: 'temperature' } }), status(400, { error: { param: 'max_completion_tokens' } }), reply('never'))
+    expect(await requestWording(candidate, base(mock.fetcher).options)).toEqual({ ok: false, reason: 'rejected', attempts: 2 })
+    expect(mock.calls).toHaveLength(2)
+  })
+
+  it("counts only billed calls against the day's limit: an error answer gives its call back", async () => {
+    let taken = 0
+    const day = { takeCall: async () => (taken += 1) > 0, refundCall: async () => void (taken -= 1) }
+    const mock = mockFetch(status(400, { error: { param: 'temperature' } }), status(503), reply('Billed once.'))
+    const { options } = base(mock.fetcher)
+    expect(await requestWording(candidate, { ...options, ...day })).toMatchObject({ ok: true, attempts: 3 })
+    expect(taken).toBe(1)
+    // A timeout may have been billed: it stays counted.
+    taken = 0
+    const hang = mockFetch('hang')
+    await requestWording(candidate, { ...base(hang.fetcher).options, ...day, timeoutMs: 5 })
+    expect(taken).toBe(3)
+  })
+
+  it("shares one request's calls (at most 9) and its one renegotiation across alerts", async () => {
+    const session = newSession()
+    expect(session.maxCalls).toBe(DRAFT_LIMITS.maxCallsPerRequest)
+    expect(DRAFT_LIMITS.maxCallsPerRequest).toBe(9)
+    // The model refuses temperature, then answers.
+    const refusing = mockFetch(status(400, { error: { param: 'temperature' } }), reply('ok'))
+    const first = await requestWording(candidate, { ...base(refusing.fetcher).options, session })
+    expect(first).toMatchObject({ ok: true, attempts: 2 })
+    expect(session).toMatchObject({ renegotiated: true, calls: 2 })
+    // The next alert starts with the renegotiated parameters: one call.
+    const next = mockFetch(reply('ok'))
+    expect(await requestWording(candidate, { ...base(next.fetcher).options, session })).toMatchObject({ ok: true, attempts: 1 })
+    expect(next.body(0)).not.toHaveProperty('temperature')
+    // 7 more alerts at once against a model that's down: the 6 calls left go
+    // to first tries (no retry fits), and the seventh alert gets none.
+    const down = mockFetch(status(503))
+    const results = await Promise.all([1, 2, 3, 4, 5, 6, 7].map(() => requestWording(candidate, { ...base(down.fetcher).options, session })))
+    expect(session.calls).toBe(9)
+    expect(down.calls).toHaveLength(6)
+    expect(results.map((result) => (result.ok ? 'ok' : result.reason)).sort()).toEqual([...Array(6).fill('unreachable'), 'call-cap'].sort())
   })
 
   it("stops when the day's limit is used up, without calling", async () => {

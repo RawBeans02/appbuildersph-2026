@@ -16,7 +16,7 @@ import type {
 import { MAX_REPORT_ROWS } from '../reports.js'
 import type { AlertRecord, NewAlert, Store } from '../store.js'
 import { checkAlertText } from './check.js'
-import { requestWording, type Fetcher } from './draft.js'
+import { newSession, requestWording, type Fetcher, type LunaSession } from './draft.js'
 import { alertCandidates, withCaveats, type AlertCandidate, type AlertFacts } from './facts.js'
 
 // Phase 2 alerts: draft from the facts (template always, GPT-6 Luna's wording
@@ -82,7 +82,15 @@ export function alertView(record: AlertRecord): AlertView {
 
 type Worded = Pick<NewAlert, 'text' | 'source' | 'checkReasons' | 'aiNote'>
 
-async function word(candidate: AlertCandidate, store: Store, env: ServerEnv, status: AiStatus, now: Date, ai: AiDeps): Promise<Worded> {
+async function word(
+  candidate: AlertCandidate,
+  store: Store,
+  env: ServerEnv,
+  status: AiStatus,
+  now: Date,
+  ai: AiDeps,
+  session: LunaSession,
+): Promise<Worded> {
   const template: Worded = { text: candidate.templateText, source: 'template', checkReasons: [], aiNote: status.on ? null : status.reason }
   if (!status.on || !env.openaiApiKey) return template
   const day = phDay(now)
@@ -90,6 +98,8 @@ async function word(candidate: AlertCandidate, store: Store, env: ServerEnv, sta
     apiKey: env.openaiApiKey,
     model: env.openaiModel,
     takeCall: () => store.takeLunaCall(day, env.lunaDailyLimit),
+    refundCall: () => store.refundLunaCall(day),
+    session,
     fetch: ai.fetch,
     sleep: ai.sleep,
   })
@@ -105,7 +115,15 @@ async function word(candidate: AlertCandidate, store: Store, env: ServerEnv, sta
 export async function draftAlerts(store: Store, env: ServerEnv, municipality: string, now: Date, ai: AiDeps = {}): Promise<DraftAlertsResponse> {
   const candidates = alertCandidates(await latestPayloads(store, municipality))
   const status = await aiStatus(store, env, now)
-  const worded = await Promise.all(candidates.map((candidate) => word(candidate, store, env, status, now, ai)))
+  // One share of OpenAI for the whole request (at most 9 calls, one
+  // renegotiation, 45 s). The first alert goes alone, so a parameter the model
+  // refuses is learned once; the others then go at the same time.
+  const session = newSession()
+  const worded: Worded[] = []
+  if (candidates.length > 0) {
+    worded.push(await word(candidates[0], store, env, status, now, ai, session))
+    worded.push(...(await Promise.all(candidates.slice(1).map((candidate) => word(candidate, store, env, status, now, ai, session)))))
+  }
   const batch = randomUUID()
   const records = await store.insertAlerts(
     candidates.map((candidate, i) => ({

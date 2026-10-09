@@ -424,6 +424,10 @@ export function createPgStore(db: pg.Pool | pg.PoolClient, inTransaction = false
       return result.rowCount === 1
     },
 
+    async refundLunaCall(day) {
+      await db.query('UPDATE luna_usage SET calls = calls - 1 WHERE day = $1 AND calls > 0', [day])
+    },
+
     async lunaCalls(day) {
       const result = await db.query<{ calls: number }>('SELECT calls FROM luna_usage WHERE day = $1', [day])
       return result.rows[0]?.calls ?? 0

@@ -54,6 +54,7 @@ const NOTE: Record<string, string> = {
   'no-key': 'AI off',
   'no-limit': 'AI off',
   'daily-limit': "Today's AI limit was used up",
+  'call-cap': "This draft's GPT-6 Luna calls were used up",
   timeout: 'GPT-6 Luna took too long',
   unreachable: "GPT-6 Luna couldn't be reached",
   auth: 'GPT-6 Luna refused the key',

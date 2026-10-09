@@ -3,10 +3,10 @@ import type { ServerEnv } from '../env.js'
 import { HttpError } from '../http.js'
 import { createMemoryStore, type MemoryStore } from '../test/memoryStore.js'
 import { NOW } from '../test/fixtures.js'
-import { scenarioPayloads } from '../test/lunaScenario.js'
+import { fullDraftPayloads, scenarioPayloads } from '../test/lunaScenario.js'
 import { approveAlert, draftAlerts, listAlerts, phDay, rejectAlert } from './alerts.js'
 import type { Fetcher } from './draft.js'
-import { CAVEATS, DOCTOR_TEAM_CAVEAT, DOXY_CAVEAT, MHO_CONDITION, WATCH_CAVEAT } from './facts.js'
+import { CAVEATS, DOCTOR_TEAM_CAVEAT, DOXY_CAVEAT, MAX_ALERTS, MHO_CONDITION, WATCH_CAVEAT } from './facts.js'
 
 // Drafting, the AI gates and the decisions, on the in-memory store, with
 // OpenAI mocked.
@@ -165,6 +165,73 @@ describe('drafting alerts', () => {
   it('drafts nothing without reports', async () => {
     const result = await draftAlerts(createMemoryStore(), ENV, 'SID', NOW, { fetch: model((t) => t).fetcher })
     expect(result.alerts).toEqual([])
+  })
+})
+
+describe('OpenAI calls per draft request', () => {
+  // A store whose reports call for the most alerts a draft can have (8).
+  async function fullStore(): Promise<MemoryStore> {
+    const full = createMemoryStore()
+    for (const payload of fullDraftPayloads()) {
+      full.keys.set(payload.barangay, {
+        barangay: payload.barangay,
+        municipality: 'SID',
+        publicJwk: { kty: 'EC', crv: 'P-256', x: 'x', y: 'y' },
+        fingerprint: 'AAAA-BBBB-CCCC-DDDD',
+        vouchedBy: LAPTOP,
+        updatedAt: NOW,
+      })
+      await full.putReport({ barangay: payload.barangay, epiWeek: payload.epiWeek, seq: payload.seq, municipality: 'SID', payload, phoneFingerprint: 'AAAA-BBBB-CCCC-DDDD', receivedFrom: LAPTOP, receivedAt: NOW })
+    }
+    return full
+  }
+  const noWait = async () => undefined
+
+  it('worst case, a model refusing a parameter on every call: 8 alerts, 9 calls (one renegotiation), none counted', async () => {
+    const full = await fullStore()
+    const bodies: Record<string, unknown>[] = []
+    const params = ['temperature', 'max_completion_tokens', 'reasoning_effort']
+    const refusing: Fetcher = async (_url, init) => {
+      bodies.push(JSON.parse(String(init!.body)))
+      return new Response(JSON.stringify({ error: { param: params[bodies.length % 3] } }), { status: 400 })
+    }
+    const result = await draftAlerts(full, ENV, 'SID', NOW, { fetch: refusing, sleep: noWait })
+    expect(result.alerts).toHaveLength(MAX_ALERTS)
+    expect(bodies).toHaveLength(MAX_ALERTS + 1)
+    // The first alert renegotiated once, alone; every later call used the result.
+    expect(bodies[0]).toHaveProperty('temperature')
+    expect(bodies.slice(1).every((body) => !('temperature' in body) && !('reasoning_effort' in body) && body.max_tokens === 200)).toBe(true)
+    expect(result.alerts.every((alert) => alert.source === 'template' && alert.aiNote === 'rejected')).toBe(true)
+    // Error answers aren't billed: nothing counts against the day's limit.
+    expect(full.lunaUsage.get(phDay(NOW)) ?? 0).toBe(0)
+  })
+
+  it('worst case, a model that is down: still at most 9 calls for 8 alerts', async () => {
+    const full = await fullStore()
+    let calls = 0
+    const down: Fetcher = async () => {
+      calls += 1
+      return new Response('{}', { status: 503 })
+    }
+    const result = await draftAlerts(full, ENV, 'SID', NOW, { fetch: down, sleep: noWait })
+    expect(calls).toBe(MAX_ALERTS + 1)
+    expect(result.alerts.map((alert) => alert.aiNote).sort()).toEqual([...Array(7).fill('unreachable'), 'call-cap'].sort())
+  })
+
+  it('counts a refused parameter and its retry as one call against the daily limit', async () => {
+    const full = await fullStore()
+    let calls = 0
+    const once: Fetcher = async (_url, init) => {
+      calls += 1
+      if (calls === 1) return new Response(JSON.stringify({ error: { param: 'temperature' } }), { status: 400 })
+      const template = JSON.parse(JSON.parse(String(init!.body)).messages[1].content).template as string
+      return new Response(JSON.stringify({ choices: [{ message: { content: template } }] }))
+    }
+    const result = await draftAlerts(full, ENV, 'SID', NOW, { fetch: once, sleep: noWait })
+    expect(calls).toBe(MAX_ALERTS + 1)
+    expect(result.alerts.every((alert) => alert.source === 'luna')).toBe(true)
+    expect(full.lunaUsage.get(phDay(NOW))).toBe(MAX_ALERTS)
+    expect(result.ai).toMatchObject({ on: true, callsToday: MAX_ALERTS })
   })
 })
 

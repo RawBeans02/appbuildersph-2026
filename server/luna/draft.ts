@@ -1,4 +1,4 @@
-import type { AlertCandidate } from './facts.js'
+import { MAX_ALERTS, type AlertCandidate } from './facts.js'
 
 // Asks OpenAI's GPT-6 Luna (OPENAI_CHAT_MODEL) to reword one alert's
 // template, server-side, through the Chat Completions endpoint. Wording only:
@@ -18,12 +18,15 @@ export const DRAFT_LIMITS = {
   temperature: 0.2,
   timeoutMs: 20_000,
   // At most 2 retries after the first try, on a timeout, a network error, 429
-  // or 5xx, waiting 0.5 s then 1.5 s.
+  // or 5xx, waiting 0.5 s then 1.5 s, while the request's calls and time last.
   retries: 2,
   backoffMs: [500, 1500],
-  // No retry starts unless a full try still fits in this, so a draft request
-  // ends well inside the route's 60 s (vercel.json).
+  // No try starts unless it still fits in this, counted from the start of the
+  // draft request, so it ends well inside the route's 60 s (vercel.json).
   budgetMs: 45_000,
+  // OpenAI calls per draft request, in all: one billed call per alert (at most
+  // MAX_ALERTS) plus one to renegotiate the parameters the model refuses.
+  maxCallsPerRequest: MAX_ALERTS + 1,
 } as const
 
 export const SYSTEM_PROMPT = [
@@ -48,15 +51,42 @@ export function draftMessages(candidate: AlertCandidate): { role: 'system' | 'us
 
 export type Fetcher = (input: string, init?: RequestInit) => Promise<Response>
 
-export type DraftFailure = 'daily-limit' | 'timeout' | 'unreachable' | 'auth' | 'rejected' | 'empty'
+// 'call-cap': the draft request's calls (maxCallsPerRequest) were used up.
+export type DraftFailure = 'daily-limit' | 'call-cap' | 'timeout' | 'unreachable' | 'auth' | 'rejected' | 'empty'
 
 export type DraftOutcome = { ok: true; text: string; attempts: number } | { ok: false; reason: DraftFailure; attempts: number }
+
+// One draft request's share of OpenAI, across all its alerts: the request
+// parameters as negotiated so far (renegotiated at most once), the calls made
+// (at most maxCalls) and when the request started (for the time budget).
+export type LunaSession = {
+  params: Readonly<Record<string, unknown>>
+  renegotiated: boolean
+  calls: number
+  readonly maxCalls: number
+  readonly started: number
+}
+
+const DEFAULT_PARAMS = {
+  max_completion_tokens: DRAFT_LIMITS.maxCompletionTokens,
+  reasoning_effort: 'none',
+  temperature: DRAFT_LIMITS.temperature,
+} as const
+
+export function newSession(clock: () => number = Date.now, maxCalls: number = DRAFT_LIMITS.maxCallsPerRequest): LunaSession {
+  return { params: DEFAULT_PARAMS, renegotiated: false, calls: 0, maxCalls, started: clock() }
+}
 
 export type DraftOptions = {
   apiKey: string
   model: string
   // Takes one call from the day's limit; false when it's used up.
   takeCall: () => Promise<boolean>
+  // Gives it back when OpenAI answered with an error status: such a call
+  // isn't billed. (A timeout or a network error may have been, so it stays.)
+  refundCall?: () => Promise<void>
+  // Shared by every alert of one draft request; a single call gets its own.
+  session?: LunaSession
   fetch?: Fetcher
   sleep?: (ms: number) => Promise<void>
   timeoutMs?: number
@@ -64,9 +94,23 @@ export type DraftOptions = {
   clock?: () => number
 }
 
-// Parameters a model may refuse (OpenAI answers 400 naming the param): dropped,
-// or for the token cap swapped to the older name, then tried again at once.
+// Parameters a model may refuse (OpenAI answers 400 naming the param). The
+// first refusal in a request renegotiates once for every alert after it: the
+// optional temperature and reasoning_effort are both dropped, and a refused
+// max_completion_tokens becomes the older max_tokens (the token cap always
+// stays). A later refusal isn't renegotiated again.
 const ADJUSTABLE = new Set(['temperature', 'reasoning_effort', 'max_completion_tokens'])
+
+function renegotiate(params: Readonly<Record<string, unknown>>, refused: string): Record<string, unknown> {
+  const next: Record<string, unknown> = { ...params }
+  delete next.temperature
+  delete next.reasoning_effort
+  if (refused === 'max_completion_tokens') {
+    delete next.max_completion_tokens
+    next.max_tokens = DRAFT_LIMITS.maxCompletionTokens
+  }
+  return next
+}
 
 const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms))
 
@@ -89,40 +133,51 @@ export async function requestWording(candidate: AlertCandidate, options: DraftOp
   const fetcher = options.fetch ?? fetch
   const sleep = options.sleep ?? wait
   const timeoutMs = options.timeoutMs ?? DRAFT_LIMITS.timeoutMs
-  const body: Record<string, unknown> = {
-    model: options.model,
-    messages: draftMessages(candidate),
-    max_completion_tokens: DRAFT_LIMITS.maxCompletionTokens,
-    reasoning_effort: 'none',
-    temperature: DRAFT_LIMITS.temperature,
-  }
   const clock = options.clock ?? Date.now
-  const started = clock()
+  const session = options.session ?? newSession(clock)
+  const messages = draftMessages(candidate)
   let attempts = 0
   let retried = 0
-  let adjusted = 0
+  let backoff = 0
+  // Why the last try failed: what a retry that can't start reports.
+  let failure: DraftFailure | null = null
   for (;;) {
-    if (!(await options.takeCall())) return { ok: false, reason: 'daily-limit', attempts }
+    if (backoff > 0) await sleep(backoff)
+    backoff = 0
+    // Every try, the first included, must fit the request's time and calls.
+    if (clock() - session.started + timeoutMs > DRAFT_LIMITS.budgetMs) return { ok: false, reason: failure ?? 'timeout', attempts }
+    if (session.calls >= session.maxCalls) return { ok: false, reason: failure ?? 'call-cap', attempts }
+    // Reserved before anything is awaited, so alerts running at the same time can't pass the cap.
+    session.calls += 1
+    if (!(await options.takeCall())) {
+      session.calls -= 1
+      return { ok: false, reason: 'daily-limit', attempts }
+    }
     attempts += 1
-    let failure: DraftFailure
+    const params = session.params
     try {
       const response = await fetcher(OPENAI_CHAT_URL, {
         method: 'POST',
         headers: { authorization: `Bearer ${options.apiKey}`, 'content-type': 'application/json' },
-        body: JSON.stringify(body),
+        body: JSON.stringify({ model: options.model, messages, ...params }),
         signal: AbortSignal.timeout(timeoutMs),
       })
       if (response.ok) {
         const text = replyText(await response.json().catch(() => null))
         return text ? { ok: true, text, attempts } : { ok: false, reason: 'empty', attempts }
       }
-      if (response.status === 400 && adjusted < ADJUSTABLE.size) {
+      // An error answer isn't billed: it doesn't count against the day's limit.
+      await options.refundCall?.()
+      if (response.status === 400) {
         const param = await errorParam(response)
-        if (param && ADJUSTABLE.has(param) && param in body) {
-          if (param === 'max_completion_tokens') body.max_tokens = DRAFT_LIMITS.maxCompletionTokens
-          delete body[param]
-          adjusted += 1
-          continue
+        if (param && ADJUSTABLE.has(param) && param in params) {
+          // Another alert of this request already renegotiated: try its parameters.
+          if (session.params !== params) continue
+          if (!session.renegotiated) {
+            session.params = renegotiate(params, param)
+            session.renegotiated = true
+            continue
+          }
         }
       }
       if (response.status === 401 || response.status === 403) return { ok: false, reason: 'auth', attempts }
@@ -132,9 +187,9 @@ export async function requestWording(candidate: AlertCandidate, options: DraftOp
       failure = error instanceof DOMException && (error.name === 'TimeoutError' || error.name === 'AbortError') ? 'timeout' : 'unreachable'
     }
     if (retried >= DRAFT_LIMITS.retries) return { ok: false, reason: failure, attempts }
-    const backoff = DRAFT_LIMITS.backoffMs[retried]
-    if (clock() - started + backoff + timeoutMs > DRAFT_LIMITS.budgetMs) return { ok: false, reason: failure, attempts }
-    await sleep(backoff)
+    backoff = DRAFT_LIMITS.backoffMs[retried]
     retried += 1
+    // A retry that couldn't finish in the budget doesn't start (or wait).
+    if (clock() - session.started + backoff + timeoutMs > DRAFT_LIMITS.budgetMs) return { ok: false, reason: failure, attempts }
   }
 }
