@@ -172,7 +172,7 @@ The brief (from the team's phone-test feedback) goes to Claude Design. Build fro
   - The owner's 3:10–3:55 phone test list is in the kit (`owner-test-3am.md`): the demo loop with real cameras is the go/no-go.
 - [x] done · P9 (brief P1) phone: 14d QR receipt (real bytes, counts, export #, key), 14e QR `reveal-qr`, 14c/13b/6c/Prepare "Done" `stamp`, 9a new rows `land`, 8d footer count `tick` · [lead] · ca92d8e..4847f02, CI 37968493277 green
 - [x] done · P10 (brief P1) laptop: 18d doctor-team order bars (fixed weights ×3/×2/×1, ranges dashed), 20c newest log row + B25 full approved text · [lead] · 586d0f8, c01eccf, 7f25ba5, 1b426d0 (18d moved under the merged table: Lead override, `design/README.md`); CI 37968802870 green
-- [ ] todo · P8 I2 loop art on 0c (ordered-list fallback until then) · [sr] after P4
+- [x] done · P8 I2 loop art on 0c · [lead] · 4837f19 (with the real I1 brand tile; design pass 2 imported in d6f8e50)
 
 ## Next
 - [ ] todo · Claude Design pass 2: remaining screens, 404, og:image, video title card · [lead] · owns: `design/`
