@@ -201,9 +201,10 @@ Measured with Lighthouse 12.8.2 (mobile emulation, simulated throttling), the sa
 
 | Run | Performance | Accessibility | Best Practices | SEO |
 |---|---|---|---|---|
-| [Fri Oct 9, 5:58 PM PH](https://github.com/RawBeans02/appbuildersph-2026/actions/runs/37914606334) | 86 | 100 | 100 | 91 |
+| [Fri Oct 9, 6:09 PM PH](https://github.com/RawBeans02/appbuildersph-2026/actions/runs/37915694829), median of 3 runs (Performance 66, 99, 99) | 99 | 100 | 100 | 100 |
+| [Fri Oct 9, 5:58 PM PH](https://github.com/RawBeans02/appbuildersph-2026/actions/runs/37914606334), single run, before the `robots.txt` and first-load fixes | 86 | 100 | 100 | 91 |
 
-Re-measured at the feature freeze; the latest run is the one that counts. Accessibility is also checked on every push by axe-core on 14 screens (`docs/MEASUREMENTS.md`, method 6).
+Single runs vary on GitHub's shared runners (one of the three runs above scored 66, with 2,120 ms of blocking time), so we report the median of three and show every run. Re-measured at the feature freeze; the latest median is the one that counts. Accessibility is also checked on every push by axe-core on 14 screens (`docs/MEASUREMENTS.md`, method 6).
 
 ## Team
 | Name (as on appbuildersph.com/hackathon/participants) | GitHub | Role | Contributions |
