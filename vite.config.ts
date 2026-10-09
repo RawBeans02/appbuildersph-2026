@@ -14,10 +14,12 @@ const spikePages = Object.fromEntries(
     .map((file) => [file.slice(0, -'.html'.length), fileURLToPath(new URL(`./${file}`, import.meta.url))]),
 )
 
-// The build's version, for /device's Demo readiness: the commit (Vercel's, or
-// the local checkout's) and when it was built. Only the device page reads it.
+// The build's version, for /device's Demo readiness: the commit (Vercel's,
+// Cloudflare Pages', or the local checkout's) and when it was built. Only the
+// device page reads it.
 function gitShortSha(): string {
-  if (process.env.VERCEL_GIT_COMMIT_SHA) return process.env.VERCEL_GIT_COMMIT_SHA.slice(0, 7)
+  const hosted = process.env.VERCEL_GIT_COMMIT_SHA || process.env.CF_PAGES_COMMIT_SHA
+  if (hosted) return hosted.slice(0, 7)
   try {
     return execSync('git rev-parse --short=7 HEAD', { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim()
   } catch {
