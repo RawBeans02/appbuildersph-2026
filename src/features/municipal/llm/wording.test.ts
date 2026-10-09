@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import type { WebGPUSupport } from '../../../lib/capabilities'
+import { buildMessages, draftTokenBudget } from './prompt'
 import { createWording, DRAFT_TIMEOUT_MS, parseFetchedMB, type LlmEngine, type LoadProgress } from './wording'
 
 const gpu: WebGPUSupport = {
@@ -87,7 +88,8 @@ describe('createWording', () => {
   })
 
   it('downloads with the measured MB, loads, drafts, and accepts a faithful draft', async () => {
-    const { wording, states, progress, finishLoad } = setup(fakeEngine(GOOD))
+    const engine = fakeEngine(GOOD)
+    const { wording, states, progress, finishLoad } = setup(engine)
     await wording.checkAvailable()
     const done = wording.draft(TEMPLATE, PLAN, KNOWN)
     await flush()
@@ -98,6 +100,10 @@ describe('createWording', () => {
     await done
     expect(states).toEqual(['idle', 'loading', 'downloading', 'loading', 'drafting', 'drafting', 'done'])
     expect(wording.getState()).toEqual({ status: 'done', text: GOOD, check: { ok: true }, ms: 500, template: TEMPLATE })
+    expect(engine.complete).toHaveBeenCalledWith(
+      buildMessages(PLAN),
+      expect.objectContaining({ maxTokens: draftTokenBudget(PLAN) }),
+    )
   })
 
   it('marks a draft that adds a number or a dose as rejected, so the template stays', async () => {

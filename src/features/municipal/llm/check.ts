@@ -88,10 +88,15 @@ function scorePattern(score: CountRange): RegExp {
   return max === undefined ? new RegExp(`(?<![\\d.,])${min}(?![\\d])`) : new RegExp(`(?<![\\d])${min}\\s*[–-]\\s*${max}(?![\\d])`)
 }
 
+const leftToTheMho = (sentence: string) => /\bMHO\b/.test(sentence) && /\b(?:decid\w*|approv\w*|aprubado)\b/i.test(sentence)
+
 export function checkDraft(draft: string, template: string, plan: PlanFacts, knownNames: readonly string[]): DraftCheck {
   const reasons: string[] = []
   const text = draft.trim()
   if (text.length < 40) reasons.push('The draft is empty or too short.')
+  // The prompt's sample exchange (prompt.ts) uses SAMPLE_ placeholders and an
+  // "ACTUAL PLAN" header; a draft that echoes them copied the wrong thing.
+  if (/\bSAMPLE|ACTUAL PLAN/i.test(text)) reasons.push('It copies the sample from the instructions instead of the plan.')
 
   // Numbers: each one must be a number of the plan.
   const allowed = numbersIn(template)
@@ -131,12 +136,17 @@ export function checkDraft(draft: string, template: string, plan: PlanFacts, kno
   const parts = sentences(text)
   for (const move of plan.moves) {
     const amount = formatCount(move.capsulesUpTo)
-    const kept = parts.some((sentence) => {
+    const keptIn = parts.filter((sentence) => {
       const from = sentence.indexOf(move.fromName)
       const to = sentence.indexOf(move.toName)
       return from >= 0 && to > from && hasAmount(sentence, amount)
     })
-    if (!kept) reasons.push(`It changes or leaves out the move of up to ${amount} capsules from ${move.fromName} to ${move.toName}.`)
+    if (!keptIn.length) reasons.push(`It changes or leaves out the move of up to ${amount} capsules from ${move.fromName} to ${move.toName}.`)
+    // A move is a suggestion for the MHO, never an order: its sentence keeps
+    // the MHO's decision ("for the MHO to decide", "if the MHO approves").
+    else if (!keptIn.some(leftToTheMho)) {
+      reasons.push(`It turns the move of up to ${amount} capsules from ${move.fromName} to ${move.toName} into an order; keep "for the MHO to decide".`)
+    }
   }
   for (const sentence of parts) {
     if (!MOVE_WORDS.test(sentence) || !STOCK_WORDS.test(sentence)) continue
@@ -159,6 +169,19 @@ export function checkDraft(draft: string, template: string, plan: PlanFacts, kno
 // no-dose, no-diagnosis line can't be lost in rewording.
 export const PLAN_REMINDER =
   'Paalala: this plan does not diagnose anyone and sets no dose; doxycycline only after consultation with a health professional.'
+
+// The template's notes that a short accepted summary leaves out: why no stock
+// move is suggested, what the plan is based on, an older week, and what "<5"
+// means. They're added under the draft the officer uses, so the approved text
+// in the log keeps them (they come from the rules, not the model).
+const NOTE_LINES = [/^No stock move suggested:/, /^Batayan \(based on\):/, /^Older week:/]
+const LESS_THAN_5 = '"<5" means 1 to 4, so scores and totals that include one are ranges.'
+
+export function withPlanNotes(draft: string, template: string): string {
+  const notes = template.split('\n').filter((line) => NOTE_LINES.some((pattern) => pattern.test(line)) && !draft.includes(line))
+  if (template.includes('"<5" means 1 to 4') && !draft.includes('"<5" means')) notes.push(LESS_THAN_5)
+  return notes.length ? `${draft.trim()}\n\n${notes.join('\n')}` : draft
+}
 
 export function withReminder(draft: string): string {
   return draft.includes(PLAN_REMINDER) ? draft : `${draft.trim()}\n\n${PLAN_REMINDER}`

@@ -4,7 +4,7 @@ import { Button, Progress } from '../../../components'
 import { DEMO_BARANGAYS } from '../../../data/places'
 import { checkWebGPU } from '../../../lib/capabilities'
 import type { MunicipalPlan } from '../../../rules/plan'
-import { withReminder } from './check'
+import { withPlanNotes, withReminder } from './check'
 import { loadWordingEngine } from './llmEngine'
 import { WORDING_MODEL_NAME } from './model'
 import { createWording, type Wording } from './wording'
@@ -57,7 +57,7 @@ export function LlmWordingPanel({ plan, draft, onUse, children }: LlmWordingPane
   async function write() {
     await wording.draft(draft, plan, KNOWN_NAMES)
     const after = wording.getState()
-    if (after.status === 'done' && after.template === draft && after.check.ok) onUse(withReminder(after.text))
+    if (after.status === 'done' && after.template === draft && after.check.ok) onUse(withReminder(withPlanNotes(after.text, draft)))
   }
   const writeAgain = (
     <div className={styles.again}>
@@ -104,7 +104,7 @@ export function LlmWordingPanel({ plan, draft, onUse, children }: LlmWordingPane
     top = (
       <>
         <p className={styles.stateTitle}>{state.status === 'downloading' ? 'Downloading the writing AI' : 'Loading the writing AI'}</p>
-        <p className={styles.body}>First time only. After this it runs on this laptop with no internet.</p>
+        <p className={styles.body}>For offline use, all required model files must remain cached in this browser.</p>
         <div className={styles.progress}>
           <Progress
             value={state.status === 'downloading' ? state.progress : null}
@@ -157,6 +157,7 @@ export function LlmWordingPanel({ plan, draft, onUse, children }: LlmWordingPane
           <LaptopIcon size={16} weight="bold" aria-hidden />
           Written on this laptop · {WORDING_MODEL_NAME} · {(state.ms / 1000).toFixed(1)} s
         </p>
+        {state.check.ok && <p className={styles.body}>Check this short action summary against the full plan before approving.</p>}
         {!state.check.ok && (
           <div role="alert">
             <p className={styles.checkWarn}>
@@ -168,11 +169,14 @@ export function LlmWordingPanel({ plan, draft, onUse, children }: LlmWordingPane
                 <li key={reason}>{reason}</li>
               ))}
             </ul>
+            <p className={styles.body}>The same plan gives the same draft. Approve the plan as listed, or write the wording yourself.</p>
           </div>
         )}
       </>
     )
-    bottom = writeAgain
+    // The model writes at temperature 0: writing again from the same plan
+    // repeats a rejected draft, so only an accepted one offers it.
+    bottom = state.check.ok ? writeAgain : null
   } else if (state.status === 'error') {
     top = (
       <>
@@ -185,7 +189,7 @@ export function LlmWordingPanel({ plan, draft, onUse, children }: LlmWordingPane
     top = (
       <>
         <p className={styles.body}>
-          A small language model on this laptop can reword the plan. It may not change any number, and you still check and approve.
+          Optional: the on-device AI writes a short action summary from the rule-based plan. Check each draft against the full plan before approving.
         </p>
         <div className={styles.actions}>
           <Button variant="secondary" onClick={() => void write()}>
