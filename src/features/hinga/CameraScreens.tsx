@@ -26,11 +26,11 @@ import styles from './Hinga.module.css'
 // without the camera.
 
 const REFUSAL_ICONS: Record<RefusalIcon, ReactNode> = {
-  crying: <SpeakerHighIcon size={24} weight="bold" aria-hidden />,
-  motion: <VibrateIcon size={24} weight="bold" aria-hidden />,
-  chest: <EyeSlashIcon size={24} weight="bold" aria-hidden />,
-  disagree: <ArrowsSplitIcon size={24} weight="bold" aria-hidden />,
-  paused: <ClockIcon size={24} weight="bold" aria-hidden />,
+  crying: <SpeakerHighIcon size={32} weight="bold" />,
+  motion: <VibrateIcon size={32} weight="bold" />,
+  chest: <EyeSlashIcon size={32} weight="bold" />,
+  disagree: <ArrowsSplitIcon size={32} weight="bold" />,
+  paused: <ClockIcon size={32} weight="bold" />,
 }
 
 export function CryOffNote({ reason }: { reason: string }) {
@@ -205,16 +205,7 @@ function RefusalSheet(props: {
   // 5e: the second refusal in a row also offers the hand count.
   const text = refusalText(props.refusal, props.onHandCount !== null)
   return (
-    <BottomSheet
-      open
-      onClose={props.onRetry}
-      title={
-        <>
-          <span className={styles.sheetIconWarn}>{REFUSAL_ICONS[text.icon]}</span>
-          {text.title}
-        </>
-      }
-    >
+    <BottomSheet open onClose={props.onRetry} icon={REFUSAL_ICONS[text.icon]} iconTone="warn" title={text.title}>
       <p className={styles.sheetText}>{text.body}</p>
       <p className={styles.sheetNote}>Nothing was saved.</p>
       {props.cryOff && props.refusal !== 'crying' && <CryOffNote reason={props.cryOff} />}

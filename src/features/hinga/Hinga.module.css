@@ -509,15 +509,6 @@
   text-wrap: pretty;
 }
 
-/* 5a–5e: the refusal's icon before the title, until the sheet's icon circle
-   has the design's warn tone (TASKS.md A7). */
-.sheetIconWarn {
-  display: inline-flex;
-  vertical-align: -4px;
-  margin-right: var(--space-2);
-  color: var(--warn);
-}
-
 .sheetNote {
   font: var(--type-body-dense);
   color: var(--ink-2);
