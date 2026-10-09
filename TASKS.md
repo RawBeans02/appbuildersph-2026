@@ -164,7 +164,7 @@ The brief (from the team's phone-test feedback) goes to Claude Design. Build fro
 - [ ] doing · P4 Intro 0a–0c (lazy chunk, seen flag; never on deep links or /municipal) and L10b; e2e sets the seen flag and axe checks the intro · [lead] (reassigned from [sr]) · owns: `src/features/home/Intro*`, `src/features/privacy/`, `e2e/`
 - [ ] todo · P5 Laptop core: LaptopNav v2 (BrandTile), LoopStrip, 16b received meter, 17g/17h check lines (shared `components/CheckLines.tsx`), 19g approved panel · [human:Gabriel] (Syd) · owns: `src/features/municipal/` (except `llm/`), `src/components/CheckLines.tsx`
 - [ ] todo · P6 21a Receive restyle (uses CheckLines), and 22a Return QR · [human:Gabriel] (Syd) · owns: `src/features/return/`
-- [ ] todo · P7 Laptop rest: 18c newest row + B22 pill variant, 19f rule rail, 19h AI-off row · [lead] after P2 · owns: `MergedPage`, `PlanPage` `PlanSteps`, `llm/LlmWordingPanel.tsx`
+- [x] done · P7 Laptop rest: 18c newest row + B22 pill variant, 19f rule rail, 19h AI-off row · [lead] · owns: `MergedPage`, `PlanPage` `PlanSteps`, `llm/LlmWordingPanel.tsx` · 394845a (the "Just now" row is the newest QR scanned on this laptop this session: `justReceived.ts`; the rail animates only when the received exports changed: `planShown.ts`)
 - [ ] todo · P8 I2 loop art on 0c (ordered-list fallback until then) · [sr] after P4
 
 ## Next
