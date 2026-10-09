@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Exposure, ExposureKind } from '../data/db/types'
-import { watchedCount, watchList } from './watch'
+import { watchedCount, watchList, watchWindow } from './watch'
 
 let n = 0
 const exposure = (residentId: string, exposedOn: string, kinds: ExposureKind[] = ['waded']): Exposure => ({
@@ -53,6 +53,19 @@ describe('watchList', () => {
     )
     expect(list.map((e) => e.phase)).toEqual(['active', 'upcoming', 'ended'])
     expect(watchedCount(list)).toBe(2)
+  })
+
+  it('counts the row day from the last contact, so day 15 is the last day of the window', () => {
+    const single = (today: string) => watchList([exposure('r1', '2026-10-04')], today)[0]
+    expect(single('2026-10-10')).toMatchObject({ day: 6, phase: 'active' })
+    expect(single('2026-10-19')).toMatchObject({ day: 15, daysLeft: 0, phase: 'active' })
+    const [twoDays] = watchList([exposure('r1', '2026-10-04'), exposure('r1', '2026-10-06')], '2026-10-21')
+    expect(twoDays).toMatchObject({ day: 15, daysLeft: 0, windowEnd: '2026-10-21' })
+  })
+
+  it('gives the window for one day of contact, or several', () => {
+    expect(watchWindow('2026-10-04')).toEqual({ start: '2026-10-09', end: '2026-10-19' })
+    expect(watchWindow('2026-10-04', '2026-10-06')).toEqual({ start: '2026-10-09', end: '2026-10-21' })
   })
 
   it('returns nothing without exposures', () => {

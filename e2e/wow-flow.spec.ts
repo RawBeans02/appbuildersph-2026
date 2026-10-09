@@ -8,10 +8,8 @@ import { DEMO_SCAN_LABEL } from '../src/data/seed/demoLabel'
 // The label's expiry is printed (EXP 11/2026), so the "expiring" count holds
 // for the demo days, not forever.
 
-async function watchCount(page: Page): Promise<number> {
-  const heading = await page.getByRole('heading', { name: /^Watch list \(\d+\)$/ }).textContent()
-  return Number(/\((\d+)\)/.exec(heading ?? '')?.[1])
-}
+// A watch-list section's count, from its heading ("In the window now 9").
+const section = (page: Page, title: string) => page.getByRole('heading', { level: 2, name: new RegExp(`^${title} \\d+$`) })
 
 test('tap exposed, add the scanned box, flag for review, create the QR', async ({ page }) => {
   test.setTimeout(90_000)
@@ -21,33 +19,43 @@ test('tap exposed, add the scanned box, flag for review, create the QR', async (
 
   // Flood exposure: the three one-person households the demo taps.
   await page.goto('/watch')
-  await expect(page.getByText(/^Flood since /)).toBeVisible()
-  expect(await watchCount(page)).toBe(9)
+  await expect(page.getByRole('heading', { level: 1, name: 'Watch list' })).toBeVisible()
+  await expect(section(page, 'In the window now')).toHaveText(/ 9$/)
+  await expect(section(page, 'Starts soon')).toHaveCount(0)
+  await page.getByRole('button', { name: 'Mark more people exposed' }).click()
   for (const id of ['HH-03', 'HH-07', 'HH-10']) {
-    const household = page.getByRole('button', { name: new RegExp(`^${id}, .*1 person`) })
+    const household = page.getByRole('button', { name: new RegExp(`^${id}.*1 person$`) })
     await household.click()
     await expect(household).toHaveAttribute('aria-pressed', 'true')
   }
-  await expect.poll(() => watchCount(page)).toBe(12)
+  await page.getByRole('button', { name: 'Confirm and start the watch' }).click()
+  await page.getByRole('dialog').getByRole('button', { name: /^Start the watch/ }).click()
+  await expect(page.getByText('Watch started for 3 people.')).toBeVisible()
+  await expect(section(page, 'In the window now')).toHaveText(/ 9$/)
+  await expect(section(page, 'Starts soon')).toHaveText(/ 3$/)
 
-  // Stock: the demo box, entered by hand with the label's values.
+  // Stock: the demo box, typed in with the label's values (no camera here).
   await page.goto('/stock')
-  await page.getByRole('button', { name: 'Add by hand' }).click()
-  await page.getByLabel('Medicine').fill(DEMO_SCAN_LABEL.drug)
-  await page.getByLabel('Strength').fill(DEMO_SCAN_LABEL.strength)
-  await page.getByLabel('Lot number').fill(DEMO_SCAN_LABEL.lot)
-  await page.getByLabel('Expiry').fill(DEMO_SCAN_LABEL.expiry)
-  await page.getByLabel('How many on hand').fill(String(DEMO_SCAN_LABEL.quantity))
-  await page.getByLabel('Unit').selectOption(DEMO_SCAN_LABEL.unit)
-  await page.getByRole('button', { name: 'Confirm and save' }).click()
-  await expect(page.getByText(new RegExp(`lot ${DEMO_SCAN_LABEL.lot}`))).toBeVisible()
+  await page.getByRole('button', { name: 'Scan a box' }).click()
+  await page.getByRole('button', { name: 'Type it in' }).click()
+  await page.getByLabel('Medicine', { exact: true }).fill(DEMO_SCAN_LABEL.drug)
+  await page.getByLabel('Strength', { exact: true }).fill(DEMO_SCAN_LABEL.strength)
+  await page.getByLabel('Lot number', { exact: true }).fill(DEMO_SCAN_LABEL.lot)
+  await page.getByLabel('Expiry', { exact: true }).fill(DEMO_SCAN_LABEL.expiry)
+  await page.getByLabel('How many on hand', { exact: true }).fill(String(DEMO_SCAN_LABEL.quantity))
+  await page.getByLabel('Unit', { exact: true }).selectOption(DEMO_SCAN_LABEL.unit)
+  await page.getByRole('button', { name: /^Confirm/ }).click()
+  await expect(page.getByRole('status').filter({ hasText: `lot ${DEMO_SCAN_LABEL.lot}.` })).toBeVisible()
 
-  // Exposure × stock: the demo's line, then the flag. Never a dose.
+  // Exposure × stock: the demo's three numbers, then the flag. Never a dose.
+  const metric = (label: string) => page.locator('p').filter({ hasText: label })
   await page.goto('/compare')
-  await expect(page.getByText('12 exposed · 40 doxycycline capsules · 30 expire within 6 weeks')).toBeVisible()
+  await expect(metric('people exposed to floodwater')).toHaveText(/^12\D/)
+  await expect(metric('doxycycline capsules on hand')).toHaveText(/^40\D/)
+  await expect(metric('of them expire within 6 weeks')).toHaveText(/^30\D/)
   await expect(page.getByText(/dose/i)).toHaveText(['Agapay never suggests a dose. Doxycycline is given only after consultation with a health professional (DOH).'])
   await page.getByRole('button', { name: 'Flag for clinician review' }).click()
-  await expect(page.getByText(/^Flagged for clinician review on /)).toBeVisible()
+  await expect(page.getByText('Flagged for clinician review', { exact: true })).toBeVisible()
 
   // Send: the de-identified table and the QR.
   await page.goto('/send')

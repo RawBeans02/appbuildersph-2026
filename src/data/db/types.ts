@@ -20,6 +20,9 @@ export type FloodEvent = {
   note: string
   createdAt: string
   sample: boolean
+  // The areas with floodwater, as the residents' purok names ("Purok 1").
+  // Optional: older records and the seed may not have them.
+  puroks?: string[]
 }
 
 export type ExposureKind = 'waded' | 'open-wound' | 'repeated'
@@ -32,6 +35,18 @@ export type Exposure = {
   exposedOn: string
   kinds: ExposureKind[]
   createdAt: string
+  sample: boolean
+}
+
+// Version 3: a check on someone on the watch list (screen 9b). 'no-signs':
+// checked, no fever, muscle pain or red eyes. 'referred': sent to the RHU.
+export type WatchCheckResult = 'no-signs' | 'referred'
+
+export type WatchCheck = {
+  id: string
+  residentId: string
+  checkedAt: string
+  result: WatchCheckResult
   sample: boolean
 }
 

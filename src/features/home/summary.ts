@@ -74,7 +74,7 @@ export function summarizeHome(records: HomeRecords, today: string, modelsPrepare
           window: floodDay < WATCH_START_DAY ? 'before' : floodDay > WATCH_END_DAY ? 'over' : 'open',
           windowStart: addDays(flood.startedOn, WATCH_START_DAY),
           windowEnd: addDays(flood.startedOn, WATCH_END_DAY),
-          puroks: (flood as FloodEvent & { puroks?: string[] }).puroks ?? [],
+          puroks: flood.puroks ?? [],
         }
       : null,
     watch: {

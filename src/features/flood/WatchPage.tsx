@@ -1,14 +1,23 @@
-import { useState, type FormEvent } from 'react'
+import { useState } from 'react'
+import { useFlowMode } from '../../app/flow'
+import { useToast } from '../../components'
 import { getDb } from '../../data/db/appDb'
 import type { AgapayDb } from '../../data/db/db'
-import type { ExposureKind } from '../../data/db/types'
-import { useDbQuery } from '../../data/db/useDbQuery'
+import { useDbQuery, type DbQueryState } from '../../data/db/useDbQuery'
+import { placeLine, usePlace } from '../../data/db/usePlace'
 import { localToday } from '../../rules/dates'
-import { watchedCount, watchList, type WatchEntry } from '../../rules/watch'
-import { currentFlood, groupHouseholds, logFlood, markHouseholdExposed, undoHouseholdExposure, type Household } from './flood'
+import { currentFlood, exposedBefore, groupHouseholds, logFlood, marksOn, puroksOf, saveMarks, type Marks } from './flood'
+import { LogFlood, type FloodDraft } from './LogFlood'
+import { MarkExposed, type MarkData, type MarkEdits } from './MarkExposed'
+import { useWatchSteps } from './steps'
+import { readWatchChecks } from './watchChecks'
+import { WatchList, type ListData } from './WatchList'
+import { peopleWords } from './words'
 
-// Screens 8-9: log a flood, tap exposed households, and the watch list.
-// Plain until design/ lands. NEEDS DESIGN: screens 8-9.
+// /watch: the watch list (9a–9c), and the flood flow (8a log a flood, 8b mark
+// who was exposed, 8c confirm). The flow hides the bottom nav.
+
+const STORES = ['residents', 'floodEvents', 'exposures', 'watchChecks'] as const
 
 const readWatchData = async (db: AgapayDb) => {
   const [residents, floods, exposures] = await Promise.all([
@@ -16,140 +25,105 @@ const readWatchData = async (db: AgapayDb) => {
     db.floodEvents.list({ limit: 100 }),
     db.exposures.list({ limit: 1000 }),
   ])
-  return { residents, floods, exposures }
+  const checks = await readWatchChecks(db, [...new Set(exposures.map((exposure) => exposure.residentId))])
+  return { residents, floods, exposures, checks }
 }
 
-const KIND_LABELS: Record<ExposureKind, string> = {
-  waded: 'waded in floodwater',
-  'open-wound': 'open wound',
-  repeated: 'repeated contact',
-}
-
-function describeEntry(entry: WatchEntry): string {
-  if (entry.phase === 'upcoming') return `Watch starts in ${entry.daysToStart} day${entry.daysToStart === 1 ? '' : 's'} (${entry.windowStart})`
-  if (entry.phase === 'active') return `Watch now, ${entry.daysLeft} day${entry.daysLeft === 1 ? '' : 's'} left (until ${entry.windowEnd})`
-  return `Window ended ${entry.windowEnd}`
+type FlowDraft = FloodDraft & {
+  // 8a's Next was pressed: 8b marks people for this new flood.
+  ready: boolean
 }
 
 export default function WatchPage() {
-  const data = useDbQuery(['residents', 'floodEvents', 'exposures'], readWatchData)
+  const data = useDbQuery(STORES, readWatchData)
+  const place = usePlace()
+  const toast = useToast()
   const [today] = useState(localToday)
-  const [floodDate, setFloodDate] = useState(today)
-  const [note, setNote] = useState('')
-  const [woundHouseholds, setWoundHouseholds] = useState<Set<string>>(new Set())
+  const { step, go, back, finish } = useWatchSteps()
+  const [draft, setDraft] = useState<FlowDraft>(() => ({ startedOn: today, puroks: [], ready: false }))
+  const [edits, setEdits] = useState<MarkEdits>(() => new Map())
 
-  if (data.status === 'loading') return <p>Loading…</p>
-  if (data.status === 'error') return <p role="alert">Could not read the records on this phone.</p>
+  const records = data.status === 'ready' ? data.data : null
+  const flood = records ? currentFlood(records.floods) : null
+  const households = records ? groupHouseholds(records.residents) : []
+  // 8b marks for the new flood from 8a, or more people for the current flood.
+  const markMode = draft.ready ? 'new' : flood ? 'more' : null
+  // 8b with no flood to mark (e.g. reopened mid-flow): log one first.
+  const shown = step === 'mark' && records && !markMode ? 'log' : step
+  useFlowMode(shown !== 'list')
 
-  const { residents, floods, exposures } = data.data
-  const flood = currentFlood(floods)
-  const households = groupHouseholds(residents)
-  const names = new Map(residents.map((r) => [r.id, r]))
-  const exposedHere = new Set(
-    exposures.filter((e) => e.floodEventId === flood?.id).map((e) => names.get(e.residentId)?.householdId),
-  )
-  const entries = watchList(exposures, today).filter((entry) => entry.phase !== 'ended')
-
-  async function onLogFlood(event: FormEvent) {
-    event.preventDefault()
-    await logFlood(await getDb(), { startedOn: floodDate, note })
-    setNote('')
+  const startLog = () => {
+    setDraft({ startedOn: today, puroks: [], ready: false })
+    setEdits(new Map())
+    go('log')
+  }
+  const startMore = () => {
+    if (!flood) return startLog()
+    setDraft((current) => ({ ...current, ready: false }))
+    setEdits(new Map())
+    go('mark')
   }
 
-  async function toggle(household: Household) {
-    if (!flood) return
-    const db = await getDb()
-    if (exposedHere.has(household.id)) {
-      await undoHouseholdExposure(db, { floodEventId: flood.id, household })
-    } else {
-      const kinds: ExposureKind[] = woundHouseholds.has(household.id) ? ['waded', 'open-wound'] : ['waded']
-      await markHouseholdExposed(db, { floodEventId: flood.id, household, exposedOn: today, kinds })
+  if (shown === 'log') {
+    return (
+      <LogFlood
+        draft={draft}
+        onChange={(next) => setDraft({ ...next, ready: false })}
+        puroks={records ? puroksOf(records.residents) : []}
+        today={today}
+        onBack={() => back('list')}
+        onNext={() => {
+          setDraft((current) => ({ ...current, ready: true }))
+          go('mark')
+        }}
+      />
+    )
+  }
+
+  if (shown === 'mark') {
+    const before: Marks = markMode === 'more' && flood && records ? marksOn(records.exposures, flood.id, households, today) : new Map()
+    const markData: MarkData =
+      data.status !== 'ready'
+        ? { status: data.status }
+        : {
+            status: 'ready',
+            households,
+            affected: markMode === 'new' ? draft.puroks : (flood?.puroks ?? []),
+            before,
+            earlier: markMode === 'more' && flood ? exposedBefore(data.data.exposures, flood.id, households, today) : new Map(),
+          }
+
+    const save = async (after: Marks) => {
+      const db = await getDb()
+      const floodEventId =
+        markMode === 'new' || !flood ? (await logFlood(db, { startedOn: draft.startedOn, puroks: draft.puroks })).id : flood.id
+      const added = await saveMarks(db, { floodEventId, households, before, after, exposedOn: today })
+      setDraft({ startedOn: today, puroks: [], ready: false })
+      setEdits(new Map())
+      finish()
+      if (added > 0) toast({ message: `Watch started for ${peopleWords(added)}.` })
     }
+
+    return (
+      <MarkExposed
+        data={markData}
+        edits={edits}
+        onEdit={setEdits}
+        today={today}
+        onBack={() => back(markMode === 'new' ? 'log' : 'list')}
+        onSave={save}
+      />
+    )
   }
 
+  const listData: DbQueryState<ListData> = data
   return (
-    <>
-      <h1>Flood exposure watch</h1>
-
-      <h2>Flood</h2>
-      {flood ? (
-        <p>
-          Flood since {flood.startedOn}
-          {flood.note ? `: ${flood.note}` : ''}.
-        </p>
-      ) : (
-        <form onSubmit={(event) => void onLogFlood(event)}>
-          <p>
-            <label>
-              Flood started on <input type="date" value={floodDate} max={today} onChange={(e) => setFloodDate(e.target.value)} required />
-            </label>
-          </p>
-          <p>
-            <label>
-              Note (optional) <input value={note} onChange={(e) => setNote(e.target.value)} maxLength={120} />
-            </label>
-          </p>
-          <button type="submit">Log the flood</button>
-        </form>
-      )}
-
-      {flood && (
-        <>
-          <h2>Who waded through floodwater?</h2>
-          <p>Tap a household to mark everyone in it exposed today. Tap again to undo.</p>
-          {households.length === 0 ? (
-            <p>No residents on this phone yet.</p>
-          ) : (
-            <ul>
-              {households.map((household) => (
-                <li key={household.id}>
-                  <button type="button" aria-pressed={exposedHere.has(household.id)} onClick={() => void toggle(household)}>
-                    {household.id}, {household.purok}, {household.members.length}{' '}
-                    {household.members.length === 1 ? 'person' : 'people'}
-                    {exposedHere.has(household.id) ? ': exposed' : ''}
-                  </button>{' '}
-                  {!exposedHere.has(household.id) && (
-                    <label>
-                      <input
-                        type="checkbox"
-                        checked={woundHouseholds.has(household.id)}
-                        onChange={(e) =>
-                          setWoundHouseholds((current) => {
-                            const next = new Set(current)
-                            if (e.target.checked) next.add(household.id)
-                            else next.delete(household.id)
-                            return next
-                          })
-                        }
-                      />{' '}
-                      someone has an open wound
-                    </label>
-                  )}
-                </li>
-              ))}
-            </ul>
-          )}
-        </>
-      )}
-
-      <h2>Watch list ({watchedCount(entries)})</h2>
-      <p>Days 5 to 15 after contact with floodwater. Anyone who gets a fever in their window: refer to the midwife or RHU.</p>
-      {entries.length === 0 ? (
-        <p>No one to watch yet.</p>
-      ) : (
-        <ul>
-          {entries.map((entry) => {
-            const resident = names.get(entry.residentId)
-            return (
-              <li key={entry.residentId}>
-                {resident?.name ?? entry.residentId} ({resident?.householdId}): {describeEntry(entry)}.
-                {entry.higherRisk ? ' Higher risk: ' : ' '}
-                {entry.kinds.map((kind) => KIND_LABELS[kind]).join(', ')}.
-              </li>
-            )
-          })}
-        </ul>
-      )}
-    </>
+    <WatchList
+      data={listData}
+      place={placeLine(['Leptospirosis watch', place.barangay], place.sample)}
+      today={today}
+      onMarkMore={startMore}
+      onLogFlood={startLog}
+    />
   )
 }

@@ -155,7 +155,7 @@ export default function HomePage() {
                 title="Nothing recorded yet"
                 body="Start with a breathing check. When floodwater reaches the barangay, log the flood to start a 15-day leptospirosis watch."
               >
-                <Link to="/watch" className={styles.emptyLink}>
+                <Link to="/watch?step=log" className={styles.emptyLink}>
                   Log a flood
                   <ArrowRightIcon size={20} weight="bold" aria-hidden />
                 </Link>

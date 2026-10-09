@@ -23,11 +23,20 @@ export type WatchEntry = {
   // Days until the window opens (upcoming), or days left in it (active).
   daysToStart: number
   daysLeft: number
+  // The watch-list row's "Day {n} of 15": days since the last contact, so
+  // day 15 is always the window's last day (0 on the day of contact).
+  day: number
   // Every kind of exposure logged, plus 'repeated' when contact happened on
   // more than one day.
   kinds: ExposureKind[]
   // An open wound or repeated contact.
   higherRisk: boolean
+}
+
+// The window for contact from `firstExposedOn` to `lastExposedOn`: from day 5
+// after the first contact to day 15 after the last, inclusive.
+export function watchWindow(firstExposedOn: string, lastExposedOn = firstExposedOn): { start: string; end: string } {
+  return { start: addDays(firstExposedOn, WATCH_START_DAY), end: addDays(lastExposedOn, WATCH_END_DAY) }
 }
 
 const PHASE_ORDER: Record<WatchPhase, number> = { active: 0, upcoming: 1, ended: 2 }
@@ -46,8 +55,7 @@ export function watchList(exposures: Exposure[], today: string): WatchEntry[] {
     const days = [...new Set(list.map((e) => e.exposedOn))].sort()
     const firstExposedOn = days[0]
     const lastExposedOn = days[days.length - 1]
-    const windowStart = addDays(firstExposedOn, WATCH_START_DAY)
-    const windowEnd = addDays(lastExposedOn, WATCH_END_DAY)
+    const { start: windowStart, end: windowEnd } = watchWindow(firstExposedOn, lastExposedOn)
     const kindSet = new Set(list.flatMap((e) => e.kinds))
     if (days.length > 1) kindSet.add('repeated')
     const kinds = KIND_ORDER.filter((kind) => kindSet.has(kind))
@@ -62,6 +70,7 @@ export function watchList(exposures: Exposure[], today: string): WatchEntry[] {
       phase,
       daysToStart: Math.max(0, daysBetween(today, windowStart)),
       daysLeft: Math.max(0, daysBetween(today, windowEnd)),
+      day: daysBetween(lastExposedOn, today),
       kinds,
       higherRisk: kindSet.has('open-wound') || kindSet.has('repeated'),
     })

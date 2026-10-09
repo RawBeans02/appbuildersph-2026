@@ -13,6 +13,7 @@ import type {
   SeedData,
   SeedInfo,
   StockLot,
+  WatchCheck,
 } from './types'
 
 // The on-device database. Every list is bounded (QUALITY.md): pass a limit, or
@@ -37,12 +38,14 @@ interface AgapaySchema extends DBSchema {
   receivedPayloads: { key: string; value: ReceivedPayload; indexes: { byEpiWeek: string; byBarangay: string } }
   pairedDevices: { key: string; value: PairedDevice }
   plans: { key: string; value: Plan; indexes: { byEpiWeek: string } }
+  // Version 3
+  watchChecks: { key: string; value: WatchCheck; indexes: { byResident: string; byCheckedAt: string } }
 }
 
 export type RecordStore = Exclude<StoreNames<AgapaySchema>, 'meta'>
 
 export const DB_NAME = 'agapay'
-export const DB_VERSION = 2
+export const DB_VERSION = 3
 export const DEFAULT_LIMIT = 100
 export const MAX_LIMIT = 1000
 
@@ -126,6 +129,11 @@ export async function openAgapayDb(name = DB_NAME) {
         database.createObjectStore('pairedDevices', { keyPath: 'barangay' })
         database.createObjectStore('plans', { keyPath: 'id' }).createIndex('byEpiWeek', 'epiWeek')
       }
+      if (oldVersion < 3) {
+        const checks = database.createObjectStore('watchChecks', { keyPath: 'id' })
+        checks.createIndex('byResident', 'residentId')
+        checks.createIndex('byCheckedAt', 'checkedAt')
+      }
     },
   })
 
@@ -143,6 +151,7 @@ export async function openAgapayDb(name = DB_NAME) {
     receivedPayloads: createRepository(db, 'receivedPayloads', notify),
     pairedDevices: createRepository(db, 'pairedDevices', notify),
     plans: createRepository(db, 'plans', notify),
+    watchChecks: createRepository(db, 'watchChecks', notify),
 
     // The phone's signing identity, or null before it's made.
     async getDeviceIdentity(): Promise<DeviceIdentity | null> {
@@ -226,6 +235,7 @@ export async function openAgapayDb(name = DB_NAME) {
         'approvals',
         'receivedPayloads',
         'plans',
+        'watchChecks',
       ] as const
       const tx = db.transaction([...records, 'meta', 'pairedDevices', 'deviceIdentity'], 'readwrite')
       const paired = tx.objectStore('pairedDevices')
