@@ -17,7 +17,7 @@
   border-radius: var(--r-xl) var(--r-xl) 0 0;
   background: var(--surface);
   box-shadow: var(--shadow-2);
-  animation: rise 0.2s ease-out;
+  animation: rise var(--dur-base) var(--ease-out) backwards;
 }
 
 .grabber {
@@ -84,7 +84,7 @@
 
 @keyframes rise {
   from {
-    transform: translateY(24px);
+    transform: translateY(var(--rise));
     opacity: 0;
   }
   to {

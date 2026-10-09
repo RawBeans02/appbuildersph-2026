@@ -12,6 +12,11 @@
   height: auto;
 }
 
+/* The four connectors draw one after another within --dur-draw in all. */
+.art :global(.draw-long) {
+  animation-duration: calc(var(--dur-draw) / 4);
+}
+
 .labels {
   position: relative;
   height: 20px;

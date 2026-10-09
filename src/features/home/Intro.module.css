@@ -67,9 +67,19 @@
   cursor: pointer;
 }
 
+.skip {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
 .skip:hover,
 .skip:active {
-  background: var(--sunken);
+  background: none;
+  color: var(--ink-2);
+}
+
+.skip:active {
+  text-decoration-thickness: 2px;
 }
 
 .card {
@@ -107,7 +117,7 @@
 }
 
 .hero {
-  margin: var(--space-10) auto;
+  margin: 56px auto 60px;
 }
 
 .display {
@@ -117,6 +127,7 @@
 .body {
   margin-top: var(--space-3);
   font: var(--type-body-lg);
+  color: var(--ink-2);
   text-wrap: pretty;
 }
 
@@ -126,7 +137,7 @@
 }
 
 .rows {
-  margin: var(--space-4) calc(-1 * var(--space-5)) 0;
+  margin: var(--space-3) calc(-1 * var(--space-5)) 0;
   border-top: 1px solid var(--line);
 }
 
@@ -152,7 +163,6 @@
 }
 
 .rowIcon {
-  align-self: start;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -170,12 +180,13 @@
 
 .rowTitle {
   display: block;
-  font: 700 18px/26px var(--font-ui);
+  font: 700 18px/24px var(--font-ui);
 }
 
 .rowText {
   display: block;
-  font: var(--type-body);
+  margin-top: 2px;
+  font: var(--type-body-dense);
   color: var(--ink-2);
 }
 
@@ -183,9 +194,13 @@
   color: var(--ink-3);
 }
 
-/* 0c: the loop's labels in order, one calm row (stands in for I2). */
+/* 0c: the I2 loop drawing with its labels. */
 .loop {
-  margin-top: var(--space-4);
+  margin-top: var(--space-5);
+}
+
+.loop + .body {
+  font: var(--type-body-md);
 }
 
 .status {

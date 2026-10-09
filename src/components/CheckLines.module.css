@@ -2,9 +2,12 @@
    in the order the device ran them, each with its result. */
 .list {
   display: grid;
-  gap: var(--space-3);
+  gap: 10px;
   margin: 0;
-  padding: 0;
+  padding: 14px var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
   list-style: none;
 }
 

@@ -21,6 +21,12 @@
   transform: scale(0.98);
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .button:active:not(:disabled):not([aria-disabled='true']) {
+    transform: none;
+  }
+}
+
 .primary {
   background: var(--ink);
   color: var(--surface);
@@ -41,9 +47,13 @@
 }
 
 .secondary:hover:not(:disabled),
-.secondary:active:not(:disabled),
-.text:active:not(:disabled) {
+.secondary:active:not(:disabled) {
   background: var(--sunken);
+}
+
+.text:active:not(:disabled) {
+  color: var(--ink-2);
+  text-decoration-thickness: 2px;
 }
 
 .text {

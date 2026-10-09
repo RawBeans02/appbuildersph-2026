@@ -28,6 +28,10 @@
   color: var(--ink-2);
 }
 
+.tab:active {
+  background: var(--sunken);
+}
+
 .bar {
   width: 32px;
   height: 4px;

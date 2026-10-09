@@ -48,6 +48,12 @@
 }
 .reveal-qr { animation: reveal-qr var(--dur-draw) var(--ease-in-out) backwards; }
 
+/* Checked: a check line's icon wipes in from the left (17g, 17h, 21a). */
+@keyframes wipe {
+  from { clip-path: inset(0 100% 0 0); }
+}
+.wipe { animation: wipe var(--dur-quick) var(--ease-out) backwards; }
+
 /* Saved, verified, approved: on the icon only. */
 @keyframes stamp {
   from { transform: scale(1.08); opacity: 0; }

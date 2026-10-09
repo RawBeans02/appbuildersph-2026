@@ -36,11 +36,11 @@ export function LoopArt({ labels, draw = false }: { labels: readonly string[]; d
         <path d="M237.5 30h3M246.5 30v3M237.5 35.5v3.5M242.5 39h4" />
         <rect x="291.5" y="10" width="20" height="34" rx="4" />
         <path d="M291.5 16h20M291.5 38h20" />
-        <circle cx="33.5" cy="27" r="3.5" fill="var(--warn-fill)" stroke="none" />
+        <circle cx="33.5" cy="27" r="3.5" fill="var(--warn-fill)" />
         <path className={connector} pathLength={1} d="M49.5 27H82.5M78.5 23l4 4-4 4" />
-        <path className={connector} pathLength={1} d="M118.5 27H143.5M139.5 23l4 4-4 4" style={draw ? { animationDelay: '150ms' } : undefined} />
-        <path className={connector} pathLength={1} d="M191.5 27H216.5M212.5 23l4 4-4 4" style={draw ? { animationDelay: '300ms' } : undefined} />
-        <path className={connector} pathLength={1} d="M252.5 27H285.5M281.5 23l4 4-4 4" style={draw ? { animationDelay: '450ms' } : undefined} />
+        <path className={connector} pathLength={1} d="M118.5 27H143.5M139.5 23l4 4-4 4" style={draw ? { animationDelay: 'calc(var(--dur-draw) / 4)' } : undefined} />
+        <path className={connector} pathLength={1} d="M191.5 27H216.5M212.5 23l4 4-4 4" style={draw ? { animationDelay: 'calc(var(--dur-draw) / 2)' } : undefined} />
+        <path className={connector} pathLength={1} d="M252.5 27H285.5M281.5 23l4 4-4 4" style={draw ? { animationDelay: 'calc(var(--dur-draw) * 3 / 4)' } : undefined} />
       </svg>
       <ol className={styles.labels}>
         {labels.map((label, i) => (
