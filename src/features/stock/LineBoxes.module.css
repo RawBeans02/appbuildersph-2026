@@ -1,0 +1,114 @@
+/* 11b: the box photo, full content width and up to 240 px tall, letterboxed
+   on night. Once the picture loads, its shape is set inline (aspect-ratio). */
+.photo {
+  --photo-max: 240px;
+  position: relative;
+  width: 100%;
+  height: var(--photo-max);
+  max-height: var(--photo-max);
+  border-radius: var(--r-md);
+  background: var(--night-2);
+  overflow: hidden;
+}
+
+.img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* The picture's own rectangle inside the letterbox (its width is set inline):
+   the reader's fractions are drawn against it. */
+.stage {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  height: 100%;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.boxes {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* Every line: a 2 px surface outline over a solid ink stroke 1 px wider on
+   each side, so it reads on any photo. */
+.halo,
+.outline {
+  fill: none;
+}
+
+.halo {
+  stroke: var(--ink);
+  stroke-width: 4px;
+}
+
+.outline {
+  stroke: var(--surface);
+  stroke-width: 2px;
+}
+
+/* A "Please check" field's line: dashed warn-fill over the ink halo. */
+.check .outline {
+  stroke: var(--warn-fill);
+  stroke-dasharray: 6px 4px;
+}
+
+/* The line of the field being edited: 4 px ink with a paper halo. */
+.focused .halo {
+  stroke: var(--paper);
+  stroke-width: 6px;
+}
+
+.focused .outline {
+  stroke: var(--ink);
+  stroke-width: 4px;
+  stroke-dasharray: none;
+}
+
+.dimmed {
+  opacity: 0.5;
+}
+
+/* A field's number: a 24 px ink circle with a paper mono numeral. Two
+   numbers make a pill. */
+.tag {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--space-6);
+  height: var(--space-6);
+  padding: 0 6px;
+  border-radius: var(--r-full);
+  background: var(--ink);
+  color: var(--paper);
+  font: 700 14px/1 var(--font-mono);
+  white-space: nowrap;
+}
+
+.tag::before {
+  content: attr(data-n);
+}
+
+/* On the photo: centered on its box's top-left corner (left and top are set
+   inline), with a surface ring for dark photos. */
+.boxTag {
+  position: absolute;
+  margin: -12px 0 0 -12px;
+  outline: 1px solid var(--surface);
+}
+
+.inverted {
+  z-index: 1;
+  background: var(--paper);
+  color: var(--ink);
+  outline: 2px solid var(--ink);
+}

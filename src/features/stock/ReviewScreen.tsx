@@ -3,9 +3,20 @@ import { useEffect, useRef, useState } from 'react'
 import { Button, Field, FlowTopBar, RecordsError, useToast, type FieldTag } from '../../components'
 import { cx } from '../../components/cx'
 import { getDb } from '../../data/db/appDb'
+import { OCR_ENGINE, type OcrEngine } from '../../inference/ocr/engine'
 import type { LineFrame } from '../../inference/ocr/ocrClient'
 import { useHoldReload } from '../../lib/useHoldReload'
 import type { LabelReading } from '../../rules/label'
+import { LineBoxes, NumberTag } from './LineBoxes'
+import {
+  fieldLines,
+  fieldNumber,
+  lineMarks,
+  linesFoundText,
+  photoAlt,
+  readLinesStatus,
+  type ReadField,
+} from './readLines'
 import styles from './Review.module.css'
 import screen from './screen.module.css'
 import {
@@ -25,7 +36,8 @@ import {
 // Screen 11a (the AI result review, L11): every field read from the box is
 // shown with how sure the reader was, and is editable; the quantity is always
 // typed. Nothing is saved until Confirm. Without a scan, the same form is
-// "Add stock by hand".
+// "Add stock by hand". 11b draws the reader's lines on the photo, numbered
+// like the fields they filled.
 
 export type ScanResult = {
   reading: LabelReading
@@ -45,6 +57,9 @@ const HELPERS: Partial<Record<FieldTag, string>> = {
   check: 'Read with low confidence. Compare it with the box.',
   'not-read': "The phone couldn't find it. Please type it.",
 }
+
+// The engine that read the box, as "Read by … on this phone" names it.
+const ENGINE_NAME: Record<OcrEngine, string> = { 'pp-ocr': 'PP-OCRv5', tesseract: 'Tesseract' }
 
 // The unit select shares the field's look, but not the quantity's error border.
 const baseInputClass = (className: string) => className.split(' ')[0]
@@ -70,6 +85,7 @@ export function ReviewScreen({
   const [errors, setErrors] = useState<DraftErrors>({})
   const [saving, setSaving] = useState(false)
   const [saveFailed, setSaveFailed] = useState(false)
+  const [focused, setFocused] = useState<ReadField | null>(null)
   const savingRef = useRef(false)
   const formRef = useRef<HTMLFormElement>(null)
   const headingRef = useRef<HTMLHeadingElement>(null)
@@ -113,6 +129,24 @@ export function ReviewScreen({
     ? { drug: readTag(reading.drug), strength: readTag(reading.strength), lot: readTag(reading.lot), expiry: readTag(reading.expiry) }
     : null
 
+  // 11b: the reader's lines on the photo, numbered like the fields they filled.
+  const boxes = scan && photoUrl ? { count: scan.frames.length, lines: fieldLines(scan.reading, scan.frames.length) } : null
+  const focusedLine = boxes && focused ? (boxes.lines[focused] ?? null) : null
+
+  // A field's label, after its number when its line is on the photo.
+  function label(field: ReadField, text: string) {
+    if (boxes?.lines[field] === undefined) return text
+    return (
+      <span className={styles.numbered}>
+        <NumberTag text={String(fieldNumber(field))} />
+        {text}
+      </span>
+    )
+  }
+
+  // Editing a read field highlights its line on the photo.
+  const tracks = (field: ReadField) => ({ onFocus: () => setFocused(field), onBlur: () => setFocused(null) })
+
   return (
     <form
       ref={formRef}
@@ -127,11 +161,25 @@ export function ReviewScreen({
       <div className={cx(screen.content, styles.content)}>
         {scan && (
           <div className={styles.readInfo}>
-            {photoUrl && <img src={photoUrl} alt="The box you photographed" className={styles.thumb} />}
+            {photoUrl && boxes && (
+              <LineBoxes
+                photoUrl={photoUrl}
+                alt={photoAlt(boxes.count)}
+                frames={scan.frames}
+                marks={lineMarks(scan.reading, boxes.count)}
+                focusedLine={focusedLine}
+              />
+            )}
             <p className={styles.readText}>
               <span className={styles.line}>{readTimeText(scan.readMs, scan.loadMs)}</span>
+              {boxes && <span className={styles.line}>{linesFoundText(boxes.count)}</span>}
               <span className={styles.line}>The photo is deleted when you leave.</span>
             </p>
+            {boxes && (
+              <p role="status" className="visually-hidden">
+                {readLinesStatus(boxes.count)}
+              </p>
+            )}
           </div>
         )}
         <h1 ref={headingRef} tabIndex={-1} className={cx(screen.title, scan ? styles.title : styles.titleFirst)}>
@@ -140,25 +188,33 @@ export function ReviewScreen({
         {scan && <p className={styles.sub}>Fix anything that's wrong. Nothing is saved until you confirm.</p>}
 
         <div className={styles.fields}>
-          <Field label="Medicine" tag={tags?.drug} helper={tags && HELPERS[tags.drug]} error={errors.drug}>
-            {(input) => (
-              <input {...input} value={draft.drug} autoComplete="off" onChange={(event) => set('drug', event.target.value)} />
-            )}
-          </Field>
-          <Field label="Strength" tag={tags?.strength} helper={tags && HELPERS[tags.strength]}>
+          <Field label={label('drug', 'Medicine')} tag={tags?.drug} helper={tags && HELPERS[tags.drug]} error={errors.drug}>
             {(input) => (
               <input
                 {...input}
+                {...tracks('drug')}
+                value={draft.drug}
+                autoComplete="off"
+                onChange={(event) => set('drug', event.target.value)}
+              />
+            )}
+          </Field>
+          <Field label={label('strength', 'Strength')} tag={tags?.strength} helper={tags && HELPERS[tags.strength]}>
+            {(input) => (
+              <input
+                {...input}
+                {...tracks('strength')}
                 value={draft.strength}
                 autoComplete="off"
                 onChange={(event) => set('strength', event.target.value)}
               />
             )}
           </Field>
-          <Field label="Lot number" tag={tags?.lot} helper={tags && HELPERS[tags.lot]} error={errors.lot}>
+          <Field label={label('lot', 'Lot number')} tag={tags?.lot} helper={tags && HELPERS[tags.lot]} error={errors.lot}>
             {(input) => (
               <input
                 {...input}
+                {...tracks('lot')}
                 className={cx(input.className, styles.mono)}
                 value={draft.lot}
                 autoComplete="off"
@@ -168,11 +224,12 @@ export function ReviewScreen({
               />
             )}
           </Field>
-          <Field label="Expiry" tag={tags?.expiry} helper={tags && HELPERS[tags.expiry]} error={errors.expiry}>
+          <Field label={label('expiry', 'Expiry')} tag={tags?.expiry} helper={tags && HELPERS[tags.expiry]} error={errors.expiry}>
             {(input) => (
               <span className={styles.withIcon}>
                 <input
                   {...input}
+                  {...tracks('expiry')}
                   type="month"
                   className={cx(input.className, styles.month)}
                   value={draft.expiry}
@@ -240,6 +297,7 @@ export function ReviewScreen({
                 <li key={index}>{line}</li>
               ))}
             </ul>
+            <p className={styles.engine}>Read by {ENGINE_NAME[OCR_ENGINE]} on this phone</p>
           </details>
         )}
       </div>

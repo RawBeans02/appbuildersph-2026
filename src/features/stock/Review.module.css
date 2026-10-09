@@ -2,19 +2,11 @@
   padding: var(--space-1) var(--space-5) var(--space-5);
 }
 
+/* 11b: the photo with the reader's lines, then what was read and how long it took. */
 .readInfo {
   display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.thumb {
-  flex: none;
-  width: 96px;
-  height: 72px;
-  border-radius: var(--r-sm);
-  background: var(--sunken);
-  object-fit: cover;
+  flex-direction: column;
+  gap: var(--space-3);
 }
 
 .readText {
@@ -38,6 +30,13 @@
   margin-top: var(--space-1);
   font: 400 17px/25px var(--font-ui);
   color: var(--ink-2);
+}
+
+/* A field's number before its label, matching its line on the photo. */
+.numbered {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
 }
 
 .fields {
@@ -137,4 +136,11 @@
   font: var(--type-mono);
   color: var(--ink-2);
   overflow-wrap: anywhere;
+}
+
+/* Which engine read the box, after the lines. */
+.engine {
+  padding-bottom: var(--space-3);
+  font: var(--type-body-dense);
+  color: var(--ink-2);
 }
