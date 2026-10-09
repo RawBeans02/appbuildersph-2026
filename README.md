@@ -127,8 +127,8 @@ _TBD: Performance, Accessibility, Best Practices and SEO, measured on pagespeed.
 | Name (as on appbuildersph.com/hackathon/participants) | GitHub | Role | Contributions |
 |---|---|---|---|
 | Rovince Eduvane | RawBeans02 | Build lead | _TBD_ |
-| Vicente Seumal | _TBD_ | _TBD_ | _TBD_ |
+| Vicente Seumal | ThirdyThirdy | _TBD_ | _TBD_ |
 | Adam Arous | _TBD_ | _TBD_ | _TBD_ |
-| Gabriel Syd Paguio | _TBD_ | _TBD_ | _TBD_ |
+| Gabriel Syd Paguio | Syd7 | _TBD_ | _TBD_ |
 
 Teammates commit under their own GitHub accounts; no one outside the team commits.
