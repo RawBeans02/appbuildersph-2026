@@ -34,6 +34,9 @@ const mbNumber = (bytes: number) => (bytes / 1e6).toFixed(1)
 type PartState = 'done' | 'downloading' | 'waiting'
 
 function PartRows({ parts, states }: { parts: PartWithModels[]; states: PartState[] }) {
+  // A part's "Done" check stamps only when it finishes while these rows are
+  // shown; parts already on the phone when they appear show still.
+  const [doneAtStart] = useState(() => new Set(parts.filter((_, i) => states[i] === 'done').map((part) => part.key)))
   return (
     <div className={styles.list}>
       {parts.map((part, i) => {
@@ -42,7 +45,7 @@ function PartRows({ parts, states }: { parts: PartWithModels[]; states: PartStat
           <div key={part.key} className={cx(styles.stateRow, state === 'waiting' && styles.waiting, state === 'done' && styles.done)}>
             <span className={styles.stateIcon} aria-hidden>
               {state === 'done' ? (
-                <CheckCircleIcon size={22} weight="bold" />
+                <CheckCircleIcon className={cx(!doneAtStart.has(part.key) && 'stamp')} size={22} weight="bold" />
               ) : state === 'downloading' ? (
                 <CircleNotchIcon className="spin" size={22} weight="bold" />
               ) : (
