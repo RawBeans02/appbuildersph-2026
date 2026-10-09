@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<title>Agapay · Local AI states</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;500;700&family=Atkinson+Hyperlegible+Next:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+<style>
+body{margin:0;background:#E4DED3;color:#221D18;font-family:'Atkinson Hyperlegible Next',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#221D18;text-decoration:underline;text-underline-offset:3px}
+a:hover{color:#4D463F;text-decoration-thickness:2px}
+button{font-family:inherit}
+</style>
+</helmet>
+
+<section data-screen-label="Local AI header" style="padding:64px 72px 16px;width:1800px">
+<h1 style="margin:0 0 10px;font-size:48px;line-height:54px;font-weight:800">Local AI states</h1>
+<p style="margin:0;max-width:940px;font-size:19px;line-height:28px;color:#4D463F">The states every on-device model goes through, applied to Agapay's three phone models. Route <span style="font-family:'Atkinson Hyperlegible Mono',monospace">/prepare</span> for L1–L4. The “Runs on this phone” line appears only once the AI is ready (L5 onward). MB figures come from the model registry (<span style="font-family:'Atkinson Hyperlegible Mono',monospace">offlineModels.ts</span>); only the box reader's 26.9 MB is measured so far, the other two sizes are placeholders. Laptop model states are in <a href="Agapay Laptop.dc.html">Laptop</a>, screen 19.</p>
+</section>
+
+<section data-screen-label="L1-L4 Download" style="padding:32px 72px 56px">
+<div style="display:flex;align-items:baseline;gap:14px;margin-bottom:6px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:18px;font-weight:700;color:#4D463F">L1–L4</span><h2 style="margin:0;font-size:32px;line-height:38px;font-weight:800">First run: download, space, keep, getting ready</h2></div>
+<p style="margin:0 0 28px;max-width:960px;font-size:17px;line-height:26px;color:#4D463F">Shown once, on the first visit with a signal. Plain words: “the AI”, never “model weights” or “WASM”.</p>
+<div style="display:flex;flex-wrap:wrap;gap:56px 48px;align-items:flex-start;filter:{{ artFilter }}">
+
+<figure id="L1a" style="margin:0;width:375px;display:flex;flex-direction:column;gap:14px">
+<figcaption><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700;background:#221D18;color:#F7F4ED;padding:3px 8px;border-radius:6px">L1a</span><span style="font-size:18px;font-weight:800">First run: what and why</span></div><div style="margin-top:6px;font-size:14px;line-height:20px;color:#4D463F">Download first shows L3 (one line about keeping the files), then starts L1b.</div></figcaption>
+<div data-screen-label="L1a Prepare intro" style="width:375px;height:812px;position:relative;overflow:hidden;background:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<dc-import name="StatusBar" online="{{ true }}" hint-size="375px,40px"></dc-import>
+<div style="flex:1;min-height:0;overflow:hidden;padding:28px 20px 0">
+<h1 style="margin:0;font-size:28px;line-height:34px;font-weight:800">Get Agapay ready for no signal</h1>
+<p style="margin:10px 0 0;font-size:18px;line-height:26px;text-wrap:pretty">Download the AI once, so Agapay works without internet. After this, nothing you do needs a signal.</p>
+<div style="margin-top:24px;border-top:1px solid #D9D3CA">
+<div style="display:flex;justify-content:space-between;gap:12px;padding:14px 0;border-bottom:1px solid #D9D3CA"><div><div style="font-size:18px;line-height:24px;font-weight:700">Breathing check (Hinga)</div><div style="font-size:15px;line-height:22px;color:#4D463F">Counts breaths with the camera</div></div><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:16px;font-weight:500;white-space:nowrap">15.2 MB</span></div>
+<div style="display:flex;justify-content:space-between;gap:12px;padding:14px 0;border-bottom:1px solid #D9D3CA"><div><div style="font-size:18px;line-height:24px;font-weight:700">Crying check</div><div style="font-size:15px;line-height:22px;color:#4D463F">Hears if the child is crying</div></div><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:16px;font-weight:500;white-space:nowrap">13.0 MB</span></div>
+<div style="display:flex;justify-content:space-between;gap:12px;padding:14px 0;border-bottom:1px solid #D9D3CA"><div><div style="font-size:18px;line-height:24px;font-weight:700">Medicine-box reader</div><div style="font-size:15px;line-height:22px;color:#4D463F">Reads the lot and expiry</div></div><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:16px;font-weight:500;white-space:nowrap">26.9 MB</span></div>
+<div style="display:flex;justify-content:space-between;gap:12px;padding:14px 0"><span style="font-size:18px;font-weight:800">Total, one time</span><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:16px;font-weight:700">55.1 MB</span></div>
+</div>
+<p style="margin:8px 0 0;font-size:15px;line-height:22px;color:#4D463F">Use Wi-Fi if you can. This phone has 2.1 GB free.</p>
+</div>
+<div style="padding:12px 20px 12px"><button style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border-radius:12px;background:#221D18;color:#FFFDFA;border:0;font-size:18px;font-weight:700"><i class="ph-bold ph-download-simple" style="font-size:22px"></i>Download 55.1 MB<span style="color:#C7C3BD;font-weight:600">· I-download</span></button><button style="display:block;margin:4px auto 0;height:48px;padding:0 8px;background:none;border:0;color:#221D18;font-size:17px;font-weight:700;text-decoration:underline;text-underline-offset:4px">Later</button></div>
+</div>
+</figure>
+
+<figure id="L1b" style="margin:0;width:375px;display:flex;flex-direction:column;gap:14px">
+<figcaption><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700;background:#221D18;color:#F7F4ED;padding:3px 8px;border-radius:6px">L1b</span><span style="font-size:18px;font-weight:800">Downloading, 1 of 3</span></div><div style="margin-top:6px;font-size:14px;line-height:20px;color:#4D463F">One bar for the whole download, MB and %. Cancel keeps finished parts.</div></figcaption>
+<div data-screen-label="L1b Downloading" style="width:375px;height:812px;position:relative;overflow:hidden;background:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<dc-import name="StatusBar" online="{{ true }}" hint-size="375px,40px"></dc-import>
+<div style="flex:1;min-height:0;overflow:hidden;padding:28px 20px 0">
+<h1 style="margin:0;font-size:28px;line-height:34px;font-weight:800">Downloading the AI</h1>
+<p style="margin:10px 0 0;font-size:18px;line-height:26px">So Agapay works without internet. Keep this screen open.</p>
+<div style="margin-top:28px;display:flex;justify-content:space-between;align-items:baseline;gap:12px"><span style="font-size:17px;font-weight:700">1 of 3: Breathing check</span><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:16px;font-weight:500;white-space:nowrap">9.8 / 55.1 MB</span></div>
+<div role="progressbar" aria-valuenow="17" aria-label="Download progress" style="margin-top:10px;height:14px;border-radius:999px;background:#EBE6DD;overflow:hidden;box-shadow:inset 0 0 0 1px #D9D3CA"><div style="width:17%;height:100%;background:#221D18;border-radius:999px"></div></div>
+<div style="margin-top:8px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:28px;line-height:32px;font-weight:700">17%</div>
+<div style="margin-top:24px;border-top:1px solid #D9D3CA">
+<div style="display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid #D9D3CA"><i class="ph-bold ph-circle-notch" style="font-size:22px"></i><span style="flex:1;font-size:17px;font-weight:700">Breathing check (Hinga)</span><span style="font-size:15px;font-weight:600">Downloading</span></div>
+<div style="display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid #D9D3CA;color:#4D463F"><i class="ph-bold ph-clock" style="font-size:22px"></i><span style="flex:1;font-size:17px">Crying check</span><span style="font-size:15px">Waiting</span></div>
+<div style="display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid #D9D3CA;color:#4D463F"><i class="ph-bold ph-clock" style="font-size:22px"></i><span style="flex:1;font-size:17px">Medicine-box reader</span><span style="font-size:15px">Waiting</span></div>
+</div>
+</div>
+<div style="padding:12px 20px 20px"><button style="display:flex;align-items:center;justify-content:center;width:100%;height:56px;border-radius:12px;background:#FFFDFA;color:#221D18;border:2px solid #221D18;font-size:18px;font-weight:700">Cancel</button></div>
+</div>
+</figure>
+
+<figure id="L2" style="margin:0;width:375px;display:flex;flex-direction:column;gap:14px">
+<figcaption><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700;background:#221D18;color:#F7F4ED;padding:3px 8px;border-radius:6px">L2</span><span style="font-size:18px;font-weight:800">Not enough space</span></div><div style="margin-top:6px;font-size:14px;line-height:20px;color:#4D463F">From navigator.storage.estimate(), checked before downloading. Everything except the camera AI still works.</div></figcaption>
+<div data-screen-label="L2 Not enough space" style="width:375px;height:812px;position:relative;overflow:hidden;background:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<dc-import name="StatusBar" online="{{ true }}" hint-size="375px,40px"></dc-import>
+<div style="flex:1;min-height:0;overflow:hidden;padding:28px 20px 0">
+<span style="width:64px;height:64px;border-radius:999px;background:#FDEEC5;color:#805216;display:flex;align-items:center;justify-content:center"><i class="ph-bold ph-hard-drives" style="font-size:32px"></i></span>
+<h1 style="margin:18px 0 0;font-size:28px;line-height:34px;font-weight:800">Not enough space on this phone</h1>
+<div style="margin-top:22px;display:grid;grid-template-columns:1fr 1fr;border-top:1px solid #D9D3CA;border-bottom:1px solid #D9D3CA">
+<div style="padding:14px 0"><div style="font-size:15px;font-weight:600;color:#4D463F">Agapay needs</div><div style="margin-top:2px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:28px;line-height:34px;font-weight:700">55.1 MB</div></div>
+<div style="padding:14px 0 14px 16px;border-left:1px solid #D9D3CA"><div style="font-size:15px;font-weight:600;color:#4D463F">Free now</div><div style="margin-top:2px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:28px;line-height:34px;font-weight:700;color:#805216">21.4 MB</div></div>
+</div>
+<p style="margin:18px 0 0;font-size:18px;line-height:26px;text-wrap:pretty">Free up about 34 MB, then check again. Deleting old videos or an app you don't use is usually enough.</p>
+</div>
+<div style="padding:12px 20px 12px"><button style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border-radius:12px;background:#221D18;color:#FFFDFA;border:0;font-size:18px;font-weight:700"><i class="ph-bold ph-arrow-clockwise" style="font-size:22px"></i>Check again</button><button style="display:block;margin:4px auto 0;height:48px;padding:0 8px;background:none;border:0;color:#221D18;font-size:17px;font-weight:700;text-decoration:underline;text-underline-offset:4px">Use Agapay without the AI for now</button></div>
+</div>
+</figure>
+
+<figure id="L3" style="margin:0;width:375px;display:flex;flex-direction:column;gap:14px">
+<figcaption><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700;background:#221D18;color:#F7F4ED;padding:3px 8px;border-radius:6px">L3</span><span style="font-size:18px;font-weight:800">Keep-the-download prompt</span></div><div style="margin-top:6px;font-size:14px;line-height:20px;color:#4D463F">Continue calls navigator.storage.persist(). Some browsers decide silently; the download starts either way.</div></figcaption>
+<div data-screen-label="L3 Keep the download" style="width:375px;height:812px;position:relative;overflow:hidden;background:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<dc-import name="StatusBar" online="{{ true }}" hint-size="375px,40px"></dc-import>
+<div style="padding:28px 20px 0"><h1 style="margin:0;font-size:28px;line-height:34px;font-weight:800">Get Agapay ready for no signal</h1><p style="margin:10px 0 0;font-size:18px;line-height:26px">Download the AI once, so Agapay works without internet.</p></div>
+<div style="position:absolute;inset:0;background:rgba(22,19,16,0.5)"></div>
+<div style="position:absolute;left:0;right:0;bottom:0;background:#FFFDFA;border-radius:24px 24px 0 0;padding:12px 20px 24px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<div style="width:40px;height:5px;border-radius:999px;background:#D9D3CA;margin:0 auto 18px"></div>
+<h2 style="margin:0;font-size:22px;line-height:28px;font-weight:800">Next, your browser may ask to keep Agapay's files</h2>
+<p style="margin:8px 0 20px;font-size:18px;line-height:26px">Tap Allow, so the AI isn't deleted when the phone runs low on space.</p>
+<button style="display:flex;align-items:center;justify-content:center;width:100%;height:56px;border-radius:12px;background:#221D18;color:#FFFDFA;border:0;font-size:18px;font-weight:700">Continue</button>
+</div>
+</div>
+</figure>
+
+<figure id="L4" style="margin:0;width:375px;display:flex;flex-direction:column;gap:14px">
+<figcaption><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700;background:#221D18;color:#F7F4ED;padding:3px 8px;border-radius:6px">L4</span><span style="font-size:18px;font-weight:800">Getting ready</span></div><div style="margin-top:6px;font-size:14px;line-height:20px;color:#4D463F">After the download, and on later launches if loading takes over 1 s. Indeterminate; no buttons. Then Home (1a).</div></figcaption>
+<div data-screen-label="L4 Getting ready" style="width:375px;height:812px;position:relative;overflow:hidden;background:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<dc-import name="StatusBar" online="{{ online }}" hint-size="375px,40px"></dc-import>
+<div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 28px 120px">
+<h1 style="margin:0;font-size:28px;line-height:34px;font-weight:800">Getting the AI ready</h1>
+<div aria-label="Loading" style="margin-top:20px;height:14px;border-radius:999px;background:#EBE6DD;overflow:hidden;box-shadow:inset 0 0 0 1px #D9D3CA;position:relative"><div style="position:absolute;left:34%;width:30%;height:100%;background:#221D18;border-radius:999px"></div></div>
+<p style="margin:14px 0 0;font-size:18px;line-height:26px;color:#4D463F">Loading it into this phone's memory. This takes a few seconds.</p>
+</div>
+</div>
+</figure>
+
+</div>
+</section>
+
+<section data-screen-label="L5-L7 Ready working offline" style="padding:32px 72px 56px">
+<div style="display:flex;align-items:baseline;gap:14px;margin-bottom:6px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:18px;font-weight:700;color:#4D463F">L5–L7</span><h2 style="margin:0;font-size:32px;line-height:38px;font-weight:800">Ready, working, offline</h2></div>
+<p style="margin:0 0 28px;max-width:960px;font-size:17px;line-height:26px;color:#4D463F">The ready and offline indicators are one quiet line under the title (see Home 1a). Each opens a sheet. Working uses the box reader as the example; Hinga's working state is its 60-second count (Phone 1, 4a).</p>
+<div style="display:flex;flex-wrap:wrap;gap:56px 48px;align-items:flex-start;filter:{{ artFilter }}">
+
+<figure id="L5" style="margin:0;width:375px;display:flex;flex-direction:column;gap:14px">
+<figcaption><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700;background:#221D18;color:#F7F4ED;padding:3px 8px;border-radius:6px">L5</span><span style="font-size:18px;font-weight:800">Ready: “Runs on this phone” sheet</span></div><div style="margin-top:6px;font-size:14px;line-height:20px;color:#4D463F">Opened by tapping the indicator. The only sheet that uses the lagoon accent.</div></figcaption>
+<div data-screen-label="L5 Ready sheet" style="width:375px;height:812px;position:relative;overflow:hidden;background:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<dc-import name="StatusBar" online="{{ online }}" hint-size="375px,40px"></dc-import>
+<div style="padding:4px 20px 0"><div style="font-size:26px;line-height:32px;font-weight:700">Maligaya-D</div><div style="margin-top:2px;font-size:16px;line-height:24px;color:#4D463F">San Isidro Demo · Sample data</div><div style="margin-top:8px"><dc-import name="LocalStatus" online="{{ online }}" hint-size="335px,20px"></dc-import></div></div>
+<div style="position:absolute;inset:0;background:rgba(22,19,16,0.5)"></div>
+<div style="position:absolute;left:0;right:0;bottom:0;background:#FFFDFA;border-radius:24px 24px 0 0;padding:12px 20px 24px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<div style="width:40px;height:5px;border-radius:999px;background:#D9D3CA;margin:0 auto 18px"></div>
+<div style="display:flex;align-items:center;gap:12px"><span style="width:48px;height:48px;border-radius:999px;background:#DFF2F9;color:#0D6880;display:flex;align-items:center;justify-content:center"><i class="ph-bold ph-device-mobile" style="font-size:26px"></i></span><h2 style="margin:0;font-size:22px;line-height:28px;font-weight:800">Runs on this phone</h2></div>
+<p style="margin:12px 0 0;font-size:18px;line-height:26px;text-wrap:pretty">The AI is saved on this phone and works with no signal. What you record stays here.</p>
+<div style="margin-top:14px;border-top:1px solid #D9D3CA">
+<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #D9D3CA"><span style="font-size:17px">Breathing check (Hinga)</span><span style="display:flex;align-items:center;gap:6px;font-size:15px;font-weight:700;color:#1D6835"><i class="ph-bold ph-check-circle" style="font-size:18px"></i>Ready</span></div>
+<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #D9D3CA"><span style="font-size:17px">Crying check</span><span style="display:flex;align-items:center;gap:6px;font-size:15px;font-weight:700;color:#1D6835"><i class="ph-bold ph-check-circle" style="font-size:18px"></i>Ready</span></div>
+<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #D9D3CA"><span style="font-size:17px">Medicine-box reader</span><span style="display:flex;align-items:center;gap:6px;font-size:15px;font-weight:700;color:#1D6835"><i class="ph-bold ph-check-circle" style="font-size:18px"></i>Ready</span></div>
+</div>
+<button style="display:flex;align-items:center;gap:6px;height:48px;margin-top:4px;padding:0;background:none;border:0;color:#221D18;font-size:17px;font-weight:700;text-decoration:underline;text-underline-offset:4px">What stays on this phone<i class="ph-bold ph-arrow-right" style="font-size:18px"></i></button>
+</div>
+</div>
+</figure>
+
+<figure id="L6a" style="margin:0;width:375px;display:flex;flex-direction:column;gap:14px">
+<figcaption><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700;background:#221D18;color:#F7F4ED;padding:3px 8px;border-radius:6px">L6a</span><span style="font-size:18px;font-weight:800">Working: reading one box</span></div><div style="margin-top:6px;font-size:14px;line-height:20px;color:#4D463F">Two real steps (find text, read text), so the bar is honest. Runs in a Web Worker; Cancel stops it.</div></figcaption>
+<div data-screen-label="L6a Working" style="width:375px;height:812px;position:relative;overflow:hidden;background:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<dc-import name="StatusBar" online="{{ online }}" hint-size="375px,40px"></dc-import>
+<div style="flex:1;min-height:0;overflow:hidden">
+<div style="display:flex;align-items:center;justify-content:space-between;height:56px;padding:0 20px 0 8px"><button aria-label="Back" style="width:48px;height:48px;border:0;background:transparent;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#221D18"><i class="ph-bold ph-arrow-left" style="font-size:26px"></i></button><dc-import name="LocalStatus" online="{{ online }}" hint-size="230px,20px"></dc-import></div>
+<img src="assets/stock-box-photo.jpg" alt="The box you photographed" style="display:block;margin:4px 20px 0;width:335px;height:210px;border-radius:16px;object-fit:cover">
+<h1 style="margin:24px 20px 0;font-size:26px;line-height:32px;font-weight:700">Reading the box</h1>
+<div style="margin:16px 20px 0;display:flex;justify-content:space-between;font-size:16px;font-weight:700"><span>Finding the text</span><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-weight:500">step 1 of 2</span></div>
+<div role="progressbar" aria-valuenow="40" style="margin:10px 20px 0;height:14px;border-radius:999px;background:#EBE6DD;overflow:hidden;box-shadow:inset 0 0 0 1px #D9D3CA"><div style="width:40%;height:100%;background:#221D18;border-radius:999px"></div></div>
+<p style="margin:14px 20px 0;font-size:16px;line-height:24px;color:#4D463F">Reading on this phone. The photo is deleted after.</p>
+</div>
+<div style="padding:12px 20px 20px"><button style="display:flex;align-items:center;justify-content:center;width:100%;height:56px;border-radius:12px;background:#FFFDFA;color:#221D18;border:2px solid #221D18;font-size:18px;font-weight:700">Cancel</button></div>
+</div>
+</figure>
+
+<figure id="L6b" style="margin:0;width:375px;display:flex;flex-direction:column;gap:14px">
+<figcaption><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700;background:#221D18;color:#F7F4ED;padding:3px 8px;border-radius:6px">L6b</span><span style="font-size:18px;font-weight:800">Working: result appearing</span></div><div style="margin-top:6px;font-size:14px;line-height:20px;color:#4D463F">Fields fill in as they are read, then the screen becomes the review (Phone 3, 11a). Nothing saves without Confirm.</div></figcaption>
+<div data-screen-label="L6b Result appearing" style="width:375px;height:812px;position:relative;overflow:hidden;background:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<dc-import name="StatusBar" online="{{ online }}" hint-size="375px,40px"></dc-import>
+<div style="flex:1;min-height:0;overflow:hidden">
+<div style="display:flex;align-items:center;justify-content:space-between;height:56px;padding:0 20px 0 8px"><button aria-label="Back" style="width:48px;height:48px;border:0;background:transparent;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#221D18"><i class="ph-bold ph-arrow-left" style="font-size:26px"></i></button><dc-import name="LocalStatus" online="{{ online }}" hint-size="230px,20px"></dc-import></div>
+<img src="assets/stock-box-photo.jpg" alt="The box you photographed" style="display:block;margin:4px 20px 0;width:335px;height:120px;border-radius:16px;object-fit:cover">
+<h1 style="margin:20px 20px 0;font-size:26px;line-height:32px;font-weight:700">Reading the box</h1>
+<div style="margin:12px 20px 0;display:flex;justify-content:space-between;font-size:16px;font-weight:700"><span>Reading the text</span><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-weight:500">step 2 of 2</span></div>
+<div style="margin:10px 20px 0;height:14px;border-radius:999px;background:#EBE6DD;overflow:hidden;box-shadow:inset 0 0 0 1px #D9D3CA"><div style="width:85%;height:100%;background:#221D18;border-radius:999px"></div></div>
+<div style="margin:20px 20px 0;display:flex;flex-direction:column;gap:14px">
+<div><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:16px;font-weight:700">Medicine</span><span style="display:flex;align-items:center;gap:5px;font-size:14px;font-weight:700;color:#1D6835"><i class="ph-bold ph-check" style="font-size:16px"></i>Sure</span></div><div style="margin-top:6px;height:52px;border:2px solid #7B7369;border-radius:12px;background:#FFFDFA;display:flex;align-items:center;padding:0 16px;font-size:18px">Doxycycline 100 mg</div></div>
+<div><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:16px;font-weight:700">Lot number</span><span style="display:flex;align-items:center;gap:5px;font-size:14px;font-weight:700;color:#805216"><i class="ph-bold ph-eye" style="font-size:16px"></i>Please check</span></div><div style="margin-top:6px;height:52px;border:2px dashed #805216;border-radius:12px;background:#FDEEC5;display:flex;align-items:center;padding:0 16px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:18px">DEMO-L0T-24A</div></div>
+<div><div style="font-size:16px;font-weight:700">Expiry</div><div style="margin-top:6px;height:52px;border-radius:12px;background:#EBE6DD"></div></div>
+</div>
+</div>
+<div style="padding:12px 20px 20px"><button style="display:flex;align-items:center;justify-content:center;width:100%;height:56px;border-radius:12px;background:#FFFDFA;color:#221D18;border:2px solid #221D18;font-size:18px;font-weight:700">Cancel</button></div>
+</div>
+</figure>
+
+<figure id="L7" style="margin:0;width:375px;display:flex;flex-direction:column;gap:14px">
+<figcaption><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700;background:#221D18;color:#F7F4ED;padding:3px 8px;border-radius:6px">L7</span><span style="font-size:18px;font-weight:800">Offline sheet</span></div><div style="margin-top:6px;font-size:14px;line-height:20px;color:#4D463F">Opened from “Offline”. Calm on purpose: offline is the normal case.</div></figcaption>
+<div data-screen-label="L7 Offline sheet" style="width:375px;height:812px;position:relative;overflow:hidden;background:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<dc-import name="StatusBar" hint-size="375px,40px"></dc-import>
+<div style="padding:4px 20px 0"><div style="font-size:26px;line-height:32px;font-weight:700">Maligaya-D</div><div style="margin-top:2px;font-size:16px;line-height:24px;color:#4D463F">San Isidro Demo · Sample data</div><div style="margin-top:8px"><dc-import name="LocalStatus" hint-size="335px,20px"></dc-import></div></div>
+<div style="position:absolute;inset:0;background:rgba(22,19,16,0.5)"></div>
+<div style="position:absolute;left:0;right:0;bottom:0;background:#FFFDFA;border-radius:24px 24px 0 0;padding:12px 20px 24px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<div style="width:40px;height:5px;border-radius:999px;background:#D9D3CA;margin:0 auto 18px"></div>
+<div style="display:flex;align-items:center;gap:12px"><span style="width:48px;height:48px;border-radius:999px;background:#EBE6DD;display:flex;align-items:center;justify-content:center"><i class="ph-bold ph-cloud-slash" style="font-size:26px"></i></span><h2 style="margin:0;font-size:22px;line-height:28px;font-weight:800">Offline. Everything here still works.</h2></div>
+<p style="margin:12px 0 22px;font-size:18px;line-height:26px;text-wrap:pretty">Breathing checks, the watch list, stock and the QR all work with no signal. Only the first download and app updates need internet.</p>
+<button style="display:flex;align-items:center;justify-content:center;width:100%;height:56px;border-radius:12px;background:#221D18;color:#FFFDFA;border:0;font-size:18px;font-weight:700">Got it</button>
+</div>
+</div>
+</figure>
+
+</div>
+</section>
+
+<section data-screen-label="L8-L9 Fallback and errors" style="padding:32px 72px 56px">
+<div style="display:flex;align-items:baseline;gap:14px;margin-bottom:6px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:18px;font-weight:700;color:#4D463F">L8–L9</span><h2 style="margin:0;font-size:32px;line-height:38px;font-weight:800">Can't run it, and errors with one next step</h2></div>
+<p style="margin:0 0 28px;max-width:960px;font-size:17px;line-height:26px;color:#4D463F">Every error says what happened in one line and gives one next step. No codes on screen (log them to the console). The lighter mode is counting by hand: the WHO method BHWs are trained in, with the app keeping time and applying the cut-off.</p>
+<div style="display:flex;flex-wrap:wrap;gap:56px 48px;align-items:flex-start;filter:{{ artFilter }}">
+
+<figure id="L8a" style="margin:0;width:375px;display:flex;flex-direction:column;gap:14px">
+<figcaption><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700;background:#221D18;color:#F7F4ED;padding:3px 8px;border-radius:6px">L8a</span><span style="font-size:18px;font-weight:800">This phone can't run it</span></div><div style="margin-top:6px;font-size:14px;line-height:20px;color:#4D463F">When pickBackend() returns none, or loading fails twice. The reason line uses the capability check's result.</div></figcaption>
+<div data-screen-label="L8a Device cannot run" style="width:375px;height:812px;position:relative;overflow:hidden;background:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<dc-import name="StatusBar" online="{{ online }}" hint-size="375px,40px"></dc-import>
+<div style="flex:1;min-height:0;overflow:hidden">
+<div style="display:flex;align-items:center;height:56px;padding:0 8px"><button aria-label="Back" style="width:48px;height:48px;border:0;background:transparent;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#221D18"><i class="ph-bold ph-arrow-left" style="font-size:26px"></i></button></div>
+<div style="padding:8px 20px 0">
+<span style="width:64px;height:64px;border-radius:999px;background:#FDEEC5;color:#805216;display:flex;align-items:center;justify-content:center"><i class="ph-bold ph-memory" style="font-size:32px"></i></span>
+<h1 style="margin:18px 0 0;font-size:28px;line-height:34px;font-weight:800">This phone can't run the camera check</h1>
+<p style="margin:10px 0 0;font-size:18px;line-height:26px;text-wrap:pretty">Its browser can't run the breathing AI. Updating Chrome or Safari may fix this.</p>
+<h2 style="margin:24px 0 8px;font-size:20px;line-height:26px;font-weight:700">You can still</h2>
+<div style="display:flex;flex-direction:column;gap:10px;font-size:17px;line-height:24px">
+<div style="display:flex;gap:10px"><i class="ph-bold ph-check" style="font-size:20px;color:#1D6835;margin-top:2px"></i>Count breaths by hand with a timer</div>
+<div style="display:flex;gap:10px"><i class="ph-bold ph-check" style="font-size:20px;color:#1D6835;margin-top:2px"></i>Keep the flood watch list</div>
+<div style="display:flex;gap:10px"><i class="ph-bold ph-check" style="font-size:20px;color:#1D6835;margin-top:2px"></i>Add medicine stock by typing</div>
+<div style="display:flex;gap:10px"><i class="ph-bold ph-check" style="font-size:20px;color:#1D6835;margin-top:2px"></i>Send the QR to the RHU</div>
+</div>
+</div>
+</div>
+<div style="padding:12px 20px 20px"><button style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border-radius:12px;background:#221D18;color:#FFFDFA;border:0;font-size:18px;font-weight:700"><i class="ph-bold ph-timer" style="font-size:22px"></i>Count by hand with a timer</button></div>
+</div>
+</figure>
+
+<figure id="L8b" style="margin:0;width:375px;display:flex;flex-direction:column;gap:14px">
+<figcaption><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700;background:#221D18;color:#F7F4ED;padding:3px 8px;border-radius:6px">L8b</span><span style="font-size:18px;font-weight:800">Lighter mode: count by hand</span></div><div style="margin-top:6px;font-size:14px;line-height:20px;color:#4D463F">Tap once per breath for 60 s. At 0:00 it shows the same result screens (6a, 7a), marked “counted by hand”.</div></figcaption>
+<div data-screen-label="L8b Count by hand" style="width:375px;height:812px;position:relative;overflow:hidden;background:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<dc-import name="StatusBar" online="{{ online }}" hint-size="375px,40px"></dc-import>
+<div style="flex:1;min-height:0;overflow:hidden">
+<div style="display:flex;align-items:center;justify-content:space-between;height:56px;padding:0 20px 0 12px"><button style="height:48px;padding:0 16px;border:2px solid #221D18;border-radius:999px;background:#FFFDFA;color:#221D18;font-size:17px;font-weight:700">Stop</button><div style="display:flex;align-items:baseline;gap:6px"><span role="timer" style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:36px;line-height:40px;font-weight:700">0:29</span><span style="font-size:16px;font-weight:600;color:#4D463F">left</span></div></div>
+<div style="padding:8px 20px 0"><h1 style="margin:0;font-size:26px;line-height:32px;font-weight:700">Count by hand</h1><p style="margin:6px 0 0;font-size:17px;line-height:25px;color:#4D463F">Watch the chest rise. Tap once for each breath.</p></div>
+<button aria-label="Tap for each breath" style="margin:36px auto 0;display:flex;flex-direction:column;align-items:center;justify-content:center;width:260px;height:260px;border-radius:999px;background:#221D18;color:#FFFDFA;border:0;box-shadow:0 0 0 10px #EBE6DD"><span style="font-size:72px;line-height:76px;font-weight:800;font-variant-numeric:tabular-nums">24</span><span style="margin-top:4px;font-size:18px;font-weight:700;color:#C7C3BD">Tap for each breath</span></button>
+<div style="margin-top:36px;text-align:center;font-size:16px;line-height:24px;color:#4D463F">1–5 years · fast is 40 or more a minute</div>
+</div>
+</div>
+</figure>
+
+<figure id="L9a" style="margin:0;width:375px;display:flex;flex-direction:column;gap:14px">
+<figcaption><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700;background:#221D18;color:#F7F4ED;padding:3px 8px;border-radius:6px">L9a</span><span style="font-size:18px;font-weight:800">Error: download stopped</span></div><div style="margin-top:6px;font-size:14px;line-height:20px;color:#4D463F">Finished files stay in the cache; Try again resumes with the next one.</div></figcaption>
+<div data-screen-label="L9a Download failed" style="width:375px;height:812px;position:relative;overflow:hidden;background:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<dc-import name="StatusBar" hint-size="375px,40px"></dc-import>
+<div style="flex:1;min-height:0;overflow:hidden;padding:28px 20px 0">
+<span style="width:64px;height:64px;border-radius:999px;background:#FFE8E5;color:#AC2724;display:flex;align-items:center;justify-content:center"><i class="ph-bold ph-wifi-slash" style="font-size:32px"></i></span>
+<h1 style="margin:18px 0 0;font-size:28px;line-height:34px;font-weight:800">The download stopped</h1>
+<p style="margin:10px 0 0;font-size:18px;line-height:26px;text-wrap:pretty">The signal dropped at 9.8 of 55.1 MB. Connect to Wi-Fi or mobile data, then try again. What already downloaded is kept.</p>
+<div style="margin-top:22px;height:14px;border-radius:999px;background:#EBE6DD;overflow:hidden;box-shadow:inset 0 0 0 1px #D9D3CA"><div style="width:17%;height:100%;background:#7B7369;border-radius:999px"></div></div>
+<div style="margin-top:8px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:16px;color:#4D463F">9.8 / 55.1 MB · 17%</div>
+</div>
+<div style="padding:12px 20px 20px"><button style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border-radius:12px;background:#221D18;color:#FFFDFA;border:0;font-size:18px;font-weight:700"><i class="ph-bold ph-arrow-clockwise" style="font-size:22px"></i>Try again<span style="color:#C7C3BD;font-weight:600">· Subukan ulit</span></button></div>
+</div>
+</figure>
+
+<figure id="L9b" style="margin:0;width:375px;display:flex;flex-direction:column;gap:14px">
+<figcaption><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700;background:#221D18;color:#F7F4ED;padding:3px 8px;border-radius:6px">L9b</span><span style="font-size:18px;font-weight:800">Error: AI didn't load</span></div><div style="margin-top:6px;font-size:14px;line-height:20px;color:#4D463F">Files are cached but the runtime failed (often memory). A second failure leads to L8a.</div></figcaption>
+<div data-screen-label="L9b Model failed to load" style="width:375px;height:812px;position:relative;overflow:hidden;background:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<dc-import name="StatusBar" online="{{ online }}" hint-size="375px,40px"></dc-import>
+<div style="flex:1;min-height:0;overflow:hidden">
+<div style="display:flex;align-items:center;height:56px;padding:0 8px"><button aria-label="Back" style="width:48px;height:48px;border:0;background:transparent;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#221D18"><i class="ph-bold ph-arrow-left" style="font-size:26px"></i></button></div>
+<div style="padding:8px 20px 0">
+<span style="width:64px;height:64px;border-radius:999px;background:#FFE8E5;color:#AC2724;display:flex;align-items:center;justify-content:center"><i class="ph-bold ph-warning-circle" style="font-size:34px"></i></span>
+<h1 style="margin:18px 0 0;font-size:28px;line-height:34px;font-weight:800">The breathing check couldn't start</h1>
+<p style="margin:10px 0 0;font-size:18px;line-height:26px;text-wrap:pretty">Its files are on this phone, but it didn't load. Closing other apps usually fixes this.</p>
+</div>
+</div>
+<div style="padding:12px 20px 20px"><button style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border-radius:12px;background:#221D18;color:#FFFDFA;border:0;font-size:18px;font-weight:700"><i class="ph-bold ph-arrow-clockwise" style="font-size:22px"></i>Try again<span style="color:#C7C3BD;font-weight:600">· Subukan ulit</span></button></div>
+</div>
+</figure>
+
+<figure id="L9c" style="margin:0;width:375px;display:flex;flex-direction:column;gap:14px">
+<figcaption><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700;background:#221D18;color:#F7F4ED;padding:3px 8px;border-radius:6px">L9c</span><span style="font-size:18px;font-weight:800">Error: couldn't read the label</span></div><div style="margin-top:6px;font-size:14px;line-height:20px;color:#4D463F">Also Stock screen 11, error state. No text found, or no drug, lot or expiry in it.</div></figcaption>
+<div data-screen-label="L9c Could not read label" style="width:375px;height:812px;position:relative;overflow:hidden;background:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<dc-import name="StatusBar" online="{{ online }}" hint-size="375px,40px"></dc-import>
+<div style="flex:1;min-height:0;overflow:hidden">
+<div style="display:flex;align-items:center;justify-content:space-between;height:56px;padding:0 20px 0 8px"><button aria-label="Back" style="width:48px;height:48px;border:0;background:transparent;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#221D18"><i class="ph-bold ph-arrow-left" style="font-size:26px"></i></button><dc-import name="LocalStatus" online="{{ online }}" hint-size="230px,20px"></dc-import></div>
+<img src="assets/stock-box-photo-blurry.jpg" alt="The box you photographed" style="display:block;margin:4px 20px 0;width:335px;height:170px;border-radius:16px;object-fit:cover">
+<div style="padding:24px 20px 0">
+<span style="width:56px;height:56px;border-radius:999px;background:#FFE8E5;color:#AC2724;display:flex;align-items:center;justify-content:center"><i class="ph-bold ph-warning-circle" style="font-size:30px"></i></span>
+<h1 style="margin:16px 0 0;font-size:26px;line-height:32px;font-weight:800">Couldn't read the label</h1>
+<p style="margin:8px 0 0;font-size:18px;line-height:26px;text-wrap:pretty">The text was too blurry or shiny. Try again, or type it in.</p>
+</div>
+</div>
+<div style="padding:12px 20px 20px;display:flex;flex-direction:column;gap:10px"><button style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border-radius:12px;background:#221D18;color:#FFFDFA;border:0;font-size:18px;font-weight:700"><i class="ph-bold ph-camera" style="font-size:22px"></i>Scan again</button><button style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border-radius:12px;background:#FFFDFA;color:#221D18;border:2px solid #221D18;font-size:18px;font-weight:700"><i class="ph-bold ph-pencil-simple" style="font-size:22px"></i>Type it in</button></div>
+</div>
+</figure>
+
+</div>
+</section>
+
+<section data-screen-label="L10 Privacy" style="padding:32px 72px 96px">
+<div style="display:flex;align-items:baseline;gap:14px;margin-bottom:6px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:18px;font-weight:700;color:#4D463F">L10 · 15</span><h2 style="margin:0;font-size:32px;line-height:38px;font-weight:800">What stays on this phone (Privacy &amp; AI)</h2></div>
+<p style="margin:0 0 28px;max-width:960px;font-size:17px;line-height:26px;color:#4D463F">Route <span style="font-family:'Atkinson Hyperlegible Mono',monospace">/privacy</span>, from the shield on Home and from L5. This is also brief screen 15. Plain sections, no cards. L11 (AI result review) is the stock review: <a href="Agapay Phone 3 Stock.dc.html">Phone 3</a>, 11a.</p>
+<div style="display:flex;flex-wrap:wrap;gap:56px 48px;align-items:flex-start;filter:{{ artFilter }}">
+
+<figure id="L10" style="margin:0;width:375px;display:flex;flex-direction:column;gap:14px">
+<figcaption><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700;background:#221D18;color:#F7F4ED;padding:3px 8px;border-radius:6px">L10</span><span style="font-size:18px;font-weight:800">Privacy &amp; AI (full scroll)</span></div><div style="margin-top:6px;font-size:14px;line-height:20px;color:#4D463F">Tall frame shows the whole scroll.</div></figcaption>
+<div data-screen-label="L10 Privacy and AI" style="width:375px;height:1240px;position:relative;overflow:hidden;background:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<dc-import name="StatusBar" online="{{ online }}" hint-size="375px,40px"></dc-import>
+<div style="display:flex;align-items:center;justify-content:space-between;height:56px;padding:0 20px 0 8px"><button aria-label="Back" style="width:48px;height:48px;border:0;background:transparent;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#221D18"><i class="ph-bold ph-arrow-left" style="font-size:26px"></i></button><dc-import name="LocalStatus" online="{{ online }}" hint-size="230px,20px"></dc-import></div>
+<div style="padding:4px 20px 32px">
+<h1 style="margin:0;font-size:26px;line-height:32px;font-weight:700">Privacy &amp; AI</h1>
+<h2 style="margin:24px 0 4px;font-size:20px;line-height:26px;font-weight:700">What runs on this phone</h2>
+<div style="border-top:1px solid #D9D3CA">
+<div style="display:flex;gap:14px;padding:14px 0;border-bottom:1px solid #D9D3CA"><i class="ph-bold ph-camera" style="font-size:24px;margin-top:2px"></i><div><div style="font-size:18px;line-height:24px;font-weight:700">Breathing check (Hinga)</div><div style="font-size:16px;line-height:24px;color:#4D463F">Uses the camera to count breaths. The video is never recorded or saved.</div></div></div>
+<div style="display:flex;gap:14px;padding:14px 0;border-bottom:1px solid #D9D3CA"><i class="ph-bold ph-microphone" style="font-size:24px;margin-top:2px"></i><div><div style="font-size:18px;line-height:24px;font-weight:700">Crying check</div><div style="font-size:16px;line-height:24px;color:#4D463F">Listens for crying during a count. Sound is never recorded.</div></div></div>
+<div style="display:flex;gap:14px;padding:14px 0;border-bottom:1px solid #D9D3CA"><i class="ph-bold ph-scan" style="font-size:24px;margin-top:2px"></i><div><div style="font-size:18px;line-height:24px;font-weight:700">Medicine-box reader</div><div style="font-size:16px;line-height:24px;color:#4D463F">Reads the lot and expiry from a photo. The photo is deleted after reading.</div></div></div>
+<div style="display:flex;gap:14px;padding:14px 0;border-bottom:1px solid #D9D3CA"><i class="ph-bold ph-lock-simple" style="font-size:24px;margin-top:2px"></i><div><div style="font-size:18px;line-height:24px;font-weight:700">Your records</div><div style="font-size:16px;line-height:24px;color:#4D463F">Residents, floods, checks and stock stay in this phone's browser storage.</div></div></div>
+</div>
+<h2 style="margin:28px 0 6px;font-size:20px;line-height:26px;font-weight:700">What leaves this phone</h2>
+<p style="margin:0;font-size:17px;line-height:25px;text-wrap:pretty">Only the counts in the QR code, and only when you show it to the municipal laptop. No names, birthdays or addresses. Counts from 1 to 4 show as “&lt;5”.</p>
+<button style="display:flex;align-items:center;gap:6px;height:48px;padding:0;background:none;border:0;color:#221D18;font-size:17px;font-weight:700;text-decoration:underline;text-underline-offset:4px">See exactly what the QR holds<i class="ph-bold ph-arrow-right" style="font-size:18px"></i></button>
+<h2 style="margin:20px 0 8px;font-size:20px;line-height:26px;font-weight:700">What the AI can get wrong</h2>
+<div style="display:flex;flex-direction:column;gap:12px;font-size:17px;line-height:25px">
+<div style="display:flex;gap:10px"><i class="ph-bold ph-warning" style="font-size:20px;color:#805216;margin-top:3px;flex:none"></i><span>It can miscount breaths if the child moves or cries, or the light is poor. When it can tell, it stops and says why.</span></div>
+<div style="display:flex;gap:10px"><i class="ph-bold ph-warning" style="font-size:20px;color:#805216;margin-top:3px;flex:none"></i><span>It can misread a lot number or expiry. You check every field before anything is saved.</span></div>
+<div style="display:flex;gap:10px"><i class="ph-bold ph-warning" style="font-size:20px;color:#805216;margin-top:3px;flex:none"></i><span>On the municipal laptop, AI drafts the plan's wording. The officer checks it before approving.</span></div>
+</div>
+<p style="margin:24px 0 0;font-size:18px;line-height:26px;font-weight:800">Agapay never diagnoses and never suggests a dose. It counts, flags and refers.</p>
+<div style="margin-top:24px;padding-top:16px;border-top:1px solid #D9D3CA;font-size:15px;line-height:22px;color:#4D463F">Research prototype, not a registered medical device. San Isidro Demo and every record in it are invented sample data.</div>
+</div>
+</div>
+</figure>
+
+</div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;online&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Preview&quot;},&quot;grayscale&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Preview&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const t = (v) => v === true || v === 'true';
+    return { online: t(this.props.online), artFilter: t(this.props.grayscale) ? 'grayscale(1)' : 'none' };
+  }
+}
+</script>
+</body>
+</html>

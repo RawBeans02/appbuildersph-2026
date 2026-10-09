@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<title>Agapay · Design system (pass 1)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;500;700&family=Atkinson+Hyperlegible+Next:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+<style>
+body{margin:0;background:#E4DED3;color:#221D18;font-family:'Atkinson Hyperlegible Next',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#221D18;text-decoration:underline;text-underline-offset:3px}
+a:hover{color:#4D463F;text-decoration-thickness:2px}
+</style>
+</helmet>
+
+<section data-screen-label="DS header" style="padding:72px 72px 40px;width:1440px">
+<h1 style="margin:0 0 16px;font-size:56px;line-height:60px;font-weight:800;letter-spacing:-0.01em">Agapay design system</h1>
+<p style="margin:0;max-width:820px;font-size:22px;line-height:32px;color:#4D463F;text-wrap:pretty">A field tool for barangay health workers in the days after a typhoon. Readable in direct sun, usable with one hand, calm when there is no signal. Light mode only for this build.</p>
+<ol style="margin:32px 0 0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px;max-width:1296px">
+<li style="border-top:3px solid #221D18;padding-top:16px"><div style="font-size:20px;line-height:26px;font-weight:800">1. Ink for actions, color for meaning.</div><p style="margin:8px 0 0;font-size:16px;line-height:24px;color:#4D463F">Buttons are ink. Green, amber, red and lagoon only ever mean a status, so color is never decoration.</p></li>
+<li style="border-top:3px solid #221D18;padding-top:16px"><div style="font-size:20px;line-height:26px;font-weight:800">2. Every status is color + icon + word.</div><p style="margin:8px 0 0;font-size:16px;line-height:24px;color:#4D463F">Nothing depends on color alone, so it reads for color-blind users and on a dim, scratched screen.</p></li>
+<li style="border-top:3px solid #221D18;padding-top:16px"><div style="font-size:20px;line-height:26px;font-weight:800">3. Built for sun and thumbs.</div><p style="margin:8px 0 0;font-size:16px;line-height:24px;color:#4D463F">18 px body text, 48 px minimum targets, the main action in the bottom third, every text pair 4.5:1 or better.</p></li>
+</ol>
+<div style="margin-top:32px;display:flex;flex-wrap:wrap;gap:12px;font-size:16px;font-weight:700">
+<a href="Agapay Local AI States.dc.html">Local AI states</a><span style="color:#7B7369">·</span>
+<a href="Agapay Phone 1 Home and Hinga.dc.html">Phone 1: Home and Hinga</a><span style="color:#7B7369">·</span>
+<a href="Agapay Phone 2 Flood and Watch.dc.html">Phone 2: Flood and watch list</a><span style="color:#7B7369">·</span>
+<a href="Agapay Phone 3 Stock.dc.html">Phone 3: Stock</a><span style="color:#7B7369">·</span>
+<a href="Agapay Phone 4 Send and Privacy.dc.html">Phone 4: Send, privacy, 404</a><span style="color:#7B7369">·</span>
+<a href="Agapay Laptop.dc.html">Laptop: municipal view</a><span style="color:#7B7369">·</span>
+<a href="README.md">README (tokens, fonts, licenses)</a><span style="color:#7B7369">·</span>
+<a href="COPY.md">Copy deck</a>
+</div>
+</section>
+
+<section data-screen-label="DS color" style="margin:0 72px 48px;width:1296px;background:#F7F4ED;border-radius:24px;padding:48px">
+<h2 style="margin:0 0 8px;font-size:32px;line-height:38px;font-weight:800">Color</h2>
+<p style="margin:0 0 32px;max-width:820px;font-size:18px;line-height:26px;color:#4D463F">Warm paper and brown-black ink, so the app feels like a field notebook, not a hospital. Four status hues sit far apart on the wheel (green 150°, amber 70°, red 27°, lagoon 222°). Values were set in OKLCH, then checked as sRGB hex.</p>
+
+<h3 style="margin:0 0 16px;font-size:20px;line-height:26px;font-weight:700">Neutrals</h3>
+<div style="display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:16px;margin-bottom:36px">
+<div><div style="height:88px;border-radius:12px;background:#F7F4ED;border:1px solid #D9D3CA"></div><div style="margin-top:10px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700">--paper</div><div style="font-size:14px;line-height:20px;color:#4D463F">#F7F4ED<br>App background</div></div>
+<div><div style="height:88px;border-radius:12px;background:#FFFDFA;border:1px solid #D9D3CA"></div><div style="margin-top:10px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700">--surface</div><div style="font-size:14px;line-height:20px;color:#4D463F">#FFFDFA<br>Cards, sheets, fields, nav</div></div>
+<div><div style="height:88px;border-radius:12px;background:#EBE6DD"></div><div style="margin-top:10px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700">--sunken</div><div style="font-size:14px;line-height:20px;color:#4D463F">#EBE6DD<br>Insets, skeletons, info</div></div>
+<div><div style="height:88px;border-radius:12px;background:#D9D3CA"></div><div style="margin-top:10px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700">--line</div><div style="font-size:14px;line-height:20px;color:#4D463F">#D9D3CA<br>Dividers (decorative)</div></div>
+<div><div style="height:88px;border-radius:12px;background:#7B7369"></div><div style="margin-top:10px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700">--line-strong</div><div style="font-size:14px;line-height:20px;color:#4D463F">#7B7369<br>Field borders · 4.6:1</div></div>
+<div><div style="height:88px;border-radius:12px;background:#696259"></div><div style="margin-top:10px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700">--ink-3</div><div style="font-size:14px;line-height:20px;color:#4D463F">#696259<br>Captions · 5.5:1</div></div>
+<div><div style="height:88px;border-radius:12px;background:#4D463F"></div><div style="margin-top:10px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700">--ink-2</div><div style="font-size:14px;line-height:20px;color:#4D463F">#4D463F<br>Secondary text · 8.5:1</div></div>
+<div><div style="height:88px;border-radius:12px;background:#221D18"></div><div style="margin-top:10px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700">--ink</div><div style="font-size:14px;line-height:20px;color:#4D463F">#221D18<br>Text, primary buttons · 15.2:1</div></div>
+</div>
+
+<div style="display:grid;grid-template-columns:3fr 5fr;gap:48px;margin-bottom:36px">
+<div>
+<h3 style="margin:0 0 16px;font-size:20px;line-height:26px;font-weight:700">Camera screens</h3>
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px">
+<div><div style="height:88px;border-radius:12px;background:#161310"></div><div style="margin-top:10px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700">--night</div><div style="font-size:14px;line-height:20px;color:#4D463F">#161310<br>Camera background</div></div>
+<div><div style="height:88px;border-radius:12px;background:#2A2621"></div><div style="margin-top:10px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700">--night-2</div><div style="font-size:14px;line-height:20px;color:#4D463F">#2A2621<br>Panels on camera</div></div>
+<div><div style="height:88px;border-radius:12px;background:#C7C3BD"></div><div style="margin-top:10px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700">--on-night-2</div><div style="font-size:14px;line-height:20px;color:#4D463F">#C7C3BD<br>Secondary text on dark</div></div>
+</div>
+<p style="margin:12px 0 0;font-size:14px;line-height:20px;color:#4D463F">Primary text on dark is <span style="font-family:'Atkinson Hyperlegible Mono',monospace">--paper</span> (16.9:1).</p>
+</div>
+<div>
+<h3 style="margin:0 0 16px;font-size:20px;line-height:26px;font-weight:700">On this device <span style="font-weight:500;color:#4D463F">· only for the local-AI indicator</span></h3>
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) 1.4fr;gap:16px;align-items:start">
+<div><div style="height:88px;border-radius:12px;background:#0D6880"></div><div style="margin-top:10px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700">--device</div><div style="font-size:14px;line-height:20px;color:#4D463F">#0D6880<br>Indicator text, icon</div></div>
+<div><div style="height:88px;border-radius:12px;background:#DFF2F9"></div><div style="margin-top:10px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700">--device-tint</div><div style="font-size:14px;line-height:20px;color:#4D463F">#DFF2F9<br>Indicator background</div></div>
+<div><div style="height:88px;border-radius:12px;background:#91CFE5"></div><div style="margin-top:10px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700">--device-on-night</div><div style="font-size:14px;line-height:20px;color:#4D463F">#91CFE5<br>Indicator on camera</div></div>
+<p style="margin:0;font-size:16px;line-height:24px;color:#4D463F">Lagoon, a hue no status uses. It appears only in “Runs on this phone” / “Runs on this laptop” and its info sheet. Never on buttons, links or progress bars.</p>
+</div>
+</div>
+</div>
+
+<h3 style="margin:0 0 16px;font-size:20px;line-height:26px;font-weight:700">Status</h3>
+<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px">
+<div style="background:#FFFDFA;border:1px solid #D9D3CA;border-radius:16px;padding:20px">
+<div style="display:flex;align-items:center;gap:8px;font-size:18px;font-weight:800;color:#1D6835"><i class="ph-bold ph-check-circle" style="font-size:22px"></i>OK · success</div>
+<p style="margin:6px 0 16px;font-size:14px;line-height:20px;color:#4D463F">Not fast, saved, sure, received, checked</p>
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
+<div><div style="height:48px;border-radius:8px;background:#1D6835"></div><div style="margin-top:6px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px;font-weight:700">--ok</div><div style="font-size:13px;color:#4D463F">#1D6835</div></div>
+<div><div style="height:48px;border-radius:8px;background:#DFF6E2"></div><div style="margin-top:6px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px;font-weight:700">--ok-tint</div><div style="font-size:13px;color:#4D463F">#DFF6E2</div></div>
+<div><div style="height:48px;border-radius:8px;background:#83DC97"></div><div style="margin-top:6px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px;font-weight:700">--ok-on-night</div><div style="font-size:13px;color:#4D463F">#83DC97</div></div>
+</div>
+</div>
+<div style="background:#FFFDFA;border:1px solid #D9D3CA;border-radius:16px;padding:20px">
+<div style="display:flex;align-items:center;gap:8px;font-size:18px;font-weight:800;color:#805216"><i class="ph-bold ph-warning" style="font-size:22px"></i>Warning · refer</div>
+<p style="margin:6px 0 16px;font-size:14px;line-height:20px;color:#4D463F">Fast breathing, please check, expiring soon, higher risk</p>
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
+<div><div style="height:48px;border-radius:8px;background:#805216"></div><div style="margin-top:6px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px;font-weight:700">--warn</div><div style="font-size:13px;color:#4D463F">#805216</div></div>
+<div><div style="height:48px;border-radius:8px;background:#FDEEC5"></div><div style="margin-top:6px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px;font-weight:700">--warn-tint</div><div style="font-size:13px;color:#4D463F">#FDEEC5</div></div>
+<div><div style="height:48px;border-radius:8px;background:#F4C352"></div><div style="margin-top:6px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px;font-weight:700">--warn-fill</div><div style="font-size:13px;color:#4D463F">#F4C352</div></div>
+</div>
+</div>
+<div style="background:#FFFDFA;border:1px solid #D9D3CA;border-radius:16px;padding:20px">
+<div style="display:flex;align-items:center;gap:8px;font-size:18px;font-weight:800;color:#AC2724"><i class="ph-bold ph-warning-circle" style="font-size:22px"></i>Error · urgent</div>
+<p style="margin:6px 0 16px;font-size:14px;line-height:20px;color:#4D463F">URGENT, failed, expired, couldn't read</p>
+<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px">
+<div><div style="height:48px;border-radius:8px;background:#AC2724"></div><div style="margin-top:6px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px;font-weight:700">--bad</div><div style="font-size:13px;color:#4D463F">#AC2724</div></div>
+<div><div style="height:48px;border-radius:8px;background:#FFE8E5"></div><div style="margin-top:6px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px;font-weight:700">-tint</div><div style="font-size:13px;color:#4D463F">#FFE8E5</div></div>
+<div><div style="height:48px;border-radius:8px;background:#B32322"></div><div style="margin-top:6px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px;font-weight:700">-fill</div><div style="font-size:13px;color:#4D463F">#B32322</div></div>
+<div><div style="height:48px;border-radius:8px;background:#FB988D"></div><div style="margin-top:6px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px;font-weight:700">-on-night</div><div style="font-size:13px;color:#4D463F">#FB988D</div></div>
+</div>
+</div>
+<div style="background:#FFFDFA;border:1px solid #D9D3CA;border-radius:16px;padding:20px">
+<div style="display:flex;align-items:center;gap:8px;font-size:18px;font-weight:800;color:#4D463F"><i class="ph-bold ph-info" style="font-size:22px"></i>Info · neutral</div>
+<p style="margin:6px 0 16px;font-size:14px;line-height:20px;color:#4D463F">Notes and tips. Neutral on purpose: info is not a status.</p>
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
+<div><div style="height:48px;border-radius:8px;background:#4D463F"></div><div style="margin-top:6px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px;font-weight:700">--info</div><div style="font-size:13px;color:#4D463F">= ink-2</div></div>
+<div><div style="height:48px;border-radius:8px;background:#EBE6DD"></div><div style="margin-top:6px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px;font-weight:700">--info-tint</div><div style="font-size:13px;color:#4D463F">= sunken</div></div>
+</div>
+</div>
+</div>
+
+<h3 style="margin:40px 0 6px;font-size:20px;line-height:26px;font-weight:700">Text and background pairs (WCAG 2.2 contrast)</h3>
+<p style="margin:0 0 16px;font-size:16px;line-height:24px;color:#4D463F">Every pair the screens use. AA needs 4.5:1 for text (3:1 for borders and icons); AAA needs 7:1.</p>
+<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px">
+<div style="background:#F7F4ED;border:1px solid #D9D3CA;border-radius:12px;padding:14px 16px"><div style="font-size:20px;font-weight:700;color:#221D18">Aa Ink on paper</div><div style="margin-top:4px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;color:#4D463F">15.21:1 · AAA</div></div>
+<div style="background:#F7F4ED;border:1px solid #D9D3CA;border-radius:12px;padding:14px 16px"><div style="font-size:20px;font-weight:700;color:#4D463F">Aa Ink-2 on paper</div><div style="margin-top:4px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;color:#4D463F">8.45:1 · AAA</div></div>
+<div style="background:#F7F4ED;border:1px solid #D9D3CA;border-radius:12px;padding:14px 16px"><div style="font-size:20px;font-weight:700;color:#696259">Aa Ink-3 on paper</div><div style="margin-top:4px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;color:#4D463F">5.47:1 · AA · captions only</div></div>
+<div style="background:#EBE6DD;border-radius:12px;padding:14px 16px"><div style="font-size:20px;font-weight:700;color:#696259">Aa Ink-3 on sunken</div><div style="margin-top:4px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;color:#4D463F">4.84:1 · AA</div></div>
+<div style="background:#221D18;border-radius:12px;padding:14px 16px"><div style="font-size:20px;font-weight:700;color:#FFFDFA">Aa Surface on ink</div><div style="margin-top:4px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;color:#C7C3BD">16.45:1 · AAA · buttons</div></div>
+<div style="background:#DFF6E2;border-radius:12px;padding:14px 16px"><div style="font-size:20px;font-weight:700;color:#1D6835">Aa OK on ok-tint</div><div style="margin-top:4px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;color:#1D6835">5.97:1 · AA</div></div>
+<div style="background:#FDEEC5;border-radius:12px;padding:14px 16px"><div style="font-size:20px;font-weight:700;color:#805216">Aa Warn on warn-tint</div><div style="margin-top:4px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;color:#805216">5.81:1 · AA</div></div>
+<div style="background:#F4C352;border-radius:12px;padding:14px 16px"><div style="font-size:20px;font-weight:700;color:#221D18">Aa Ink on warn-fill</div><div style="margin-top:4px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;color:#221D18">10.16:1 · AAA · refer banner</div></div>
+<div style="background:#FFE8E5;border-radius:12px;padding:14px 16px"><div style="font-size:20px;font-weight:700;color:#AC2724">Aa Bad on bad-tint</div><div style="margin-top:4px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;color:#AC2724">5.84:1 · AA</div></div>
+<div style="background:#B32322;border-radius:12px;padding:14px 16px"><div style="font-size:20px;font-weight:700;color:#FFFDFA">Aa Surface on bad-fill</div><div style="margin-top:4px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;color:#FFFDFA">6.50:1 · AA · URGENT banner</div></div>
+<div style="background:#DFF2F9;border-radius:12px;padding:14px 16px"><div style="font-size:20px;font-weight:700;color:#0D6880">Aa Device on device-tint</div><div style="margin-top:4px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;color:#0D6880">5.50:1 · AA</div></div>
+<div style="background:#FFFDFA;border:1px solid #D9D3CA;border-radius:12px;padding:14px 16px"><div style="display:flex;align-items:center;gap:10px;font-size:20px;font-weight:700;color:#221D18"><span style="width:28px;height:28px;border-radius:6px;border:2px solid #7B7369"></span>Line-strong</div><div style="margin-top:4px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;color:#4D463F">4.60:1 on surface · borders ≥ 3:1</div></div>
+<div style="background:#161310;border-radius:12px;padding:14px 16px"><div style="font-size:20px;font-weight:700;color:#F7F4ED">Aa Paper on night</div><div style="margin-top:4px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;color:#C7C3BD">16.85:1 · AAA</div></div>
+<div style="background:#2A2621;border-radius:12px;padding:14px 16px"><div style="font-size:20px;font-weight:700;color:#91CFE5">Aa Device on night-2</div><div style="margin-top:4px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;color:#C7C3BD">8.77:1 · AAA</div></div>
+<div style="background:#2A2621;border-radius:12px;padding:14px 16px"><div style="font-size:20px;font-weight:700;color:#83DC97">Aa OK on night-2</div><div style="margin-top:4px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;color:#C7C3BD">9.05:1 · AAA</div></div>
+<div style="background:#2A2621;border-radius:12px;padding:14px 16px"><div style="font-size:20px;font-weight:700;color:#FB988D">Aa Bad on night-2</div><div style="margin-top:4px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;color:#C7C3BD">7.14:1 · AAA</div></div>
+</div>
+</section>
+
+<section data-screen-label="DS type" style="margin:0 72px 48px;width:1296px;background:#F7F4ED;border-radius:24px;padding:48px">
+<h2 style="margin:0 0 8px;font-size:32px;line-height:38px;font-weight:800">Type</h2>
+<p style="margin:0 0 32px;max-width:820px;font-size:18px;line-height:26px;color:#4D463F">One family, two cuts. Both are free to self-host under the SIL Open Font License 1.1.</p>
+<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;margin-bottom:40px">
+<div style="background:#FFFDFA;border:1px solid #D9D3CA;border-radius:16px;padding:28px">
+<div style="font-size:56px;line-height:60px;font-weight:800">Aa Il1 O0</div>
+<div style="margin-top:16px;font-size:22px;line-height:28px;font-weight:700">Atkinson Hyperlegible Next</div>
+<p style="margin:6px 0 0;font-size:16px;line-height:24px;color:#4D463F">All UI text. Braille Institute of America, SIL OFL 1.1. Weights used: 400, 500, 600, 700, 800. Letterforms are drawn to stay apart (I, l, 1; O, 0) for low-vision readers, which also helps in glare. Covers ñ for Santo Niño.</p>
+</div>
+<div style="background:#FFFDFA;border:1px solid #D9D3CA;border-radius:16px;padding:28px">
+<div style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:52px;line-height:60px;font-weight:700">DEMO-LOT-24A</div>
+<div style="margin-top:16px;font-size:22px;line-height:28px;font-weight:700">Atkinson Hyperlegible Mono</div>
+<p style="margin:6px 0 0;font-size:16px;line-height:24px;color:#4D463F">Lot numbers, export codes, MB figures, timers. Braille Institute of America, SIL OFL 1.1. Weights used: 500, 700. 0 and O, 1 and l never look alike: the same mix-ups the box reader has to catch.</p>
+</div>
+</div>
+<div style="display:grid;grid-template-columns:150px 170px 1fr 280px;border-top:2px solid #221D18">
+<div style="padding:10px 0;font-size:14px;font-weight:700;color:#4D463F;border-bottom:1px solid #D9D3CA">Token</div><div style="padding:10px 0;font-size:14px;font-weight:700;color:#4D463F;border-bottom:1px solid #D9D3CA">Size / line · weight</div><div style="padding:10px 0;font-size:14px;font-weight:700;color:#4D463F;border-bottom:1px solid #D9D3CA">Specimen</div><div style="padding:10px 0;font-size:14px;font-weight:700;color:#4D463F;border-bottom:1px solid #D9D3CA">Use</div>
+<div style="padding:18px 0;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:15px;font-weight:700;border-bottom:1px solid #D9D3CA">metric</div><div style="padding:18px 0;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:15px;border-bottom:1px solid #D9D3CA">56/56 · 800</div><div style="padding:18px 0;font-size:56px;line-height:56px;font-weight:800;font-variant-numeric:tabular-nums;border-bottom:1px solid #D9D3CA">52<span style="font-size:22px;font-weight:700"> /min</span></div><div style="padding:18px 0;font-size:16px;line-height:24px;color:#4D463F;border-bottom:1px solid #D9D3CA">The one big number on a result. Tabular figures.</div>
+<div style="padding:18px 0;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:15px;font-weight:700;border-bottom:1px solid #D9D3CA">display</div><div style="padding:18px 0;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:15px;border-bottom:1px solid #D9D3CA">34/40 · 800</div><div style="padding:18px 0;font-size:34px;line-height:40px;font-weight:800;letter-spacing:-0.01em;border-bottom:1px solid #D9D3CA">I-refer ngayon</div><div style="padding:18px 0;font-size:16px;line-height:24px;color:#4D463F;border-bottom:1px solid #D9D3CA">Result headlines. Max one per screen.</div>
+<div style="padding:18px 0;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:15px;font-weight:700;border-bottom:1px solid #D9D3CA">title</div><div style="padding:18px 0;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:15px;border-bottom:1px solid #D9D3CA">26/32 · 700</div><div style="padding:18px 0;font-size:26px;line-height:32px;font-weight:700;border-bottom:1px solid #D9D3CA">Maligaya-D</div><div style="padding:18px 0;font-size:16px;line-height:24px;color:#4D463F;border-bottom:1px solid #D9D3CA">Screen title, the page's h1.</div>
+<div style="padding:18px 0;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:15px;font-weight:700;border-bottom:1px solid #D9D3CA">heading</div><div style="padding:18px 0;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:15px;border-bottom:1px solid #D9D3CA">20/26 · 700</div><div style="padding:18px 0;font-size:20px;line-height:26px;font-weight:700;border-bottom:1px solid #D9D3CA">Check for danger signs</div><div style="padding:18px 0;font-size:16px;line-height:24px;color:#4D463F;border-bottom:1px solid #D9D3CA">Section headings (h2), sheet titles.</div>
+<div style="padding:18px 0;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:15px;font-weight:700;border-bottom:1px solid #D9D3CA">body-lg</div><div style="padding:18px 0;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:15px;border-bottom:1px solid #D9D3CA">18/26 · 500 (700 bold)</div><div style="padding:18px 0;font-size:18px;line-height:26px;font-weight:500;border-bottom:1px solid #D9D3CA">Refer to the midwife or RHU now.</div><div style="padding:18px 0;font-size:16px;line-height:24px;color:#4D463F;border-bottom:1px solid #D9D3CA">Default text, list-row titles. Buttons use 18/24 · 700.</div>
+<div style="padding:18px 0;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:15px;font-weight:700;border-bottom:1px solid #D9D3CA">body</div><div style="padding:18px 0;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:15px;border-bottom:1px solid #D9D3CA">16/24 · 400</div><div style="padding:18px 0;font-size:16px;line-height:24px;border-bottom:1px solid #D9D3CA">Exposed Sun, Oct 4 · waded in floodwater, open wound</div><div style="padding:18px 0;font-size:16px;line-height:24px;color:#4D463F;border-bottom:1px solid #D9D3CA">Descriptions, row meta.</div>
+<div style="padding:18px 0;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:15px;font-weight:700;border-bottom:1px solid #D9D3CA">caption</div><div style="padding:18px 0;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:15px;border-bottom:1px solid #D9D3CA">14/20 · 600</div><div style="padding:18px 0;font-size:14px;line-height:20px;font-weight:600;border-bottom:1px solid #D9D3CA">Sample data · Watch list · Expires within 6 weeks</div><div style="padding:18px 0;font-size:16px;line-height:24px;color:#4D463F;border-bottom:1px solid #D9D3CA">Pills, nav labels, meta. The smallest size in the app.</div>
+<div style="padding:18px 0;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:15px;font-weight:700;border-bottom:1px solid #D9D3CA">mono / mono-lg</div><div style="padding:18px 0;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:15px;border-bottom:1px solid #D9D3CA">16/22 · 500 · 32/36 · 700</div><div style="padding:18px 0;display:flex;align-items:baseline;gap:24px;border-bottom:1px solid #D9D3CA"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:16px;font-weight:500">SID-MAL · 2026-W41 · 18.2 MB</span><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:32px;line-height:36px;font-weight:700">0:42</span></div><div style="padding:18px 0;font-size:16px;line-height:24px;color:#4D463F;border-bottom:1px solid #D9D3CA">Codes, sizes, export numbers; the Hinga countdown.</div>
+</div>
+</section>
+
+<section data-screen-label="DS layout" style="margin:0 72px 48px;width:1296px;background:#F7F4ED;border-radius:24px;padding:48px">
+<h2 style="margin:0 0 32px;font-size:32px;line-height:38px;font-weight:800">Spacing, radius, elevation, touch, focus</h2>
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:40px">
+<div>
+<h3 style="margin:0 0 16px;font-size:20px;font-weight:700">Spacing (4 px base)</h3>
+<div style="display:flex;flex-direction:column;gap:10px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px">
+<div style="display:flex;align-items:center;gap:12px"><span style="width:84px;font-weight:700">space-1</span><span style="width:4px;height:16px;background:#221D18"></span>4</div>
+<div style="display:flex;align-items:center;gap:12px"><span style="width:84px;font-weight:700">space-2</span><span style="width:8px;height:16px;background:#221D18"></span>8</div>
+<div style="display:flex;align-items:center;gap:12px"><span style="width:84px;font-weight:700">space-3</span><span style="width:12px;height:16px;background:#221D18"></span>12</div>
+<div style="display:flex;align-items:center;gap:12px"><span style="width:84px;font-weight:700">space-4</span><span style="width:16px;height:16px;background:#221D18"></span>16 · row padding (vertical)</div>
+<div style="display:flex;align-items:center;gap:12px"><span style="width:84px;font-weight:700">space-5</span><span style="width:20px;height:16px;background:#221D18"></span>20 · screen edge</div>
+<div style="display:flex;align-items:center;gap:12px"><span style="width:84px;font-weight:700">space-6</span><span style="width:24px;height:16px;background:#221D18"></span>24 · between groups</div>
+<div style="display:flex;align-items:center;gap:12px"><span style="width:84px;font-weight:700">space-8</span><span style="width:32px;height:16px;background:#221D18"></span>32 · between sections</div>
+<div style="display:flex;align-items:center;gap:12px"><span style="width:84px;font-weight:700">space-10</span><span style="width:40px;height:16px;background:#221D18"></span>40</div>
+<div style="display:flex;align-items:center;gap:12px"><span style="width:84px;font-weight:700">space-12</span><span style="width:48px;height:16px;background:#221D18"></span>48 · laptop gutters</div>
+<div style="display:flex;align-items:center;gap:12px"><span style="width:84px;font-weight:700">space-16</span><span style="width:64px;height:16px;background:#221D18"></span>64</div>
+</div>
+</div>
+<div>
+<h3 style="margin:0 0 16px;font-size:20px;font-weight:700">Radius</h3>
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;font-size:14px;line-height:20px">
+<div><div style="height:64px;border-radius:8px;background:#FFFDFA;border:2px solid #221D18"></div><div style="margin-top:8px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-weight:700">r-sm 8</span><br><span style="color:#4D463F">tags, thumbnails</span></div></div>
+<div><div style="height:64px;border-radius:12px;background:#FFFDFA;border:2px solid #221D18"></div><div style="margin-top:8px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-weight:700">r-md 12</span><br><span style="color:#4D463F">buttons, fields</span></div></div>
+<div><div style="height:64px;border-radius:16px;background:#FFFDFA;border:2px solid #221D18"></div><div style="margin-top:8px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-weight:700">r-lg 16</span><br><span style="color:#4D463F">cards, panels</span></div></div>
+<div><div style="height:64px;border-radius:24px 24px 0 0;background:#FFFDFA;border:2px solid #221D18;border-bottom:0"></div><div style="margin-top:8px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-weight:700">r-xl 24</span><br><span style="color:#4D463F">sheet top corners</span></div></div>
+<div><div style="height:64px;border-radius:999px;background:#FFFDFA;border:2px solid #221D18"></div><div style="margin-top:8px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-weight:700">r-full</span><br><span style="color:#4D463F">pills, round buttons</span></div></div>
+</div>
+<h3 style="margin:32px 0 16px;font-size:20px;font-weight:700">Elevation (2 levels)</h3>
+<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;font-size:14px;line-height:20px">
+<div><div style="height:72px;border-radius:16px;background:#FFFDFA;box-shadow:0 1px 2px rgba(34,29,24,0.08),0 1px 1px rgba(34,29,24,0.04)"></div><div style="margin-top:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-weight:700">shadow-1</span><br><span style="color:#4D463F">cards, laptop panels</span></div></div>
+<div><div style="height:72px;border-radius:16px;background:#FFFDFA;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)"></div><div style="margin-top:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-weight:700">shadow-2</span><br><span style="color:#4D463F">sheets, toasts</span></div></div>
+</div>
+</div>
+<div>
+<h3 style="margin:0 0 16px;font-size:20px;font-weight:700">Touch targets</h3>
+<div style="display:flex;align-items:flex-end;gap:16px;margin-bottom:12px">
+<div style="width:48px;height:48px;border:2px dashed #7B7369;border-radius:12px;display:flex;align-items:center;justify-content:center"><i class="ph-bold ph-x" style="font-size:24px"></i></div>
+<div style="flex:1;height:56px;border-radius:12px;background:#221D18;color:#FFFDFA;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700">56 px primary</div>
+</div>
+<ul style="margin:0 0 28px;padding-left:20px;font-size:16px;line-height:24px;color:#4D463F">
+<li>Minimum 48 × 48 px (above the 44 px rule), 8 px apart.</li>
+<li>Primary buttons 56 px tall, full width, in the bottom third.</li>
+<li>Checkbox and radio rows: the whole row is the target.</li>
+</ul>
+<h3 style="margin:0 0 16px;font-size:20px;font-weight:700">Focus ring</h3>
+<div style="display:flex;gap:20px;align-items:center;margin-bottom:12px">
+<div style="height:56px;padding:0 20px;border-radius:12px;background:#FFFDFA;border:2px solid #221D18;display:flex;align-items:center;font-size:18px;font-weight:700;outline:3px solid #221D18;outline-offset:3px">Type it in</div>
+<div style="background:#161310;padding:14px;border-radius:12px"><div style="height:48px;padding:0 16px;border-radius:12px;background:#2A2621;color:#F7F4ED;display:flex;align-items:center;font-size:16px;font-weight:700;outline:3px solid #F7F4ED;outline-offset:3px">Cancel</div></div>
+</div>
+<p style="margin:0;font-size:16px;line-height:24px;color:#4D463F">3 px solid ink, 3 px offset, on every interactive element. On camera screens, 3 px paper. Never removed. Hover on laptop is a solid color change, never a fade. Reduced motion: no slides or fades; progress bars stay, spinners pulse.</p>
+</div>
+</div>
+</section>
+
+<section data-screen-label="DS icons" style="margin:0 72px 48px;width:1296px;background:#F7F4ED;border-radius:24px;padding:48px">
+<h2 style="margin:0 0 8px;font-size:32px;line-height:38px;font-weight:800">Icons</h2>
+<p style="margin:0 0 28px;max-width:860px;font-size:18px;line-height:26px;color:#4D463F"><b style="color:#221D18">Phosphor Icons 2.1</b> (MIT, phosphoricons.com), Bold weight everywhere; Fill only for the active tab and the status bar. Sizes: 18 in pills, 22–24 in rows and buttons, 26 in the nav, 36–40 in empty and error states. No medical stock icons (no crosses, stethoscopes or pills). These are all the icons the screens use.</p>
+<div style="display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:8px">
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px;background:#FFFDFA;border-radius:12px"><i class="ph-bold ph-house" style="font-size:28px"></i><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">house</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px;background:#FFFDFA;border-radius:12px"><i class="ph-bold ph-users-three" style="font-size:28px"></i><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">users-three</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px;background:#FFFDFA;border-radius:12px"><i class="ph-bold ph-wind" style="font-size:28px"></i><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">wind</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px;background:#FFFDFA;border-radius:12px"><i class="ph-bold ph-package" style="font-size:28px"></i><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">package</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px;background:#FFFDFA;border-radius:12px"><i class="ph-bold ph-qr-code" style="font-size:28px"></i><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">qr-code</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px;background:#FFFDFA;border-radius:12px"><i class="ph-bold ph-device-mobile" style="font-size:28px"></i><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">device-mobile</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px;background:#FFFDFA;border-radius:12px"><i class="ph-bold ph-laptop" style="font-size:28px"></i><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">laptop</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px;background:#FFFDFA;border-radius:12px"><i class="ph-bold ph-cloud-slash" style="font-size:28px"></i><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">cloud-slash</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px;background:#FFFDFA;border-radius:12px"><i class="ph-bold ph-wifi-high" style="font-size:28px"></i><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">wifi-high</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px;background:#FFFDFA;border-radius:12px"><i class="ph-bold ph-shield-check" style="font-size:28px"></i><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">shield-check</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px;background:#FFFDFA;border-radius:12px"><i class="ph-bold ph-warning" style="font-size:28px"></i><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">warning</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px;background:#FFFDFA;border-radius:12px"><i class="ph-bold ph-warning-circle" style="font-size:28px"></i><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">warning-circle</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px;background:#FFFDFA;border-radius:12px"><i class="ph-bold ph-check-circle" style="font-size:28px"></i><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">check-circle</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px;background:#FFFDFA;border-radius:12px"><i class="ph-bold ph-check" style="font-size:28px"></i><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">check</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px;background:#FFFDFA;border-radius:12px"><i class="ph-bold ph-x" style="font-size:28px"></i><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">x</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px;background:#FFFDFA;border-radius:12px"><i class="ph-bold ph-arrow-left" style="font-size:28px"></i><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">arrow-left</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px;background:#FFFDFA;border-radius:12px"><i class="ph-bold ph-caret-right" style="font-size:28px"></i><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">caret-right</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px;background:#FFFDFA;border-radius:12px"><i class="ph-bold ph-caret-down" style="font-size:28px"></i><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">caret-down</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px;background:#FFFDFA;border-radius:12px"><i class="ph-bold ph-download-simple" style="font-size:28px"></i><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">download-simple</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px;background:#FFFDFA;border-radius:12px"><i class="ph-bold ph-hard-drives" style="font-size:28px"></i><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">hard-drives</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px;background:#FFFDFA;border-radius:12px"><i class="ph-bold ph-memory" style="font-size:28px"></i><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">memory</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px;background:#FFFDFA;border-radius:12px"><i class="ph-bold ph-info" style="font-size:28px"></i><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">info</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px;background:#FFFDFA;border-radius:12px"><i class="ph-bold ph-sun" style="font-size:28px"></i><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">sun</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px;background:#FFFDFA;border-radius:12px"><i class="ph-bold ph-drop" style="font-size:28px"></i><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">drop</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px;background:#FFFDFA;border-radius:12px"><i class="ph-bold ph-calendar-blank" style="font-size:28px"></i><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">calendar-blank</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px;background:#FFFDFA;border-radius:12px"><i class="ph-bold ph-timer" style="font-size:28px"></i><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">timer</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px;background:#FFFDFA;border-radius:12px"><i class="ph-bold ph-arrow-clockwise" style="font-size:28px"></i><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">arrow-clockwise</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px;background:#FFFDFA;border-radius:12px"><i class="ph-bold ph-pencil-simple" style="font-size:28px"></i><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">pencil-simple</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px;background:#FFFDFA;border-radius:12px"><i class="ph-bold ph-scan" style="font-size:28px"></i><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">scan</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px;background:#FFFDFA;border-radius:12px"><i class="ph-bold ph-camera" style="font-size:28px"></i><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">camera</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px;background:#FFFDFA;border-radius:12px"><i class="ph-bold ph-baby" style="font-size:28px"></i><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">baby</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px;background:#FFFDFA;border-radius:12px"><i class="ph-bold ph-flag" style="font-size:28px"></i><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">flag</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px;background:#FFFDFA;border-radius:12px"><i class="ph-bold ph-speaker-high" style="font-size:28px"></i><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">speaker-high</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px;background:#FFFDFA;border-radius:12px"><i class="ph-bold ph-vibrate" style="font-size:28px"></i><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">vibrate</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px;background:#FFFDFA;border-radius:12px"><i class="ph-bold ph-eye-slash" style="font-size:28px"></i><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">eye-slash</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px;background:#FFFDFA;border-radius:12px"><i class="ph-bold ph-arrows-split" style="font-size:28px"></i><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">arrows-split</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px;background:#FFFDFA;border-radius:12px"><i class="ph-bold ph-table" style="font-size:28px"></i><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">table</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px;background:#FFFDFA;border-radius:12px"><i class="ph-bold ph-list-numbers" style="font-size:28px"></i><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">list-numbers</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px;background:#FFFDFA;border-radius:12px"><i class="ph-bold ph-clock-counter-clockwise" style="font-size:28px"></i><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">clock-counter-…</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px;background:#FFFDFA;border-radius:12px"><i class="ph-bold ph-seal-check" style="font-size:28px"></i><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">seal-check</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px;background:#FFFDFA;border-radius:12px"><i class="ph-bold ph-lock-simple" style="font-size:28px"></i><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">lock-simple</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px;background:#FFFDFA;border-radius:12px"><i class="ph-bold ph-trash" style="font-size:28px"></i><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">trash</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px;background:#FFFDFA;border-radius:12px"><i class="ph-bold ph-plus" style="font-size:28px"></i><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">plus</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px;background:#FFFDFA;border-radius:12px"><i class="ph-bold ph-circle-notch" style="font-size:28px"></i><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">circle-notch</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px;background:#FFFDFA;border-radius:12px"><i class="ph-bold ph-user" style="font-size:28px"></i><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">user</span></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 4px;background:#FFFDFA;border-radius:12px"><i class="ph-bold ph-file-text" style="font-size:28px"></i><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px">file-text</span></div>
+</div>
+</section>
+
+<section data-screen-label="DS components" style="margin:0 72px 48px;width:1296px;background:#F7F4ED;border-radius:24px;padding:48px">
+<h2 style="margin:0 0 8px;font-size:32px;line-height:38px;font-weight:800">Components</h2>
+<p style="margin:0 0 32px;max-width:820px;font-size:18px;line-height:26px;color:#4D463F">Shown at phone size (335 px content width inside a 375 px screen). Cards are used sparingly: rows on paper are the default.</p>
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:48px 40px;align-items:start">
+
+<div>
+<h3 style="margin:0 0 16px;font-size:20px;font-weight:700">Buttons</h3>
+<div style="display:flex;flex-direction:column;gap:12px">
+<button style="display:flex;align-items:center;justify-content:center;gap:10px;height:56px;border-radius:12px;background:#221D18;color:#FFFDFA;border:0;font-family:inherit;font-size:18px;font-weight:700"><i class="ph-bold ph-wind" style="font-size:24px"></i>Check breathing <span style="color:#C7C3BD;font-weight:600">· Hinga</span></button>
+<button style="display:flex;align-items:center;justify-content:center;gap:10px;height:56px;border-radius:12px;background:#FFFDFA;color:#221D18;border:2px solid #221D18;font-family:inherit;font-size:18px;font-weight:700"><i class="ph-bold ph-pencil-simple" style="font-size:22px"></i>Type it in</button>
+<button style="display:flex;align-items:center;justify-content:center;gap:10px;height:56px;border-radius:12px;background:#B32322;color:#FFFDFA;border:0;font-family:inherit;font-size:18px;font-weight:700"><i class="ph-bold ph-trash" style="font-size:22px"></i>Delete all records</button>
+<button style="display:flex;align-items:center;justify-content:center;gap:10px;height:56px;border-radius:12px;background:#FFFDFA;color:#AC2724;border:2px solid #AC2724;font-family:inherit;font-size:18px;font-weight:700">Cancel the download</button>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+<button style="display:flex;align-items:center;justify-content:center;gap:8px;height:56px;border-radius:12px;background:#EBE6DD;color:#696259;border:0;font-family:inherit;font-size:18px;font-weight:700">Disabled</button>
+<button style="display:flex;align-items:center;justify-content:center;gap:8px;height:56px;border-radius:12px;background:#221D18;color:#FFFDFA;border:0;font-family:inherit;font-size:18px;font-weight:700"><i class="ph-bold ph-circle-notch" style="font-size:22px"></i>Saving…</button>
+</div>
+<button style="align-self:center;height:48px;padding:0 12px;background:none;border:0;color:#221D18;font-family:inherit;font-size:18px;font-weight:700;text-decoration:underline;text-underline-offset:4px">Text button: Later</button>
+</div>
+<p style="margin:12px 0 0;font-size:14px;line-height:20px;color:#4D463F">Pressed: primary goes to #000 and moves down 1 px. Laptop hover: primary #3A332C, secondary fills --sunken. Destructive solid only inside a confirm sheet.</p>
+</div>
+
+<div>
+<h3 style="margin:0 0 16px;font-size:20px;font-weight:700">Text field and select</h3>
+<div style="display:flex;flex-direction:column;gap:18px">
+<label style="display:flex;flex-direction:column;gap:8px"><span style="font-size:16px;font-weight:700">Lot number</span><span style="height:56px;border:2px solid #7B7369;border-radius:12px;background:#FFFDFA;display:flex;align-items:center;padding:0 16px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:18px">DEMO-LOT-25B</span></label>
+<label style="display:flex;flex-direction:column;gap:8px"><span style="font-size:16px;font-weight:700">Focused</span><span style="height:56px;border:2px solid #221D18;border-radius:12px;background:#FFFDFA;display:flex;align-items:center;padding:0 16px;font-size:18px;outline:3px solid #221D18;outline-offset:3px">Purok 2<span style="width:2px;height:24px;background:#221D18;margin-left:2px"></span></span></label>
+<label style="display:flex;flex-direction:column;gap:8px"><span style="font-size:16px;font-weight:700">How many on hand</span><span style="height:56px;border:2px solid #AC2724;border-radius:12px;background:#FFFDFA;display:flex;align-items:center;padding:0 16px;font-size:18px;color:#696259">0</span><span style="display:flex;align-items:center;gap:6px;font-size:15px;font-weight:600;color:#AC2724"><i class="ph-bold ph-warning-circle" style="font-size:18px"></i>Type how many capsules are in the box.</span></label>
+<label style="display:flex;flex-direction:column;gap:8px"><span style="font-size:16px;font-weight:700">Link a resident <span style="font-weight:500;color:#4D463F">(optional)</span></span><span style="height:56px;border:2px solid #7B7369;border-radius:12px;background:#FFFDFA;display:flex;align-items:center;justify-content:space-between;padding:0 14px 0 16px;font-size:18px">Residente 014 · HH-04<i class="ph-bold ph-caret-down" style="font-size:22px"></i></span></label>
+</div>
+<p style="margin:12px 0 0;font-size:14px;line-height:20px;color:#4D463F">Labels always above, never placeholders. Select opens the phone's native picker. The box-reader's “Sure / Please check” field states are in Components 2 below.</p>
+</div>
+
+<div>
+<h3 style="margin:0 0 16px;font-size:20px;font-weight:700">Checkbox, radio, toggle</h3>
+<div style="display:flex;flex-direction:column;background:#FFFDFA;border:1px solid #D9D3CA;border-radius:16px">
+<div style="display:flex;align-items:center;gap:14px;min-height:60px;padding:12px 16px;border-bottom:1px solid #D9D3CA"><span style="flex:none;width:28px;height:28px;border-radius:6px;border:2px solid #7B7369;background:#FFFDFA"></span><span style="font-size:18px;line-height:24px">Can't drink or breastfeed</span></div>
+<div style="display:flex;align-items:center;gap:14px;min-height:60px;padding:12px 16px;border-bottom:1px solid #D9D3CA"><span style="flex:none;width:28px;height:28px;border-radius:6px;background:#221D18;color:#FFFDFA;display:flex;align-items:center;justify-content:center"><i class="ph-bold ph-check" style="font-size:18px"></i></span><span style="font-size:18px;line-height:24px;font-weight:700">Chest pulls in when breathing in</span></div>
+<div style="display:flex;align-items:center;gap:14px;min-height:60px;padding:12px 16px;border-bottom:1px solid #D9D3CA"><span style="flex:none;width:28px;height:28px;border-radius:999px;border:2px solid #7B7369"></span><span style="font-size:18px">2–12 months</span></div>
+<div style="display:flex;align-items:center;gap:14px;min-height:60px;padding:12px 16px;border-bottom:1px solid #D9D3CA"><span style="flex:none;width:28px;height:28px;border-radius:999px;border:2px solid #221D18;display:flex;align-items:center;justify-content:center"><span style="width:14px;height:14px;border-radius:999px;background:#221D18"></span></span><span style="font-size:18px;font-weight:700">1–5 years</span></div>
+<div style="display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:60px;padding:12px 16px;border-bottom:1px solid #D9D3CA"><span style="font-size:18px">Show sample data</span><span style="flex:none;width:52px;height:32px;border-radius:999px;background:#EBE6DD;border:2px solid #7B7369;position:relative"><span style="position:absolute;left:3px;top:3px;width:22px;height:22px;border-radius:999px;background:#7B7369"></span></span></div>
+<div style="display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:60px;padding:12px 16px"><span style="font-size:18px;font-weight:700">Use the writing AI</span><span style="flex:none;width:52px;height:32px;border-radius:999px;background:#221D18;position:relative;display:flex;align-items:center"><i class="ph-bold ph-check" style="font-size:14px;color:#FFFDFA;margin-left:8px"></i><span style="position:absolute;right:5px;top:5px;width:22px;height:22px;border-radius:999px;background:#FFFDFA"></span></span></div>
+</div>
+<p style="margin:12px 0 0;font-size:14px;line-height:20px;color:#4D463F">Checked = ink fill + bold label, so the state also shows in weight. The whole row is the target.</p>
+</div>
+
+<div>
+<h3 style="margin:0 0 16px;font-size:20px;font-weight:700">Status pills</h3>
+<div style="display:flex;flex-wrap:wrap;gap:8px">
+<span style="display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px 0 9px;border-radius:999px;background:#DFF6E2;color:#1D6835;font-size:14px;font-weight:700"><i class="ph-bold ph-check-circle" style="font-size:18px"></i>Not fast</span>
+<span style="display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px 0 9px;border-radius:999px;background:#DFF6E2;color:#1D6835;font-size:14px;font-weight:700"><i class="ph-bold ph-check" style="font-size:18px"></i>Sure</span>
+<span style="display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px 0 9px;border-radius:999px;background:#DFF6E2;color:#1D6835;font-size:14px;font-weight:700"><i class="ph-bold ph-seal-check" style="font-size:18px"></i>Received</span>
+<span style="display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px 0 9px;border-radius:999px;background:#FDEEC5;color:#805216;font-size:14px;font-weight:700"><i class="ph-bold ph-warning" style="font-size:18px"></i>Fast · refer</span>
+<span style="display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px 0 9px;border-radius:999px;background:#FDEEC5;color:#805216;font-size:14px;font-weight:700"><i class="ph-bold ph-eye" style="font-size:18px"></i>Please check</span>
+<span style="display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px 0 9px;border-radius:999px;background:#FDEEC5;color:#805216;font-size:14px;font-weight:700"><i class="ph-bold ph-clock" style="font-size:18px"></i>Expires within 6 weeks</span>
+<span style="display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px 0 9px;border-radius:999px;background:#FDEEC5;color:#805216;font-size:14px;font-weight:700"><i class="ph-bold ph-warning" style="font-size:18px"></i>Higher risk</span>
+<span style="display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px 0 9px;border-radius:999px;background:#B32322;color:#FFFDFA;font-size:14px;font-weight:800;letter-spacing:0.04em"><i class="ph-bold ph-warning-circle" style="font-size:18px"></i>URGENT</span>
+<span style="display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px 0 9px;border-radius:999px;background:#FFE8E5;color:#AC2724;font-size:14px;font-weight:700"><i class="ph-bold ph-x-circle" style="font-size:18px"></i>Expired: set aside</span>
+<span style="display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px 0 9px;border-radius:999px;background:#EBE6DD;color:#4D463F;font-size:14px;font-weight:700"><i class="ph-bold ph-calendar-blank" style="font-size:18px"></i>Starts Oct 15</span>
+<span style="display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px 0 9px;border-radius:999px;background:#EBE6DD;color:#4D463F;font-size:14px;font-weight:700"><i class="ph-bold ph-clock" style="font-size:18px"></i>Waiting</span>
+<span style="display:inline-flex;align-items:center;gap:6px;height:30px;color:#805216;font-size:15px;font-weight:700"><i class="ph-bold ph-clock" style="font-size:17px"></i>Inline: 30 expire within 6 weeks</span>
+</div>
+<p style="margin:12px 0 0;font-size:14px;line-height:20px;color:#4D463F">Pills only mark the status of one record in a list (watch list, stock lots, received QRs). Anywhere else a status is inline text with its icon. URGENT is the only solid pill. “Sample data” is plain text after the place name, never a badge.</p>
+<h3 style="margin:32px 0 16px;font-size:20px;font-weight:700">Local-AI indicators</h3>
+<div style="display:flex;flex-direction:column;gap:12px">
+<dc-import name="LocalStatus" hint-size="335px,20px"></dc-import>
+<dc-import name="LocalStatus" device="laptop" hint-size="335px,20px"></dc-import>
+<div style="background:#161310;border-radius:12px;padding:12px"><dc-import name="LocalStatus" dark="{{ true }}" hint-size="311px,20px"></dc-import></div>
+</div>
+<p style="margin:12px 0 0;font-size:14px;line-height:20px;color:#4D463F">One quiet line, no pill and no border: lagoon for the device, ink-2 for Offline. Under the title on main screens, top right in flows. Tap opens its sheet (Local AI states L5b, L7). Online: only the device part shows. Offline is never red.</p>
+</div>
+
+<div>
+<h3 style="margin:0 0 16px;font-size:20px;font-weight:700">List rows</h3>
+<div style="background:#FFFDFA;border:1px solid #D9D3CA;border-radius:16px;overflow:hidden">
+<div style="display:flex;gap:14px;padding:16px;border-bottom:1px solid #D9D3CA">
+<div style="flex:1;min-width:0"><div style="font-size:18px;line-height:24px;font-weight:700">Residente 004</div><div style="font-size:15px;line-height:22px;color:#4D463F">HH-01 · Purok 1 · Day 6 of 15</div><div style="margin-top:8px"><span style="display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px 0 9px;border-radius:999px;background:#FDEEC5;color:#805216;font-size:14px;font-weight:700"><i class="ph-bold ph-warning" style="font-size:18px"></i>Higher risk: open wound</span></div></div>
+<i class="ph-bold ph-caret-right" style="font-size:22px;color:#696259;align-self:center"></i>
+</div>
+<div style="display:flex;align-items:center;gap:14px;min-height:64px;padding:12px 16px">
+<span style="flex:none;width:28px;height:28px;border-radius:6px;background:#221D18;color:#FFFDFA;display:flex;align-items:center;justify-content:center"><i class="ph-bold ph-check" style="font-size:18px"></i></span>
+<div style="flex:1"><div style="font-size:18px;line-height:24px;font-weight:700">HH-03 · Purok 1</div><div style="font-size:15px;line-height:22px;color:#4D463F">1 person · marked exposed</div></div>
+</div>
+</div>
+<p style="margin:12px 0 0;font-size:14px;line-height:20px;color:#4D463F">Min height 64. Title body-lg 700, meta 15/22 ink-2. Dividers --line, inset 16.</p>
+</div>
+
+<div>
+<h3 style="margin:0 0 16px;font-size:20px;font-weight:700">Toast</h3>
+<div style="display:flex;align-items:center;gap:12px;min-height:56px;padding:10px 10px 10px 16px;border-radius:12px;background:#221D18;color:#FFFDFA;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<i class="ph-bold ph-check-circle" style="font-size:22px;color:#83DC97"></i><span style="flex:1;font-size:16px;line-height:22px;font-weight:600">Saved to Residente 014's record.</span><button style="height:44px;padding:0 10px;background:none;border:0;color:#FFFDFA;font-family:inherit;font-size:16px;font-weight:700;text-decoration:underline;text-underline-offset:3px">Undo</button>
+</div>
+<p style="margin:12px 0 28px;font-size:14px;line-height:20px;color:#4D463F">Above the nav, 16 px from the edges. Stays 6 s, or until the next tap. Never the only place a result is shown.</p>
+<h3 style="margin:0 0 16px;font-size:20px;font-weight:700">Progress</h3>
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="display:flex;justify-content:space-between;gap:12px;font-size:16px;font-weight:700"><span>Breathing check · 1 of 3</span><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-weight:500">18.2 / 55.1 MB · 33%</span></div>
+<div role="progressbar" aria-valuenow="33" style="height:12px;border-radius:999px;background:#EBE6DD;overflow:hidden;box-shadow:inset 0 0 0 1px #D9D3CA"><div style="width:33%;height:100%;background:#221D18;border-radius:999px"></div></div>
+<div style="margin-top:14px;font-size:16px;font-weight:700">Getting the AI ready…</div>
+<div style="height:12px;border-radius:999px;background:#EBE6DD;overflow:hidden;box-shadow:inset 0 0 0 1px #D9D3CA;position:relative"><div style="position:absolute;left:30%;width:32%;height:100%;background:#221D18;border-radius:999px"></div></div>
+</div>
+<p style="margin:12px 0 0;font-size:14px;line-height:20px;color:#4D463F">Always with a text label. Indeterminate: the segment slides, 1.4 s loop (reduced motion: it pulses).</p>
+</div>
+
+<div>
+<h3 style="margin:0 0 16px;font-size:20px;font-weight:700">Card (sparingly)</h3>
+<div style="background:#FFFDFA;border:1px solid #D9D3CA;border-radius:16px;box-shadow:0 1px 2px rgba(34,29,24,0.08),0 1px 1px rgba(34,29,24,0.04);padding:20px">
+<div style="display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;color:#4D463F"><i class="ph-bold ph-drop" style="font-size:20px"></i>Flood watch</div>
+<div style="margin-top:6px;font-size:20px;line-height:26px;font-weight:800">Day 6 of 15</div>
+<p style="margin:4px 0 0;font-size:16px;line-height:24px;color:#4D463F">Since Sun, Oct 4 · Purok 1, 2, 3</p>
+</div>
+<p style="margin:12px 0 0;font-size:14px;line-height:20px;color:#4D463F">One card per screen at most (Home's flood watch, the danger-sign group, laptop panels). Never in grids, never with a colored edge.</p>
+</div>
+
+<div>
+<h3 style="margin:0 0 16px;font-size:20px;font-weight:700">Empty state</h3>
+<div style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:28px 20px;background:#FFFDFA;border:1px solid #D9D3CA;border-radius:16px">
+<span style="width:72px;height:72px;border-radius:999px;background:#EBE6DD;display:flex;align-items:center;justify-content:center"><i class="ph-bold ph-users-three" style="font-size:36px"></i></span>
+<div style="margin-top:16px;font-size:20px;line-height:26px;font-weight:700">No one on the watch list</div>
+<p style="margin:6px 0 20px;font-size:16px;line-height:24px;color:#4D463F;text-wrap:pretty">Log a flood and mark who waded in the water. They show here from day 5 to day 15.</p>
+<button style="width:100%;height:56px;border-radius:12px;background:#221D18;color:#FFFDFA;border:0;font-family:inherit;font-size:18px;font-weight:700">Log a flood</button>
+</div>
+</div>
+
+<div>
+<h3 style="margin:0 0 16px;font-size:20px;font-weight:700">Error state</h3>
+<div style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:28px 20px;background:#FFFDFA;border:1px solid #D9D3CA;border-radius:16px">
+<span style="width:72px;height:72px;border-radius:999px;background:#FFE8E5;color:#AC2724;display:flex;align-items:center;justify-content:center"><i class="ph-bold ph-warning-circle" style="font-size:38px"></i></span>
+<div style="margin-top:16px;font-size:20px;line-height:26px;font-weight:700">Couldn't open the records</div>
+<p style="margin:6px 0 20px;font-size:16px;line-height:24px;color:#4D463F;text-wrap:pretty">Nothing was lost. They are still saved on this phone.</p>
+<button style="width:100%;height:56px;border-radius:12px;background:#221D18;color:#FFFDFA;border:0;font-family:inherit;font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px"><i class="ph-bold ph-arrow-clockwise" style="font-size:22px"></i>Try again</button>
+</div>
+<p style="margin:12px 0 0;font-size:14px;line-height:20px;color:#4D463F">What happened, in one line. One next step. No error codes on screen.</p>
+</div>
+
+<div>
+<h3 style="margin:0 0 16px;font-size:20px;font-weight:700">Bottom sheet</h3>
+<div style="position:relative;height:330px;border-radius:16px;overflow:hidden;background:#F7F4ED;border:1px solid #D9D3CA">
+<div style="position:absolute;inset:0;background:rgba(22,19,16,0.5)"></div>
+<div style="position:absolute;left:0;right:0;bottom:0;background:#FFFDFA;border-radius:24px 24px 0 0;padding:12px 20px 20px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<div style="width:40px;height:5px;border-radius:999px;background:#D9D3CA;margin:0 auto 16px"></div>
+<div style="font-size:20px;line-height:26px;font-weight:700">Next, your browser asks to keep Agapay's files</div>
+<p style="margin:8px 0 20px;font-size:16px;line-height:24px;color:#4D463F">Tap Allow, so the AI isn't deleted when the phone runs low on space.</p>
+<button style="width:100%;height:56px;border-radius:12px;background:#221D18;color:#FFFDFA;border:0;font-family:inherit;font-size:18px;font-weight:700">Continue</button>
+</div>
+</div>
+<p style="margin:12px 0 0;font-size:14px;line-height:20px;color:#4D463F">Scrim night at 50%. Grabber, 24 px top radius, shadow-2. Swipe down or tap the scrim to close, unless a choice is required.</p>
+</div>
+
+<div>
+<h3 style="margin:0 0 16px;font-size:20px;font-weight:700">Bottom nav</h3>
+<div style="border:1px solid #D9D3CA;border-radius:16px;overflow:hidden;background:#F7F4ED;padding-top:24px">
+<dc-import name="BottomNav" active="home" hint-size="100%,78px"></dc-import>
+</div>
+<p style="margin:12px 0 0;font-size:14px;line-height:20px;color:#4D463F">5 tabs: Home · Watch list · Hinga · Stock · Send. Hinga is the raised ink button. Active tab: ink, Fill icon, bold label, top bar. Hidden inside the Hinga, scan and send flows.</p>
+</div>
+
+</div>
+</section>
+
+<section data-screen-label="DS components 2" style="margin:0 72px 48px;width:1296px;background:#F7F4ED;border-radius:24px;padding:48px">
+<h2 style="margin:0 0 8px;font-size:32px;line-height:38px;font-weight:800">Components 2: AI result review</h2>
+<p style="margin:0 0 32px;max-width:860px;font-size:18px;line-height:26px;color:#4D463F">What the phone read is always editable, and its confidence shows as a look, not a percentage. “Please check” is set when a field's confidence is below the box reader's <span style="font-family:'Atkinson Hyperlegible Mono',monospace">CHECK_BELOW</span> threshold, or the field wasn't found.</p>
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:40px">
+<label style="display:flex;flex-direction:column;gap:8px"><span style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:16px;font-weight:700">Medicine</span><span style="display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px 0 8px;border-radius:999px;background:#DFF6E2;color:#1D6835;font-size:14px;font-weight:700"><i class="ph-bold ph-check" style="font-size:16px"></i>Sure</span></span><span style="height:56px;border:2px solid #7B7369;border-radius:12px;background:#FFFDFA;display:flex;align-items:center;padding:0 16px;font-size:18px">Doxycycline</span><span style="font-size:14px;color:#4D463F">Sure: plain field, green tag.</span></label>
+<label style="display:flex;flex-direction:column;gap:8px"><span style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:16px;font-weight:700">Lot number</span><span style="display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px 0 8px;border-radius:999px;background:#FDEEC5;color:#805216;font-size:14px;font-weight:700"><i class="ph-bold ph-eye" style="font-size:16px"></i>Please check</span></span><span style="height:56px;border:2px dashed #805216;border-radius:12px;background:#FDEEC5;display:flex;align-items:center;padding:0 16px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:18px">DEMO-L0T-24A</span><span style="font-size:14px;line-height:20px;color:#805216;font-weight:600">Read with low confidence. Compare with the box.</span></label>
+<label style="display:flex;flex-direction:column;gap:8px"><span style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:16px;font-weight:700">Expiry</span><span style="display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px 0 8px;border-radius:999px;background:#FDEEC5;color:#805216;font-size:14px;font-weight:700"><i class="ph-bold ph-pencil-simple" style="font-size:16px"></i>Not read</span></span><span style="height:56px;border:2px dashed #805216;border-radius:12px;background:#FFFDFA;display:flex;align-items:center;padding:0 16px;font-size:18px;color:#696259">Type the month and year</span><span style="font-size:14px;line-height:20px;color:#805216;font-weight:600">The phone couldn't find it. Please type it.</span></label>
+</div>
+</section>
+
+<section data-screen-label="DS icon and manifest" style="margin:0 72px 72px;width:1296px;background:#F7F4ED;border-radius:24px;padding:48px">
+<h2 style="margin:0 0 8px;font-size:32px;line-height:38px;font-weight:800">App icon, favicon, manifest</h2>
+<p style="margin:0 0 32px;max-width:860px;font-size:18px;line-height:26px;color:#4D463F">A paper “a” on ink with one warm lamp dot: a light that stays on when the power and signal are out. The amber dot is the only place the brand uses color outside a status. Export each tile below as PNG at 1×.</p>
+<div style="display:flex;gap:40px;align-items:flex-start;flex-wrap:wrap">
+<div><div id="icon-512" style="width:512px;height:512px;background:#221D18;position:relative;overflow:hidden"><span style="position:absolute;left:0;right:0;top:14px;text-align:center;font-family:'Atkinson Hyperlegible Next',sans-serif;font-weight:800;font-size:430px;line-height:430px;color:#F7F4ED">a</span><span style="position:absolute;left:374px;top:312px;width:58px;height:58px;border-radius:999px;background:#F4C352"></span></div><div style="margin-top:12px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700">icon-512.png · 512 × 512 · purpose any</div></div>
+<div style="display:flex;flex-direction:column;gap:32px">
+<div><div id="icon-maskable-512" style="width:512px;height:512px;background:#221D18;position:relative;overflow:hidden"><span style="position:absolute;left:0;right:0;top:70px;text-align:center;font-family:'Atkinson Hyperlegible Next',sans-serif;font-weight:800;font-size:330px;line-height:330px;color:#F7F4ED">a</span><span style="position:absolute;left:344px;top:296px;width:46px;height:46px;border-radius:999px;background:#F4C352"></span></div><div style="margin-top:12px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700">icon-maskable-512.png · purpose maskable<br><span style="font-weight:500;color:#4D463F">Mark sits inside the central 80% safe circle.</span></div></div>
+<div style="display:flex;gap:24px;align-items:flex-end">
+<div><div style="width:128px;height:128px;border-radius:999px;overflow:hidden;position:relative;background:#221D18"><span style="position:absolute;left:0;right:0;top:16px;text-align:center;font-family:'Atkinson Hyperlegible Next',sans-serif;font-weight:800;font-size:82px;line-height:82px;color:#F7F4ED">a</span><span style="position:absolute;left:86px;top:74px;width:12px;height:12px;border-radius:999px;background:#F4C352"></span></div><div style="margin-top:8px;font-size:14px;color:#4D463F">Circle mask test</div></div>
+<div><div style="width:128px;height:128px;border-radius:30px;overflow:hidden;position:relative;background:#221D18"><span style="position:absolute;left:0;right:0;top:16px;text-align:center;font-family:'Atkinson Hyperlegible Next',sans-serif;font-weight:800;font-size:82px;line-height:82px;color:#F7F4ED">a</span><span style="position:absolute;left:86px;top:74px;width:12px;height:12px;border-radius:999px;background:#F4C352"></span></div><div style="margin-top:8px;font-size:14px;color:#4D463F">Squircle mask test</div></div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:28px">
+<div><div id="icon-192" style="width:192px;height:192px;background:#221D18;position:relative;overflow:hidden"><span style="position:absolute;left:0;right:0;top:5px;text-align:center;font-family:'Atkinson Hyperlegible Next',sans-serif;font-weight:800;font-size:161px;line-height:161px;color:#F7F4ED">a</span><span style="position:absolute;left:140px;top:117px;width:22px;height:22px;border-radius:999px;background:#F4C352"></span></div><div style="margin-top:10px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700">icon-192.png</div></div>
+<div><div id="apple-touch-180" style="width:180px;height:180px;background:#221D18;position:relative;overflow:hidden"><span style="position:absolute;left:0;right:0;top:13px;text-align:center;font-family:'Atkinson Hyperlegible Next',sans-serif;font-weight:800;font-size:136px;line-height:136px;color:#F7F4ED">a</span><span style="position:absolute;left:124px;top:108px;width:19px;height:19px;border-radius:999px;background:#F4C352"></span></div><div style="margin-top:10px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700">apple-touch-icon.png · 180</div></div>
+<div style="display:flex;gap:20px;align-items:flex-end">
+<div><div id="favicon-32" style="width:32px;height:32px;border-radius:7px;background:#221D18;position:relative;overflow:hidden"><span style="position:absolute;left:0;right:0;top:0;text-align:center;font-family:'Atkinson Hyperlegible Next',sans-serif;font-weight:800;font-size:30px;line-height:30px;color:#F7F4ED">a</span></div><div style="margin-top:8px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px;font-weight:700">favicon-32.png</div></div>
+<div><div style="width:16px;height:16px;border-radius:4px;background:#221D18;position:relative;overflow:hidden"><span style="position:absolute;left:0;right:0;top:0;text-align:center;font-family:'Atkinson Hyperlegible Next',sans-serif;font-weight:800;font-size:15px;line-height:15px;color:#F7F4ED">a</span></div><div style="margin-top:8px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:13px;font-weight:700">16</div></div>
+<div style="display:flex;align-items:center;gap:8px;height:36px;padding:0 14px 0 10px;border-radius:10px 10px 0 0;background:#FFFDFA;border:1px solid #D9D3CA;border-bottom:0"><span style="width:16px;height:16px;border-radius:4px;background:#221D18;position:relative;overflow:hidden;display:inline-block"><span style="position:absolute;left:0;right:0;top:0;text-align:center;font-family:'Atkinson Hyperlegible Next',sans-serif;font-weight:800;font-size:15px;line-height:15px;color:#F7F4ED">a</span></span><span style="font-size:14px;font-weight:600">Agapay</span></div>
+</div>
+</div>
+<div style="flex:1;min-width:340px">
+<h3 style="margin:0 0 12px;font-size:20px;font-weight:700">Manifest</h3>
+<pre style="margin:0;padding:20px;background:#221D18;color:#F7F4ED;border-radius:12px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;line-height:22px;white-space:pre-wrap">{
+  "name": "Agapay",
+  "short_name": "Agapay",
+  "description": "Offline health checks for barangay health workers after a typhoon.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "theme_color": "#F7F4ED",
+  "background_color": "#F7F4ED",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icons/icon-maskable-512.png", "sizes": "512x512",
+      "type": "image/png", "purpose": "maskable" }
+  ]
+}</pre>
+<p style="margin:12px 0 0;font-size:14px;line-height:20px;color:#4D463F">index.html: &lt;meta name="theme-color" content="#F7F4ED"&gt;, &lt;link rel="icon" href="/favicon-32.png" sizes="32x32"&gt;, &lt;link rel="apple-touch-icon" href="/icons/apple-touch-icon.png"&gt;. Page title “Agapay”, then “Screen · Agapay”.</p>
+</div>
+</div>
+</section>
+</x-dc>
+</body>
+</html>

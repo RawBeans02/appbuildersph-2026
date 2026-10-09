@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+</helmet>
+<nav aria-label="Main" style="flex:none;height:78px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));align-items:stretch;background:#FFFDFA;border-top:1px solid #D9D3CA;padding:0 4px 6px;font-family:'Atkinson Hyperlegible Next',system-ui,sans-serif;position:relative">
+<sc-if value="{{ homeOn }}"><a aria-current="page" style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#221D18;text-decoration:none;font-size:14px;font-weight:700"><span style="width:32px;height:4px;border-radius:0 0 3px 3px;background:#221D18"></span><i class="ph-fill ph-house" style="font-size:26px;margin-top:6px"></i>Home</a></sc-if>
+<sc-if value="{{ homeOff }}" hint-placeholder-val="{{ true }}"><a style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#696259;text-decoration:none;font-size:14px;font-weight:600"><span style="width:32px;height:4px"></span><i class="ph-bold ph-house" style="font-size:26px;margin-top:6px"></i>Home</a></sc-if>
+<sc-if value="{{ watchOn }}"><a aria-current="page" style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#221D18;text-decoration:none;font-size:14px;font-weight:700;white-space:nowrap"><span style="width:32px;height:4px;border-radius:0 0 3px 3px;background:#221D18"></span><i class="ph-fill ph-users-three" style="font-size:26px;margin-top:6px"></i>Watch list</a></sc-if>
+<sc-if value="{{ watchOff }}" hint-placeholder-val="{{ true }}"><a style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#696259;text-decoration:none;font-size:14px;font-weight:600;white-space:nowrap"><span style="width:32px;height:4px"></span><i class="ph-bold ph-users-three" style="font-size:26px;margin-top:6px"></i>Watch list</a></sc-if>
+<a style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#221D18;text-decoration:none;font-size:14px;font-weight:700">
+<span style="width:62px;height:62px;margin-top:-20px;border-radius:999px;background:#221D18;color:#FFFDFA;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 5px #F7F4ED,0 6px 14px rgba(34,29,24,0.22)"><i class="ph-bold ph-wind" style="font-size:30px"></i></span>Hinga</a>
+<sc-if value="{{ stockOn }}"><a aria-current="page" style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#221D18;text-decoration:none;font-size:14px;font-weight:700"><span style="width:32px;height:4px;border-radius:0 0 3px 3px;background:#221D18"></span><i class="ph-fill ph-package" style="font-size:26px;margin-top:6px"></i>Stock</a></sc-if>
+<sc-if value="{{ stockOff }}" hint-placeholder-val="{{ true }}"><a style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#696259;text-decoration:none;font-size:14px;font-weight:600"><span style="width:32px;height:4px"></span><i class="ph-bold ph-package" style="font-size:26px;margin-top:6px"></i>Stock</a></sc-if>
+<sc-if value="{{ sendOn }}"><a aria-current="page" style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#221D18;text-decoration:none;font-size:14px;font-weight:700"><span style="width:32px;height:4px;border-radius:0 0 3px 3px;background:#221D18"></span><i class="ph-fill ph-qr-code" style="font-size:26px;margin-top:6px"></i>Send</a></sc-if>
+<sc-if value="{{ sendOff }}" hint-placeholder-val="{{ true }}"><a style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#696259;text-decoration:none;font-size:14px;font-weight:600"><span style="width:32px;height:4px"></span><i class="ph-bold ph-qr-code" style="font-size:26px;margin-top:6px"></i>Send</a></sc-if>
+</nav>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:375,&quot;height&quot;:100},&quot;active&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;home&quot;,&quot;watch&quot;,&quot;hinga&quot;,&quot;stock&quot;,&quot;send&quot;],&quot;default&quot;:&quot;home&quot;,&quot;tsType&quot;:&quot;'home'|'watch'|'hinga'|'stock'|'send'&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const a = this.props.active || 'home';
+    const v = {};
+    for (const k of ['home', 'watch', 'stock', 'send']) { v[k + 'On'] = a === k; v[k + 'Off'] = a !== k; }
+    return v;
+  }
+}
+</script>
+</body>
+</html>

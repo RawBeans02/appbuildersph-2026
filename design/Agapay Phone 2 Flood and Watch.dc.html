@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<title>Agapay · Phone 2: Flood and watch list</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;500;700&family=Atkinson+Hyperlegible+Next:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+<style>
+body{margin:0;background:#E4DED3;color:#221D18;font-family:'Atkinson Hyperlegible Next',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#221D18;text-decoration:underline;text-underline-offset:3px}
+a:hover{color:#4D463F;text-decoration-thickness:2px}
+button{font-family:inherit}
+</style>
+</helmet>
+
+<section data-screen-label="Phone 2 header" style="padding:64px 72px 16px;width:1800px">
+<h1 style="margin:0 0 10px;font-size:48px;line-height:54px;font-weight:800">Phone 2: Flood and watch list</h1>
+<p style="margin:0;max-width:940px;font-size:19px;line-height:28px;color:#4D463F">Screens 8 and 9 of the brief, route <span style="font-family:'Atkinson Hyperlegible Mono',monospace">/watch</span>. The logging flow (8) happens on the flood day, Sun Oct 4; the watch list (9) is Sat Oct 10. Window rule from <span style="font-family:'Atkinson Hyperlegible Mono',monospace">rules/watch.ts</span>: day 5 to day 15 after contact. Loading and error use the Home patterns (1b skeleton rows, 1d error block). <a href="Agapay Design System.dc.html">Design system</a> · <a href="Agapay Phone 1 Home and Hinga.dc.html">Phone 1</a></p>
+</section>
+
+<section data-screen-label="08 Flood event" style="padding:32px 72px 56px">
+<div style="display:flex;align-items:baseline;gap:14px;margin-bottom:6px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:18px;font-weight:700;color:#4D463F">08</span><h2 style="margin:0;font-size:32px;line-height:38px;font-weight:800">Flood event: log it, mark who was exposed</h2></div>
+<p style="margin:0 0 28px;max-width:960px;font-size:17px;line-height:26px;color:#4D463F">Two steps, no bottom nav. A tap marks a whole household (as <span style="font-family:'Atkinson Hyperlegible Mono',monospace">markHouseholdExposed</span> does); exposure details are toggle chips under each marked household. Confirm starts the watch.</p>
+<div style="display:flex;flex-wrap:wrap;gap:56px 48px;align-items:flex-start;filter:{{ artFilter }}">
+
+<figure id="8a" style="margin:0;width:375px;display:flex;flex-direction:column;gap:14px">
+<figcaption><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700;background:#221D18;color:#F7F4ED;padding:3px 8px;border-radius:6px">8a</span><span style="font-size:18px;font-weight:800">Log a flood</span></div><div style="margin-top:6px;font-size:14px;line-height:20px;color:#4D463F">Date defaults to today, can't be in the future. Selected puroks are saved in the flood's note.</div></figcaption>
+<div data-screen-label="8a Log a flood" style="width:375px;height:812px;position:relative;overflow:hidden;background:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<dc-import name="StatusBar" online="{{ online }}" hint-size="375px,40px"></dc-import>
+<div style="flex:1;min-height:0;overflow:hidden">
+<div style="display:flex;align-items:center;justify-content:space-between;height:56px;padding:0 20px 0 8px"><button aria-label="Back" style="width:48px;height:48px;border:0;background:transparent;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#221D18"><i class="ph-bold ph-arrow-left" style="font-size:26px"></i></button><dc-import name="LocalStatus" online="{{ online }}" hint-size="230px,20px"></dc-import></div>
+<div style="padding:4px 20px 0">
+<div style="display:flex;align-items:center;gap:10px"><span style="display:grid;grid-template-columns:repeat(2,28px);gap:4px"><span style="height:6px;border-radius:3px;background:#221D18"></span><span style="height:6px;border-radius:3px;background:#D9D3CA"></span></span><span style="font-size:15px;font-weight:700;color:#4D463F">Step 1 of 2</span></div>
+<h1 style="margin:12px 0 4px;font-size:26px;line-height:32px;font-weight:700">Log a flood</h1>
+<p style="margin:0;font-size:17px;line-height:25px;color:#4D463F;text-wrap:pretty">This starts the leptospirosis watch for everyone who waded in the water.</p>
+<label style="margin-top:24px;display:flex;flex-direction:column;gap:8px"><span style="font-size:16px;font-weight:700">The flood started on</span><span style="height:56px;border:2px solid #7B7369;border-radius:12px;background:#FFFDFA;display:flex;align-items:center;justify-content:space-between;padding:0 14px 0 16px;font-size:18px">Today, Sun Oct 4, 2026<i class="ph-bold ph-calendar-blank" style="font-size:22px"></i></span></label>
+<div style="margin-top:24px"><div style="font-size:16px;font-weight:700">Areas with floodwater <span style="font-weight:500;color:#4D463F">(optional)</span></div>
+<div role="group" style="margin-top:10px;display:flex;flex-wrap:wrap;gap:8px">
+<button aria-pressed="true" style="display:flex;align-items:center;gap:6px;height:48px;padding:0 16px 0 12px;border-radius:12px;background:#221D18;color:#FFFDFA;border:0;font-size:17px;font-weight:700"><i class="ph-bold ph-check" style="font-size:18px"></i>Purok 1</button>
+<button aria-pressed="true" style="display:flex;align-items:center;gap:6px;height:48px;padding:0 16px 0 12px;border-radius:12px;background:#221D18;color:#FFFDFA;border:0;font-size:17px;font-weight:700"><i class="ph-bold ph-check" style="font-size:18px"></i>Purok 2</button>
+<button aria-pressed="true" style="display:flex;align-items:center;gap:6px;height:48px;padding:0 16px 0 12px;border-radius:12px;background:#221D18;color:#FFFDFA;border:0;font-size:17px;font-weight:700"><i class="ph-bold ph-check" style="font-size:18px"></i>Purok 3</button>
+<button aria-pressed="false" style="height:48px;padding:0 16px;border-radius:12px;background:#FFFDFA;color:#221D18;border:2px solid #7B7369;font-size:17px;font-weight:600">Purok 4</button>
+<button aria-pressed="false" style="height:48px;padding:0 16px;border-radius:12px;background:#FFFDFA;color:#221D18;border:2px solid #7B7369;font-size:17px;font-weight:600">Purok 5</button>
+</div>
+<div style="margin-top:12px;display:flex;align-items:center;gap:8px;font-size:15px;line-height:22px;color:#4D463F"><i class="ph-bold ph-lock-simple" style="font-size:18px"></i>Kept on this phone only. Never in the QR.</div>
+</div>
+</div>
+</div>
+<div style="padding:12px 20px 20px"><button style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border-radius:12px;background:#221D18;color:#FFFDFA;border:0;font-size:18px;font-weight:700">Next: mark who was exposed<i class="ph-bold ph-arrow-right" style="font-size:22px"></i></button></div>
+</div>
+</figure>
+
+<figure id="8b" style="margin:0;width:375px;display:flex;flex-direction:column;gap:14px">
+<figcaption><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700;background:#221D18;color:#F7F4ED;padding:3px 8px;border-radius:6px">8b</span><span style="font-size:18px;font-weight:800">Mark exposed households</span></div><div style="margin-top:6px;font-size:14px;line-height:20px;color:#4D463F">Affected puroks first. “Waded” is on for every mark; the other two are optional. The footer total updates live.</div></figcaption>
+<div data-screen-label="8b Mark exposed" style="width:375px;height:812px;position:relative;overflow:hidden;background:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<dc-import name="StatusBar" online="{{ online }}" hint-size="375px,40px"></dc-import>
+<div style="flex:1;min-height:0;overflow:hidden">
+<div style="display:flex;align-items:center;justify-content:space-between;height:56px;padding:0 20px 0 8px"><button aria-label="Back" style="width:48px;height:48px;border:0;background:transparent;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#221D18"><i class="ph-bold ph-arrow-left" style="font-size:26px"></i></button><dc-import name="LocalStatus" online="{{ online }}" hint-size="230px,20px"></dc-import></div>
+<div style="padding:4px 20px 0">
+<div style="display:flex;align-items:center;gap:10px"><span style="display:grid;grid-template-columns:repeat(2,28px);gap:4px"><span style="height:6px;border-radius:3px;background:#221D18"></span><span style="height:6px;border-radius:3px;background:#221D18"></span></span><span style="font-size:15px;font-weight:700;color:#4D463F">Step 2 of 2</span></div>
+<h1 style="margin:12px 0 4px;font-size:26px;line-height:32px;font-weight:700">Who waded in floodwater?</h1>
+<p style="margin:0;font-size:16px;line-height:24px;color:#4D463F">Tap a household to mark everyone in it. Tap again to undo.</p>
+</div>
+<div style="margin:16px 20px 6px;font-size:15px;font-weight:700;color:#4D463F">Purok 1</div>
+<div style="margin:0 20px;background:#FFFDFA;border:1px solid #D9D3CA;border-radius:16px;overflow:hidden">
+<div style="padding:12px 16px 14px;border-bottom:1px solid #D9D3CA">
+<div style="display:flex;align-items:center;gap:14px"><span style="flex:none;width:28px;height:28px;border-radius:6px;background:#221D18;color:#FFFDFA;display:flex;align-items:center;justify-content:center"><i class="ph-bold ph-check" style="font-size:18px"></i></span><span style="flex:1;font-size:18px;font-weight:700">HH-01</span><span style="font-size:15px;color:#4D463F">4 people</span></div>
+<div style="margin:10px 0 0 42px;display:flex;flex-wrap:wrap;gap:6px">
+<span style="display:inline-flex;align-items:center;gap:5px;height:44px;padding:0 12px 0 10px;border-radius:10px;background:#221D18;color:#FFFDFA;font-size:15px;font-weight:700"><i class="ph-bold ph-check" style="font-size:15px"></i>Waded</span>
+<span style="display:inline-flex;align-items:center;gap:5px;height:44px;padding:0 12px 0 10px;border-radius:10px;background:#221D18;color:#FFFDFA;font-size:15px;font-weight:700"><i class="ph-bold ph-check" style="font-size:15px"></i>Open wound</span>
+<span style="display:inline-flex;align-items:center;height:44px;padding:0 12px;border-radius:10px;border:2px solid #7B7369;color:#221D18;font-size:15px;font-weight:600">Repeated</span>
+</div>
+</div>
+<div style="display:flex;align-items:center;gap:14px;min-height:58px;padding:10px 16px;border-bottom:1px solid #D9D3CA"><span style="flex:none;width:28px;height:28px;border-radius:6px;border:2px solid #7B7369"></span><span style="flex:1;font-size:18px">HH-02</span><span style="font-size:15px;color:#4D463F">6 people</span></div>
+<div style="display:flex;align-items:center;gap:14px;min-height:58px;padding:10px 16px;border-bottom:1px solid #D9D3CA"><span style="flex:none;width:28px;height:28px;border-radius:6px;border:2px solid #7B7369"></span><span style="flex:1;font-size:18px">HH-03</span><span style="font-size:15px;color:#4D463F">1 person</span></div>
+<div style="display:flex;align-items:center;gap:14px;min-height:58px;padding:10px 16px"><span style="flex:none;width:28px;height:28px;border-radius:6px;border:2px solid #7B7369"></span><span style="flex:1;font-size:18px">HH-04</span><span style="font-size:15px;color:#4D463F">5 people</span></div>
+</div>
+<div style="margin:16px 20px 6px;font-size:15px;font-weight:700;color:#4D463F">Purok 2</div>
+<div style="margin:0 20px;background:#FFFDFA;border:1px solid #D9D3CA;border-radius:16px;overflow:hidden">
+<div style="padding:12px 16px 14px">
+<div style="display:flex;align-items:center;gap:14px"><span style="flex:none;width:28px;height:28px;border-radius:6px;background:#221D18;color:#FFFDFA;display:flex;align-items:center;justify-content:center"><i class="ph-bold ph-check" style="font-size:18px"></i></span><span style="flex:1;font-size:18px;font-weight:700">HH-05</span><span style="font-size:15px;color:#4D463F">3 people</span></div>
+<div style="margin:10px 0 0 42px;display:flex;flex-wrap:wrap;gap:6px">
+<span style="display:inline-flex;align-items:center;gap:5px;height:44px;padding:0 12px 0 10px;border-radius:10px;background:#221D18;color:#FFFDFA;font-size:15px;font-weight:700"><i class="ph-bold ph-check" style="font-size:15px"></i>Waded</span>
+<span style="display:inline-flex;align-items:center;height:44px;padding:0 12px;border-radius:10px;border:2px solid #7B7369;color:#221D18;font-size:15px;font-weight:600">Open wound</span>
+<span style="display:inline-flex;align-items:center;gap:5px;height:44px;padding:0 12px 0 10px;border-radius:10px;background:#221D18;color:#FFFDFA;font-size:15px;font-weight:700"><i class="ph-bold ph-check" style="font-size:15px"></i>Repeated</span>
+</div>
+</div>
+</div>
+</div>
+<div style="padding:12px 20px 20px;border-top:1px solid #D9D3CA;background:#F7F4ED"><div style="margin-bottom:10px;display:flex;justify-content:space-between;font-size:16px"><span style="font-weight:800">9 people marked</span><span style="color:#4D463F">3 households</span></div><button style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border-radius:12px;background:#221D18;color:#FFFDFA;border:0;font-size:18px;font-weight:700">Confirm and start the watch</button></div>
+</div>
+</figure>
+
+<figure id="8c" style="margin:0;width:375px;display:flex;flex-direction:column;gap:14px">
+<figcaption><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700;background:#221D18;color:#F7F4ED;padding:3px 8px;border-radius:6px">8c</span><span style="font-size:18px;font-weight:800">Confirm: start the watch</span></div><div style="margin-top:6px;font-size:14px;line-height:20px;color:#4D463F">Says exactly which days. After Start, go to the watch list with a toast “Watch started for 9 people.”</div></figcaption>
+<div data-screen-label="8c Confirm watch" style="width:375px;height:812px;position:relative;overflow:hidden;background:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<dc-import name="StatusBar" online="{{ online }}" hint-size="375px,40px"></dc-import>
+<div style="padding:60px 20px 0"><div style="font-size:26px;line-height:32px;font-weight:700">Who waded in floodwater?</div></div>
+<div style="position:absolute;inset:0;background:rgba(22,19,16,0.5)"></div>
+<div style="position:absolute;left:0;right:0;bottom:0;background:#FFFDFA;border-radius:24px 24px 0 0;padding:12px 20px 20px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<div style="width:40px;height:5px;border-radius:999px;background:#D9D3CA;margin:0 auto 18px"></div>
+<h2 style="margin:0;font-size:24px;line-height:30px;font-weight:800">Start the watch for 9 people?</h2>
+<p style="margin:8px 0 0;font-size:18px;line-height:26px;text-wrap:pretty">They were in the floodwater today. Watch them from <b>Fri, Oct 9</b> to <b>Mon, Oct 19</b> (days 5 to 15).</p>
+<div style="margin-top:16px;display:flex;gap:12px;padding:14px 16px;background:#EBE6DD;border-radius:12px"><i class="ph-bold ph-info" style="font-size:22px;flex:none"></i><span style="font-size:16px;line-height:24px">If one gets fever, muscle pain or red eyes, refer them to the RHU physician.</span></div>
+<button style="margin-top:20px;display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border-radius:12px;background:#221D18;color:#FFFDFA;border:0;font-size:18px;font-weight:700">Start the watch<span style="color:#C7C3BD;font-weight:600">· Kumpirmahin</span></button>
+<button style="display:block;margin:4px auto 0;height:48px;padding:0 8px;background:none;border:0;color:#221D18;font-size:17px;font-weight:700;text-decoration:underline;text-underline-offset:4px">Back to the list</button>
+</div>
+</div>
+</figure>
+
+</div>
+</section>
+
+<section data-screen-label="09 Watch list" style="padding:32px 72px 96px">
+<div style="display:flex;align-items:baseline;gap:14px;margin-bottom:6px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:18px;font-weight:700;color:#4D463F">09</span><h2 style="margin:0;font-size:32px;line-height:38px;font-weight:800">Watch list</h2></div>
+<p style="margin:0 0 28px;max-width:960px;font-size:17px;line-height:26px;color:#4D463F">Order from <span style="font-family:'Atkinson Hyperlegible Mono',monospace">watchList()</span>: in the window first, higher risk first, then the window closing soonest. Rows open a sheet (9b) to mark checked or referred. “Higher risk” (open wound or repeated contact) is the only pill.</p>
+<div style="display:flex;flex-wrap:wrap;gap:56px 48px;align-items:flex-start;filter:{{ artFilter }}">
+
+<figure id="9a" style="margin:0;width:375px;display:flex;flex-direction:column;gap:14px">
+<figcaption><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700;background:#221D18;color:#F7F4ED;padding:3px 8px;border-radius:6px">9a</span><span style="font-size:18px;font-weight:800">Default (scrolls)</span></div><div style="margin-top:6px;font-size:14px;line-height:20px;color:#4D463F">Tall frame. Day counter right-aligned in each row; “Starts Oct 15” for people not in the window yet.</div></figcaption>
+<div data-screen-label="9a Watch list" style="width:375px;height:1500px;position:relative;overflow:hidden;background:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<dc-import name="StatusBar" online="{{ online }}" hint-size="375px,40px"></dc-import>
+<div style="flex:1;min-height:0;overflow:hidden">
+<header style="padding:4px 20px 0"><h1 style="margin:0;font-size:26px;line-height:32px;font-weight:700">Watch list</h1><div style="margin-top:2px;font-size:16px;line-height:24px;color:#4D463F">Leptospirosis watch · Maligaya-D · Sample data</div><div style="margin-top:8px"><dc-import name="LocalStatus" online="{{ online }}" hint-size="335px,20px"></dc-import></div></header>
+<div style="margin:16px 20px 0;display:flex;gap:12px;padding:14px 16px;background:#EBE6DD;border-radius:12px"><i class="ph-bold ph-info" style="font-size:22px;flex:none"></i><span style="font-size:16px;line-height:24px;font-weight:600">Refer to the RHU physician if anyone here has fever, muscle pain or red eyes.</span></div>
+<div style="margin:22px 20px 6px;display:flex;justify-content:space-between;align-items:baseline"><h2 style="margin:0;font-size:20px;line-height:26px;font-weight:700">In the window now</h2><span style="font-size:16px;font-weight:700;color:#4D463F">9</span></div>
+<div style="border-top:1px solid #D9D3CA">
+<a style="display:flex;gap:12px;padding:12px 20px;border-bottom:1px solid #D9D3CA;color:#221D18;text-decoration:none"><div style="flex:1;min-width:0"><div style="font-size:18px;line-height:24px;font-weight:700">Residente 002</div><div style="font-size:15px;line-height:22px;color:#4D463F">HH-01 · Purok 1 · waded, open wound</div><div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:8px;align-items:center"><span style="display:inline-flex;align-items:center;gap:5px;height:28px;padding:0 10px 0 8px;border-radius:999px;background:#FDEEC5;color:#805216;font-size:14px;font-weight:700"><i class="ph-bold ph-warning" style="font-size:16px"></i>Higher risk</span><span style="display:inline-flex;align-items:center;gap:5px;font-size:14px;font-weight:700;color:#1D6835"><i class="ph-bold ph-check-circle" style="font-size:16px"></i>Checked 8:15 AM</span></div></div><div style="text-align:right"><div style="font-size:18px;line-height:24px;font-weight:800">Day 6</div><div style="font-size:14px;color:#4D463F">of 15</div></div></a>
+<a style="display:flex;gap:12px;padding:12px 20px;border-bottom:1px solid #D9D3CA;color:#221D18;text-decoration:none"><div style="flex:1;min-width:0"><div style="font-size:18px;line-height:24px;font-weight:700">Residente 004</div><div style="font-size:15px;line-height:22px;color:#4D463F">HH-01 · Purok 1 · waded, repeated</div><div style="margin-top:6px"><span style="display:inline-flex;align-items:center;gap:5px;height:28px;padding:0 10px 0 8px;border-radius:999px;background:#FDEEC5;color:#805216;font-size:14px;font-weight:700"><i class="ph-bold ph-warning" style="font-size:16px"></i>Higher risk</span></div></div><div style="text-align:right"><div style="font-size:18px;line-height:24px;font-weight:800">Day 6</div><div style="font-size:14px;color:#4D463F">of 15</div></div></a>
+<a style="display:flex;gap:12px;padding:12px 20px;border-bottom:1px solid #D9D3CA;color:#221D18;text-decoration:none"><div style="flex:1;min-width:0"><div style="font-size:18px;line-height:24px;font-weight:700">Residente 017</div><div style="font-size:15px;line-height:22px;color:#4D463F">HH-05 · Purok 2 · waded, open wound, repeated</div><div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:8px;align-items:center"><span style="display:inline-flex;align-items:center;gap:5px;height:28px;padding:0 10px 0 8px;border-radius:999px;background:#FDEEC5;color:#805216;font-size:14px;font-weight:700"><i class="ph-bold ph-warning" style="font-size:16px"></i>Higher risk</span><span style="display:inline-flex;align-items:center;gap:5px;font-size:14px;font-weight:700"><i class="ph-bold ph-arrow-up-right" style="font-size:16px"></i>Referred to RHU, Oct 9</span></div></div><div style="text-align:right"><div style="font-size:18px;line-height:24px;font-weight:800">Day 6</div><div style="font-size:14px;color:#4D463F">of 15</div></div></a>
+<a style="display:flex;gap:12px;padding:12px 20px;border-bottom:1px solid #D9D3CA;color:#221D18;text-decoration:none"><div style="flex:1;min-width:0"><div style="font-size:18px;line-height:24px;font-weight:700">Residente 019</div><div style="font-size:15px;line-height:22px;color:#4D463F">HH-05 · Purok 2 · waded, repeated</div><div style="margin-top:6px"><span style="display:inline-flex;align-items:center;gap:5px;height:28px;padding:0 10px 0 8px;border-radius:999px;background:#FDEEC5;color:#805216;font-size:14px;font-weight:700"><i class="ph-bold ph-warning" style="font-size:16px"></i>Higher risk</span></div></div><div style="text-align:right"><div style="font-size:18px;line-height:24px;font-weight:800">Day 6</div><div style="font-size:14px;color:#4D463F">of 15</div></div></a>
+<a style="display:flex;gap:12px;padding:12px 20px;border-bottom:1px solid #D9D3CA;color:#221D18;text-decoration:none"><div style="flex:1;min-width:0"><div style="font-size:18px;line-height:24px;font-weight:700">Residente 025</div><div style="font-size:15px;line-height:22px;color:#4D463F">HH-08 · Purok 3 · waded, open wound</div><div style="margin-top:6px"><span style="display:inline-flex;align-items:center;gap:5px;height:28px;padding:0 10px 0 8px;border-radius:999px;background:#FDEEC5;color:#805216;font-size:14px;font-weight:700"><i class="ph-bold ph-warning" style="font-size:16px"></i>Higher risk</span></div></div><div style="text-align:right"><div style="font-size:18px;line-height:24px;font-weight:800">Day 6</div><div style="font-size:14px;color:#4D463F">of 15</div></div></a>
+<a style="display:flex;gap:12px;padding:12px 20px;border-bottom:1px solid #D9D3CA;color:#221D18;text-decoration:none"><div style="flex:1;min-width:0"><div style="font-size:18px;line-height:24px;font-weight:700">Residente 001</div><div style="font-size:15px;line-height:22px;color:#4D463F">HH-01 · Purok 1 · waded</div></div><div style="text-align:right"><div style="font-size:18px;line-height:24px;font-weight:800">Day 6</div><div style="font-size:14px;color:#4D463F">of 15</div></div></a>
+<a style="display:flex;gap:12px;padding:12px 20px;border-bottom:1px solid #D9D3CA;color:#221D18;text-decoration:none"><div style="flex:1;min-width:0"><div style="font-size:18px;line-height:24px;font-weight:700">Residente 003</div><div style="font-size:15px;line-height:22px;color:#4D463F">HH-01 · Purok 1 · waded</div></div><div style="text-align:right"><div style="font-size:18px;line-height:24px;font-weight:800">Day 6</div><div style="font-size:14px;color:#4D463F">of 15</div></div></a>
+<a style="display:flex;gap:12px;padding:12px 20px;border-bottom:1px solid #D9D3CA;color:#221D18;text-decoration:none"><div style="flex:1;min-width:0"><div style="font-size:18px;line-height:24px;font-weight:700">Residente 018</div><div style="font-size:15px;line-height:22px;color:#4D463F">HH-05 · Purok 2 · waded</div></div><div style="text-align:right"><div style="font-size:18px;line-height:24px;font-weight:800">Day 6</div><div style="font-size:14px;color:#4D463F">of 15</div></div></a>
+<a style="display:flex;gap:12px;padding:12px 20px;border-bottom:1px solid #D9D3CA;color:#221D18;text-decoration:none"><div style="flex:1;min-width:0"><div style="font-size:18px;line-height:24px;font-weight:700">Residente 026</div><div style="font-size:15px;line-height:22px;color:#4D463F">HH-08 · Purok 3 · waded</div></div><div style="text-align:right"><div style="font-size:18px;line-height:24px;font-weight:800">Day 6</div><div style="font-size:14px;color:#4D463F">of 15</div></div></a>
+</div>
+<div style="margin:22px 20px 6px;display:flex;justify-content:space-between;align-items:baseline"><h2 style="margin:0;font-size:20px;line-height:26px;font-weight:700">Starts soon</h2><span style="font-size:16px;font-weight:700;color:#4D463F">3</span></div>
+<div style="border-top:1px solid #D9D3CA">
+<a style="display:flex;gap:12px;padding:12px 20px;border-bottom:1px solid #D9D3CA;color:#221D18;text-decoration:none"><div style="flex:1;min-width:0"><div style="font-size:18px;line-height:24px;font-weight:700">Residente 011</div><div style="font-size:15px;line-height:22px;color:#4D463F">HH-03 · Purok 1 · waded today</div></div><div style="text-align:right"><div style="font-size:16px;line-height:24px;font-weight:700">Starts Oct 15</div><div style="font-size:14px;color:#4D463F">in 5 days</div></div></a>
+<a style="display:flex;gap:12px;padding:12px 20px;border-bottom:1px solid #D9D3CA;color:#221D18;text-decoration:none"><div style="flex:1;min-width:0"><div style="font-size:18px;line-height:24px;font-weight:700">Residente 024</div><div style="font-size:15px;line-height:22px;color:#4D463F">HH-07 · Purok 2 · waded today</div></div><div style="text-align:right"><div style="font-size:16px;line-height:24px;font-weight:700">Starts Oct 15</div><div style="font-size:14px;color:#4D463F">in 5 days</div></div></a>
+<a style="display:flex;gap:12px;padding:12px 20px;border-bottom:1px solid #D9D3CA;color:#221D18;text-decoration:none"><div style="flex:1;min-width:0"><div style="font-size:18px;line-height:24px;font-weight:700">Residente 033</div><div style="font-size:15px;line-height:22px;color:#4D463F">HH-10 · Purok 3 · waded today</div></div><div style="text-align:right"><div style="font-size:16px;line-height:24px;font-weight:700">Starts Oct 15</div><div style="font-size:14px;color:#4D463F">in 5 days</div></div></a>
+</div>
+</div>
+<div style="padding:12px 20px 14px;border-top:1px solid #D9D3CA;background:#F7F4ED"><button style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border-radius:12px;background:#221D18;color:#FFFDFA;border:0;font-size:18px;font-weight:700"><i class="ph-bold ph-plus" style="font-size:22px"></i>Mark more people exposed</button></div>
+<dc-import name="BottomNav" active="watch" hint-size="375px,78px"></dc-import>
+</div>
+</figure>
+
+<figure id="9b" style="margin:0;width:375px;display:flex;flex-direction:column;gap:14px">
+<figcaption><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700;background:#221D18;color:#F7F4ED;padding:3px 8px;border-radius:6px">9b</span><span style="font-size:18px;font-weight:800">Row sheet: checked or referred</span></div><div style="margin-top:6px;font-size:14px;line-height:20px;color:#4D463F">Checked is the common case, so it is primary. Either one closes the sheet and shows a toast with Undo.</div></figcaption>
+<div data-screen-label="9b Watch row sheet" style="width:375px;height:812px;position:relative;overflow:hidden;background:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<dc-import name="StatusBar" online="{{ online }}" hint-size="375px,40px"></dc-import>
+<div style="padding:4px 20px 0"><div style="font-size:26px;line-height:32px;font-weight:700">Watch list</div><div style="margin-top:2px;font-size:16px;line-height:24px;color:#4D463F">Leptospirosis watch · Maligaya-D · Sample data</div></div>
+<div style="position:absolute;inset:0;background:rgba(22,19,16,0.5)"></div>
+<div style="position:absolute;left:0;right:0;bottom:0;background:#FFFDFA;border-radius:24px 24px 0 0;padding:12px 20px 20px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<div style="width:40px;height:5px;border-radius:999px;background:#D9D3CA;margin:0 auto 18px"></div>
+<h2 style="margin:0;font-size:24px;line-height:30px;font-weight:800">Residente 004</h2>
+<div style="margin-top:2px;font-size:16px;color:#4D463F">HH-01 · Purok 1</div>
+<div style="margin-top:14px;border-top:1px solid #D9D3CA">
+<div style="display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid #D9D3CA"><span style="font-size:16px;color:#4D463F">In the floodwater</span><span style="font-size:16px;font-weight:700;text-align:right">Sun, Oct 4 · waded, repeated</span></div>
+<div style="display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid #D9D3CA"><span style="font-size:16px;color:#4D463F">Watch</span><span style="font-size:16px;font-weight:700;text-align:right">Oct 9 to Oct 19 · day 6</span></div>
+<div style="display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid #D9D3CA"><span style="font-size:16px;color:#4D463F">Risk</span><span style="display:flex;align-items:center;gap:5px;font-size:16px;font-weight:700;color:#805216"><i class="ph-bold ph-warning" style="font-size:18px"></i>Higher: repeated contact</span></div>
+</div>
+<p style="margin:14px 0 0;font-size:17px;line-height:25px;font-weight:600">Fever, muscle pain or red eyes? Refer to the RHU physician.</p>
+<button style="margin-top:18px;display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border-radius:12px;background:#221D18;color:#FFFDFA;border:0;font-size:18px;font-weight:700"><i class="ph-bold ph-check" style="font-size:22px"></i>Checked today: no signs</button>
+<button style="margin-top:10px;display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border-radius:12px;background:#FFFDFA;color:#221D18;border:2px solid #221D18;font-size:18px;font-weight:700"><i class="ph-bold ph-arrow-up-right" style="font-size:22px"></i>Referred to the RHU</button>
+</div>
+</div>
+</figure>
+
+<figure id="9c" style="margin:0;width:375px;display:flex;flex-direction:column;gap:14px">
+<figcaption><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700;background:#221D18;color:#F7F4ED;padding:3px 8px;border-radius:6px">9c</span><span style="font-size:18px;font-weight:800">Empty</span></div><div style="margin-top:6px;font-size:14px;line-height:20px;color:#4D463F">No flood, or every window has ended. One action: Log a flood (8a).</div></figcaption>
+<div data-screen-label="9c Watch empty" style="width:375px;height:812px;position:relative;overflow:hidden;background:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<dc-import name="StatusBar" online="{{ online }}" hint-size="375px,40px"></dc-import>
+<div style="flex:1;min-height:0;overflow:hidden">
+<header style="padding:4px 20px 0"><h1 style="margin:0;font-size:26px;line-height:32px;font-weight:700">Watch list</h1><div style="margin-top:2px;font-size:16px;line-height:24px;color:#4D463F">Leptospirosis watch · Maligaya-D</div><div style="margin-top:8px"><dc-import name="LocalStatus" online="{{ online }}" hint-size="335px,20px"></dc-import></div></header>
+<div style="margin:96px 28px 0;display:flex;flex-direction:column;align-items:center;text-align:center">
+<span style="width:64px;height:64px;border-radius:999px;background:#EBE6DD;display:flex;align-items:center;justify-content:center"><i class="ph-bold ph-users-three" style="font-size:32px"></i></span>
+<div style="margin-top:16px;font-size:22px;line-height:28px;font-weight:800">No one on the watch list</div>
+<p style="margin:8px 0 0;font-size:17px;line-height:25px;color:#4D463F;text-wrap:pretty">Log a flood and mark who waded in the water. They show here from day 5 to day 15.</p>
+</div>
+</div>
+<div style="padding:12px 20px 14px"><button style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border-radius:12px;background:#221D18;color:#FFFDFA;border:0;font-size:18px;font-weight:700"><i class="ph-bold ph-drop" style="font-size:22px"></i>Log a flood</button></div>
+<dc-import name="BottomNav" active="watch" hint-size="375px,78px"></dc-import>
+</div>
+</figure>
+
+</div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;online&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Preview&quot;},&quot;grayscale&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Preview&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const t = (v) => v === true || v === 'true';
+    return { online: t(this.props.online), artFilter: t(this.props.grayscale) ? 'grayscale(1)' : 'none' };
+  }
+}
+</script>
+</body>
+</html>

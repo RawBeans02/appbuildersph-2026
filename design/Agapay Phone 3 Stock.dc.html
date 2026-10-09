@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<title>Agapay · Phone 3: Stock</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;500;700&family=Atkinson+Hyperlegible+Next:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+<style>
+body{margin:0;background:#E4DED3;color:#221D18;font-family:'Atkinson Hyperlegible Next',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#221D18;text-decoration:underline;text-underline-offset:3px}
+a:hover{color:#4D463F;text-decoration-thickness:2px}
+button{font-family:inherit}
+</style>
+</helmet>
+
+<section data-screen-label="Phone 3 header" style="padding:64px 72px 16px;width:1800px">
+<h1 style="margin:0 0 10px;font-size:48px;line-height:54px;font-weight:800">Phone 3: Stock</h1>
+<p style="margin:0;max-width:940px;font-size:19px;line-height:28px;color:#4D463F">Screens 10 to 13 of the brief, routes <span style="font-family:'Atkinson Hyperlegible Mono',monospace">/stock</span> and <span style="font-family:'Atkinson Hyperlegible Mono',monospace">/compare</span>. Expiring soon = the expiry month starts within 6 weeks (<span style="font-family:'Atkinson Hyperlegible Mono',monospace">rules/stock.ts</span>). The reading states are in <a href="Agapay Local AI States.dc.html">Local AI states</a> (L6 working, L9c couldn't read). Loading and error follow Home 1b and 1d.</p>
+</section>
+
+<section data-screen-label="10-11 Scan and review" style="padding:32px 72px 56px">
+<div style="display:flex;align-items:baseline;gap:14px;margin-bottom:6px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:18px;font-weight:700;color:#4D463F">10–11</span><h2 style="margin:0;font-size:32px;line-height:38px;font-weight:800">Scan a medicine box, review what was read</h2></div>
+<p style="margin:0 0 28px;max-width:960px;font-size:17px;line-height:26px;color:#4D463F">The camera stays inside the app; if it is blocked, the same sheet as Hinga 3d offers “Type it in”. The review is the AI result review (L11): the phone suggests, the health worker confirms. Error state: L9c.</p>
+<div style="display:flex;flex-wrap:wrap;gap:56px 48px;align-items:flex-start;filter:{{ artFilter }}">
+
+<figure id="10a" style="margin:0;width:375px;display:flex;flex-direction:column;gap:14px">
+<figcaption><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700;background:#221D18;color:#F7F4ED;padding:3px 8px;border-radius:6px">10a</span><span style="font-size:18px;font-weight:800">Scan a box</span></div><div style="margin-top:6px;font-size:14px;line-height:20px;color:#4D463F">Wide guide for the lot/expiry panel. Shutter takes the photo, then L6a.</div></figcaption>
+<div data-screen-label="10a Scan a box" style="width:375px;height:812px;position:relative;overflow:hidden;background:#161310;color:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<img src="assets/stock-camera-box.jpg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"><div style="position:absolute;left:0;right:0;top:0;height:100px;background:rgba(22,19,16,0.55)"></div>
+<div style="position:relative"><dc-import name="StatusBar" dark="{{ true }}" online="{{ online }}" hint-size="375px,40px"></dc-import></div>
+<div style="position:relative;display:flex;align-items:center;justify-content:space-between;height:56px;padding:0 20px 0 12px"><button aria-label="Close" style="width:48px;height:48px;border:0;border-radius:999px;background:#2A2621;color:#F7F4ED;display:flex;align-items:center;justify-content:center"><i class="ph-bold ph-x" style="font-size:24px"></i></button><dc-import name="LocalStatus" dark="{{ true }}" online="{{ online }}" hint-size="230px,20px"></dc-import></div>
+<div style="position:absolute;left:0;right:0;top:196px;display:flex;justify-content:center"><span style="padding:6px 14px;border-radius:10px;background:#161310;font-size:18px;line-height:24px;font-weight:800">Fit the lot and expiry inside the box</span></div>
+<div style="position:absolute;left:28px;right:28px;top:248px;height:170px;border:3px solid #F7F4ED;border-radius:16px"></div>
+<div style="position:absolute;left:0;right:0;top:440px;display:flex;justify-content:center"><span style="display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 14px 0 12px;border-radius:999px;background:#161310;color:#F7F4ED;font-size:15px;font-weight:600"><i class="ph-bold ph-sun" style="font-size:18px"></i>Glare? Tilt the box away from the light.</span></div>
+<div style="position:absolute;left:0;right:0;bottom:0;background:#2A2621;border-radius:24px 24px 0 0;padding:20px 20px 24px">
+<div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center">
+<button style="justify-self:start;height:48px;padding:0 4px;background:none;border:0;color:#F7F4ED;font-size:17px;font-weight:700;text-decoration:underline;text-underline-offset:4px">Type it in</button>
+<button aria-label="Take photo" style="width:76px;height:76px;border-radius:999px;background:#F7F4ED;border:0;box-shadow:0 0 0 4px #2A2621,0 0 0 7px #F7F4ED"></button>
+<span></span>
+</div>
+<p style="margin:18px 0 0;text-align:center;font-size:15px;line-height:22px;color:#C7C3BD">Read on this phone. The photo is deleted after.</p>
+</div>
+</div>
+</figure>
+
+<figure id="11a" style="margin:0;width:375px;display:flex;flex-direction:column;gap:14px">
+<figcaption><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700;background:#221D18;color:#F7F4ED;padding:3px 8px;border-radius:6px">11a</span><span style="font-size:18px;font-weight:800">Review the scan (L11)</span></div><div style="margin-top:6px;font-size:14px;line-height:20px;color:#4D463F">Every field editable. “Please check” below CHECK_BELOW. Quantity is always typed. Read time is measured live.</div></figcaption>
+<div data-screen-label="11a Review scan" style="width:375px;height:1060px;position:relative;overflow:hidden;background:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<dc-import name="StatusBar" online="{{ online }}" hint-size="375px,40px"></dc-import>
+<div style="flex:1;min-height:0;overflow:hidden">
+<div style="display:flex;align-items:center;justify-content:space-between;height:56px;padding:0 20px 0 8px"><button aria-label="Back" style="width:48px;height:48px;border:0;background:transparent;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#221D18"><i class="ph-bold ph-arrow-left" style="font-size:26px"></i></button><dc-import name="LocalStatus" online="{{ online }}" hint-size="230px,20px"></dc-import></div>
+<div style="padding:4px 20px 0">
+<div style="display:flex;gap:14px;align-items:center"><img src="assets/stock-box-photo.jpg" alt="The box you photographed" style="flex:none;width:96px;height:72px;border-radius:8px;object-fit:cover"><div style="font-size:15px;line-height:22px;color:#4D463F">Read on this phone in 2.4 s.<br>The photo is deleted when you leave.</div></div>
+<h1 style="margin:20px 0 4px;font-size:26px;line-height:32px;font-weight:700">Check what was read</h1>
+<p style="margin:0;font-size:17px;line-height:25px;color:#4D463F">Fix anything that's wrong. Nothing is saved until you confirm.</p>
+<div style="margin-top:20px;display:flex;flex-direction:column;gap:18px">
+<label style="display:flex;flex-direction:column;gap:8px"><span style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:16px;font-weight:700">Medicine</span><span style="display:inline-flex;align-items:center;gap:5px;font-size:14px;font-weight:700;color:#1D6835"><i class="ph-bold ph-check" style="font-size:16px"></i>Sure</span></span><span style="height:56px;border:2px solid #7B7369;border-radius:12px;background:#FFFDFA;display:flex;align-items:center;padding:0 16px;font-size:18px">Doxycycline</span></label>
+<label style="display:flex;flex-direction:column;gap:8px"><span style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:16px;font-weight:700">Strength</span><span style="display:inline-flex;align-items:center;gap:5px;font-size:14px;font-weight:700;color:#1D6835"><i class="ph-bold ph-check" style="font-size:16px"></i>Sure</span></span><span style="height:56px;border:2px solid #7B7369;border-radius:12px;background:#FFFDFA;display:flex;align-items:center;padding:0 16px;font-size:18px">100 mg</span></label>
+<label style="display:flex;flex-direction:column;gap:8px"><span style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:16px;font-weight:700">Lot number</span><span style="display:inline-flex;align-items:center;gap:5px;font-size:14px;font-weight:700;color:#805216"><i class="ph-bold ph-eye" style="font-size:16px"></i>Please check</span></span><span style="height:56px;border:2px dashed #805216;border-radius:12px;background:#FDEEC5;display:flex;align-items:center;padding:0 16px;font-family:'Atkinson Hyperlegible Mono',monospace;font-size:18px">DEMO-L0T-24A</span><span style="font-size:15px;line-height:22px;font-weight:600;color:#805216">Read with low confidence. Compare it with the box.</span></label>
+<label style="display:flex;flex-direction:column;gap:8px"><span style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:16px;font-weight:700">Expiry</span><span style="display:inline-flex;align-items:center;gap:5px;font-size:14px;font-weight:700;color:#1D6835"><i class="ph-bold ph-check" style="font-size:16px"></i>Sure</span></span><span style="height:56px;border:2px solid #7B7369;border-radius:12px;background:#FFFDFA;display:flex;align-items:center;justify-content:space-between;padding:0 14px 0 16px;font-size:18px">November 2026<i class="ph-bold ph-calendar-blank" style="font-size:22px"></i></span></label>
+<div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:16px;font-weight:700">How many on hand</span><div style="display:grid;grid-template-columns:1fr 1.2fr;gap:10px"><span style="height:56px;border:2px solid #7B7369;border-radius:12px;background:#FFFDFA;display:flex;align-items:center;padding:0 16px;font-size:18px;font-variant-numeric:tabular-nums">30</span><span style="height:56px;border:2px solid #7B7369;border-radius:12px;background:#FFFDFA;display:flex;align-items:center;justify-content:space-between;padding:0 14px 0 16px;font-size:18px">capsules<i class="ph-bold ph-caret-down" style="font-size:20px"></i></span></div><span style="font-size:15px;color:#4D463F">Count what is in the box. The phone doesn't guess this.</span></div>
+</div>
+<button style="margin-top:14px;display:flex;align-items:center;justify-content:space-between;width:100%;min-height:52px;padding:0;background:none;border:0;border-top:1px solid #D9D3CA;color:#221D18;font-size:16px;font-weight:700">All text read from the box<i class="ph-bold ph-caret-down" style="font-size:20px"></i></button>
+</div>
+</div>
+<div style="padding:12px 20px 12px;border-top:1px solid #D9D3CA;background:#F7F4ED"><button style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border-radius:12px;background:#221D18;color:#FFFDFA;border:0;font-size:18px;font-weight:700"><i class="ph-bold ph-check" style="font-size:22px"></i>Confirm<span style="color:#C7C3BD;font-weight:600">· Kumpirmahin</span></button><button style="display:block;margin:4px auto 0;height:48px;padding:0 8px;background:none;border:0;color:#221D18;font-size:17px;font-weight:700;text-decoration:underline;text-underline-offset:4px">Scan again</button></div>
+</div>
+</figure>
+
+</div>
+</section>
+
+<section data-screen-label="12 Stock list" style="padding:32px 72px 56px">
+<div style="display:flex;align-items:baseline;gap:14px;margin-bottom:6px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:18px;font-weight:700;color:#4D463F">12</span><h2 style="margin:0;font-size:32px;line-height:38px;font-weight:800">Stock list</h2></div>
+<p style="margin:0 0 28px;max-width:960px;font-size:17px;line-height:26px;color:#4D463F">Lots sorted by expiry. Expiring soon gets its own group at the top and the amber pill; expired lots (not shown) get the red “Expired: set aside” pill and are not counted as on hand.</p>
+<div style="display:flex;flex-wrap:wrap;gap:56px 48px;align-items:flex-start;filter:{{ artFilter }}">
+
+<figure id="12a" style="margin:0;width:375px;display:flex;flex-direction:column;gap:14px">
+<figcaption><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700;background:#221D18;color:#F7F4ED;padding:3px 8px;border-radius:6px">12a</span><span style="font-size:18px;font-weight:800">Default</span></div><div style="margin-top:6px;font-size:14px;line-height:20px;color:#4D463F">The comparison row opens screen 13. Rows open the lot to edit the count.</div></figcaption>
+<div data-screen-label="12a Stock list" style="width:375px;height:960px;position:relative;overflow:hidden;background:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<dc-import name="StatusBar" online="{{ online }}" hint-size="375px,40px"></dc-import>
+<div style="flex:1;min-height:0;overflow:hidden">
+<header style="padding:4px 20px 0"><h1 style="margin:0;font-size:26px;line-height:32px;font-weight:700">Stock</h1><div style="margin-top:2px;font-size:16px;line-height:24px;color:#4D463F">Maligaya-D health station · Sample data</div><div style="margin-top:8px"><dc-import name="LocalStatus" online="{{ online }}" hint-size="335px,20px"></dc-import></div></header>
+<a style="margin:16px 20px 0;display:flex;align-items:center;gap:12px;min-height:64px;padding:12px 14px 12px 16px;background:#FFFDFA;border:1px solid #D9D3CA;border-radius:12px;color:#221D18;text-decoration:none"><div style="flex:1"><div style="font-size:17px;line-height:24px;font-weight:800">Exposure and stock</div><div style="font-size:15px;line-height:22px;color:#4D463F">12 exposed · 40 doxycycline capsules</div></div><i class="ph-bold ph-caret-right" style="font-size:22px;color:#696259"></i></a>
+<h2 style="margin:22px 20px 6px;font-size:20px;line-height:26px;font-weight:700">Expires within 6 weeks</h2>
+<div style="border-top:1px solid #D9D3CA">
+<a style="display:flex;gap:12px;padding:14px 20px;border-bottom:1px solid #D9D3CA;background:#FDEEC5;color:#221D18;text-decoration:none"><div style="flex:1;min-width:0"><div style="font-size:18px;line-height:24px;font-weight:700">Doxycycline 100 mg</div><div style="font-size:15px;line-height:22px;color:#4D463F"><span style="font-family:'Atkinson Hyperlegible Mono',monospace">DEMO-LOT-24A</span> · EXP Nov 2026</div><div style="margin-top:6px"><span style="display:inline-flex;align-items:center;gap:5px;height:28px;padding:0 10px 0 8px;border-radius:999px;background:#FFFDFA;color:#805216;font-size:14px;font-weight:700"><i class="ph-bold ph-clock" style="font-size:16px"></i>Expires within 6 weeks</span></div></div><div style="text-align:right"><div style="font-size:22px;line-height:26px;font-weight:800;font-variant-numeric:tabular-nums">30</div><div style="font-size:14px;color:#4D463F">capsules</div></div></a>
+</div>
+<h2 style="margin:22px 20px 6px;font-size:20px;line-height:26px;font-weight:700">All stock</h2>
+<div style="border-top:1px solid #D9D3CA">
+<a style="display:flex;gap:12px;padding:14px 20px;border-bottom:1px solid #D9D3CA;color:#221D18;text-decoration:none"><div style="flex:1;min-width:0"><div style="font-size:18px;line-height:24px;font-weight:700">Oral rehydration salts 20.5 g</div><div style="font-size:15px;line-height:22px;color:#4D463F"><span style="font-family:'Atkinson Hyperlegible Mono',monospace">DEMO-LOT-27E</span> · EXP Jan 2027</div></div><div style="text-align:right"><div style="font-size:22px;line-height:26px;font-weight:800;font-variant-numeric:tabular-nums">50</div><div style="font-size:14px;color:#4D463F">sachets</div></div></a>
+<a style="display:flex;gap:12px;padding:14px 20px;border-bottom:1px solid #D9D3CA;color:#221D18;text-decoration:none"><div style="flex:1;min-width:0"><div style="font-size:18px;line-height:24px;font-weight:700">Amoxicillin 500 mg</div><div style="font-size:15px;line-height:22px;color:#4D463F"><span style="font-family:'Atkinson Hyperlegible Mono',monospace">DEMO-LOT-23D</span> · EXP Mar 2027</div></div><div style="text-align:right"><div style="font-size:22px;line-height:26px;font-weight:800;font-variant-numeric:tabular-nums">100</div><div style="font-size:14px;color:#4D463F">capsules</div></div></a>
+<a style="display:flex;gap:12px;padding:14px 20px;border-bottom:1px solid #D9D3CA;color:#221D18;text-decoration:none"><div style="flex:1;min-width:0"><div style="font-size:18px;line-height:24px;font-weight:700">Doxycycline 100 mg</div><div style="font-size:15px;line-height:22px;color:#4D463F"><span style="font-family:'Atkinson Hyperlegible Mono',monospace">DEMO-LOT-25B</span> · EXP Jul 2027</div></div><div style="text-align:right"><div style="font-size:22px;line-height:26px;font-weight:800;font-variant-numeric:tabular-nums">10</div><div style="font-size:14px;color:#4D463F">capsules</div></div></a>
+<a style="display:flex;gap:12px;padding:14px 20px;border-bottom:1px solid #D9D3CA;color:#221D18;text-decoration:none"><div style="flex:1;min-width:0"><div style="font-size:18px;line-height:24px;font-weight:700">Paracetamol 500 mg</div><div style="font-size:15px;line-height:22px;color:#4D463F"><span style="font-family:'Atkinson Hyperlegible Mono',monospace">DEMO-LOT-26C</span> · EXP Dec 2027</div></div><div style="text-align:right"><div style="font-size:22px;line-height:26px;font-weight:800;font-variant-numeric:tabular-nums">200</div><div style="font-size:14px;color:#4D463F">tablets</div></div></a>
+</div>
+</div>
+<div style="padding:12px 20px 14px;border-top:1px solid #D9D3CA;background:#F7F4ED"><button style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border-radius:12px;background:#221D18;color:#FFFDFA;border:0;font-size:18px;font-weight:700"><i class="ph-bold ph-scan" style="font-size:22px"></i>Scan a box</button></div>
+<dc-import name="BottomNav" active="stock" hint-size="375px,78px"></dc-import>
+</div>
+</figure>
+
+<figure id="12b" style="margin:0;width:375px;display:flex;flex-direction:column;gap:14px">
+<figcaption><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700;background:#221D18;color:#F7F4ED;padding:3px 8px;border-radius:6px">12b</span><span style="font-size:18px;font-weight:800">Empty</span></div><div style="margin-top:6px;font-size:14px;line-height:20px;color:#4D463F">One action, Scan a box, plus the manual path.</div></figcaption>
+<div data-screen-label="12b Stock empty" style="width:375px;height:812px;position:relative;overflow:hidden;background:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<dc-import name="StatusBar" online="{{ online }}" hint-size="375px,40px"></dc-import>
+<div style="flex:1;min-height:0;overflow:hidden">
+<header style="padding:4px 20px 0"><h1 style="margin:0;font-size:26px;line-height:32px;font-weight:700">Stock</h1><div style="margin-top:2px;font-size:16px;line-height:24px;color:#4D463F">Maligaya-D health station</div><div style="margin-top:8px"><dc-import name="LocalStatus" online="{{ online }}" hint-size="335px,20px"></dc-import></div></header>
+<div style="margin:96px 28px 0;display:flex;flex-direction:column;align-items:center;text-align:center">
+<span style="width:64px;height:64px;border-radius:999px;background:#EBE6DD;display:flex;align-items:center;justify-content:center"><i class="ph-bold ph-package" style="font-size:32px"></i></span>
+<div style="margin-top:16px;font-size:22px;line-height:28px;font-weight:800">No medicine recorded yet</div>
+<p style="margin:8px 0 0;font-size:17px;line-height:25px;color:#4D463F;text-wrap:pretty">Scan a box to add its lot and expiry. It takes a few seconds and works offline.</p>
+<button style="height:48px;margin-top:4px;padding:0 8px;background:none;border:0;color:#221D18;font-size:17px;font-weight:700;text-decoration:underline;text-underline-offset:4px">Type it in instead</button>
+</div>
+</div>
+<div style="padding:12px 20px 14px"><button style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border-radius:12px;background:#221D18;color:#FFFDFA;border:0;font-size:18px;font-weight:700"><i class="ph-bold ph-scan" style="font-size:22px"></i>Scan a box</button></div>
+<dc-import name="BottomNav" active="stock" hint-size="375px,78px"></dc-import>
+</div>
+</figure>
+
+</div>
+</section>
+
+<section data-screen-label="13 Exposure vs stock" style="padding:32px 72px 96px">
+<div style="display:flex;align-items:baseline;gap:14px;margin-bottom:6px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:18px;font-weight:700;color:#4D463F">13</span><h2 style="margin:0;font-size:32px;line-height:38px;font-weight:800">Exposure and stock</h2></div>
+<p style="margin:0 0 28px;max-width:960px;font-size:17px;line-height:26px;color:#4D463F">Facts from <span style="font-family:'Atkinson Hyperlegible Mono',monospace">reviewExposureStock()</span> and one action: flag for a clinician. Never a dose, never a per-person number of capsules.</p>
+<div style="display:flex;flex-wrap:wrap;gap:56px 48px;align-items:flex-start;filter:{{ artFilter }}">
+
+<figure id="13a" style="margin:0;width:375px;display:flex;flex-direction:column;gap:14px">
+<figcaption><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700;background:#221D18;color:#F7F4ED;padding:3px 8px;border-radius:6px">13a</span><span style="font-size:18px;font-weight:800">Default: flag for review</span></div><div style="margin-top:6px;font-size:14px;line-height:20px;color:#4D463F">The reasons list is the rule output, word for word. The flag goes into the next QR as a count.</div></figcaption>
+<div data-screen-label="13a Exposure and stock" style="width:375px;height:900px;position:relative;overflow:hidden;background:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<dc-import name="StatusBar" online="{{ online }}" hint-size="375px,40px"></dc-import>
+<div style="flex:1;min-height:0;overflow:hidden">
+<div style="display:flex;align-items:center;justify-content:space-between;height:56px;padding:0 20px 0 8px"><button aria-label="Back" style="width:48px;height:48px;border:0;background:transparent;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#221D18"><i class="ph-bold ph-arrow-left" style="font-size:26px"></i></button><dc-import name="LocalStatus" online="{{ online }}" hint-size="230px,20px"></dc-import></div>
+<div style="padding:4px 20px 0"><h1 style="margin:0;font-size:26px;line-height:32px;font-weight:700">Exposure and stock</h1><div style="margin-top:2px;font-size:16px;line-height:24px;color:#4D463F">Maligaya-D · Sample data</div></div>
+<div style="margin-top:16px;border-top:1px solid #D9D3CA">
+<div style="display:grid;grid-template-columns:64px minmax(0,1fr);align-items:center;gap:8px;padding:12px 20px;border-bottom:1px solid #D9D3CA"><span style="font-size:34px;line-height:38px;font-weight:800;font-variant-numeric:tabular-nums">12</span><span style="font-size:18px;line-height:24px;font-weight:700">people exposed to floodwater</span></div>
+<div style="display:grid;grid-template-columns:64px minmax(0,1fr);align-items:center;gap:8px;padding:12px 20px;border-bottom:1px solid #D9D3CA"><span style="font-size:34px;line-height:38px;font-weight:800;font-variant-numeric:tabular-nums">40</span><span style="font-size:18px;line-height:24px;font-weight:700">doxycycline capsules on hand</span></div>
+<div style="display:grid;grid-template-columns:64px minmax(0,1fr);align-items:center;gap:8px;padding:12px 20px;border-bottom:1px solid #D9D3CA"><span style="font-size:34px;line-height:38px;font-weight:800;font-variant-numeric:tabular-nums;color:#805216">30</span><span style="display:flex;align-items:center;gap:8px;font-size:18px;line-height:24px;font-weight:700;color:#805216"><i class="ph-bold ph-clock" style="font-size:20px"></i>of them expire within 6 weeks</span></div>
+</div>
+<h2 style="margin:22px 20px 8px;font-size:20px;line-height:26px;font-weight:700">Why a clinician should look</h2>
+<ul style="margin:0 20px;padding-left:22px;font-size:17px;line-height:25px">
+<li>12 residents are in or near the leptospirosis watch window.</li>
+<li style="margin-top:6px">30 doxycycline capsules expire within 6 weeks.</li>
+</ul>
+<h2 style="margin:22px 20px 6px;font-size:20px;line-height:26px;font-weight:700">Doxycycline lots</h2>
+<div style="border-top:1px solid #D9D3CA">
+<div style="display:flex;justify-content:space-between;gap:12px;padding:12px 20px;border-bottom:1px solid #D9D3CA"><div><div style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:16px;font-weight:700">DEMO-LOT-24A</div><div style="display:flex;align-items:center;gap:5px;font-size:15px;font-weight:700;color:#805216"><i class="ph-bold ph-clock" style="font-size:16px"></i>EXP Nov 2026 · within 6 weeks</div></div><div style="font-size:16px;font-weight:700;white-space:nowrap">30 capsules</div></div>
+<div style="display:flex;justify-content:space-between;gap:12px;padding:12px 20px;border-bottom:1px solid #D9D3CA"><div><div style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:16px;font-weight:700">DEMO-LOT-25B</div><div style="font-size:15px;color:#4D463F">EXP Jul 2027 · usable</div></div><div style="font-size:16px;font-weight:700;white-space:nowrap">10 capsules</div></div>
+</div>
+<div style="margin:18px 20px 0;display:flex;gap:12px;padding:14px 16px;background:#EBE6DD;border-radius:12px"><i class="ph-bold ph-info" style="font-size:22px;flex:none"></i><span style="font-size:16px;line-height:24px">Agapay never suggests a dose. Doxycycline is given only after consultation with a health professional (DOH).</span></div>
+</div>
+<div style="padding:12px 20px 20px;border-top:1px solid #D9D3CA;background:#F7F4ED"><button style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border-radius:12px;background:#221D18;color:#FFFDFA;border:0;font-size:18px;font-weight:700"><i class="ph-bold ph-flag" style="font-size:22px"></i>Flag for clinician review<span style="color:#C7C3BD;font-weight:600">· I-flag</span></button></div>
+</div>
+</figure>
+
+<figure id="13b" style="margin:0;width:375px;display:flex;flex-direction:column;gap:14px">
+<figcaption><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700;background:#221D18;color:#F7F4ED;padding:3px 8px;border-radius:6px">13b</span><span style="font-size:18px;font-weight:800">Flagged</span></div><div style="margin-top:6px;font-size:14px;line-height:20px;color:#4D463F">The action becomes a status. “Mark as reviewed” after the clinician has looked (secondary).</div></figcaption>
+<div data-screen-label="13b Flagged" style="width:375px;height:812px;position:relative;overflow:hidden;background:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<dc-import name="StatusBar" online="{{ online }}" hint-size="375px,40px"></dc-import>
+<div style="flex:1;min-height:0;overflow:hidden">
+<div style="display:flex;align-items:center;justify-content:space-between;height:56px;padding:0 20px 0 8px"><button aria-label="Back" style="width:48px;height:48px;border:0;background:transparent;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#221D18"><i class="ph-bold ph-arrow-left" style="font-size:26px"></i></button><dc-import name="LocalStatus" online="{{ online }}" hint-size="230px,20px"></dc-import></div>
+<div style="padding:4px 20px 0"><h1 style="margin:0;font-size:26px;line-height:32px;font-weight:700">Exposure and stock</h1><div style="margin-top:2px;font-size:16px;line-height:24px;color:#4D463F">Maligaya-D · Sample data</div></div>
+<div role="status" style="margin:16px 20px 0;display:flex;gap:12px;align-items:flex-start;padding:14px 16px;background:#DFF6E2;color:#1D6835;border-radius:12px"><i class="ph-bold ph-flag" style="font-size:24px;flex:none"></i><div><div style="font-size:17px;line-height:24px;font-weight:800">Flagged for clinician review</div><div style="font-size:15px;line-height:22px;font-weight:600">Sat, Oct 10, 9:01 AM. It goes in the next QR as a count.</div></div></div>
+<div style="margin-top:16px;border-top:1px solid #D9D3CA">
+<div style="display:grid;grid-template-columns:64px minmax(0,1fr);align-items:center;gap:8px;padding:12px 20px;border-bottom:1px solid #D9D3CA"><span style="font-size:34px;line-height:38px;font-weight:800;font-variant-numeric:tabular-nums">12</span><span style="font-size:18px;line-height:24px;font-weight:700">people exposed to floodwater</span></div>
+<div style="display:grid;grid-template-columns:64px minmax(0,1fr);align-items:center;gap:8px;padding:12px 20px;border-bottom:1px solid #D9D3CA"><span style="font-size:34px;line-height:38px;font-weight:800;font-variant-numeric:tabular-nums">40</span><span style="font-size:18px;line-height:24px;font-weight:700">doxycycline capsules on hand</span></div>
+<div style="display:grid;grid-template-columns:64px minmax(0,1fr);align-items:center;gap:8px;padding:12px 20px;border-bottom:1px solid #D9D3CA"><span style="font-size:34px;line-height:38px;font-weight:800;font-variant-numeric:tabular-nums;color:#805216">30</span><span style="display:flex;align-items:center;gap:8px;font-size:18px;line-height:24px;font-weight:700;color:#805216"><i class="ph-bold ph-clock" style="font-size:20px"></i>of them expire within 6 weeks</span></div>
+</div>
+<div style="margin:18px 20px 0;display:flex;gap:12px;padding:14px 16px;background:#EBE6DD;border-radius:12px"><i class="ph-bold ph-info" style="font-size:22px;flex:none"></i><span style="font-size:16px;line-height:24px">Agapay never suggests a dose. Doxycycline is given only after consultation with a health professional (DOH).</span></div>
+</div>
+<div style="padding:12px 20px 20px"><button style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border-radius:12px;background:#FFFDFA;color:#221D18;border:2px solid #221D18;font-size:18px;font-weight:700"><i class="ph-bold ph-check" style="font-size:22px"></i>Mark as reviewed</button></div>
+</div>
+</figure>
+
+</div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;online&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Preview&quot;},&quot;grayscale&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Preview&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const t = (v) => v === true || v === 'true';
+    return { online: t(this.props.online), artFilter: t(this.props.grayscale) ? 'grayscale(1)' : 'none' };
+  }
+}
+</script>
+</body>
+</html>

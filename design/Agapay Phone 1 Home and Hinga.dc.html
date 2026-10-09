@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<title>Agapay · Phone 1: Home and Hinga</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;500;700&family=Atkinson+Hyperlegible+Next:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+<style>
+body{margin:0;background:#E4DED3;color:#221D18;font-family:'Atkinson Hyperlegible Next',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#221D18;text-decoration:underline;text-underline-offset:3px}
+a:hover{color:#4D463F;text-decoration-thickness:2px}
+button{font-family:inherit}
+</style>
+</helmet>
+
+<section data-screen-label="Phone 1 header" style="padding:64px 72px 16px;width:1800px">
+<h1 style="margin:0 0 10px;font-size:48px;line-height:54px;font-weight:800">Phone 1: Home and Hinga</h1>
+<p style="margin:0;max-width:900px;font-size:19px;line-height:28px;color:#4D463F">Screens 1 to 7 of the brief, every state. All data is sample data for San Isidro Demo, barangay Maligaya-D, on Saturday, Oct 10, 2026 (the flood started Sunday, Oct 4). Tokens and components: <a href="Agapay Design System.dc.html">Design system</a>. Model download and AI states: <a href="Agapay Local AI States.dc.html">Local AI states</a>. Strings: <a href="COPY.md">COPY.md</a>.</p>
+</section>
+
+<section data-screen-label="01 Home" style="padding:32px 72px 56px">
+<div style="display:flex;align-items:baseline;gap:14px;margin-bottom:6px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:18px;font-weight:700;color:#4D463F">01</span><h2 style="margin:0;font-size:32px;line-height:38px;font-weight:800">Home: barangay overview</h2></div>
+<p style="margin:0 0 28px;max-width:960px;font-size:17px;line-height:26px;color:#4D463F">Route <span style="font-family:'Atkinson Hyperlegible Mono',monospace">/</span>. One primary action: Check breathing. Rows open Watch list, Hinga history and Stock. The shield opens Privacy &amp; AI. The flood bar has 15 segments: days done in ink, days to go in line color.</p>
+<div style="display:flex;flex-wrap:wrap;gap:56px 48px;align-items:flex-start;filter:{{ artFilter }}">
+
+<figure id="1a" style="margin:0;width:375px;display:flex;flex-direction:column;gap:14px">
+<figcaption><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700;background:#221D18;color:#F7F4ED;padding:3px 8px;border-radius:6px">1a</span><span style="font-size:18px;font-weight:800">Default</span></div><div style="margin-top:6px;font-size:14px;line-height:20px;color:#4D463F">Ready and offline. Numbers come from the records on this phone.</div></figcaption>
+<div data-screen-label="1a Home default" style="width:375px;height:812px;position:relative;overflow:hidden;background:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<dc-import name="StatusBar" online="{{ online }}" hint-size="375px,40px"></dc-import>
+<div style="flex:1;min-height:0;overflow:hidden">
+<header style="padding:4px 10px 0 20px;display:flex;align-items:flex-start;justify-content:space-between">
+<div><h1 style="margin:0;font-size:26px;line-height:32px;font-weight:700">Maligaya-D</h1><div style="margin-top:2px;font-size:16px;line-height:24px;color:#4D463F">San Isidro Demo · Sample data</div></div>
+<button aria-label="Privacy and AI" style="width:48px;height:48px;border:0;background:transparent;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#221D18"><i class="ph-bold ph-shield-check" style="font-size:26px"></i></button>
+</header>
+<div style="padding:8px 20px 0"><dc-import name="LocalStatus" online="{{ online }}" hint-size="335px,20px"></dc-import></div>
+<div style="margin:20px 20px 0;background:#FFFDFA;border:1px solid #D9D3CA;border-radius:16px;box-shadow:0 1px 2px rgba(34,29,24,0.08),0 1px 1px rgba(34,29,24,0.04);padding:16px 18px">
+<div style="display:flex;align-items:center;justify-content:space-between"><span style="display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;color:#4D463F"><i class="ph-bold ph-drop" style="font-size:20px"></i>Flood watch</span><span style="font-size:15px;color:#4D463F">Since Sun, Oct 4</span></div>
+<div style="margin-top:4px;font-size:24px;line-height:30px;font-weight:800">Day 6 of 15</div>
+<div aria-hidden="true" style="margin-top:12px;display:grid;grid-template-columns:repeat(15,minmax(0,1fr));gap:3px">
+<span style="height:10px;border-radius:3px;background:#221D18"></span><span style="height:10px;border-radius:3px;background:#221D18"></span><span style="height:10px;border-radius:3px;background:#221D18"></span><span style="height:10px;border-radius:3px;background:#221D18"></span><span style="height:10px;border-radius:3px;background:#221D18"></span><span style="height:10px;border-radius:3px;background:#221D18"></span><span style="height:10px;border-radius:3px;background:#D9D3CA"></span><span style="height:10px;border-radius:3px;background:#D9D3CA"></span><span style="height:10px;border-radius:3px;background:#D9D3CA"></span><span style="height:10px;border-radius:3px;background:#D9D3CA"></span><span style="height:10px;border-radius:3px;background:#D9D3CA"></span><span style="height:10px;border-radius:3px;background:#D9D3CA"></span><span style="height:10px;border-radius:3px;background:#D9D3CA"></span><span style="height:10px;border-radius:3px;background:#D9D3CA"></span><span style="height:10px;border-radius:3px;background:#D9D3CA"></span>
+</div>
+<div style="margin-top:8px;display:flex;justify-content:space-between;font-size:14px;line-height:20px;color:#4D463F"><span>Purok 1, 2, 3</span><span>Watch window Oct 9 to 19</span></div>
+</div>
+<h2 style="margin:22px 20px 6px;font-size:20px;line-height:26px;font-weight:700">Today, Sat Oct 10</h2>
+<div style="border-top:1px solid #D9D3CA">
+<a style="display:grid;grid-template-columns:56px minmax(0,1fr) 24px;align-items:center;gap:8px;padding:12px 16px 12px 20px;border-bottom:1px solid #D9D3CA;color:#221D18;text-decoration:none"><span style="font-size:32px;line-height:36px;font-weight:800;font-variant-numeric:tabular-nums">12</span><span><span style="display:block;font-size:18px;line-height:24px;font-weight:700">On the watch list</span><span style="display:block;font-size:15px;line-height:22px;color:#4D463F">9 in the window now · 3 start Oct 15</span></span><i class="ph-bold ph-caret-right" style="font-size:22px;color:#696259"></i></a>
+<a style="display:grid;grid-template-columns:56px minmax(0,1fr) 24px;align-items:center;gap:8px;padding:12px 16px 12px 20px;border-bottom:1px solid #D9D3CA;color:#221D18;text-decoration:none"><span style="font-size:32px;line-height:36px;font-weight:800;font-variant-numeric:tabular-nums">1</span><span><span style="display:block;font-size:18px;line-height:24px;font-weight:700">Child with fast breathing</span><span style="display:block;font-size:15px;line-height:22px;color:#4D463F">Referred Tue, Oct 6</span></span><i class="ph-bold ph-caret-right" style="font-size:22px;color:#696259"></i></a>
+<a style="display:grid;grid-template-columns:56px minmax(0,1fr) 24px;align-items:center;gap:8px;padding:12px 16px 12px 20px;border-bottom:1px solid #D9D3CA;color:#221D18;text-decoration:none"><span style="font-size:32px;line-height:36px;font-weight:800;font-variant-numeric:tabular-nums">40</span><span><span style="display:block;font-size:18px;line-height:24px;font-weight:700">Doxycycline capsules</span><span style="display:flex;align-items:center;gap:6px;font-size:15px;line-height:22px;font-weight:700;color:#805216"><i class="ph-bold ph-clock" style="font-size:17px"></i>30 expire within 6 weeks</span></span><i class="ph-bold ph-caret-right" style="font-size:22px;color:#696259"></i></a>
+</div>
+</div>
+<div style="padding:12px 20px 14px"><button style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border-radius:12px;background:#221D18;color:#FFFDFA;border:0;font-size:18px;font-weight:700"><i class="ph-bold ph-wind" style="font-size:24px"></i>Check breathing<span style="color:#C7C3BD;font-weight:600">· Hinga</span></button></div>
+<dc-import name="BottomNav" active="home" hint-size="375px,78px"></dc-import>
+</div>
+</figure>
+
+<figure id="1b" style="margin:0;width:375px;display:flex;flex-direction:column;gap:14px">
+<figcaption><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700;background:#221D18;color:#F7F4ED;padding:3px 8px;border-radius:6px">1b</span><span style="font-size:18px;font-weight:800">Loading</span></div><div style="margin-top:6px;font-size:14px;line-height:20px;color:#4D463F">Skeletons in --sunken while IndexedDB opens. Check breathing works without records, so it stays on.</div></figcaption>
+<div data-screen-label="1b Home loading" style="width:375px;height:812px;position:relative;overflow:hidden;background:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<dc-import name="StatusBar" online="{{ online }}" hint-size="375px,40px"></dc-import>
+<div style="flex:1;min-height:0;overflow:hidden">
+<header style="padding:4px 10px 0 20px;display:flex;align-items:flex-start;justify-content:space-between">
+<div><h1 style="margin:0;font-size:26px;line-height:32px;font-weight:700">Maligaya-D</h1><div style="margin-top:6px;width:150px;height:18px;border-radius:6px;background:#EBE6DD"></div></div>
+<button aria-label="Privacy and AI" style="width:48px;height:48px;border:0;background:transparent;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#221D18"><i class="ph-bold ph-shield-check" style="font-size:26px"></i></button>
+</header>
+<div style="padding:8px 20px 0"><dc-import name="LocalStatus" online="{{ online }}" hint-size="335px,20px"></dc-import></div>
+<div role="status" style="display:flex;align-items:center;gap:8px;margin:18px 20px 0;font-size:15px;font-weight:600;color:#4D463F"><i class="ph-bold ph-circle-notch" style="font-size:18px"></i>Opening the records on this phone…</div>
+<div style="margin:12px 20px 0;height:122px;border-radius:16px;background:#EBE6DD"></div>
+<div style="margin:26px 20px 14px;width:170px;height:22px;border-radius:6px;background:#EBE6DD"></div>
+<div style="border-top:1px solid #D9D3CA">
+<div style="display:flex;align-items:center;gap:16px;padding:16px 20px;border-bottom:1px solid #D9D3CA"><span style="width:40px;height:34px;border-radius:8px;background:#EBE6DD"></span><span style="flex:1"><span style="display:block;width:170px;height:16px;border-radius:6px;background:#EBE6DD"></span><span style="display:block;margin-top:8px;width:120px;height:12px;border-radius:6px;background:#EBE6DD"></span></span></div>
+<div style="display:flex;align-items:center;gap:16px;padding:16px 20px;border-bottom:1px solid #D9D3CA"><span style="width:40px;height:34px;border-radius:8px;background:#EBE6DD"></span><span style="flex:1"><span style="display:block;width:190px;height:16px;border-radius:6px;background:#EBE6DD"></span><span style="display:block;margin-top:8px;width:100px;height:12px;border-radius:6px;background:#EBE6DD"></span></span></div>
+<div style="display:flex;align-items:center;gap:16px;padding:16px 20px;border-bottom:1px solid #D9D3CA"><span style="width:40px;height:34px;border-radius:8px;background:#EBE6DD"></span><span style="flex:1"><span style="display:block;width:160px;height:16px;border-radius:6px;background:#EBE6DD"></span><span style="display:block;margin-top:8px;width:140px;height:12px;border-radius:6px;background:#EBE6DD"></span></span></div>
+</div>
+</div>
+<div style="padding:12px 20px 14px"><button style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border-radius:12px;background:#221D18;color:#FFFDFA;border:0;font-size:18px;font-weight:700"><i class="ph-bold ph-wind" style="font-size:24px"></i>Check breathing<span style="color:#C7C3BD;font-weight:600">· Hinga</span></button></div>
+<dc-import name="BottomNav" active="home" hint-size="375px,78px"></dc-import>
+</div>
+</figure>
+
+<figure id="1c" style="margin:0;width:375px;display:flex;flex-direction:column;gap:14px">
+<figcaption><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700;background:#221D18;color:#F7F4ED;padding:3px 8px;border-radius:6px">1c</span><span style="font-size:18px;font-weight:800">Empty: no flood, no records</span></div><div style="margin-top:6px;font-size:14px;line-height:20px;color:#4D463F">A cleared phone: no records, no flood. One next step (Check breathing) and one link (Log a flood, 8a).</div></figcaption>
+<div data-screen-label="1c Home empty" style="width:375px;height:812px;position:relative;overflow:hidden;background:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<dc-import name="StatusBar" online="{{ online }}" hint-size="375px,40px"></dc-import>
+<div style="flex:1;min-height:0;overflow:hidden">
+<header style="padding:4px 10px 0 20px;display:flex;align-items:flex-start;justify-content:space-between">
+<div><h1 style="margin:0;font-size:26px;line-height:32px;font-weight:700">Maligaya-D</h1><div style="margin-top:2px;font-size:16px;line-height:24px;color:#4D463F">San Isidro Demo</div></div>
+<button aria-label="Privacy and AI" style="width:48px;height:48px;border:0;background:transparent;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#221D18"><i class="ph-bold ph-shield-check" style="font-size:26px"></i></button>
+</header>
+<div style="padding:8px 20px 0"><dc-import name="LocalStatus" online="{{ online }}" hint-size="335px,20px"></dc-import></div>
+<div style="margin:88px 28px 0;display:flex;flex-direction:column;align-items:center;text-align:center">
+<span style="width:64px;height:64px;border-radius:999px;background:#EBE6DD;display:flex;align-items:center;justify-content:center"><i class="ph-bold ph-file-text" style="font-size:32px"></i></span>
+<div style="margin-top:16px;font-size:22px;line-height:28px;font-weight:800">Nothing recorded yet</div>
+<p style="margin:8px 0 0;font-size:17px;line-height:25px;color:#4D463F;text-wrap:pretty">Start with a breathing check. When floodwater reaches the barangay, log the flood to start a 15-day leptospirosis watch.</p>
+<button style="display:flex;align-items:center;gap:6px;height:48px;margin-top:4px;padding:0 8px;background:none;border:0;color:#221D18;font-size:18px;font-weight:700;text-decoration:underline;text-underline-offset:4px">Log a flood<i class="ph-bold ph-arrow-right" style="font-size:20px"></i></button>
+</div>
+</div>
+<div style="padding:12px 20px 14px"><button style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border-radius:12px;background:#221D18;color:#FFFDFA;border:0;font-size:18px;font-weight:700"><i class="ph-bold ph-wind" style="font-size:24px"></i>Check breathing<span style="color:#C7C3BD;font-weight:600">· Hinga</span></button></div>
+<dc-import name="BottomNav" active="home" hint-size="375px,78px"></dc-import>
+</div>
+</figure>
+
+<figure id="1d" style="margin:0;width:375px;display:flex;flex-direction:column;gap:14px">
+<figcaption><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700;background:#221D18;color:#F7F4ED;padding:3px 8px;border-radius:6px">1d</span><span style="font-size:18px;font-weight:800">Error: records won't open</span></div><div style="margin-top:6px;font-size:14px;line-height:20px;color:#4D463F">Try again is the primary here, so Check breathing drops to secondary.</div></figcaption>
+<div data-screen-label="1d Home error" style="width:375px;height:812px;position:relative;overflow:hidden;background:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<dc-import name="StatusBar" online="{{ online }}" hint-size="375px,40px"></dc-import>
+<div style="flex:1;min-height:0;overflow:hidden">
+<header style="padding:4px 10px 0 20px;display:flex;align-items:flex-start;justify-content:space-between">
+<div><h1 style="margin:0;font-size:26px;line-height:32px;font-weight:700">Maligaya-D</h1><div style="margin-top:2px;font-size:16px;line-height:24px;color:#4D463F">San Isidro Demo</div></div>
+<button aria-label="Privacy and AI" style="width:48px;height:48px;border:0;background:transparent;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#221D18"><i class="ph-bold ph-shield-check" style="font-size:26px"></i></button>
+</header>
+<div style="padding:8px 20px 0"><dc-import name="LocalStatus" online="{{ online }}" hint-size="335px,20px"></dc-import></div>
+<div role="alert" style="margin:72px 20px 0;display:flex;flex-direction:column;align-items:center;text-align:center">
+<span style="width:72px;height:72px;border-radius:999px;background:#FFE8E5;color:#AC2724;display:flex;align-items:center;justify-content:center"><i class="ph-bold ph-warning-circle" style="font-size:38px"></i></span>
+<div style="margin-top:16px;font-size:22px;line-height:28px;font-weight:800">Couldn't open the records</div>
+<p style="margin:8px 0 22px;font-size:17px;line-height:25px;color:#4D463F;text-wrap:pretty">Nothing was lost. Your records are still saved on this phone.</p>
+<button style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border-radius:12px;background:#221D18;color:#FFFDFA;border:0;font-size:18px;font-weight:700"><i class="ph-bold ph-arrow-clockwise" style="font-size:22px"></i>Try again<span style="color:#C7C3BD;font-weight:600">· Subukan ulit</span></button>
+<p style="margin:14px 0 0;font-size:15px;line-height:22px;color:#4D463F">Still stuck? Close Agapay and open it again.</p>
+</div>
+</div>
+<div style="padding:12px 20px 14px"><button style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border-radius:12px;background:#FFFDFA;color:#221D18;border:2px solid #221D18;font-size:18px;font-weight:700"><i class="ph-bold ph-wind" style="font-size:24px"></i>Check breathing</button></div>
+<dc-import name="BottomNav" active="home" hint-size="375px,78px"></dc-import>
+</div>
+</figure>
+
+</div>
+</section>
+
+<section data-screen-label="02-04 Hinga steps" style="padding:32px 72px 56px">
+<div style="display:flex;align-items:baseline;gap:14px;margin-bottom:6px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:18px;font-weight:700;color:#4D463F">02–04</span><h2 style="margin:0;font-size:32px;line-height:38px;font-weight:800">Hinga: age, framing, counting</h2></div>
+<p style="margin:0 0 28px;max-width:960px;font-size:17px;line-height:26px;color:#4D463F">Route <span style="font-family:'Atkinson Hyperlegible Mono',monospace">/hinga</span>. A focused flow: no bottom nav. Camera steps are dark (--night) so the feed reads in sun; the torso guide is dashed while searching and turns solid green with a word when the chest is found. Cut-offs from WHO IMCI 2014 (<span style="font-family:'Atkinson Hyperlegible Mono',monospace">imci.ts</span>).</p>
+<div style="display:flex;flex-wrap:wrap;gap:56px 48px;align-items:flex-start;filter:{{ artFilter }}">
+
+<figure id="2a" style="margin:0;width:375px;display:flex;flex-direction:column;gap:14px">
+<figcaption><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700;background:#221D18;color:#F7F4ED;padding:3px 8px;border-radius:6px">2a</span><span style="font-size:18px;font-weight:800">Step 1: age and readiness</span></div><div style="margin-top:6px;font-size:14px;line-height:20px;color:#4D463F">Next stays disabled (style in DS) until an age is picked and the box is ticked. Resident is optional.</div></figcaption>
+<div data-screen-label="2a Hinga step 1" style="width:375px;height:812px;position:relative;overflow:hidden;background:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<dc-import name="StatusBar" online="{{ online }}" hint-size="375px,40px"></dc-import>
+<div style="flex:1;min-height:0;overflow:hidden">
+<div style="display:flex;align-items:center;justify-content:space-between;height:56px;padding:0 20px 0 8px"><button aria-label="Back" style="width:48px;height:48px;border:0;background:transparent;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#221D18"><i class="ph-bold ph-arrow-left" style="font-size:26px"></i></button><dc-import name="LocalStatus" online="{{ online }}" hint-size="230px,20px"></dc-import></div>
+<div style="padding:4px 20px 0">
+<div style="display:flex;align-items:center;gap:10px"><span style="display:grid;grid-template-columns:repeat(3,28px);gap:4px"><span style="height:6px;border-radius:3px;background:#221D18"></span><span style="height:6px;border-radius:3px;background:#D9D3CA"></span><span style="height:6px;border-radius:3px;background:#D9D3CA"></span></span><span style="font-size:15px;font-weight:700;color:#4D463F">Hinga · step 1 of 3</span></div>
+<h1 style="margin:12px 0 4px;font-size:26px;line-height:32px;font-weight:700">How old is the child?</h1>
+<p style="margin:0;font-size:16px;line-height:24px;color:#4D463F">The cut-off for fast breathing depends on age.</p>
+</div>
+<div role="radiogroup" style="margin:16px 20px 0;background:#FFFDFA;border:1px solid #D9D3CA;border-radius:16px;overflow:hidden">
+<div style="display:flex;align-items:center;gap:14px;min-height:60px;padding:10px 16px;border-bottom:1px solid #D9D3CA"><span style="flex:none;width:28px;height:28px;border-radius:999px;border:2px solid #7B7369"></span><span style="flex:1;font-size:18px">Under 2 months</span><span style="font-size:15px;color:#4D463F">fast: 60+ /min</span></div>
+<div style="display:flex;align-items:center;gap:14px;min-height:60px;padding:10px 16px;border-bottom:1px solid #D9D3CA"><span style="flex:none;width:28px;height:28px;border-radius:999px;border:2px solid #7B7369"></span><span style="flex:1;font-size:18px">2–12 months</span><span style="font-size:15px;color:#4D463F">fast: 50+ /min</span></div>
+<div aria-checked="true" style="display:flex;align-items:center;gap:14px;min-height:60px;padding:10px 16px;background:#F7F4ED"><span style="flex:none;width:28px;height:28px;border-radius:999px;border:2px solid #221D18;display:flex;align-items:center;justify-content:center"><span style="width:14px;height:14px;border-radius:999px;background:#221D18"></span></span><span style="flex:1;font-size:18px;font-weight:700">1–5 years</span><span style="font-size:15px;font-weight:700">fast: 40+ /min</span></div>
+</div>
+<h2 style="margin:24px 20px 10px;font-size:20px;line-height:26px;font-weight:700">Before you start</h2>
+<div style="margin:0 20px;display:flex;gap:14px;align-items:flex-start;padding:14px 16px;background:#FFFDFA;border:1px solid #D9D3CA;border-radius:16px"><span style="flex:none;width:28px;height:28px;border-radius:6px;background:#221D18;color:#FFFDFA;display:flex;align-items:center;justify-content:center"><i class="ph-bold ph-check" style="font-size:18px"></i></span><span style="font-size:17px;line-height:25px;font-weight:700">The child is calm: not crying, not feeding, and the chest is visible.</span></div>
+<label style="margin:20px 20px 0;display:flex;flex-direction:column;gap:8px"><span style="font-size:16px;font-weight:700">Link a resident <span style="font-weight:500;color:#4D463F">(optional)</span></span><span style="height:56px;border:2px solid #7B7369;border-radius:12px;background:#FFFDFA;display:flex;align-items:center;justify-content:space-between;padding:0 14px 0 16px;font-size:18px">Residente 010 · HH-02<i class="ph-bold ph-caret-down" style="font-size:22px"></i></span></label>
+</div>
+<div style="padding:12px 20px 20px"><button style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border-radius:12px;background:#221D18;color:#FFFDFA;border:0;font-size:18px;font-weight:700">Next: point the camera<i class="ph-bold ph-arrow-right" style="font-size:22px"></i></button></div>
+</div>
+</figure>
+
+<figure id="3a" style="margin:0;width:375px;display:flex;flex-direction:column;gap:14px">
+<figcaption><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700;background:#221D18;color:#F7F4ED;padding:3px 8px;border-radius:6px">3a</span><span style="font-size:18px;font-weight:800">Step 2: framing, looking</span></div><div style="margin-top:6px;font-size:14px;line-height:20px;color:#4D463F">The pose model looks for the torso. Start stays off until it is found.</div></figcaption>
+<div data-screen-label="3a Hinga framing looking" style="width:375px;height:812px;position:relative;overflow:hidden;background:#161310;color:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<img src="assets/hinga-camera-torso.jpg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"><div style="position:absolute;left:0;right:0;top:0;height:100px;background:rgba(22,19,16,0.55)"></div>
+<div style="position:relative"><dc-import name="StatusBar" dark="{{ true }}" online="{{ online }}" hint-size="375px,40px"></dc-import></div>
+<div style="position:relative;display:flex;align-items:center;justify-content:space-between;height:56px;padding:0 20px 0 12px"><button aria-label="Cancel the check" style="width:48px;height:48px;border:0;border-radius:999px;background:#2A2621;color:#F7F4ED;display:flex;align-items:center;justify-content:center"><i class="ph-bold ph-x" style="font-size:24px"></i></button><dc-import name="LocalStatus" dark="{{ true }}" online="{{ online }}" hint-size="230px,20px"></dc-import></div>
+<div style="position:absolute;left:68px;top:162px;width:240px;height:290px;border:3px dashed #F7F4ED;border-radius:32px"><span style="position:absolute;left:12px;top:12px;height:30px;padding:0 10px;border-radius:999px;background:#161310;color:#F7F4ED;font-size:14px;font-weight:700;display:flex;align-items:center">Chest here</span></div>
+<div style="position:absolute;left:0;right:0;bottom:0;background:#2A2621;border-radius:24px 24px 0 0;padding:20px 20px 24px">
+<div style="font-size:15px;font-weight:700;color:#C7C3BD">Hinga · step 2 of 3</div>
+<div style="margin-top:6px;font-size:24px;line-height:30px;font-weight:800">Point at the chest. Hold the phone still.</div>
+<div role="status" style="margin-top:12px;display:flex;align-items:center;gap:8px;font-size:17px;font-weight:600;color:#C7C3BD"><i class="ph-bold ph-circle-notch" style="font-size:20px"></i>Looking for the chest…</div>
+<button disabled style="margin-top:18px;display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border-radius:12px;background:#3B362F;color:#A49D93;border:0;font-size:18px;font-weight:700">Start counting</button>
+</div>
+</div>
+</figure>
+
+<figure id="3b" style="margin:0;width:375px;display:flex;flex-direction:column;gap:14px">
+<figcaption><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700;background:#221D18;color:#F7F4ED;padding:3px 8px;border-radius:6px">3b</span><span style="font-size:18px;font-weight:800">Step 2: chest found, ready</span></div><div style="margin-top:6px;font-size:14px;line-height:20px;color:#4D463F">Guide goes solid green with “Chest found”. On dark, the primary button is paper with ink text.</div></figcaption>
+<div data-screen-label="3b Hinga framing ready" style="width:375px;height:812px;position:relative;overflow:hidden;background:#161310;color:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<img src="assets/hinga-camera-torso.jpg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"><div style="position:absolute;left:0;right:0;top:0;height:100px;background:rgba(22,19,16,0.55)"></div>
+<div style="position:relative"><dc-import name="StatusBar" dark="{{ true }}" online="{{ online }}" hint-size="375px,40px"></dc-import></div>
+<div style="position:relative;display:flex;align-items:center;justify-content:space-between;height:56px;padding:0 20px 0 12px"><button aria-label="Cancel the check" style="width:48px;height:48px;border:0;border-radius:999px;background:#2A2621;color:#F7F4ED;display:flex;align-items:center;justify-content:center"><i class="ph-bold ph-x" style="font-size:24px"></i></button><dc-import name="LocalStatus" dark="{{ true }}" online="{{ online }}" hint-size="230px,20px"></dc-import></div>
+<div style="position:absolute;left:68px;top:162px;width:240px;height:290px;border:4px solid #83DC97;border-radius:32px"><span style="position:absolute;left:12px;top:12px;height:30px;padding:0 10px 0 8px;gap:6px;border-radius:999px;background:#161310;color:#83DC97;font-size:14px;font-weight:700;display:flex;align-items:center"><i class="ph-bold ph-check-circle" style="font-size:18px"></i>Chest found</span></div>
+<div style="position:absolute;left:0;right:0;bottom:0;background:#2A2621;border-radius:24px 24px 0 0;padding:20px 20px 24px">
+<div style="font-size:15px;font-weight:700;color:#C7C3BD">Hinga · step 2 of 3</div>
+<div style="margin-top:6px;font-size:24px;line-height:30px;font-weight:800">Point at the chest. Hold the phone still.</div>
+<div role="status" style="margin-top:12px;display:flex;align-items:center;gap:8px;font-size:17px;font-weight:700;color:#83DC97"><i class="ph-bold ph-check-circle" style="font-size:20px"></i>Chest found. Ready to count.</div>
+<button style="margin-top:18px;display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border-radius:12px;background:#F7F4ED;color:#221D18;border:0;font-size:18px;font-weight:700"><i class="ph-bold ph-timer" style="font-size:22px"></i>Start counting<span style="color:#4D463F;font-weight:600">· Simulan</span></button>
+</div>
+</div>
+</figure>
+
+<figure id="3c" style="margin:0;width:375px;display:flex;flex-direction:column;gap:14px">
+<figcaption><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700;background:#221D18;color:#F7F4ED;padding:3px 8px;border-radius:6px">3c</span><span style="font-size:18px;font-weight:800">Before the camera prompt</span></div><div style="margin-top:6px;font-size:14px;line-height:20px;color:#4D463F">First run only. Says why, then Continue triggers the browser's camera and microphone prompt.</div></figcaption>
+<div data-screen-label="3c Camera pre-permission" style="width:375px;height:812px;position:relative;overflow:hidden;background:#161310;color:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<dc-import name="StatusBar" dark="{{ true }}" online="{{ online }}" hint-size="375px,40px"></dc-import>
+<div style="display:flex;align-items:center;justify-content:space-between;height:56px;padding:0 20px 0 12px"><button aria-label="Cancel the check" style="width:48px;height:48px;border:0;border-radius:999px;background:#2A2621;color:#F7F4ED;display:flex;align-items:center;justify-content:center"><i class="ph-bold ph-x" style="font-size:24px"></i></button><dc-import name="LocalStatus" dark="{{ true }}" online="{{ online }}" hint-size="230px,20px"></dc-import></div>
+<div style="position:absolute;left:0;right:0;bottom:0;background:#FFFDFA;color:#221D18;border-radius:24px 24px 0 0;padding:12px 20px 24px">
+<div style="width:40px;height:5px;border-radius:999px;background:#D9D3CA;margin:0 auto 18px"></div>
+<span style="width:56px;height:56px;border-radius:999px;background:#EBE6DD;display:flex;align-items:center;justify-content:center"><i class="ph-bold ph-camera" style="font-size:30px"></i></span>
+<h3 style="margin:16px 0 6px;font-size:24px;line-height:30px;font-weight:800">Next, allow the camera and microphone</h3>
+<p style="margin:0 0 20px;font-size:18px;line-height:26px;text-wrap:pretty">The camera counts breaths. The microphone listens for crying. Nothing is recorded, and nothing leaves this phone.</p>
+<button style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border-radius:12px;background:#221D18;color:#FFFDFA;border:0;font-size:18px;font-weight:700">Continue</button>
+</div>
+</div>
+</figure>
+
+<figure id="3d" style="margin:0;width:375px;display:flex;flex-direction:column;gap:14px">
+<figcaption><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700;background:#221D18;color:#F7F4ED;padding:3px 8px;border-radius:6px">3d</span><span style="font-size:18px;font-weight:800">Camera blocked</span></div><div style="margin-top:6px;font-size:14px;line-height:20px;color:#4D463F">Permission denied or no camera. The fallback is counting by hand with the app's 60-second timer (Local AI states L8b).</div></figcaption>
+<div data-screen-label="3d Camera blocked" style="width:375px;height:812px;position:relative;overflow:hidden;background:#161310;color:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<dc-import name="StatusBar" dark="{{ true }}" online="{{ online }}" hint-size="375px,40px"></dc-import>
+<div style="display:flex;align-items:center;justify-content:space-between;height:56px;padding:0 20px 0 12px"><button aria-label="Close" style="width:48px;height:48px;border:0;border-radius:999px;background:#2A2621;color:#F7F4ED;display:flex;align-items:center;justify-content:center"><i class="ph-bold ph-x" style="font-size:24px"></i></button><dc-import name="LocalStatus" dark="{{ true }}" online="{{ online }}" hint-size="230px,20px"></dc-import></div>
+<div style="position:absolute;left:0;right:0;bottom:0;background:#FFFDFA;color:#221D18;border-radius:24px 24px 0 0;padding:12px 20px 20px">
+<div style="width:40px;height:5px;border-radius:999px;background:#D9D3CA;margin:0 auto 18px"></div>
+<span style="width:56px;height:56px;border-radius:999px;background:#EBE6DD;display:flex;align-items:center;justify-content:center"><i class="ph-bold ph-camera-slash" style="font-size:30px"></i></span>
+<h3 style="margin:16px 0 6px;font-size:24px;line-height:30px;font-weight:800">The camera is blocked</h3>
+<p style="margin:0 0 20px;font-size:18px;line-height:26px;text-wrap:pretty">Hinga can't count without it. To allow it, open this site's settings in your browser and turn on Camera.</p>
+<button style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border-radius:12px;background:#221D18;color:#FFFDFA;border:0;font-size:18px;font-weight:700"><i class="ph-bold ph-timer" style="font-size:22px"></i>Count by hand with a timer</button>
+<button style="display:block;margin:6px auto 0;height:48px;padding:0 8px;background:none;border:0;color:#221D18;font-size:17px;font-weight:700;text-decoration:underline;text-underline-offset:4px">I turned it on: try again</button>
+</div>
+</div>
+</figure>
+
+<figure id="4a" style="margin:0;width:375px;display:flex;flex-direction:column;gap:14px">
+<figcaption><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700;background:#221D18;color:#F7F4ED;padding:3px 8px;border-radius:6px">4a</span><span style="font-size:18px;font-weight:800">Step 3: counting, 60 s</span></div><div style="margin-top:6px;font-size:14px;line-height:20px;color:#4D463F">Live trace of chest movement. No running count, so nobody reads a half-done number. The bar fills over 60 s.</div></figcaption>
+<div data-screen-label="4a Hinga counting" style="width:375px;height:812px;position:relative;overflow:hidden;background:#161310;color:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<img src="assets/hinga-camera-torso.jpg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"><div style="position:absolute;left:0;right:0;top:0;height:128px;background:rgba(22,19,16,0.55)"></div>
+<div style="position:relative"><dc-import name="StatusBar" dark="{{ true }}" online="{{ online }}" hint-size="375px,40px"></dc-import></div>
+<div style="position:relative;display:flex;align-items:center;justify-content:space-between;height:64px;padding:0 20px 0 12px"><button style="height:48px;padding:0 18px;border:0;border-radius:999px;background:#2A2621;color:#F7F4ED;font-size:17px;font-weight:700">Cancel</button><div style="display:flex;align-items:baseline;gap:6px"><span role="timer" style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:36px;line-height:40px;font-weight:700">0:42</span><span style="font-size:16px;font-weight:600;color:#C7C3BD">left</span></div></div>
+<div style="position:relative;padding:0 20px"><dc-import name="LocalStatus" dark="{{ true }}" online="{{ online }}" hint-size="230px,20px"></dc-import></div>
+<div style="position:absolute;left:78px;top:200px;width:220px;height:250px;border:3px solid #F7F4ED;border-radius:28px"></div>
+<div style="position:absolute;left:0;right:0;bottom:0;background:#2A2621;border-radius:24px 24px 0 0;padding:20px 20px 24px">
+<div style="display:flex;align-items:baseline;justify-content:space-between"><span style="font-size:34px;line-height:40px;font-weight:800">Hold still</span><span style="font-size:15px;font-weight:700;color:#C7C3BD">step 3 of 3</span></div>
+<div style="margin-top:12px;height:76px;border-radius:12px;background:#161310;position:relative;overflow:hidden">
+<span style="position:absolute;left:0;right:0;top:38px;height:1px;background:#3B362F"></span>
+<svg width="335" height="76" viewBox="0 0 335 76" style="position:absolute;inset:0" aria-label="Breathing trace"><polyline points="{{ tracePoints }}" fill="none" stroke="#F7F4ED" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"></polyline></svg>
+</div>
+<div style="margin-top:14px;height:10px;border-radius:999px;background:#3B362F;overflow:hidden"><div style="width:30%;height:100%;border-radius:999px;background:#F7F4ED"></div></div>
+<div style="margin-top:12px;display:flex;align-items:center;gap:8px;font-size:15px;line-height:22px;color:#C7C3BD"><i class="ph-bold ph-microphone" style="font-size:18px"></i>Listening for crying. Nothing is recorded.</div>
+</div>
+</div>
+</figure>
+
+</div>
+</section>
+
+<section data-screen-label="05 Hinga refusals" style="padding:32px 72px 56px">
+<div style="display:flex;align-items:baseline;gap:14px;margin-bottom:6px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:18px;font-weight:700;color:#4D463F">05</span><h2 style="margin:0;font-size:32px;line-height:38px;font-weight:800">Hinga refusals</h2></div>
+<p style="margin:0 0 28px;max-width:960px;font-size:17px;line-height:26px;color:#4D463F">The quality gate stops the count and says why. Amber, not red: it is a caution, not a failure. Each sheet has exactly one action, Try again, which returns to step 2. Nothing is saved.</p>
+<div style="display:flex;flex-wrap:wrap;gap:56px 48px;align-items:flex-start;filter:{{ artFilter }}">
+
+<figure id="5a" style="margin:0;width:375px;display:flex;flex-direction:column;gap:14px">
+<figcaption><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700;background:#221D18;color:#F7F4ED;padding:3px 8px;border-radius:6px">5a</span><span style="font-size:18px;font-weight:800">Crying detected</span></div><div style="margin-top:6px;font-size:14px;line-height:20px;color:#4D463F">From the on-device sound check (YAMNet).</div></figcaption>
+<div data-screen-label="5a Refusal crying" style="width:375px;height:812px;position:relative;overflow:hidden;background:#161310;color:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<img src="assets/hinga-camera-torso.jpg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+<div style="position:absolute;inset:0;background:rgba(22,19,16,0.6)"></div>
+<div style="position:relative"><dc-import name="StatusBar" dark="{{ true }}" online="{{ online }}" hint-size="375px,40px"></dc-import></div>
+<div style="position:relative;display:flex;align-items:center;gap:12px;height:56px;padding:0 20px 0 12px"><button aria-label="Close" style="width:48px;height:48px;border:0;border-radius:999px;background:#2A2621;color:#F7F4ED;display:flex;align-items:center;justify-content:center"><i class="ph-bold ph-x" style="font-size:24px"></i></button><span style="font-size:17px;font-weight:700">Count stopped</span></div>
+<div style="position:absolute;left:0;right:0;bottom:0;background:#FFFDFA;color:#221D18;border-radius:24px 24px 0 0;padding:12px 20px 24px;box-shadow:0 12px 32px rgba(34,29,24,0.18)">
+<div style="width:40px;height:5px;border-radius:999px;background:#D9D3CA;margin:0 auto 18px"></div>
+<span style="width:56px;height:56px;border-radius:999px;background:#FDEEC5;color:#805216;display:flex;align-items:center;justify-content:center"><i class="ph-bold ph-speaker-high" style="font-size:30px"></i></span>
+<h3 style="margin:16px 0 6px;font-size:24px;line-height:30px;font-weight:800">Crying detected</h3>
+<p style="margin:0;font-size:18px;line-height:26px;text-wrap:pretty">Wait until the child is calm, then count again. Crying changes the breathing rate.</p>
+<p style="margin:8px 0 20px;font-size:15px;line-height:22px;color:#4D463F">Nothing was saved.</p>
+<button style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border-radius:12px;background:#221D18;color:#FFFDFA;border:0;font-size:18px;font-weight:700"><i class="ph-bold ph-arrow-clockwise" style="font-size:22px"></i>Try again<span style="color:#C7C3BD;font-weight:600">· Subukan ulit</span></button>
+</div>
+</div>
+</figure>
+
+<figure id="5b" style="margin:0;width:375px;display:flex;flex-direction:column;gap:14px">
+<figcaption><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700;background:#221D18;color:#F7F4ED;padding:3px 8px;border-radius:6px">5b</span><span style="font-size:18px;font-weight:800">Too much movement</span></div><div style="margin-top:6px;font-size:14px;line-height:20px;color:#4D463F">From the motion-quality gate.</div></figcaption>
+<div data-screen-label="5b Refusal movement" style="width:375px;height:812px;position:relative;overflow:hidden;background:#161310;color:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<img src="assets/hinga-camera-torso.jpg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+<div style="position:absolute;inset:0;background:rgba(22,19,16,0.6)"></div>
+<div style="position:relative"><dc-import name="StatusBar" dark="{{ true }}" online="{{ online }}" hint-size="375px,40px"></dc-import></div>
+<div style="position:relative;display:flex;align-items:center;gap:12px;height:56px;padding:0 20px 0 12px"><button aria-label="Close" style="width:48px;height:48px;border:0;border-radius:999px;background:#2A2621;color:#F7F4ED;display:flex;align-items:center;justify-content:center"><i class="ph-bold ph-x" style="font-size:24px"></i></button><span style="font-size:17px;font-weight:700">Count stopped</span></div>
+<div style="position:absolute;left:0;right:0;bottom:0;background:#FFFDFA;color:#221D18;border-radius:24px 24px 0 0;padding:12px 20px 24px;box-shadow:0 12px 32px rgba(34,29,24,0.18)">
+<div style="width:40px;height:5px;border-radius:999px;background:#D9D3CA;margin:0 auto 18px"></div>
+<span style="width:56px;height:56px;border-radius:999px;background:#FDEEC5;color:#805216;display:flex;align-items:center;justify-content:center"><i class="ph-bold ph-vibrate" style="font-size:30px"></i></span>
+<h3 style="margin:16px 0 6px;font-size:24px;line-height:30px;font-weight:800">Too much movement</h3>
+<p style="margin:0;font-size:18px;line-height:26px;text-wrap:pretty">Steady the phone. Rest your elbows on your knees or a table, and keep the chest inside the box.</p>
+<p style="margin:8px 0 20px;font-size:15px;line-height:22px;color:#4D463F">Nothing was saved.</p>
+<button style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border-radius:12px;background:#221D18;color:#FFFDFA;border:0;font-size:18px;font-weight:700"><i class="ph-bold ph-arrow-clockwise" style="font-size:22px"></i>Try again<span style="color:#C7C3BD;font-weight:600">· Subukan ulit</span></button>
+</div>
+</div>
+</figure>
+
+<figure id="5c" style="margin:0;width:375px;display:flex;flex-direction:column;gap:14px">
+<figcaption><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700;background:#221D18;color:#F7F4ED;padding:3px 8px;border-radius:6px">5c</span><span style="font-size:18px;font-weight:800">Can't see the chest</span></div><div style="margin-top:6px;font-size:14px;line-height:20px;color:#4D463F">Torso lost or too dark during the count.</div></figcaption>
+<div data-screen-label="5c Refusal chest not visible" style="width:375px;height:812px;position:relative;overflow:hidden;background:#161310;color:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<img src="assets/hinga-camera-torso.jpg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+<div style="position:absolute;inset:0;background:rgba(22,19,16,0.6)"></div>
+<div style="position:relative"><dc-import name="StatusBar" dark="{{ true }}" online="{{ online }}" hint-size="375px,40px"></dc-import></div>
+<div style="position:relative;display:flex;align-items:center;gap:12px;height:56px;padding:0 20px 0 12px"><button aria-label="Close" style="width:48px;height:48px;border:0;border-radius:999px;background:#2A2621;color:#F7F4ED;display:flex;align-items:center;justify-content:center"><i class="ph-bold ph-x" style="font-size:24px"></i></button><span style="font-size:17px;font-weight:700">Count stopped</span></div>
+<div style="position:absolute;left:0;right:0;bottom:0;background:#FFFDFA;color:#221D18;border-radius:24px 24px 0 0;padding:12px 20px 24px;box-shadow:0 12px 32px rgba(34,29,24,0.18)">
+<div style="width:40px;height:5px;border-radius:999px;background:#D9D3CA;margin:0 auto 18px"></div>
+<span style="width:56px;height:56px;border-radius:999px;background:#FDEEC5;color:#805216;display:flex;align-items:center;justify-content:center"><i class="ph-bold ph-eye-slash" style="font-size:30px"></i></span>
+<h3 style="margin:16px 0 6px;font-size:24px;line-height:30px;font-weight:800">Can't see the chest clearly</h3>
+<p style="margin:0;font-size:18px;line-height:26px;text-wrap:pretty">Move to brighter light or lift the shirt. Keep the whole chest inside the box.</p>
+<p style="margin:8px 0 20px;font-size:15px;line-height:22px;color:#4D463F">Nothing was saved.</p>
+<button style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border-radius:12px;background:#221D18;color:#FFFDFA;border:0;font-size:18px;font-weight:700"><i class="ph-bold ph-arrow-clockwise" style="font-size:22px"></i>Try again<span style="color:#C7C3BD;font-weight:600">· Subukan ulit</span></button>
+</div>
+</div>
+</figure>
+
+<figure id="5d" style="margin:0;width:375px;display:flex;flex-direction:column;gap:14px">
+<figcaption><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700;background:#221D18;color:#F7F4ED;padding:3px 8px;border-radius:6px">5d</span><span style="font-size:18px;font-weight:800">Readings didn't agree</span></div><div style="margin-top:6px;font-size:14px;line-height:20px;color:#4D463F">The two counting methods (FFT and zero-crossing) disagreed.</div></figcaption>
+<div data-screen-label="5d Refusal disagree" style="width:375px;height:812px;position:relative;overflow:hidden;background:#161310;color:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<img src="assets/hinga-camera-torso.jpg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+<div style="position:absolute;inset:0;background:rgba(22,19,16,0.6)"></div>
+<div style="position:relative"><dc-import name="StatusBar" dark="{{ true }}" online="{{ online }}" hint-size="375px,40px"></dc-import></div>
+<div style="position:relative;display:flex;align-items:center;gap:12px;height:56px;padding:0 20px 0 12px"><button aria-label="Close" style="width:48px;height:48px;border:0;border-radius:999px;background:#2A2621;color:#F7F4ED;display:flex;align-items:center;justify-content:center"><i class="ph-bold ph-x" style="font-size:24px"></i></button><span style="font-size:17px;font-weight:700">Count stopped</span></div>
+<div style="position:absolute;left:0;right:0;bottom:0;background:#FFFDFA;color:#221D18;border-radius:24px 24px 0 0;padding:12px 20px 24px;box-shadow:0 12px 32px rgba(34,29,24,0.18)">
+<div style="width:40px;height:5px;border-radius:999px;background:#D9D3CA;margin:0 auto 18px"></div>
+<span style="width:56px;height:56px;border-radius:999px;background:#FDEEC5;color:#805216;display:flex;align-items:center;justify-content:center"><i class="ph-bold ph-arrows-split" style="font-size:30px"></i></span>
+<h3 style="margin:16px 0 6px;font-size:24px;line-height:30px;font-weight:800">Readings didn't agree</h3>
+<p style="margin:0;font-size:18px;line-height:26px;text-wrap:pretty">The phone counted two ways and got different numbers, so this count isn't safe to use.</p>
+<p style="margin:8px 0 20px;font-size:15px;line-height:22px;color:#4D463F">Nothing was saved.</p>
+<button style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border-radius:12px;background:#221D18;color:#FFFDFA;border:0;font-size:18px;font-weight:700"><i class="ph-bold ph-arrow-clockwise" style="font-size:22px"></i>Try again<span style="color:#C7C3BD;font-weight:600">· Subukan ulit</span></button>
+</div>
+</div>
+</figure>
+
+</div>
+</section>
+
+<section data-screen-label="06-07 Hinga results" style="padding:32px 72px 96px">
+<div style="display:flex;align-items:baseline;gap:14px;margin-bottom:6px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:18px;font-weight:700;color:#4D463F">06–07</span><h2 style="margin:0;font-size:32px;line-height:38px;font-weight:800">Hinga results</h2></div>
+<p style="margin:0 0 28px;max-width:960px;font-size:17px;line-height:26px;color:#4D463F">Color follows the IMCI chart BHWs already know: amber band = refer, red band = URGENT, green = not fast. Each band also carries an icon and a word. 6a and 6b scroll (taller frames); the save bar stays fixed. Never a diagnosis, never a dose.</p>
+<div style="display:flex;flex-wrap:wrap;gap:56px 48px;align-items:flex-start;filter:{{ artFilter }}">
+
+<figure id="6a" style="margin:0;width:375px;display:flex;flex-direction:column;gap:14px">
+<figcaption><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700;background:#221D18;color:#F7F4ED;padding:3px 8px;border-radius:6px">6a</span><span style="font-size:18px;font-weight:800">Fast breathing: refer</span></div><div style="margin-top:6px;font-size:14px;line-height:20px;color:#4D463F">Ticking any danger sign turns the screen into 6b immediately.</div></figcaption>
+<div data-screen-label="6a Result fast" style="width:375px;height:968px;position:relative;overflow:hidden;background:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<dc-import name="StatusBar" online="{{ online }}" hint-size="375px,40px"></dc-import>
+<div style="flex:1;min-height:0;overflow:hidden">
+<div style="display:flex;align-items:center;justify-content:space-between;height:56px;padding:0 20px 0 8px"><button aria-label="Close" style="width:48px;height:48px;border:0;background:transparent;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#221D18"><i class="ph-bold ph-x" style="font-size:26px"></i></button><dc-import name="LocalStatus" online="{{ online }}" hint-size="230px,20px"></dc-import></div>
+<div style="padding:0 20px;font-size:15px;line-height:22px;color:#4D463F">Residente 010 · HH-02 · 1–5 years · 8:31 AM</div>
+<div style="margin:10px 20px 0;background:#F4C352;color:#221D18;border-radius:16px;padding:16px 18px 18px">
+<div style="display:flex;align-items:center;gap:8px;font-size:17px;line-height:22px;font-weight:800"><i class="ph-bold ph-warning" style="font-size:20px"></i>Fast breathing for age</div>
+<div style="margin-top:8px;display:flex;align-items:baseline;gap:8px"><span style="font-size:56px;line-height:56px;font-weight:800;font-variant-numeric:tabular-nums">52</span><span style="font-size:20px;font-weight:700">breaths a minute</span></div>
+<div style="margin-top:8px;font-size:16px;line-height:24px;font-weight:600">The cut-off for 1–5 years is 40.</div>
+</div>
+<div style="margin:20px 20px 0"><div style="font-size:34px;line-height:40px;font-weight:800;letter-spacing:-0.01em">I-refer ngayon</div><p style="margin:4px 0 0;font-size:18px;line-height:26px">Refer to the midwife or RHU now.</p></div>
+<div style="margin:22px 20px 0;background:#FFFDFA;border:1px solid #D9D3CA;border-radius:16px;overflow:hidden">
+<div style="padding:16px 16px 12px;border-bottom:1px solid #D9D3CA"><h2 style="margin:0;font-size:20px;line-height:26px;font-weight:700">Check for danger signs</h2><p style="margin:4px 0 0;font-size:15px;line-height:22px;color:#4D463F">Tick any you see. One tick makes this URGENT.</p></div>
+<div style="display:flex;align-items:center;gap:14px;min-height:58px;padding:10px 16px;border-bottom:1px solid #D9D3CA"><span style="flex:none;width:28px;height:28px;border-radius:6px;border:2px solid #7B7369;background:#FFFDFA"></span><span style="font-size:17px;line-height:23px">Chest pulls in when breathing in <span style="color:#4D463F">(chest indrawing)</span></span></div>
+<div style="display:flex;align-items:center;gap:14px;min-height:58px;padding:10px 16px;border-bottom:1px solid #D9D3CA"><span style="flex:none;width:28px;height:28px;border-radius:6px;border:2px solid #7B7369;background:#FFFDFA"></span><span style="font-size:17px;line-height:23px">Harsh noise when breathing in <span style="color:#4D463F">(stridor)</span></span></div>
+<div style="display:flex;align-items:center;gap:14px;min-height:58px;padding:10px 16px;border-bottom:1px solid #D9D3CA"><span style="flex:none;width:28px;height:28px;border-radius:6px;border:2px solid #7B7369;background:#FFFDFA"></span><span style="font-size:17px;line-height:23px">Can't drink or breastfeed</span></div>
+<div style="display:flex;align-items:center;gap:14px;min-height:58px;padding:10px 16px;border-bottom:1px solid #D9D3CA"><span style="flex:none;width:28px;height:28px;border-radius:6px;border:2px solid #7B7369;background:#FFFDFA"></span><span style="font-size:17px;line-height:23px">Convulsions <span style="color:#4D463F">(kombulsyon)</span></span></div>
+<div style="display:flex;align-items:center;gap:14px;min-height:58px;padding:10px 16px"><span style="flex:none;width:28px;height:28px;border-radius:6px;border:2px solid #7B7369;background:#FFFDFA"></span><span style="font-size:17px;line-height:23px">Very sleepy or hard to wake</span></div>
+</div>
+<div style="margin:16px 20px 0;display:flex;align-items:center;gap:8px;font-size:15px;line-height:22px;font-weight:600;color:#4D463F"><i class="ph-bold ph-info" style="font-size:20px"></i>Screening aid only. Not a diagnosis.</div>
+</div>
+<div style="padding:12px 20px 20px;border-top:1px solid #D9D3CA;background:#F7F4ED"><button style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border-radius:12px;background:#221D18;color:#FFFDFA;border:0;font-size:18px;font-weight:700">Save to the record<span style="color:#C7C3BD;font-weight:600">· I-save</span></button></div>
+</div>
+</figure>
+
+<figure id="6b" style="margin:0;width:375px;display:flex;flex-direction:column;gap:14px">
+<figcaption><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700;background:#221D18;color:#F7F4ED;padding:3px 8px;border-radius:6px">6b</span><span style="font-size:18px;font-weight:800">Danger sign ticked: URGENT</span></div><div style="margin-top:6px;font-size:14px;line-height:20px;color:#4D463F">The band turns red, the headline becomes “I-refer agad”, and the save button says URGENT.</div></figcaption>
+<div data-screen-label="6b Result urgent" style="width:375px;height:968px;position:relative;overflow:hidden;background:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<dc-import name="StatusBar" online="{{ online }}" hint-size="375px,40px"></dc-import>
+<div style="flex:1;min-height:0;overflow:hidden">
+<div style="display:flex;align-items:center;justify-content:space-between;height:56px;padding:0 20px 0 8px"><button aria-label="Close" style="width:48px;height:48px;border:0;background:transparent;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#221D18"><i class="ph-bold ph-x" style="font-size:26px"></i></button><dc-import name="LocalStatus" online="{{ online }}" hint-size="230px,20px"></dc-import></div>
+<div style="padding:0 20px;font-size:15px;line-height:22px;color:#4D463F">Residente 010 · HH-02 · 1–5 years · 8:31 AM</div>
+<div role="alert" style="margin:10px 20px 0;background:#B32322;color:#FFFDFA;border-radius:16px;padding:16px 18px 18px">
+<div style="display:flex;align-items:center;gap:8px;font-size:17px;line-height:22px;font-weight:800"><i class="ph-bold ph-warning-circle" style="font-size:20px"></i>Urgent · danger sign</div>
+<div style="margin-top:8px;display:flex;align-items:baseline;gap:8px"><span style="font-size:56px;line-height:56px;font-weight:800;font-variant-numeric:tabular-nums">52</span><span style="font-size:20px;font-weight:700">breaths a minute</span></div>
+<div style="margin-top:8px;font-size:16px;line-height:24px;font-weight:600">Fast for 1–5 years (cut-off 40), and chest indrawing.</div>
+</div>
+<div style="margin:20px 20px 0"><div style="font-size:34px;line-height:40px;font-weight:800;letter-spacing:-0.01em">I-refer agad</div><p style="margin:4px 0 0;font-size:18px;line-height:26px">URGENT: bring the child to the RHU now. Don't wait for the next check.</p></div>
+<div style="margin:22px 20px 0;background:#FFFDFA;border:1px solid #D9D3CA;border-radius:16px;overflow:hidden">
+<div style="padding:16px 16px 12px;border-bottom:1px solid #D9D3CA"><h2 style="margin:0;font-size:20px;line-height:26px;font-weight:700">Check for danger signs</h2><p style="margin:4px 0 0;font-size:15px;line-height:22px;color:#4D463F">1 ticked</p></div>
+<div style="display:flex;align-items:center;gap:14px;min-height:58px;padding:10px 16px;border-bottom:1px solid #D9D3CA;background:#FFE8E5"><span style="flex:none;width:28px;height:28px;border-radius:6px;background:#221D18;color:#FFFDFA;display:flex;align-items:center;justify-content:center"><i class="ph-bold ph-check" style="font-size:18px"></i></span><span style="font-size:17px;line-height:23px;font-weight:700">Chest pulls in when breathing in <span style="color:#4D463F;font-weight:600">(chest indrawing)</span></span></div>
+<div style="display:flex;align-items:center;gap:14px;min-height:58px;padding:10px 16px;border-bottom:1px solid #D9D3CA"><span style="flex:none;width:28px;height:28px;border-radius:6px;border:2px solid #7B7369;background:#FFFDFA"></span><span style="font-size:17px;line-height:23px">Harsh noise when breathing in <span style="color:#4D463F">(stridor)</span></span></div>
+<div style="display:flex;align-items:center;gap:14px;min-height:58px;padding:10px 16px;border-bottom:1px solid #D9D3CA"><span style="flex:none;width:28px;height:28px;border-radius:6px;border:2px solid #7B7369;background:#FFFDFA"></span><span style="font-size:17px;line-height:23px">Can't drink or breastfeed</span></div>
+<div style="display:flex;align-items:center;gap:14px;min-height:58px;padding:10px 16px;border-bottom:1px solid #D9D3CA"><span style="flex:none;width:28px;height:28px;border-radius:6px;border:2px solid #7B7369;background:#FFFDFA"></span><span style="font-size:17px;line-height:23px">Convulsions <span style="color:#4D463F">(kombulsyon)</span></span></div>
+<div style="display:flex;align-items:center;gap:14px;min-height:58px;padding:10px 16px"><span style="flex:none;width:28px;height:28px;border-radius:6px;border:2px solid #7B7369;background:#FFFDFA"></span><span style="font-size:17px;line-height:23px">Very sleepy or hard to wake</span></div>
+</div>
+<div style="margin:16px 20px 0;display:flex;align-items:center;gap:8px;font-size:15px;line-height:22px;font-weight:600;color:#4D463F"><i class="ph-bold ph-info" style="font-size:20px"></i>Screening aid only. Not a diagnosis.</div>
+</div>
+<div style="padding:12px 20px 20px;border-top:1px solid #D9D3CA;background:#F7F4ED"><button style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border-radius:12px;background:#221D18;color:#FFFDFA;border:0;font-size:18px;font-weight:700">Save as URGENT<span style="color:#C7C3BD;font-weight:600">· I-save</span></button></div>
+</div>
+</figure>
+
+<figure id="6c" style="margin:0;width:375px;display:flex;flex-direction:column;gap:14px">
+<figcaption><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700;background:#221D18;color:#F7F4ED;padding:3px 8px;border-radius:6px">6c</span><span style="font-size:18px;font-weight:800">Saved</span></div><div style="margin-top:6px;font-size:14px;line-height:20px;color:#4D463F">After Save: an inline confirmation replaces the checklist. Done goes Home; the count now shows in Home and in Send.</div></figcaption>
+<div data-screen-label="6c Result saved" style="width:375px;height:812px;position:relative;overflow:hidden;background:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<dc-import name="StatusBar" online="{{ online }}" hint-size="375px,40px"></dc-import>
+<div style="flex:1;min-height:0;overflow:hidden">
+<div style="display:flex;align-items:center;justify-content:space-between;height:56px;padding:0 20px 0 8px"><button aria-label="Close" style="width:48px;height:48px;border:0;background:transparent;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#221D18"><i class="ph-bold ph-x" style="font-size:26px"></i></button><dc-import name="LocalStatus" online="{{ online }}" hint-size="230px,20px"></dc-import></div>
+<div style="padding:0 20px;font-size:15px;line-height:22px;color:#4D463F">Residente 010 · HH-02 · 1–5 years · 8:31 AM</div>
+<div style="margin:10px 20px 0;background:#F4C352;color:#221D18;border-radius:16px;padding:16px 18px 18px">
+<div style="display:flex;align-items:center;gap:8px;font-size:17px;line-height:22px;font-weight:800"><i class="ph-bold ph-warning" style="font-size:20px"></i>Fast breathing for age</div>
+<div style="margin-top:8px;display:flex;align-items:baseline;gap:8px"><span style="font-size:56px;line-height:56px;font-weight:800;font-variant-numeric:tabular-nums">52</span><span style="font-size:20px;font-weight:700">breaths a minute</span></div>
+<div style="margin-top:8px;font-size:16px;line-height:24px;font-weight:600">The cut-off for 1–5 years is 40.</div>
+</div>
+<div style="margin:20px 20px 0"><div style="font-size:34px;line-height:40px;font-weight:800;letter-spacing:-0.01em">I-refer ngayon</div><p style="margin:4px 0 0;font-size:18px;line-height:26px">Refer to the midwife or RHU now.</p></div>
+<div role="status" style="margin:22px 20px 0;display:flex;gap:12px;align-items:flex-start;padding:14px 16px;background:#DFF6E2;color:#1D6835;border-radius:12px"><i class="ph-bold ph-check-circle" style="font-size:24px;flex:none"></i><div><div style="font-size:17px;line-height:24px;font-weight:800">Saved to Residente 010's record</div><div style="font-size:15px;line-height:22px;font-weight:600">No danger signs ticked · 8:32 AM</div></div></div>
+<div style="margin:16px 20px 0;display:flex;align-items:center;gap:8px;font-size:15px;line-height:22px;font-weight:600;color:#4D463F"><i class="ph-bold ph-info" style="font-size:20px"></i>Screening aid only. Not a diagnosis.</div>
+</div>
+<div style="padding:12px 20px 20px;display:flex;flex-direction:column;gap:10px"><button style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border-radius:12px;background:#221D18;color:#FFFDFA;border:0;font-size:18px;font-weight:700">Done<span style="color:#C7C3BD;font-weight:600">· Tapos na</span></button><button style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border-radius:12px;background:#FFFDFA;color:#221D18;border:2px solid #221D18;font-size:18px;font-weight:700">Check another child</button></div>
+</div>
+</figure>
+
+<figure id="7a" style="margin:0;width:375px;display:flex;flex-direction:column;gap:14px">
+<figcaption><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Atkinson Hyperlegible Mono',monospace;font-size:14px;font-weight:700;background:#221D18;color:#F7F4ED;padding:3px 8px;border-radius:6px">7a</span><span style="font-size:18px;font-weight:800">Not fast breathing</span></div><div style="margin-top:6px;font-size:14px;line-height:20px;color:#4D463F">Re-check advice from WHO IMCI 2014 (cough or cold: follow up in 5 days if not improving). The danger-sign row still opens the checklist: a sign means refer, whatever the count.</div></figcaption>
+<div data-screen-label="7a Result not fast" style="width:375px;height:812px;position:relative;overflow:hidden;background:#F7F4ED;display:flex;flex-direction:column;border-radius:32px;box-shadow:0 12px 32px rgba(34,29,24,0.18),0 2px 8px rgba(34,29,24,0.10)">
+<dc-import name="StatusBar" online="{{ online }}" hint-size="375px,40px"></dc-import>
+<div style="flex:1;min-height:0;overflow:hidden">
+<div style="display:flex;align-items:center;justify-content:space-between;height:56px;padding:0 20px 0 8px"><button aria-label="Close" style="width:48px;height:48px;border:0;background:transparent;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#221D18"><i class="ph-bold ph-x" style="font-size:26px"></i></button><dc-import name="LocalStatus" online="{{ online }}" hint-size="230px,20px"></dc-import></div>
+<div style="padding:0 20px;font-size:15px;line-height:22px;color:#4D463F">Residente 022 · HH-06 · 2–12 months · 8:47 AM</div>
+<div style="margin:10px 20px 0;background:#DFF6E2;color:#221D18;border-radius:16px;padding:16px 18px 18px">
+<div style="display:flex;align-items:center;gap:8px;font-size:17px;line-height:22px;font-weight:800;color:#1D6835"><i class="ph-bold ph-check-circle" style="font-size:20px"></i>Not fast breathing for age</div>
+<div style="margin-top:8px;display:flex;align-items:baseline;gap:8px"><span style="font-size:56px;line-height:56px;font-weight:800;font-variant-numeric:tabular-nums">38</span><span style="font-size:20px;font-weight:700">breaths a minute</span></div>
+<div style="margin-top:8px;font-size:16px;line-height:24px;font-weight:600">The cut-off for 2–12 months is 50.</div>
+</div>
+<div style="margin:20px 20px 0"><div style="font-size:28px;line-height:34px;font-weight:800">Hindi mabilis ang paghinga</div><p style="margin:4px 0 0;font-size:18px;line-height:26px">Not fast breathing for this age.</p></div>
+<h2 style="margin:20px 20px 4px;font-size:20px;line-height:26px;font-weight:700">When to check again</h2>
+<p style="margin:0 20px;font-size:17px;line-height:25px;text-wrap:pretty">In 5 days if the child isn't getting better. Right away if breathing gets faster or harder, or the child can't drink.</p>
+<a style="margin:16px 20px 0;display:flex;align-items:center;gap:12px;min-height:56px;padding:10px 14px;background:#FFFDFA;border:1px solid #D9D3CA;border-radius:12px;color:#221D18;text-decoration:none"><i class="ph-bold ph-warning" style="font-size:22px;color:#805216"></i><span style="flex:1;font-size:16px;line-height:22px;font-weight:700">See a danger sign? Refer now, whatever the count.</span><i class="ph-bold ph-caret-right" style="font-size:20px;color:#696259"></i></a>
+<div style="margin:14px 20px 0;display:flex;align-items:center;gap:8px;font-size:15px;line-height:22px;font-weight:600;color:#4D463F"><i class="ph-bold ph-info" style="font-size:20px"></i>Screening aid only. Not a diagnosis.</div>
+</div>
+<div style="padding:12px 20px 12px"><button style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border-radius:12px;background:#221D18;color:#FFFDFA;border:0;font-size:18px;font-weight:700">Save to the record<span style="color:#C7C3BD;font-weight:600">· I-save</span></button><button style="display:block;margin:4px auto 0;height:48px;padding:0 8px;background:none;border:0;color:#221D18;font-size:17px;font-weight:700;text-decoration:underline;text-underline-offset:4px">Check another child</button></div>
+</div>
+</figure>
+
+</div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;online&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Preview&quot;},&quot;grayscale&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Preview&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const t = (v) => v === true || v === 'true';
+    const pts = [];
+    for (let i = 0; i <= 66; i++) {
+      const x = i * 5;
+      const ph = (x / 330) * 6.2 * 2 * Math.PI;
+      const y = 38 - 22 * Math.sin(ph) - 3 * Math.sin(ph * 3.3 + 1.2);
+      pts.push(x.toFixed(1) + ',' + y.toFixed(1));
+    }
+    return {
+      online: t(this.props.online),
+      artFilter: t(this.props.grayscale) ? 'grayscale(1)' : 'none',
+      tracePoints: pts.join(' '),
+    };
+  }
+}
+</script>
+</body>
+</html>

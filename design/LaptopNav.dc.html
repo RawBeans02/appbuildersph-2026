@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
+</helmet>
+<nav aria-label="Municipal" style="width:248px;height:100%;background:#FFFDFA;border-right:1px solid #D9D3CA;display:flex;flex-direction:column;padding:24px 16px 20px;font-family:'Atkinson Hyperlegible Next',system-ui,sans-serif;color:#221D18">
+<div style="display:flex;align-items:center;gap:10px;padding:0 8px"><span style="width:36px;height:36px;border-radius:9px;background:#221D18;color:#F7F4ED;display:flex;align-items:center;justify-content:center;font-size:30px;line-height:30px;font-weight:800;padding-bottom:4px">a</span><div><div style="font-size:20px;line-height:24px;font-weight:800">Agapay</div><div style="font-size:14px;line-height:20px;color:#4D463F">Municipal view</div></div></div>
+<div style="margin:18px 8px 0;font-size:14px;line-height:20px;color:#4D463F">San Isidro Demo · Sample data</div>
+<div style="margin-top:18px;display:flex;flex-direction:column;gap:4px">
+<sc-if value="{{ scanOn }}"><a aria-current="page" style="display:flex;align-items:center;gap:12px;height:48px;padding:0 12px;border-radius:10px;background:#EBE6DD;color:#221D18;font-size:16px;font-weight:700;text-decoration:none"><i class="ph-bold ph-scan" style="font-size:22px"></i>Scan QR codes</a></sc-if>
+<sc-if value="{{ scanOff }}" hint-placeholder-val="{{ true }}"><a style="display:flex;align-items:center;gap:12px;height:48px;padding:0 12px;border-radius:10px;color:#4D463F;font-size:16px;font-weight:600;text-decoration:none"><i class="ph-bold ph-scan" style="font-size:22px"></i>Scan QR codes</a></sc-if>
+<sc-if value="{{ mergedOn }}"><a aria-current="page" style="display:flex;align-items:center;gap:12px;height:48px;padding:0 12px;border-radius:10px;background:#EBE6DD;color:#221D18;font-size:16px;font-weight:700;text-decoration:none"><i class="ph-bold ph-table" style="font-size:22px"></i>Merged view</a></sc-if>
+<sc-if value="{{ mergedOff }}" hint-placeholder-val="{{ true }}"><a style="display:flex;align-items:center;gap:12px;height:48px;padding:0 12px;border-radius:10px;color:#4D463F;font-size:16px;font-weight:600;text-decoration:none"><i class="ph-bold ph-table" style="font-size:22px"></i>Merged view</a></sc-if>
+<sc-if value="{{ planOn }}"><a aria-current="page" style="display:flex;align-items:center;gap:12px;height:48px;padding:0 12px;border-radius:10px;background:#EBE6DD;color:#221D18;font-size:16px;font-weight:700;text-decoration:none"><i class="ph-bold ph-list-numbers" style="font-size:22px"></i>Plan</a></sc-if>
+<sc-if value="{{ planOff }}" hint-placeholder-val="{{ true }}"><a style="display:flex;align-items:center;gap:12px;height:48px;padding:0 12px;border-radius:10px;color:#4D463F;font-size:16px;font-weight:600;text-decoration:none"><i class="ph-bold ph-list-numbers" style="font-size:22px"></i>Plan</a></sc-if>
+<sc-if value="{{ logOn }}"><a aria-current="page" style="display:flex;align-items:center;gap:12px;height:48px;padding:0 12px;border-radius:10px;background:#EBE6DD;color:#221D18;font-size:16px;font-weight:700;text-decoration:none"><i class="ph-bold ph-clock-counter-clockwise" style="font-size:22px"></i>Approval log</a></sc-if>
+<sc-if value="{{ logOff }}" hint-placeholder-val="{{ true }}"><a style="display:flex;align-items:center;gap:12px;height:48px;padding:0 12px;border-radius:10px;color:#4D463F;font-size:16px;font-weight:600;text-decoration:none"><i class="ph-bold ph-clock-counter-clockwise" style="font-size:22px"></i>Approval log</a></sc-if>
+</div>
+<div style="margin-top:auto;padding:0 8px;display:flex;flex-direction:column;gap:14px">
+<dc-import name="LocalStatus" device="laptop" online="{{ online }}" hint-size="216px,44px"></dc-import>
+<a style="display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;color:#221D18;text-decoration:underline;text-underline-offset:3px"><i class="ph-bold ph-shield-check" style="font-size:18px"></i>Privacy &amp; AI</a>
+</div>
+</nav>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:248,&quot;height&quot;:800},&quot;active&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;scan&quot;,&quot;merged&quot;,&quot;plan&quot;,&quot;log&quot;],&quot;default&quot;:&quot;scan&quot;,&quot;tsType&quot;:&quot;'scan'|'merged'|'plan'|'log'&quot;},&quot;online&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const a = this.props.active || 'scan';
+    const t = (v) => v === true || v === 'true';
+    const v = { online: t(this.props.online) };
+    for (const k of ['scan', 'merged', 'plan', 'log']) { v[k + 'On'] = a === k; v[k + 'Off'] = a !== k; }
+    return v;
+  }
+}
+</script>
+</body>
+</html>
