@@ -143,9 +143,9 @@ export async function listAlerts(store: Store, env: ServerEnv, municipality: str
   return { ok: true, ai, drafts: drafts.map(alertView), decided: decided.map(alertView), audit: auditViews }
 }
 
-async function draftOf(store: Store, id: string, municipality: string): Promise<AlertRecord> {
+async function draftOf(store: Store, id: string, municipality?: string): Promise<AlertRecord> {
   const alert = await store.getAlert(id)
-  if (!alert || alert.municipality !== municipality) throw new HttpError('not-found', 'No such alert.')
+  if (!alert || (municipality !== undefined && alert.municipality !== municipality)) throw new HttpError('not-found', 'No such alert.')
   if (alert.status !== 'draft') throw new HttpError('already-decided', 'This alert was already approved or rejected.')
   return alert
 }
@@ -154,7 +154,7 @@ async function draftOf(store: Store, id: string, municipality: string): Promise<
 // alert's facts before it can be approved.
 export async function approveAlert(
   store: Store,
-  input: { id: string; municipality: string; role: string; text?: string },
+  input: { id: string; municipality?: string; role: string; text?: string },
   now: Date,
 ): Promise<DecideResponse> {
   const alert = await draftOf(store, input.id, input.municipality)
@@ -176,7 +176,7 @@ export async function approveAlert(
 }
 
 // POST /api/alerts-reject.
-export async function rejectAlert(store: Store, input: { id: string; municipality: string; role: string }, now: Date): Promise<DecideResponse> {
+export async function rejectAlert(store: Store, input: { id: string; municipality?: string; role: string }, now: Date): Promise<DecideResponse> {
   const alert = await draftOf(store, input.id, input.municipality)
   const decided = await store.decideAlert(alert.id, { status: 'rejected', role: input.role, at: now, text: alert.text })
   if (!decided) throw new HttpError('already-decided', 'This alert was already approved or rejected.')
