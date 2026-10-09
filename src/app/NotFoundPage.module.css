@@ -1,0 +1,58 @@
+/* The 404 (design: Agapay Phone 4 Send and Privacy, 404). */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.block {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 28px 60px;
+}
+
+.code {
+  font: 700 20px/28px var(--font-mono);
+  color: var(--ink-2);
+}
+
+.title {
+  margin-top: 10px;
+  font: 800 30px/36px var(--font-ui);
+}
+
+.body {
+  margin-top: 10px;
+  font: 400 18px/26px var(--font-ui);
+  text-wrap: pretty;
+}
+
+.status {
+  margin-top: 14px;
+}
+
+.actions {
+  padding: var(--space-3) var(--space-5) var(--space-6);
+}
+
+/* Laptop: the same block, centered in the window, the button under it. */
+.laptop {
+  align-items: center;
+  justify-content: center;
+}
+
+.laptop .block,
+.laptop .actions {
+  flex: none;
+  width: 100%;
+  max-width: 420px;
+  padding: 0 28px;
+}
+
+.laptop .actions {
+  margin-top: var(--space-6);
+}

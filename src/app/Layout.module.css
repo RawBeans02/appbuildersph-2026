@@ -7,7 +7,7 @@
 }
 
 .withNav {
-  padding-bottom: calc(78px + var(--space-6));
+  padding-bottom: 78px;
 }
 
 /* The municipal laptop's screens use the full width. */

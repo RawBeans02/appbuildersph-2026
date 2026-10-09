@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import { prepareForOffline } from './prepare'
 
 // "Measure this device" works end to end offline (CI runner, fake camera):
 // every measurement fills in, the demo label is read right, and the table row
@@ -12,11 +13,7 @@ test.use({
 
 test('measures the reader, pose model, camera rate and cry check offline', async ({ page, context }) => {
   test.setTimeout(300_000)
-  await page.goto('/prepare')
-  await expect(page.locator('html')).toHaveAttribute('data-shell-status', 'ready', { timeout: 30_000 })
-  await page.waitForFunction(() => navigator.serviceWorker.controller !== null)
-  await page.getByRole('button', { name: 'Prepare for offline' }).click()
-  await expect(page.locator('[data-prepare-status]')).toHaveAttribute('data-prepare-status', 'ready', { timeout: 180_000 })
+  await prepareForOffline(page)
 
   await context.setOffline(true)
   await page.goto('/device')

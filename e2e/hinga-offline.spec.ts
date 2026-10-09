@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import { prepareForOffline } from './prepare'
 
 // Hinga in airplane mode with Chromium's fake camera and microphone. The fake
 // camera shows a test pattern, not a person (we use no real people), so this
@@ -19,11 +20,7 @@ test('Hinga starts its models offline and will not count without a chest in view
     if (!url.startsWith(origin) && !url.startsWith('blob:') && !url.startsWith('data:')) elsewhere.push(url)
   })
 
-  await page.goto('/prepare')
-  await expect(page.locator('html')).toHaveAttribute('data-shell-status', 'ready', { timeout: 30_000 })
-  await page.waitForFunction(() => navigator.serviceWorker.controller !== null)
-  await page.getByRole('button', { name: 'Prepare for offline' }).click()
-  await expect(page.locator('[data-prepare-status]')).toHaveAttribute('data-prepare-status', 'ready', { timeout: 180_000 })
+  await prepareForOffline(page)
 
   await context.setOffline(true)
   await page.goto('/hinga')

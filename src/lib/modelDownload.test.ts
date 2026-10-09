@@ -158,6 +158,9 @@ describe('createModelDownload', () => {
       code: 'network',
       message: 'The download failed.',
       storage: null,
+      // How far it got, for "The signal dropped at …".
+      loadedBytes: 0,
+      totalBytes: 1000,
     })
     expect(fake.release).toHaveBeenCalledOnce()
 

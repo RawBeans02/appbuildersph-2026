@@ -1,0 +1,176 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100dvh - 78px);
+}
+
+.content {
+  flex: 1;
+}
+
+.card {
+  margin: var(--space-5) var(--space-5) 0;
+  padding: var(--space-4) 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-1);
+}
+
+.cardTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  font: var(--type-body-dense);
+  color: var(--ink-2);
+}
+
+.cardLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 700;
+}
+
+.day {
+  margin-top: var(--space-1);
+  font: 800 24px/30px var(--font-ui);
+}
+
+.segments {
+  display: grid;
+  grid-template-columns: repeat(15, minmax(0, 1fr));
+  gap: 3px;
+  margin-top: var(--space-3);
+}
+
+.segment {
+  height: 10px;
+  border-radius: 3px;
+  background: var(--line);
+}
+
+.segmentOn {
+  background: var(--ink);
+}
+
+.cardBottom {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+  font: var(--type-caption);
+  font-weight: 400;
+  color: var(--ink-2);
+}
+
+.today {
+  margin: 22px var(--space-5) 6px;
+  font: var(--type-heading);
+}
+
+.rows {
+  border-top: 1px solid var(--line);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) 24px;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 72px;
+  padding: var(--space-3) var(--space-4) var(--space-3) var(--space-5);
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+a.row:hover {
+  background: var(--sunken);
+}
+
+.count {
+  font: 800 32px/36px var(--font-ui);
+  font-variant-numeric: tabular-nums;
+}
+
+.rowTitle {
+  display: block;
+  font: 700 18px/24px var(--font-ui);
+}
+
+.rowMeta {
+  display: block;
+  font: var(--type-body-dense);
+  color: var(--ink-2);
+}
+
+.rowMetaWarn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font: var(--type-body-dense);
+  font-weight: 700;
+  color: var(--warn);
+}
+
+.caret {
+  color: var(--ink-3);
+}
+
+/* Loading: skeletons in --sunken. */
+.loading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 18px var(--space-5) 0;
+  font: var(--type-body-dense);
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.skeleton {
+  border-radius: 6px;
+  background: var(--sunken);
+}
+
+.skeletonCard {
+  height: 122px;
+  margin: var(--space-3) var(--space-5) 0;
+  border-radius: var(--r-lg);
+  background: var(--sunken);
+}
+
+.skeletonRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--line);
+}
+
+.empty {
+  margin-top: 88px;
+}
+
+.emptyLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 48px;
+  padding: 0 var(--space-2);
+  color: var(--ink);
+  font: var(--type-button);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+/* The one primary, in the bottom third, clear of the raised Hinga tab
+   (it rises 25 px above the nav). */
+.footer {
+  position: sticky;
+  bottom: 78px;
+  padding: var(--space-3) var(--space-5) var(--space-8);
+  background: var(--paper);
+}

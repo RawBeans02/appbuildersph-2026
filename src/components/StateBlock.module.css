@@ -42,3 +42,9 @@
   width: 100%;
   margin-top: var(--space-5);
 }
+
+.footnote {
+  margin-top: 14px;
+  font: var(--type-body-dense);
+  color: var(--ink-2);
+}

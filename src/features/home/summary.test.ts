@@ -74,9 +74,9 @@ describe('summarizeHome', () => {
       true,
     )
     expect(summary).toEqual({
-      flood: { startedOn: '2026-10-04', day: 6, window: 'open' },
-      watch: { active: 2, upcoming: 1, higherRisk: 1 },
-      hingaThisWeek: { fast: 1, urgent: 1, refused: 1 },
+      flood: { startedOn: '2026-10-04', day: 6, window: 'open', windowStart: '2026-10-09', windowEnd: '2026-10-19', puroks: [] },
+      watch: { active: 2, upcoming: 1, higherRisk: 1, nextStart: '2026-10-15' },
+      hingaThisWeek: { fast: 1, urgent: 1, refused: 1, referred: 2, lastReferredAt: '2026-10-09T03:00:00.000Z' },
       doxycycline: { onHand: 40, expiringSoon: 30, expired: 5 },
       openFlags: 1,
       modelsPrepared: true,
@@ -94,8 +94,8 @@ describe('summarizeHome', () => {
   it('is all zeros with no flood on a fresh phone', () => {
     expect(summarizeHome(empty, TODAY, false)).toEqual({
       flood: null,
-      watch: { active: 0, upcoming: 0, higherRisk: 0 },
-      hingaThisWeek: { fast: 0, urgent: 0, refused: 0 },
+      watch: { active: 0, upcoming: 0, higherRisk: 0, nextStart: null },
+      hingaThisWeek: { fast: 0, urgent: 0, refused: 0, referred: 0, lastReferredAt: null },
       doxycycline: { onHand: 0, expiringSoon: 0, expired: 0 },
       openFlags: 0,
       modelsPrepared: false,

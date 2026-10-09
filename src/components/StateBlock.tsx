@@ -1,4 +1,4 @@
-import { WarningCircleIcon, type Icon } from '@phosphor-icons/react'
+import { ArrowClockwiseIcon, WarningCircleIcon, type Icon } from '@phosphor-icons/react'
 import type { ReactNode } from 'react'
 import { Button } from './Button'
 import { cx } from './cx'
@@ -12,6 +12,7 @@ export function StateBlock({
   title,
   body,
   children,
+  footnote,
 }: {
   tone?: 'empty' | 'error'
   icon: Icon
@@ -19,6 +20,8 @@ export function StateBlock({
   body?: ReactNode
   // The action(s): buttons or links.
   children?: ReactNode
+  // A line under the actions.
+  footnote?: ReactNode
 }) {
   return (
     <section className={cx(styles.block, tone === 'error' && styles.error)} role={tone === 'error' ? 'alert' : undefined}>
@@ -28,6 +31,7 @@ export function StateBlock({
       <h2 className={styles.title}>{title}</h2>
       {body && <p className={styles.body}>{body}</p>}
       {children && <div className={styles.actions}>{children}</div>}
+      {footnote && <p className={styles.footnote}>{footnote}</p>}
     </section>
   )
 }
@@ -39,15 +43,14 @@ export function RecordsError({ onRetry, children }: { onRetry?: () => void; chil
       tone="error"
       icon={WarningCircleIcon}
       title="Couldn't open the records"
-      body={
-        <>
-          Nothing was lost. Your records are still saved on this phone.
-          <br />
-          Still stuck? Close Agapay and open it again.
-        </>
-      }
+      body="Nothing was lost. Your records are still saved on this phone."
+      footnote="Still stuck? Close Agapay and open it again."
     >
-      <Button tagalog="Subukan ulit" onClick={onRetry ?? (() => window.location.reload())}>
+      <Button
+        tagalog="Subukan ulit"
+        icon={<ArrowClockwiseIcon size={22} weight="bold" aria-hidden />}
+        onClick={onRetry ?? (() => window.location.reload())}
+      >
         Try again
       </Button>
       {children}

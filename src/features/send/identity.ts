@@ -18,9 +18,21 @@ export function resolvePlace(seed: SeedInfo | null): Place {
   return { ok: true, municipality: DEMO_MUNICIPALITY.code, barangay }
 }
 
+// Calls run one at a time per database, so two quick first taps can't each
+// make a key (the second would replace the first, and a QR signed with the
+// first would no longer verify).
+const queues = new WeakMap<AgapayDb, Promise<unknown>>()
+
 // Made once, on the first send or pairing, from the user's action. The private
 // key is non-extractable: it can sign, but can't be read out of IndexedDB.
-export async function ensureDeviceIdentity(db: AgapayDb, barangay: string, now = new Date()): Promise<DeviceIdentity> {
+export function ensureDeviceIdentity(db: AgapayDb, barangay: string, now = new Date()): Promise<DeviceIdentity> {
+  const previous = queues.get(db) ?? Promise.resolve()
+  const run = previous.catch(() => {}).then(() => getOrCreateIdentity(db, barangay, now))
+  queues.set(db, run)
+  return run
+}
+
+async function getOrCreateIdentity(db: AgapayDb, barangay: string, now: Date): Promise<DeviceIdentity> {
   const existing = await db.getDeviceIdentity()
   if (existing) {
     if (existing.barangay !== barangay) {

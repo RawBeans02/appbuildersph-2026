@@ -1,0 +1,229 @@
+/* Screen 14 (design: Agapay Phone 4 Send and Privacy, 14a–14c). */
+
+/* Fills the viewport above the bottom nav (the layout pads <main> by the
+   nav's height, --nav-offset; 0 in a flow), so the footer sits on the nav. */
+.screen {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - var(--nav-offset, 0px));
+  min-height: calc(100dvh - var(--nav-offset, 0px));
+}
+
+/* The primary's bar, pinned above the nav while 14a scrolls. The bottom
+   padding keeps the button clear of the raised Hinga tab, which rises 25 px
+   above the nav (review decision 6; the same bar as Home). */
+.footer {
+  position: sticky;
+  bottom: var(--nav-offset, 0px);
+  z-index: 1;
+  margin-top: auto;
+  padding: var(--space-3) var(--space-5) var(--space-8);
+  background: var(--paper);
+}
+
+.footerDivided {
+  border-top: 1px solid var(--line);
+}
+
+.mono {
+  font-family: var(--font-mono);
+}
+
+/* 14a */
+
+.heading {
+  margin: 22px var(--space-5) var(--space-1);
+  font: 800 22px/28px var(--font-ui);
+}
+
+.sub {
+  margin: 0 var(--space-5);
+  font: 400 17px/25px var(--font-ui);
+}
+
+.card {
+  margin: var(--space-4) var(--space-5) 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font: 400 17px/24px var(--font-ui);
+}
+
+.table th,
+.table td {
+  padding: var(--space-2) var(--space-4);
+}
+
+.table th {
+  padding-right: 0;
+  font-weight: inherit;
+  text-align: left;
+}
+
+.table td {
+  padding-left: var(--space-3);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.table .groupHeading {
+  padding: var(--space-3) var(--space-4) 6px;
+  font: 800 15px/22px var(--font-ui);
+  color: var(--ink-2);
+}
+
+.group tr:last-child > * {
+  padding-bottom: 14px;
+}
+
+.single > tr > * {
+  padding-top: 14px;
+  padding-bottom: 14px;
+  font-weight: 700;
+}
+
+.table tbody:not(:last-child) tr:last-child > * {
+  border-bottom: 1px solid var(--line);
+}
+
+.footnote {
+  margin: 14px var(--space-5) 0;
+  font: var(--type-body-dense);
+  color: var(--ink-2);
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: var(--space-3) var(--space-5) 0;
+  font: var(--type-body-dense);
+  color: var(--ink-2);
+}
+
+.meta svg {
+  flex: none;
+}
+
+/* The text button's own 8 px padding lines its text up with the 20 px edge. */
+.pair {
+  margin: var(--space-2) var(--space-3) var(--space-4);
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 18px var(--space-5) 0;
+  font: 600 15px/22px var(--font-ui);
+  color: var(--ink-2);
+}
+
+.skeleton {
+  height: 122px;
+  margin: var(--space-3) var(--space-5) 0;
+  border-radius: var(--r-lg);
+  background: var(--sunken);
+}
+
+/* The records error and the QR error sit under the header, as on Home (1d). */
+.state {
+  margin-top: var(--space-12);
+}
+
+/* 14b */
+
+.qrTitle {
+  margin: var(--space-1) var(--space-5) 0;
+  font: var(--type-title);
+}
+
+/* Pure black on white with a quiet zone (QrImage), as large as the frame. */
+.qrBox {
+  width: min(300px, 100%);
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-1);
+}
+
+.qrBoxShown {
+  margin-top: 22px;
+}
+
+.code {
+  margin-top: 14px;
+  font: 700 16px/22px var(--font-mono);
+  text-align: center;
+}
+
+.hold {
+  margin: 14px 28px 0;
+  font: 400 17px/25px var(--font-ui);
+  color: var(--ink-2);
+  text-align: center;
+  text-wrap: pretty;
+}
+
+.qrActions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  margin-top: auto;
+  padding: var(--space-6) var(--space-5) var(--space-3);
+}
+
+/* 14c */
+
+.shared {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 80px 28px 0;
+  text-align: center;
+}
+
+.sharedIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  border-radius: var(--r-full);
+  background: var(--ok-tint);
+  color: var(--ok);
+}
+
+.sharedTitle {
+  margin-top: 18px;
+  font: 800 26px/32px var(--font-ui);
+}
+
+.sharedBody {
+  margin: var(--space-2) 0 6px;
+  font: 400 17px/25px var(--font-ui);
+  color: var(--ink-2);
+  text-wrap: pretty;
+}
+
+/* The pairing sheet */
+
+.sheetText {
+  font: var(--type-body);
+  color: var(--ink-2);
+}
+
+.fingerprint {
+  font: 700 16px/22px var(--font-mono);
+  color: var(--ink);
+  white-space: nowrap;
+}

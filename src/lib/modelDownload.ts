@@ -35,6 +35,9 @@ export type ModelDownloadState =
       message: string
       // Set for 'insufficient-storage', so the screen can show how much is needed.
       storage: StorageCheck | null
+      // How far the download got before it stopped (L9a: "The signal dropped at …").
+      loadedBytes?: number
+      totalBytes?: number
     }
 
 export type ModelDownloadDeps = {
@@ -83,6 +86,7 @@ export function createModelDownload(models: ModelSpec | ModelSpec[], deps: Model
       if (!abort.signal.aborted) setState(next)
     }
     const release = deps.holdReload()
+    let reached: { loadedBytes: number; totalBytes: number } | null = null
     update({ status: 'checking-storage' })
     try {
       const missing: ModelSpec[] = []
@@ -105,6 +109,7 @@ export function createModelDownload(models: ModelSpec | ModelSpec[], deps: Model
       let lastStep = -1
       let lastFile = ''
       let doneBytes = 0
+      reached = { loadedBytes: 0, totalBytes }
       update({ status: 'downloading', loadedBytes: 0, totalBytes, modelId: null, file: null })
       for (const spec of missing) {
         const before = doneBytes
@@ -112,6 +117,7 @@ export function createModelDownload(models: ModelSpec | ModelSpec[], deps: Model
           signal: abort.signal,
           onProgress: ({ loadedBytes, file }) => {
             const loaded = before + loadedBytes
+            reached = { loadedBytes: loaded, totalBytes }
             const step = totalBytes === 0 ? 1000 : Math.floor((loaded / totalBytes) * 1000)
             const fileKey = `${spec.id}|${file?.index ?? -1}`
             if (step === lastStep && fileKey === lastFile) return
@@ -140,6 +146,7 @@ export function createModelDownload(models: ModelSpec | ModelSpec[], deps: Model
         code: error instanceof ModelCacheError ? error.code : 'unknown',
         message: error instanceof Error ? error.message : String(error),
         storage: null,
+        ...(reached ?? {}),
       })
     } finally {
       release()

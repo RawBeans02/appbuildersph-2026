@@ -10,7 +10,7 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  min-height: 24px;
+  min-height: 48px;
   padding: 0;
   border: 0;
   background: none;
@@ -66,4 +66,32 @@
 
 .lead {
   color: var(--device);
+}
+
+.sheetTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.sheetIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--r-full);
+  background: var(--device-tint);
+  color: var(--device);
+}
+
+.more {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 48px;
+  color: var(--ink);
+  font: var(--type-button);
+  text-decoration: underline;
+  text-underline-offset: 4px;
 }

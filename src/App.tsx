@@ -6,8 +6,6 @@ import { PlaceholderPage } from './app/PlaceholderPage'
 import { usePath } from './app/router'
 import { resolveRoute } from './app/routes'
 import { ToastProvider } from './components'
-import type { AgapayDb } from './data/db/db'
-import { useDbQuery } from './data/db/useDbQuery'
 
 // Each route's page element is made once, from a lazy component, so every
 // screen is its own chunk and React keeps its state across renders.
@@ -23,19 +21,6 @@ const pages = new Map<string, ReactElement>(
   }),
 )
 
-const readSeedInfo = (db: AgapayDb) => db.getSeedInfo()
-
-// NEEDS DESIGN: the "Sample data" label.
-function SampleDataNotice() {
-  const seed = useDbQuery(['residents'], readSeedInfo)
-  if (seed.status !== 'ready' || !seed.data) return null
-  return (
-    <p>
-      Sample data: {seed.data.barangay}, {seed.data.municipality}. Invented records for the demo.
-    </p>
-  )
-}
-
 export default function App() {
   const path = usePath()
   const resolved = resolveRoute(path, featureRoutes)
@@ -47,7 +32,7 @@ export default function App() {
 
   return (
     <ToastProvider>
-      <Layout path={path} notice={<SampleDataNotice />}>
+      <Layout path={path}>
         {resolved.kind === 'feature' ? (
           pages.get(resolved.route.path)
         ) : resolved.kind === 'planned' ? (

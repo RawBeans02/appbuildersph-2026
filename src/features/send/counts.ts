@@ -48,10 +48,13 @@ export function collectRawCounts(records: PhoneRecords, today: string): RawCount
   const residents = new Map(records.residents.map((resident) => [resident.id, resident]))
   const watch = watchList(records.exposures, today)
 
-  // Exposed: residents still being watched (window upcoming or open), by age band today.
+  // Exposed, by age band today: only residents whose watch hasn't started yet
+  // (window upcoming). Everyone in the window is counted once, in
+  // inWatchWindow, and never in a band as well: if the two overlapped, a "<5"
+  // band could be worked out as inWatchWindow minus the exact bands.
   const exposed = zeroBands(AGE_BANDS)
   for (const entry of watch) {
-    if (entry.phase === 'ended') continue
+    if (entry.phase !== 'upcoming') continue
     const resident = residents.get(entry.residentId)
     if (resident) exposed[ageBand(ageInMonths(resident.birthDate, today))] += 1
   }

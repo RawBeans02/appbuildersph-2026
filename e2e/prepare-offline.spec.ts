@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import { prepareForOffline } from './prepare'
 
 // "Prepare for offline" downloads the models and the runtime .wasm into the
 // model caches; with no network afterwards, the screen still says ready and
@@ -6,18 +7,13 @@ import { expect, test } from '@playwright/test'
 
 test('prepared models and the runtime .wasm load with no network', async ({ page, context }) => {
   test.setTimeout(120_000)
-  await page.goto('/prepare')
-  await expect(page.locator('html')).toHaveAttribute('data-shell-status', 'ready', { timeout: 30_000 })
-  await page.waitForFunction(() => navigator.serviceWorker.controller !== null)
-
-  const screen = page.locator('[data-prepare-status]')
-  await page.getByRole('button', { name: 'Prepare for offline' }).click()
-  await expect(screen).toHaveAttribute('data-prepare-status', 'ready', { timeout: 90_000 })
+  await prepareForOffline(page)
 
   await context.setOffline(true)
-  await page.reload()
+  await page.goto('/prepare')
   // Already cached: straight to ready, no download.
-  await expect(screen).toHaveAttribute('data-prepare-status', 'ready')
+  await expect(page.locator('[data-prepare-status]')).toHaveAttribute('data-prepare-status', 'ready')
+  await expect(page.getByRole('heading', { level: 1, name: 'Runs on this phone' })).toBeVisible()
 
   const files = await page.evaluate(async () => {
     const urls: string[] = []

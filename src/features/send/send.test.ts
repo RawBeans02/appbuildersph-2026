@@ -73,6 +73,8 @@ describe('ages', () => {
 
 describe('collectRawCounts', () => {
   it('counts exposure by age band, the open watch window, this week\'s referrals, stock and open flags', () => {
+    // child: in the window (exposed Oct 3, window from Oct 8) · adult: watch
+    // not started yet (exposed Oct 8, window from Oct 13) · old: window ended.
     const counts = collectRawCounts(
       {
         residents: [resident('child', '2024-01-01'), resident('adult', '1990-01-01'), resident('old', '1950-01-01')],
@@ -92,7 +94,7 @@ describe('collectRawCounts', () => {
       TODAY,
     )
     expect(counts).toEqual({
-      exposed: { under2m: 0, m2to12: 0, y1to5: 1, y5to17: 0, y18to59: 1, y60plus: 0 },
+      exposed: { under2m: 0, m2to12: 0, y1to5: 0, y5to17: 0, y18to59: 1, y60plus: 0 },
       inWatchWindow: 1,
       fastBreathing: { under2m: 0, m2to12: 0, y1to5: 1 },
       urgentReferrals: 1,
@@ -100,6 +102,36 @@ describe('collectRawCounts', () => {
       doxyCapsulesExpiring6w: 30,
       clinicianReviewFlags: 1,
     })
+  })
+
+  it('never counts one resident both in an age band and in the watch window', () => {
+    // Everyone in the window: if the bands counted them too, a "<5" band could
+    // be worked out as inWatchWindow minus the exact bands.
+    const residents = [
+      ...Array.from({ length: 6 }, (_, i) => resident(`a${i}`, '1990-01-01')),
+      resident('c0', '2015-01-01'),
+      resident('n0', '2026-01-01'),
+    ]
+    const inWindow = collectRawCounts(
+      { residents, exposures: residents.map((r) => exposure(r.id, '2026-10-03')), hingaChecks: [], stockLots: [], flags: [] },
+      TODAY,
+    )
+    expect(inWindow.inWatchWindow).toBe(8)
+    expect(Object.values(inWindow.exposed)).toEqual([0, 0, 0, 0, 0, 0])
+
+    // Half upcoming, half in the window: each resident lands in exactly one count.
+    const mixed = collectRawCounts(
+      {
+        residents,
+        exposures: residents.map((r, i) => exposure(r.id, i % 2 ? '2026-10-08' : '2026-10-03')),
+        hingaChecks: [],
+        stockLots: [],
+        flags: [],
+      },
+      TODAY,
+    )
+    const inBands = Object.values(mixed.exposed).reduce((sum, n) => sum + n, 0)
+    expect([inBands, mixed.inWatchWindow]).toEqual([4, 4])
   })
 })
 
@@ -120,8 +152,9 @@ describe('createExport', () => {
       version: 't',
       municipality: 'San Isidro Demo',
       barangay: 'Maligaya-D',
-      residents: Array.from({ length: 7 }, (_, i) => withoutSample(resident(`r${i}`, '1990-01-01'))),
-      exposures: Array.from({ length: 7 }, (_, i) => withoutSample(exposure(`r${i}`, '2026-10-03'))),
+      // 7 in the watch window (exposed Oct 3), 5 whose watch starts Oct 13.
+      residents: Array.from({ length: 12 }, (_, i) => withoutSample(resident(`r${i}`, '1990-01-01'))),
+      exposures: Array.from({ length: 12 }, (_, i) => withoutSample(exposure(`r${i}`, i < 7 ? '2026-10-03' : '2026-10-08'))),
       stockLots: [withoutSample(doxy(3, '2027-06'))],
     })
 
@@ -130,7 +163,8 @@ describe('createExport', () => {
     if (!first.ok || !second.ok) throw new Error('export failed')
     expect([first.payload.seq, second.payload.seq]).toEqual([1, 2])
     expect(first.payload).toMatchObject({ municipality: 'SID', barangay: 'SID-MAL', epiWeek: '2026-W41' })
-    expect(first.payload.counts.exposed.y18to59).toBe(7)
+    expect(first.payload.counts.inWatchWindow).toBe(7)
+    expect(first.payload.counts.exposed.y18to59).toBe(5)
     expect(first.payload.counts.doxyCapsulesOnHand).toBe('<5')
 
     const identity = await db.getDeviceIdentity()
@@ -147,6 +181,26 @@ describe('createExport', () => {
     expect((await ensureDeviceIdentity(db, 'SID-MAL')).fingerprint).toBe(identity.fingerprint)
     await expect(ensureDeviceIdentity(db, 'SID-BGS')).rejects.toThrow('set up for SID-MAL')
     db.close()
+  })
+
+  it('makes one key for two quick first taps, so both QRs verify', async () => {
+    const db = await openAgapayDb('send-test-4')
+    const [a, b] = await Promise.all([ensureDeviceIdentity(db, 'SID-MAL'), ensureDeviceIdentity(db, 'SID-MAL')])
+    expect(a.fingerprint).toBe(b.fingerprint)
+    expect((await db.getDeviceIdentity())?.fingerprint).toBe(a.fingerprint)
+
+    const fresh = await openAgapayDb('send-test-5')
+    await fresh.loadSeed({ version: 't', municipality: 'San Isidro Demo', barangay: 'Maligaya-D', residents: [] })
+    const exports = await Promise.all([createExport(fresh, TODAY), createExport(fresh, TODAY)])
+    const stored = await fresh.getDeviceIdentity()
+    for (const exported of exports) {
+      if (!exported.ok) throw new Error(exported.reason)
+      expect(exported.fingerprint).toBe(stored?.fingerprint)
+      expect(await decodeQr(exported.text, { 'SID-MAL': stored!.publicJwk })).toMatchObject({ ok: true })
+    }
+    expect(exports.map((e) => e.ok && e.payload.seq).sort()).toEqual([1, 2])
+    db.close()
+    fresh.close()
   })
 })
 

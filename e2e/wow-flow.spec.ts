@@ -16,7 +16,8 @@ async function watchCount(page: Page): Promise<number> {
 test('tap exposed, add the scanned box, flag for review, create the QR', async ({ page }) => {
   test.setTimeout(90_000)
   await page.goto('/')
-  await expect(page.getByText(/^Sample data: Maligaya-D, San Isidro Demo/)).toBeVisible({ timeout: 30_000 })
+  await expect(page.getByRole('heading', { level: 1, name: 'Maligaya-D' })).toBeVisible({ timeout: 30_000 })
+  await expect(page.getByText('San Isidro Demo · Sample data')).toBeVisible()
 
   // Flood exposure: the three one-person households the demo taps.
   await page.goto('/watch')
@@ -52,8 +53,8 @@ test('tap exposed, add the scanned box, flag for review, create the QR', async (
   await page.goto('/send')
   await expect(page.getByRole('row', { name: /Doxycycline capsules on hand/ })).toContainText('40')
   await expect(page.getByRole('row', { name: /Flags for clinician review/ })).toContainText('<5')
-  await page.getByRole('button', { name: 'Create the QR' }).click()
-  await expect(page.getByRole('img', { name: "QR code with this week's counts for SID-MAL" })).toBeVisible()
-  await expect(page.getByText(/^Export 1, week \d{4}-W\d{2}/)).toBeVisible()
+  await page.getByRole('button', { name: /^Show the QR/ }).click()
+  await expect(page.getByRole('img', { name: "QR code with this week's counts" })).toBeVisible()
+  await expect(page.getByText(/^SID-MAL · \d{4}-W\d{2} · #1$/)).toBeVisible()
   await expect(page.getByText(/Residente/)).toHaveCount(0)
 })

@@ -1,6 +1,7 @@
-import { CheckCircleIcon, CloudSlashIcon, DeviceMobileIcon, LaptopIcon } from '@phosphor-icons/react'
+import { ArrowRightIcon, CheckCircleIcon, CloudSlashIcon, DeviceMobileIcon, LaptopIcon } from '@phosphor-icons/react'
 import { useState } from 'react'
 import { Link } from '../app/Link'
+import { partsWithModels } from '../lib/modelParts'
 import { offlineModels } from '../lib/offlineModels'
 import { useModelsPrepared } from '../lib/useModelsPrepared'
 import { useOnlineStatus } from '../lib/useOnlineStatus'
@@ -32,7 +33,7 @@ export function LocalStatus({
 
   const DeviceIcon = device === 'laptop' ? LaptopIcon : DeviceMobileIcon
   const label = device === 'laptop' ? 'Runs on this laptop' : 'Runs on this phone'
-  const models = offlineModels.filter((model) => model.device === device)
+  const parts = partsWithModels(offlineModels.filter((model) => model.device === device))
 
   return (
     <div className={cx(styles.status, dark && styles.dark)}>
@@ -47,14 +48,26 @@ export function LocalStatus({
         </button>
       )}
 
-      <BottomSheet open={sheet === 'device'} onClose={() => setSheet(null)} title={label}>
+      <BottomSheet
+        open={sheet === 'device'}
+        onClose={() => setSheet(null)}
+        title={
+          <span className={styles.sheetTitle}>
+            <span className={styles.sheetIcon} aria-hidden>
+              <DeviceIcon size={22} weight="bold" />
+            </span>
+            {label}
+          </span>
+        }
+      >
         <p className={styles.sheetBody}>
           The AI is saved on this {device} and works with no signal. What you record stays here.
+          {device === 'phone' && ' Only counts leave, in the QR you choose to show.'}
         </p>
         <ul className={styles.rows}>
-          {models.map((model) => (
-            <li key={`${model.id}@${model.version}`} className={styles.row}>
-              {model.label}
+          {parts.map((part) => (
+            <li key={part.key} className={styles.row}>
+              {part.title}
               <span className={styles.ready}>
                 <CheckCircleIcon size={18} weight="bold" aria-hidden />
                 Ready
@@ -62,8 +75,9 @@ export function LocalStatus({
             </li>
           ))}
         </ul>
-        <Link to="/privacy" onClick={() => setSheet(null)}>
+        <Link to="/privacy" className={styles.more} onClick={() => setSheet(null)}>
           What stays on this phone
+          <ArrowRightIcon size={20} weight="bold" aria-hidden />
         </Link>
       </BottomSheet>
 

@@ -23,7 +23,9 @@
 }
 
 .status {
-  margin-top: var(--space-2);
+  /* LocalStatus's buttons are 48 px tall for touch; the text line sits 8 px
+     under the place line, as designed. */
+  margin: calc(var(--space-2) - 14px) 0 -14px;
 }
 
 .iconButton {
@@ -96,4 +98,14 @@
 
 .dark .segmentOn {
   background: var(--paper);
+}
+
+/* Camera screens: the bar sits on solid --night, never over the live image. */
+.dark {
+  background: var(--night);
+  color: var(--paper);
+}
+
+.dark .step {
+  padding-bottom: var(--space-3);
 }

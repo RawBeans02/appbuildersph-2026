@@ -1,0 +1,101 @@
+/* Screen 15 / L10 (design: Agapay Local AI States, L10). */
+
+.body {
+  padding: var(--space-1) var(--space-5) var(--space-8);
+}
+
+.title {
+  font: var(--type-title);
+}
+
+.heading {
+  margin: var(--space-6) 0 var(--space-1);
+  font: var(--type-heading);
+}
+
+.parts {
+  border-top: 1px solid var(--line);
+}
+
+.part {
+  display: flex;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.partIcon {
+  flex: none;
+  margin-top: 2px;
+}
+
+.partTitle {
+  font: 700 18px/24px var(--font-ui);
+}
+
+.partText {
+  font: var(--type-body);
+  color: var(--ink-2);
+}
+
+.leavesHeading {
+  margin: 28px 0 6px;
+  font: var(--type-heading);
+}
+
+.text {
+  font: 400 17px/25px var(--font-ui);
+  text-wrap: pretty;
+}
+
+/* The design's text link, with the arrow after the words. */
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 48px;
+  color: var(--ink);
+  font: 700 17px/25px var(--font-ui);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.link:hover {
+  color: var(--ink-2);
+}
+
+.wrongHeading {
+  margin: var(--space-5) 0 var(--space-2);
+  font: var(--type-heading);
+}
+
+.wrong {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  font: 400 17px/25px var(--font-ui);
+}
+
+.wrongItem {
+  display: flex;
+  gap: 10px;
+}
+
+.warnIcon {
+  flex: none;
+  margin-top: 3px;
+  color: var(--warn);
+}
+
+.never {
+  margin-top: var(--space-6);
+  font: 800 18px/26px var(--font-ui);
+}
+
+.footer {
+  margin-top: var(--space-6);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--line);
+  font: var(--type-body-dense);
+  color: var(--ink-2);
+}
