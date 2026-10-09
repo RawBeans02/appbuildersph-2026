@@ -24,3 +24,5 @@ playwright-report/
 # MediaPipe WebAssembly, copied from node_modules by `npm run copy:mediapipe` (runs before dev and build)
 public/mediapipe/
 public/models/mediapipe-runtime/
+# Local video drafts
+docs/demo/agapaymo-one-minute.webm

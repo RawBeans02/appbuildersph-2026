@@ -83,7 +83,7 @@ export function LogTable({ rows }: { rows: LogRow[] }) {
               {row.from}
               {row.week && <span className={styles.week}>{row.week}</span>}
             </td>
-            <td>{row.wording}</td>
+            <td>{row.wording}<ButtonLink to={`/municipal/return?approval=${encodeURIComponent(row.id)}`} variant="text">Make return QR</ButtonLink></td>
           </tr>
         ))}
       </tbody>

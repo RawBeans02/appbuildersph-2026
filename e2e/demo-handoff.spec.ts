@@ -35,6 +35,7 @@ test('the full demo offline: phone wow flow, then pair, receive, merge and appro
   browserName,
 }) => {
   test.setTimeout(360_000)
+  await page.setViewportSize({ width: 390, height: 844 })
   const origin = new URL(baseURL!).origin
   const phoneElsewhere: string[] = []
   watchOrigin(context, origin, phoneElsewhere)
@@ -74,6 +75,7 @@ test('the full demo offline: phone wow flow, then pair, receive, merge and appro
   await expect(metric('people exposed to floodwater')).toHaveText(/^12\D/)
   await expect(metric('doxycycline capsules on hand')).toHaveText(/^40\D/)
   await expect(metric('of them expire within 6 weeks')).toHaveText(/^30\D/)
+  await page.screenshot({ path: 'docs/demo/offline-compare.png', fullPage: true })
   await page.getByRole('button', { name: 'Flag for clinician review' }).click()
   await expect(page.getByText('Flagged for clinician review', { exact: true })).toBeVisible()
 
@@ -168,13 +170,56 @@ test('the full demo offline: phone wow flow, then pair, receive, merge and appro
     await expect(desk.getByText('Plan approved and saved to the log.')).toBeVisible()
     await expect(approve).toBeDisabled()
 
-    // The approval log has the entry: the role, all five barangays, rules only.
+    // Complete the return loop, still offline in both independent contexts.
+    await expect(desk.getByText('Send a doctor team to Maligaya-D first.', { exact: true })).toBeVisible()
+    await expect(desk.getByText('Move 30 capsules from Riverside-D to Maligaya-D.', { exact: true })).toBeVisible()
+    await desk.screenshot({ path: 'docs/demo/offline-approved-plan.png', fullPage: true })
+    await desk.getByRole('link', { name: 'Make return QR' }).click()
+    await desk.getByLabel('Recipient barangay').selectOption('SID-MAL')
+    await desk.getByRole('button', { name: 'Generate return QR' }).click()
+    const returnText = await desk.getByRole('img', { name: 'Approved return instructions QR' }).getAttribute('data-qr-text')
+    const returnImage = await desk.getByRole('img', { name: 'Approved return instructions QR' }).screenshot()
+    expect(returnText).toMatch(/^AGPR1\./)
+    const municipalFingerprint = await desk.locator('code').textContent()
+    await desk.screenshot({ path: 'docs/demo/offline-return-qr.png', fullPage: true })
+    await openPage(page, '/receive')
+    await page.getByLabel('Return QR text', { exact: true }).fill(returnText!)
+    await page.getByRole('button', { name: 'Verify return QR' }).click()
+    await expect(page.locator('code')).toHaveText(municipalFingerprint!)
+    const saveInstructions = page.getByRole('button', { name: 'Save instructions on this phone' })
+    await expect(saveInstructions).toBeDisabled()
+    await page.screenshot({ path: 'docs/demo/offline-first-trust.png', fullPage: true })
+    await page.getByRole('checkbox', { name: 'The fingerprint matches the RHU laptop' }).check()
+    await saveInstructions.click()
+    await expect(page.getByRole('heading', { name: 'Instructions saved on this phone' })).toBeVisible()
+    await page.getByRole('link', { name: 'Back to Home', exact: true }).click()
+    await expect(page.getByRole('region', { name: 'Approved instructions' })).toContainText('Riverside-D to Maligaya-D')
+    const reloaded = await page.reload()
+    expect(reloaded?.fromServiceWorker()).toBe(true)
+    await expect(page.getByRole('region', { name: 'Approved instructions' })).toContainText('doctor team to Maligaya-D first')
+    await page.screenshot({ path: 'docs/demo/offline-saved-home.png', fullPage: true })
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight))
+    await page.getByRole('region', { name: 'Approved instructions' }).screenshot({ path: 'docs/demo/offline-saved-instructions.png' })
+    // The QR image fallback decodes the actual laptop QR, not a hand-built string.
+    await openPage(page, '/receive')
+    await page.getByLabel('Choose a QR image').setInputFiles({ name: 'return.png', mimeType: 'image/png', buffer: returnImage })
+    await expect(page.getByRole('region', { name: 'Approved instructions' })).toBeVisible()
+    await page.getByRole('button', { name: 'Save instructions on this phone' }).click()
+    await expect(page.getByRole('heading', { name: 'Already saved on this phone' })).toBeVisible()
+    await openPage(page, '/compare')
+    await expect(metric('people exposed to floodwater')).toHaveText(/^12\D/)
+    await expect(metric('doxycycline capsules on hand')).toHaveText(/^40\D/)
+    await expect(metric('of them expire within 6 weeks')).toHaveText(/^30\D/)
+
+    // The approval log has the entry and can make the return QR again.
     await desk.getByRole('navigation', { name: 'Municipal' }).getByRole('link', { name: 'Approval log' }).click()
     await expect(desk.getByRole('heading', { level: 1, name: 'Approval log' })).toBeVisible()
     const entry = desk.getByRole('row').filter({ hasText: 'Municipal health officer' })
     await expect(entry).toHaveCount(1)
     await expect(entry).toContainText('5 of 5 barangays')
     await expect(entry).toContainText('Rules only')
+    await entry.getByRole('link', { name: 'Make return QR' }).click()
+    await expect(desk.getByRole('heading', { level: 1, name: 'Return instructions QR' })).toBeVisible()
   } finally {
     await laptop.close()
   }

@@ -22,5 +22,6 @@ test('reads the demo doxycycline box offline with the on-device OCR', async ({ p
   await expect(page.getByLabel('Strength', { exact: true })).toHaveValue(DEMO_SCAN_LABEL.strength)
   await expect(page.getByLabel('Lot number', { exact: true })).toHaveValue(DEMO_SCAN_LABEL.lot)
   await expect(page.getByLabel('Expiry', { exact: true })).toHaveValue(DEMO_SCAN_LABEL.expiry)
+  await page.screenshot({ path: 'docs/demo/offline-ocr-review.png', fullPage: true })
   console.log('Stock screen timing (CI runner):', await page.getByText(/^Read on this phone in/).textContent())
 })

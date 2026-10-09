@@ -122,7 +122,7 @@ describe('receiving the live phone', () => {
       ['Riverside-D', true],
       ['Santo Niño-D', true],
     ])
-    expect(result.plan.priority[0].name).toBe('Bagong Silang-D')
+    expect(result.plan.priority[0].name).toBe('Maligaya-D')
     db.close()
   })
 

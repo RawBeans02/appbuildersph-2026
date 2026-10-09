@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import type { WebGPUSupport } from '../../../lib/capabilities'
-import { createWording, parseFetchedMB, type LlmEngine, type LoadProgress } from './wording'
+import { createWording, DRAFT_TIMEOUT_MS, parseFetchedMB, type LlmEngine, type LoadProgress } from './wording'
 
 const gpu: WebGPUSupport = {
   status: 'available',
@@ -44,6 +44,38 @@ function setup(engine: LlmEngine, support: WebGPUSupport = gpu) {
 const flush = () => new Promise((resolve) => setTimeout(resolve, 0))
 
 describe('createWording', () => {
+  it('settles cancellation during loading and ignores late progress and engines', async () => {
+    const engine = { ...fakeEngine(GOOD), dispose: vi.fn() }
+    const { wording, progress, finishLoad } = setup(engine)
+    await wording.checkAvailable()
+    const done = wording.draft(TEMPLATE, PLAN, KNOWN)
+    wording.cancel()
+    await done
+    progress({ progress: 0.4, fetchedMB: 120 })
+    expect(wording.getState()).toEqual({ status: 'idle' })
+    finishLoad()
+    await flush()
+    expect(engine.dispose).toHaveBeenCalledOnce()
+    expect(engine.complete).not.toHaveBeenCalled()
+  })
+
+  it('times out a stalled load without waiting for a backend response and releases it', async () => {
+    vi.useFakeTimers()
+    try {
+      const engine = { ...fakeEngine(GOOD), dispose: vi.fn() }
+      const { wording, progress, finishLoad } = setup(engine)
+      await wording.checkAvailable()
+      const done = wording.draft(TEMPLATE, PLAN, KNOWN)
+      await vi.advanceTimersByTimeAsync(DRAFT_TIMEOUT_MS)
+      await done
+      expect(wording.getState()).toEqual({ status: 'error', message: 'The model took too long. Use the template wording.' })
+      progress({ progress: 0.5, fetchedMB: null })
+      expect(wording.getState().status).toBe('error')
+      finishLoad()
+      await Promise.resolve()
+      expect(engine.dispose).toHaveBeenCalledOnce()
+    } finally { vi.useRealTimers() }
+  })
   it('is unavailable without WebGPU or on a software adapter, and never loads the model', async () => {
     for (const support of [{ status: 'unsupported' }, { ...gpu, isFallbackAdapter: true }] as WebGPUSupport[]) {
       const { wording, loadEngine } = setup(fakeEngine(GOOD), support)

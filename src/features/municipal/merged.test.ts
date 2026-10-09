@@ -53,17 +53,17 @@ describe('the merged view (screen 18)', () => {
     const view = mergedView(plan, handoff.received, { now: SAMPLE_NOW })
     expect(view.rows.map((row) => (row.kind === 'waiting' ? [row.name, 'waiting'] : [row.name, ...Object.values(row.cells)]))).toEqual([
       ['Maligaya-D', 'waiting'],
-      ['Bagong Silang-D', '142–145', '64', '9–15', '10', '0'],
-      ['Santo Niño-D', '62–65', '27', '2–8', '60', '0'],
-      ['Mabini-D', '32–38', '11', '5', '24', '0'],
-      ['Riverside-D', '2–8', '1–4', '1–4', '50', '30'],
+      ['Bagong Silang-D', '142–145', '6', '0', '10', '0'],
+      ['Santo Niño-D', '62–65', '0', '0', '60', '0'],
+      ['Mabini-D', '32–38', '0', '0', '24', '0'],
+      ['Riverside-D', '2–8', '0', '0', '50', '30'],
     ])
     expect(view.totalLabel).toBe('4 of 5 barangays')
     expect(view.partial).toBe('Totals cover the 4 barangays received so far. Maligaya-D is not counted yet.')
     expect(view.totals).toEqual({
       exposed: '238–256',
-      inWatchWindow: '103–106',
-      fastBreathing: '17–32',
+      inWatchWindow: '6',
+      fastBreathing: '0',
       doxyOnHand: '144',
       doxyExpiring: '30',
     })
@@ -73,7 +73,7 @@ describe('the merged view (screen 18)', () => {
     expect(received[0].received).toMatch(/^\d{1,2}:\d{2} [AP]M · #3$/)
     expect(view.why).toEqual({
       name: 'Bagong Silang-D',
-      reason: 'the most residents in the watch window (64), fast-breathing referrals (9–15), and URGENT referrals (5).',
+      reason: 'the most residents in the watch window (6).',
     })
   })
 
@@ -146,11 +146,11 @@ describe('the plan steps (screen 19) and the log summary (screen 20)', () => {
     expect(planSteps(plan)).toEqual([
       {
         title: 'Send a doctor team to Bagong Silang-D first.',
-        reason: '64 residents in the watch window, fast-breathing referrals (9–15), URGENT referrals (5).',
+        reason: '6 residents in the watch window.',
       },
       {
         title: 'Move 30 capsules from Riverside-D to Bagong Silang-D.',
-        reason: 'Riverside-D has 50 capsules, 3–12 people exposed and 1–4 in the watch window.',
+        reason: 'Riverside-D has 50 capsules, 2–8 people exposed and no one in the watch window.',
       },
       { title: 'Use the 30 capsules that expire within 6 weeks first.', reason: 'Riverside-D 30.' },
     ])
@@ -158,7 +158,7 @@ describe('the plan steps (screen 19) and the log summary (screen 20)', () => {
       '1. Doctor team to Bagong Silang-D first. 2. Move 30 capsules from Riverside-D to Bagong Silang-D. 3. Use the 30 expiring capsules first.',
     )
     expect(planStepsText(plan).split('\n')[0]).toBe(
-      '1. Send a doctor team to Bagong Silang-D first. 64 residents in the watch window, fast-breathing referrals (9–15), URGENT referrals (5).',
+      '1. Send a doctor team to Bagong Silang-D first. 6 residents in the watch window.',
     )
   })
 

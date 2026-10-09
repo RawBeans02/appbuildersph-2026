@@ -9,13 +9,24 @@ export type ExportResult =
 
 const LIMIT = 1000
 
+export async function readAllRecords<T extends { id: string }>(repository: { list(options: { limit: number; after?: string }): Promise<T[]> }): Promise<T[]> {
+  const records: T[] = []
+  let after: string | undefined
+  for (;;) {
+    const page = await repository.list({ limit: LIMIT, after })
+    records.push(...page)
+    if (page.length < LIMIT) return records
+    after = page[page.length - 1].id
+  }
+}
+
 export async function readPhoneRecords(db: AgapayDb) {
   const [residents, exposures, hingaChecks, stockLots, flags] = await Promise.all([
-    db.residents.list({ limit: LIMIT }),
-    db.exposures.list({ limit: LIMIT }),
-    db.hingaChecks.list({ limit: LIMIT }),
-    db.stockLots.list({ limit: LIMIT }),
-    db.flags.list({ limit: LIMIT }),
+    readAllRecords(db.residents),
+    readAllRecords(db.exposures),
+    readAllRecords(db.hingaChecks),
+    readAllRecords(db.stockLots),
+    readAllRecords(db.flags),
   ])
   return { residents, exposures, hingaChecks, stockLots, flags }
 }

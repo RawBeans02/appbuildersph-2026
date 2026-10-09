@@ -27,6 +27,12 @@ On the device being measured, with internet on, open the live URL's `/prepare` a
 ### 3. QR sizes
 Vitest (Node 20) in CI. In `src/qr/codec.test.ts`, the realistic sample payload is 282 bytes of QR text and the largest valid one 343. `src/qr/pairing.test.ts` measures the pairing QR at 173 characters for any P-256 key.
 
+Return packets: `src/features/return/return.test.ts` enforces that its two-action
+fixture fits below 900 ASCII characters and preserves `<5`; the protocol caps
+packets at 2,048 characters. The independent-context browser test also reads
+the actual generated return QR image offline. These are browser/encoding
+checks, not physical camera or phone performance results.
+
 ### 4. CI-runner timings (runner numbers only)
 - `e2e/ocr-offline.spec.ts` logs the stock screen's line, for example "Read on this phone in 0.7 s, after 0.5 s getting the AI ready." (before the designed screens: "…, after 0.6 s loading the reader for the first time"), from headless Chromium on a GitHub Actions `ubuntu-latest` runner.
 - The CI-only model tests (`*.model.test.ts`) log detection and recognition milliseconds in Node on the same runner.
@@ -50,6 +56,26 @@ Fill in from method 1 ("Copy as a table row"). One row per device and run.
 | | MacBook Air M2 (municipal laptop) | | | | | | | | | | | | | | |
 
 ## Recorded so far
+
+### Offline-return branch: local desktop evidence
+
+Oct 9, 2026, 14:43 UTC (22:43 PH), working tree on `codex/offline-return-qr`
+based on `ddc193e`. Local production preview, Windows desktop, headless
+Chromium 156.0.8078.4. The test harness calls this device "CI runner"; this run
+was local. It used a fake camera. None of these numbers is phone speed or
+breathing accuracy. Physical results remain blank above.
+
+| Backend / engine | OCR load ms | First read ms | Warm median ms | Lot + expiry right | Pose cold / warm ms | Pose mode | Fake-camera fps / median infer ms | Cry start ms | PIN key ms |
+|---|---|---|---|---|---|---|---|---|---|
+| WASM, 1 thread / PP-OCRv5 | 2162 | 3693 | 1912 | yes | 580 / 1032 | worker | 13.7 / 59 | 511 | 237 |
+
+Source: `e2e/measure.spec.ts`, final full-suite local run. Separately,
+`e2e/ocr-offline.spec.ts` read the synthetic label with network disabled and
+reported 5.2 s after 2.8 s getting the AI ready. Timings vary by load; neither
+result decides the actual-phone S2 gate. Default-core build precache:
+136 entries, 1929.65 KiB (Workbox build output).
+
+### Earlier team-recorded evidence
 
 | When | Number | Where it came from | Device |
 |---|---|---|---|

@@ -11,6 +11,7 @@ import { WATCH_END_DAY } from '../../rules/watch'
 import type { HomeSummary } from './summary'
 import { useHomeSummary } from './useHomeSummary'
 import styles from './HomePage.module.css'
+import InstructionsCard from '../return/InstructionsCard'
 
 // Phase 2 only (P2-C): approved messages from the municipality, its own chunk.
 const MessagesCard = lazy(() => import('../inbox/MessagesCard'))
@@ -172,6 +173,7 @@ export default function HomePage() {
               <Rows summary={summary.data} />
             </>
           ))}
+        <InstructionsCard />
         {PHASE2 && (
           <Suspense fallback={null}>
             <MessagesCard />

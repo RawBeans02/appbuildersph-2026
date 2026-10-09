@@ -205,6 +205,7 @@ export default function SendPage() {
     <div className={styles.screen}>
       {header}
       <WhatLeaves sections={whatLeaves(counts)} headingRef={focusHeading} />
+      <ButtonLink to="/receive" variant="secondary">Receive RHU instructions</ButtonLink>
       <p className={styles.meta}>
         <SealCheckIcon size={18} weight="bold" aria-hidden />
         <span>

@@ -29,7 +29,7 @@ function trace(entries: string[]): Graph {
         problems.push(`${file}: ${specifier} (no .js)`)
         continue
       }
-      const target = relative(root, join(dirname(join(root, file)), specifier.replace(/\.js$/, '.ts')))
+      const target = relative(root, join(dirname(join(root, file)), specifier.replace(/\.js$/, '.ts'))).replaceAll('\\', '/')
       if (!existsSync(join(root, target))) problems.push(`${file}: ${specifier} (no ${target})`)
       else queue.push(target)
     }

@@ -35,15 +35,25 @@ flowchart LR
     APPROVE["Officer edits and approves: approval log in IndexedDB"]
     SCAN --> VERIFY --> MERGE --> PLAN --> LLM --> APPROVE
     PLAN -->|template wording| APPROVE
+    RETURN["AGPR1: approved structured actions signed with the laptop key"]
+    APPROVE --> RETURN
   end
 
   QR -->|"camera to screen, no network"| SCAN
   PAIR -->|"once; fingerprints compared"| SCAN
+  RETURN -->|"camera to screen; municipal fingerprint compared before first trust"| UI
+  UI -->|"explicit receipt save; no inventory mutation"| DB
   NET -.->|first load only| PHONE
   NET -.->|first load only| LAPTOP
 ```
 
 ## Offline: what loads when
+
+The signed return QR adds a second direction to the same offline link. Phone
+trust and the latest instructions persist in the existing `meta` store, with
+no database version bump. The laptop reuses its signing identity independently
+of cloud enrollment. Protocol, trust, reset behavior and limits are documented
+in [Offline return](OFFLINE-RETURN.md).
 
 | When | What | Where it's kept |
 |---|---|---|
@@ -225,8 +235,14 @@ Optional, after a sync. The DOH or regional officer drafts alerts on `/doh`; a p
 
 ## Limitations
 
+- **Offline return instructions**: trust depends on fingerprint comparison with
+  the approving laptop, and recency depends on its clock. Only the latest
+  approval is kept; receipt does not acknowledge completion or update stock.
+  Actual iPhone/Android QR scanning and final-device rehearsals remain pending.
+  Full bounds and reset behavior: [Offline return](OFFLINE-RETURN.md).
+
 - **OCR**: boxes are straight rectangles, so curved bottles, tilted boxes, glare and very small print read worse. The recognizer is English-only. Speed on our phones is measured in the S2 test (TASKS.md), not assumed. The Tesseract fallback hasn't run in a browser.
-- **iPhone**: Safari keeps a whole file in memory while caching it, and iOS can close a tab that uses too much memory without an error. Photos are downscaled to 1280 px and the models are small, but this is only proven on our test phones.
+- **iPhone**: Safari keeps a whole file in memory while caching it, and iOS can close a tab that uses too much memory without an error. Photos are downscaled to 1280 px and the models are small; the documented physical iPhone/Android trials still need recorded results.
 - **Laptop AI wording**: it needs WebGPU (desktop Chrome or Edge) and a large first download. A 0.5B model writes plainly at best. `checkDraft` is a word-level check and can't catch every rewording that changes the meaning, so the officer's review is the final safeguard.
 - **Storage**: if the browser refuses persistent storage, it may clear the models under storage pressure. The Prepare for offline screen then offers the download again.
 - **Phase 2 sync**: one enroll code for every laptop, so anyone who learns it can enroll a key (rotate it in the Vercel settings; enrolled laptops keep working). A laptop's vouch for a phone key is trusted as given; two laptops of one municipality that disagree overwrite each other's vouch. The DOH view code is shared, not per person and not per municipality (a decision names its municipality, checked against the alert's); it must be at least 16 characters, and each address gets 10 wrong tries per 10 minutes, but someone with many addresses can still try more. A laptop whose clock is more than 5 minutes off can't sync until it's corrected.

@@ -12,8 +12,8 @@ export function DemoTools() {
 
   async function reset(resetPairing: boolean) {
     const question = resetPairing
-      ? "Reset every record to the sample data dated today, and forget this phone's key and all paired phones? Downloaded models are kept."
-      : 'Reset every record to the sample data dated today? Downloaded models and pairing are kept.'
+      ? "Reset every record to today's sample data, clear received instructions, and forget this phone's key, all paired phones and trusted municipal keys? Downloaded models are kept."
+      : "Reset every record to today's sample data and clear received instructions? Downloaded models, pairing and municipal trust are kept."
     if (!window.confirm(question)) return
     setBusy(true)
     setStatus('Resetting…')

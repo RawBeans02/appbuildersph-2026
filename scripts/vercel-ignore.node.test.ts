@@ -1,5 +1,5 @@
 import { execFileSync, spawnSync } from 'node:child_process'
-import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -9,6 +9,17 @@ import { describe, expect, it } from 'vitest'
 // skips the build, 1 = it builds.
 
 const SCRIPT = join(dirname(fileURLToPath(import.meta.url)), 'vercel-ignore.sh')
+function findShell(): string {
+  if (process.platform !== 'win32') return 'sh'
+  // Git can be installed system-wide, per-user or in the bundled runtime.
+  const gitPaths = execFileSync('where.exe', ['git'], { encoding: 'utf8' }).trim().split(/\r?\n/)
+  const candidates = gitPaths.flatMap((git) => [join(dirname(git), '..', 'bin', 'sh.exe'), join(dirname(git), 'sh.exe')])
+  candidates.push(join(process.env.ProgramFiles ?? 'C:/Program Files', 'Git', 'bin', 'sh.exe'))
+  const found = candidates.find(existsSync)
+  if (!found) throw new Error('Git for Windows shell was not found; install Git Bash to run the deployment script tests.')
+  return found
+}
+const SHELL = findShell()
 
 function repo() {
   const dir = mkdtempSync(join(tmpdir(), 'vercel-ignore-'))
@@ -29,7 +40,7 @@ function repo() {
     git('commit', '-qm', 'change')
   }
   const run = (previous: string | undefined, message = 'lead: deploy [deploy]') =>
-    spawnSync('sh', [SCRIPT], {
+    spawnSync(SHELL, [SCRIPT], {
       cwd: dir,
       env: { ...process.env, VERCEL_GIT_PREVIOUS_SHA: previous ?? '', VERCEL_GIT_COMMIT_MESSAGE: message },
     }).status
@@ -61,7 +72,7 @@ describe('vercel-ignore.sh', () => {
       commit('docs/notes.md', path)
       expect(run(base), path).toBe(1)
     }
-  })
+  }, 20_000)
 
   it('builds when an app file moves into docs/ (both sides of the move count)', () => {
     const { dir, git, run, base } = repo()

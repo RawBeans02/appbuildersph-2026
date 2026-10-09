@@ -7,8 +7,8 @@ import { DEMO_MUNICIPALITY } from '../places'
 //
 // Everything is invented sample data for the fictional municipality San Isidro
 // Demo: de-identified counts only, the kind a barangay phone sends. The story
-// the plan should tell: Bagong Silang-D is clearly the priority for doctor
-// teams and has few capsules; Riverside-D has almost nobody in the watch window
+// the plan should tell: the live Maligaya-D phone becomes the first doctor-team
+// destination; Riverside-D has nobody in the watch window
 // but holds doxycycline that expires within 6 weeks, so the plan suggests a
 // move. Maligaya-D is the live demo phone, paired on stage, so it isn't here.
 //
@@ -22,15 +22,14 @@ export type SampleBarangay = { code: string; seq: number; counts: RawCounts }
 
 export const SAMPLE_BARANGAYS: readonly SampleBarangay[] = [
   {
-    // Low-lying, hit hardest: the most referrals and residents in the watch
-    // window, and few capsules on hand.
+    // The only pre-made barangay with an active watch; below the live phone.
     code: 'SID-BGS',
     seq: 3,
     counts: {
       exposed: { under2m: 2, m2to12: 6, y1to5: 14, y5to17: 38, y18to59: 71, y60plus: 12 },
-      inWatchWindow: 64,
-      fastBreathing: { under2m: 1, m2to12: 3, y1to5: 7 },
-      urgentReferrals: 5,
+      inWatchWindow: 6,
+      fastBreathing: { under2m: 0, m2to12: 0, y1to5: 0 },
+      urgentReferrals: 0,
       doxyCapsulesOnHand: 10,
       doxyCapsulesExpiring6w: 0,
       clinicianReviewFlags: 12,
@@ -41,9 +40,9 @@ export const SAMPLE_BARANGAYS: readonly SampleBarangay[] = [
     seq: 2,
     counts: {
       exposed: { under2m: 0, m2to12: 2, y1to5: 6, y5to17: 15, y18to59: 33, y60plus: 7 },
-      inWatchWindow: 27,
-      fastBreathing: { under2m: 0, m2to12: 1, y1to5: 4 },
-      urgentReferrals: 1,
+      inWatchWindow: 0,
+      fastBreathing: { under2m: 0, m2to12: 0, y1to5: 0 },
+      urgentReferrals: 0,
       doxyCapsulesOnHand: 60,
       doxyCapsulesExpiring6w: 0,
       clinicianReviewFlags: 5,
@@ -54,8 +53,8 @@ export const SAMPLE_BARANGAYS: readonly SampleBarangay[] = [
     seq: 4,
     counts: {
       exposed: { under2m: 0, m2to12: 0, y1to5: 3, y5to17: 9, y18to59: 21, y60plus: 4 },
-      inWatchWindow: 11,
-      fastBreathing: { under2m: 0, m2to12: 0, y1to5: 5 },
+      inWatchWindow: 0,
+      fastBreathing: { under2m: 0, m2to12: 0, y1to5: 0 },
       urgentReferrals: 0,
       doxyCapsulesOnHand: 24,
       doxyCapsulesExpiring6w: 0,
@@ -68,8 +67,8 @@ export const SAMPLE_BARANGAYS: readonly SampleBarangay[] = [
     seq: 2,
     counts: {
       exposed: { under2m: 0, m2to12: 0, y1to5: 0, y5to17: 2, y18to59: 3, y60plus: 0 },
-      inWatchWindow: 2,
-      fastBreathing: { under2m: 0, m2to12: 0, y1to5: 1 },
+      inWatchWindow: 0,
+      fastBreathing: { under2m: 0, m2to12: 0, y1to5: 0 },
       urgentReferrals: 0,
       doxyCapsulesOnHand: 50,
       doxyCapsulesExpiring6w: 30,

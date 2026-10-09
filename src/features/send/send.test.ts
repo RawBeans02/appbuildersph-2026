@@ -4,10 +4,29 @@ import { openAgapayDb } from '../../data/db/db'
 import type { Exposure, HingaCheck, Resident, StockLot } from '../../data/db/types'
 import { decodePairing, decodeQr } from '../../qr'
 import { ageBand, ageInMonths, collectRawCounts, hingaBand } from './counts'
-import { createExport, createPairingQr } from './exportQr'
+import { createExport, createPairingQr, readPhoneRecords } from './exportQr'
 import { ensureDeviceIdentity, resolvePlace } from './identity'
 
 const TODAY = '2026-10-10'
+
+it('aggregates every page beyond 1,000 residents, exposures, checks, stock lots and flags', async () => {
+  const db = await openAgapayDb('send-over-one-page')
+  try {
+    await db.loadSeed({ version: 'pagination-test', municipality: 'San Isidro Demo', barangay: 'Maligaya-D', residents: [] })
+    const ids = Array.from({ length: 1005 }, (_, i) => String(i).padStart(5, '0'))
+    await Promise.all([
+      db.residents.putMany(ids.map((id) => resident(id, '1990-01-01'))),
+      db.exposures.putMany(ids.map((id) => exposure(id, '2026-10-03'))),
+      db.hingaChecks.putMany(ids.map((id) => check(id, 20, 'fast', '2026-10-09T02:00:00.000Z'))),
+      db.stockLots.putMany(ids.map((id) => ({ ...doxy(5, '2026-11'), id }))),
+      db.flags.putMany(ids.map((id) => ({ id, kind: 'clinician-review', createdAt: '', reason: '', details: {}, status: 'open', sample: true }))),
+    ])
+    const records = await readPhoneRecords(db)
+    for (const rows of Object.values(records)) expect(rows).toHaveLength(1005)
+    const exported = await createExport(db, TODAY)
+    expect(exported.ok && exported.payload.counts).toMatchObject({ inWatchWindow: 1005, fastBreathing: { y1to5: 1005 }, doxyCapsulesOnHand: 5025, doxyCapsulesExpiring6w: 5025, clinicianReviewFlags: 1005 })
+  } finally { db.close() }
+})
 
 // Seed records come without the sample flag; the loader adds it.
 function withoutSample<T extends { sample: boolean }>(record: T): Omit<T, 'sample'> {

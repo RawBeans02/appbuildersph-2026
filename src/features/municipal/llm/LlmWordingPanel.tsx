@@ -22,10 +22,11 @@ let shared: Wording | null = null
 function getWording(): Wording {
   shared ??= createWording({
     gpu: () => checkWebGPU(),
-    loadEngine: async (onProgress) => {
+    loadEngine: async (onProgress, signal) => {
       const gpu = await checkWebGPU()
+      signal.throwIfAborted()
       if (gpu.status !== 'available') throw new Error('No usable WebGPU on this laptop.')
-      return loadWordingEngine({ kind: 'webgpu', f16: gpu.shaderF16, reason: 'AI wording on WebGPU' }, onProgress)
+      return loadWordingEngine({ kind: 'webgpu', f16: gpu.shaderF16, reason: 'AI wording on WebGPU' }, onProgress, signal)
     },
   })
   return shared

@@ -1,12 +1,16 @@
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { CheckedWording } from './CheckedWording'
 import { LogTable } from './LogPage'
 import { MergedTable } from './MergedPage'
 import { mergedView } from './merged'
 import { PlanBody, PlanSteps, type WordingPanel } from './PlanPage'
 import { sampleState, SAMPLE_NOW } from './testSample'
+
+// SSR render checks do not start the PWA runtime or resolve its virtual module.
+vi.mock('../../lib/useHoldReload', () => ({ useHoldReload: () => {} }))
+vi.mock('../../lib/appShell', () => ({ useShellStatus: () => 'ready' }))
 
 // Render checks of the laptop screens' parts with the sample barangays (no
 // browser on the build laptop; the live URL is checked by hand).
@@ -23,8 +27,8 @@ describe('laptop screens', () => {
       'Barangay Received Exposed, watch not started yet In watch window Fast-breathing referrals Doxycycline on hand Expiring in 6 weeks',
     )
     expect(table).toContain('Maligaya-D Waiting – – – – –')
-    expect(table).toMatch(/Bagong Silang-D Priority \d{1,2}:\d{2} [AP]M · #3 142–145 64 9–15 10 0/)
-    expect(table).toContain('4 of 5 barangays 238–256 103–106 17–32 144 30')
+    expect(table).toMatch(/Bagong Silang-D Priority \d{1,2}:\d{2} [AP]M · #3 142–145 6 0 10 0/)
+    expect(table).toContain('4 of 5 barangays 238–256 6 0 144 30')
     expect(html).not.toContain('<a ') // rows open nothing (the detail isn't designed)
   })
 

@@ -26,6 +26,7 @@ const ON_THIS_PHONE: { icon: Icon; title: string; text: string }[] = [
     title: 'Your records',
     text: "Residents, floods, checks and stock stay in this phone's browser storage.",
   },
+  { icon: LockSimpleIcon, title: 'Approved RHU instructions', text: 'Return QRs are checked and saved here only after you confirm. Before first trust, compare the fingerprint with the RHU laptop. Saving does not change your stock.' },
 ]
 
 const CAN_GET_WRONG = [
