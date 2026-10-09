@@ -18,7 +18,8 @@ Every task names the files or folders it **owns**, so agents pushing straight to
 **Judging (official weights, `RULES.md`):** Problem & Usefulness 25% · Local AI Implementation 25% · Technical Execution 20% · Innovation 15% · Product & Demo Quality 15%. Every wow-flow task must also work with the network off (`QUALITY.md`, "Local AI").
 
 ## Now (the wow flow)
-- [ ] todo · Claude Design pass 1: design system (tokens) + every wow-flow screen in all states (default, loading, empty, error), **plus the model download/initialization progress, "running on this device" and offline indicator states** → `design/` + `design/README.md` · [lead] · owns: `design/`
+- [ ] doing · Claude Design pass 1: design system (tokens) + every wow-flow screen in all states (default, loading, empty, error), **plus the model download/initialization progress, "running on this device" and offline indicator states** → `design/` + `design/README.md` · [lead] · owns: `design/`
+  - The brief (20 screens: phone 1–15, laptop 16–20) is with the owner to run in Claude Design. The screen numbers below refer to it.
 - [ ] doing · Scaffold + first deploy, **idea-agnostic, no designed UI** (~30–45 min) · [sr] · owns: `package.json`, the lockfile, `vite.config.ts`, `tsconfig*.json`, the ESLint config, `index.html`, `vercel.json`, `public/`, `src/main.tsx`, `src/App.tsx` (placeholder), `src/lib/`, `docs/OFFLINE-SMOKE-TEST.md`, `docs/DEPLOY.md`
   - Vite + React + TS; npm scripts `dev`, `build`, `preview`, `typecheck`, `lint`, `test` (Vitest, with at least one real test) so CI can call them.
   - PWA shell with `vite-plugin-pwa`: manifest, service worker precaching the app shell, and an offline fallback. The hello page is a plain, unstyled placeholder (no product name, no theme, no shadcn).
@@ -44,8 +45,30 @@ Every task names the files or folders it **owns**, so agents pushing straight to
 - [x] done · `useModelDownload`: state machine for the designed model-loading states (idle → checking-storage → downloading {loaded, total, file} → verifying → ready, or error {code}), with cancel, retry, `holdReload()` while downloading and an already-cached fast path; logic only, unit-tested · [sr] · owns: `src/lib/useModelDownload.ts`, `src/lib/modelDownload.ts`, `src/lib/modelCache.ts` · 58dac97 (review fixes c03e4a6)
 - [x] done · Inference worker scaffold, runtime-agnostic: module Worker, typed message protocol (init with the backend pick, run with progress, cancel, coded errors) and a fake echo runtime so it's testable now · [sr] · owns: `src/inference/` · 4ebaf08
 - [x] done · Offline e2e test with Playwright, CI only (never on the laptop): `@playwright/test`, `test:e2e`, `playwright.config.ts`, `e2e/offline.spec.ts` (load, shell ready, go offline, reload, shell still renders) · [sr] · owns: `playwright.config.ts`, `e2e/`, `package.json`, the lockfile · c308f81 (passed on its first CI run, 37894243208: Chromium, 1 test, 7.3 s)
-- [ ] todo · Theme from the `design/README.md` tokens, applied once; component library customized, no defaults · [sr] · owns: theme files
-- [ ] todo · _task_ · [owner] · owns: `<files/folders>` · design: `design/<screen>`
+
+### Agapay build (idea locked Fri ~3:30 PM; see `ONE-PAGER.md`)
+Until `design/` lands, build the logic plus plain, unstyled screens and write `NEEDS DESIGN:` under the task. Synthetic data only. Never claim "first" (see README "Related work"). Hinga never diagnoses; nothing ever recommends a dose.
+
+**Sr. Builder**
+- [ ] todo · A1 App structure + data layer: routes for every screen (phone: `/`, `/hinga`, `/watch`, `/stock`, `/send`, `/privacy`; laptop: `/municipal`, `/municipal/plan`, `/municipal/log`) as placeholders; IndexedDB repositories (residents, flood events, exposures, Hinga checks, stock lots, flags, approvals) with tests; loads the Lead's synthetic seed (`src/data/seed/`) on first run, labeled "Sample data" · [sr] · owns: `src/app/`, `src/data/db/`, `src/App.tsx`, `src/main.tsx`
+- [ ] todo · A2 Prepare for offline: precache = app shell only; models and runtime `.wasm` load on demand through `modelCache` + `useModelDownload` in one designed "Prepare for offline" step (MB/% progress, storage check, persistence); the service worker serves the cached model and runtime files offline; e2e: prepare → offline → reload → a model file and the runtime `.wasm` load from cache · [sr] · owns: `vite.config.ts`, the service-worker config, `src/lib/modelCache.ts`, `src/lib/modelDownload.ts`, `src/lib/useModelDownload.ts`, `e2e/`
+- [ ] todo · A3 Flood event → exposed residents → watch window: rules (day 5–15 after exposure; waded / open wound / repeated exposure) unit-tested; screens 8–9 · [sr] · owns: `src/features/flood/`, `src/rules/watch.ts`
+- [ ] todo · A4 Medicine-box OCR in the app: PP-OCR moves into the real inference worker; parse drug / lot (`LOT`, `Lot No`, `Batch`) / expiry (`EXP`, `Exp. Date`; MM/YYYY, YYYY-MM, MMM YYYY) with a confidence per field, unit-tested; review + confirm → stock lot; screens 10–12 · [sr] · owns: `src/features/stock/`, `src/inference/ocr/`, `src/rules/label.ts`
+- [ ] todo · A5 Exposure × stock: rules (exposed count, capsules on hand, expiring within 6 weeks → "flag for clinician review", never a dose) unit-tested; screen 13 · [sr] · owns: `src/rules/stock.ts`, `src/features/compare/`
+- [ ] todo · A6 Send: "What leaves this phone" table + the QR, using the Lead's `src/qr/` encoder; screen 14 · [sr] · owns: `src/features/send/`
+- [ ] todo · A7 Theme from the `design/README.md` tokens, applied once; component library customized, no defaults; the "Runs on this phone" and "Offline" indicators · [sr] · owns: `src/theme/`, `src/components/`
+- [ ] todo · A8 Privacy & AI page (screen 15), 404, app icons + manifest (after design) · [sr] · owns: `src/features/privacy/`, `public/icons/`
+
+**Lead**
+- [ ] doing · B1 Hinga spike S1 (see "Spike" below) · [lead]
+- [ ] todo · B2 Hinga in the app (after S1 passes): age band + readiness, framing, 60 s count, refusals (motion, torso lost, readings disagree, crying), result (fast / not fast against the WHO IMCI 2014 cut-offs) with danger signs → URGENT, save to the record; screens 2–7. Cry detection: YAMNet via MediaPipe's audio classifier, on the device; microphone audio is never stored · [lead] · owns: `src/features/hinga/`, `src/inference/hinga/`, `src/rules/imci.ts`
+- [ ] todo · B3 QR payload v1: schema, compact encoding, ECDSA P-256 sign/verify (Web Crypto), small-cell suppression ("<5"), age bands only, epi-week not dates, each QR under 800 bytes; unit tests · [lead] (→ [devin] PR 1 if the owner confirms Devin) · owns: `src/qr/`
+- [ ] todo · B4 Synthetic data: "San Isidro Demo" (Maligaya-D, Bagong Silang-D, Santo Niño-D, Mabini-D, Riverside-D), residents "Residente 001…", lots "DEMO-LOT-…", plus 4 pre-made signed barangay QRs for the laptop demo; the generator and seed are in the repo · [lead] (→ [devin] PR 2 if confirmed) · owns: `src/data/seed/`, `scripts/seed/`
+- [ ] todo · B5 Municipal laptop view: scan a QR (BarcodeDetector, with a JS decoder fallback), verify, merge the 5 barangays, merged table, rule-based plan (doctor-team priority, stock moves), approve + log; screens 16–20 except the AI panel · [lead] · owns: `src/features/municipal/`, `src/rules/plan.ts`
+- [ ] todo · B6 Local LLM wording (optional): WebLLM Llama-3.2-1B on the laptop, prompt constrained to the plan's numbers, output checked so it can't change a count, template fallback when WebGPU or the model isn't available. No WebLLM test on the 8 GB Mac without messaging Account Admin first · [lead] · owns: `src/features/municipal/llm/`
+- [ ] todo · B7 `docs/ARCHITECTURE.md` + the README sections as features land · [lead]
+
+**Decision points:** ~4:30 PM design pass 1 lands → UI phase · **7:00 PM** S1 Hinga kill call (fallback: a tap-to-select chest region; then a guided tap counter) and AMD (dropped unless a Ryzen AI laptop is confirmed) · **12:00 AM** scope check · **4:00 AM** feature freeze.
 
 **Platform notes for any on-device model (reported by outside sources, NOT yet verified on our devices; check on our own phones before relying on them):**
 - **Offline precache:** the service worker's precache list (`vite.config.ts`, `workbox.globPatterns`) doesn't include `.wasm`/`.mjs`/model files, and Workbox skips files over 2 MiB by default. Add the runtime's files and raise `maximumFileSizeToCacheInBytes`, or runtime-cache model files (CacheFirst) with `navigator.storage.persist()`, or the model silently won't work offline. Acceptance for the runtime task: after a reload in airplane mode, the runtime's `.wasm` and the model file both load.
@@ -71,7 +94,7 @@ Every task names the files or folders it **owns**, so agents pushing straight to
 
 ## Next
 - [ ] todo · Claude Design pass 2: remaining screens, 404, og:image, video title card · [lead] · owns: `design/`
-- [ ] todo · _task_
+- [ ] todo · PIN lock + AES-GCM encryption of the on-device records (Web Crypto, PBKDF2 from the PIN) · [sr] or [lead], after the wow flow works end to end
 
 ## Submission (by 9:00 AM) & Demo Day
 - [ ] todo · seed realistic Filipino demo data, stored on the device
@@ -89,7 +112,8 @@ Every task names the files or folders it **owns**, so agents pushing straight to
 - [ ] todo · 5-minute pitch + Q&A drill, rehearsed ×3 (the questions will cover what runs locally and why) · [human]
 
 ## Ideas (not now — only after the wow flow is done)
--
+- Cut list if behind at midnight, in order: dengue checks · hazard map layer · any DOH cloud view · Lemonade (unless working) · YAMNet (keep the motion gate) · Tagalog strings beyond the main labels
+- Not doing: dosing or diagnosis, accounts/login, real patient data, cloud AI in the shipped app
 
 ## Done
 -
