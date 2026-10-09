@@ -39,3 +39,22 @@ export function cryDetected(
 ): boolean {
   return cryingSeconds(windows, threshold) > minSeconds
 }
+
+// After a count: whether crying was heard, or why the cry check can't vouch
+// for the count (it never started, heard nothing, or missed part of the
+// minute). A count with the check off still stands, labeled "Cry check off".
+export type CryVerdict = { crying: boolean; off: string | null }
+
+export function cryVerdict(input: {
+  // Why the check didn't listen at all (e.g. microphone not allowed), or null.
+  offReason: string | null
+  windows: readonly CryWindow[]
+  // Pieces of audio the model failed to score.
+  failed: number
+}): CryVerdict {
+  if (input.offReason !== null) return { crying: false, off: input.offReason }
+  if (cryDetected(input.windows)) return { crying: true, off: null }
+  if (input.windows.length === 0) return { crying: false, off: 'no sound was checked' }
+  if (input.failed > 0) return { crying: false, off: "part of the sound wasn't checked" }
+  return { crying: false, off: null }
+}

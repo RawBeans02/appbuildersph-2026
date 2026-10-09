@@ -25,6 +25,8 @@ export async function startCryModel(): Promise<CryModel> {
 export type Listening = {
   // Seconds of audio scored so far, and the windows' crying scores.
   windows(): CryWindow[]
+  // Pieces of audio the model failed to score (so the check missed them).
+  failed(): number
   stop(): void
 }
 
@@ -46,10 +48,20 @@ export async function listenForCrying(model: CryModel, onWindow: () => void): Pr
   }
 
   const windows: CryWindow[] = []
-  const source = context.createMediaStreamSource(stream)
-  // ScriptProcessorNode is deprecated but works everywhere, iPhone included,
-  // without a separate worklet file; its output stays silent.
-  const processor = context.createScriptProcessor(4096, 1, 1)
+  let failed = 0
+  let source: MediaStreamAudioSourceNode
+  let processor: ScriptProcessorNode
+  try {
+    source = context.createMediaStreamSource(stream)
+    // ScriptProcessorNode is deprecated but works everywhere, iPhone included,
+    // without a separate worklet file; its output stays silent.
+    processor = context.createScriptProcessor(4096, 1, 1)
+  } catch (error) {
+    // Don't leave the microphone on.
+    stream.getTracks().forEach((track) => track.stop())
+    void context.close()
+    throw error
+  }
   const pieceLength = Math.round(context.sampleRate)
   let piece = new Float32Array(pieceLength)
   let filled = 0
@@ -75,7 +87,11 @@ export async function listenForCrying(model: CryModel, onWindow: () => void): Pr
             windows.push(...answer.windows)
             onWindow()
           })
-          .catch(() => {})
+          .catch((error: unknown) => {
+            if (stopped) return
+            failed++
+            console.error('Hinga: the cry check missed a piece of sound', error)
+          })
       }
     }
   }
@@ -84,6 +100,7 @@ export async function listenForCrying(model: CryModel, onWindow: () => void): Pr
 
   return {
     windows: () => windows,
+    failed: () => failed,
     stop() {
       stopped = true
       processor.onaudioprocess = null
