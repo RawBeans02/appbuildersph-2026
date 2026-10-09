@@ -56,6 +56,14 @@ Every task names the files or folders it **owns**, so agents pushing straight to
 - **Big files on iPhone:** WebKit's `Cache.put` holds a whole entry in memory before storing it (Chrome streams it to disk), so one large weights file can spike memory and get the tab killed. Prefer sharded models (several smaller files) for the phone path (from the WebKit/Blink sources; see `src/lib/modelCache.ts`).
 - **Where model files live:** self-hosting them on our own domain is more reliable and can be precached, but `.gitignore` blocks weights and GitHub caps files at 100 MB. Decide per model when it's picked: self-host (force-add, listed in the README with source and license) or download from the model host on first load (listed under "What requires internet").
 
+**Spike (throwaway, before the idea is locked; useful for any OCR-based idea):**
+- [ ] todo · OCR spike: PP-OCRv5 mobile detection + recognition in the inference worker via onnxruntime-web, **WASM only, single-threaded** (no WebGPU: iPhone), with self-hosted model files precached for offline. A plain dev page (`spike-ocr.html`, a separate Vite entry, not linked from the app) reads a photo of a printed medicine box and shows boxes, text and per-stage timings · [sr] · owns: `spikes/`, `spike-ocr.html`, `public/models/`, the runtime slot in `src/inference/`, `vite.config.ts`
+  - **Kill criterion** (measured on a real iPhone and a real Android, airplane mode after one online load): the lot and expiry text is read on at least 4 of 5 sample photos, in 5 s or less per photo, with no tab reload. Record the device, browser and timings under this task.
+  - Fallback if it fails on iPhone: tesseract.js, on iPhone only.
+  - Photos: only synthetic labels or our own photos of medicine boxes, never patient data. Photos aren't committed; automated tests use synthetic rendered labels.
+  - Model files: the README's Models table (source, size, license; check the license of the exact ONNX export) and the open-source table in the same commit; force-add past `.gitignore`. Precache them (raise `maximumFileSizeToCacheInBytes`, add `.onnx`/`.wasm`/`.mjs` globs).
+  - Phone tests run on the live URL (needs the Vercel import). No model test in a browser on this laptop without messaging Account Admin first.
+
 **Wow-flow acceptance (every wow-flow task):** works end to end in airplane mode after the first load (the test: load once, go offline, reload, use the core feature) · model weights cached (Cache API/OPFS, persistent storage) so the second load is instant · user data stays on the device (IndexedDB/SQLite/OPFS) · inference off the main thread · capability check with a designed fallback · any cloud feature is optional and shows a clear offline state.
 
 ## Next
