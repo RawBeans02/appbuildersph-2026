@@ -1,0 +1,107 @@
+/* Screen 19a's wording box. The textarea and the marks layer share every
+   metric (font, padding, border, wrapping, scrollbar gutter), so each mark
+   sits exactly over its number. Tokens only. */
+
+.wording {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.box {
+  position: relative;
+  flex: 1;
+  min-height: 260px;
+  border-radius: var(--r-md);
+  background: var(--surface);
+}
+
+.field,
+.marks {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 14px var(--space-4);
+  border: 2px solid transparent;
+  border-radius: var(--r-md);
+  font: var(--type-body);
+  line-height: 25px;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
+/* The field is underneath: it holds the caret, selection and focus. Its own
+   text is transparent; the marks layer above draws the text. */
+.field {
+  width: 100%;
+  height: 100%;
+  resize: none;
+  border-color: var(--line-strong);
+  background: transparent;
+  color: transparent;
+  caret-color: var(--ink);
+}
+
+.field::placeholder {
+  color: var(--ink-3);
+}
+
+.field:focus-visible {
+  border-color: var(--ink);
+  outline: 3px solid var(--ink);
+  outline-offset: 3px;
+}
+
+.marks {
+  overflow-y: hidden;
+  color: var(--ink);
+  pointer-events: none;
+}
+
+.new {
+  position: relative;
+  background: none;
+  color: var(--warn);
+  font-weight: 400;
+  border-radius: 4px;
+  outline: 2px solid var(--warn);
+  outline-offset: 1px;
+}
+
+/* The warning icon rides on the number's top-right corner, outside the text
+   flow, so the text under it doesn't move. */
+.badge {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: var(--r-full);
+  background: var(--warn-tint);
+  box-shadow: 0 0 0 1px var(--warn);
+  color: var(--warn);
+}
+
+.lineInfo,
+.lineWarn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: var(--space-3);
+  font: var(--type-body-dense);
+  font-weight: 700;
+}
+
+.lineInfo {
+  color: var(--ink-2);
+}
+
+.lineWarn {
+  color: var(--warn);
+}

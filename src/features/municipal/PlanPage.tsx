@@ -1,349 +1,174 @@
-import { useState, type ComponentType } from 'react'
-import { Link } from '../../app/Link'
+import { CheckIcon, InfoIcon, ListNumbersIcon, ScanIcon, WarningCircleIcon } from '@phosphor-icons/react'
+import { useMemo, useState, type ComponentType } from 'react'
+import { Button, ButtonLink, Field, StateBlock, useToast } from '../../components'
 import { getDb } from '../../data/db/appDb'
-import type { AgapayDb } from '../../data/db/db'
+import { DEMO_MUNICIPALITY } from '../../data/places'
 import { useDbQuery } from '../../data/db/useDbQuery'
-import { barangayName, DEMO_BARANGAYS, DEMO_MUNICIPALITY } from '../../data/places'
-import { AGE_BANDS, formatCount, formatRange, HINGA_AGE_BANDS, sumCounts, type Count, type CountRange } from '../../qr'
-import {
-  buildPlan,
-  FEW_IN_WATCH_WINDOW,
-  planTemplateText,
-  PRIORITY_WEIGHTS,
-  type DoxyMove,
-  type MunicipalPlan,
-  type PlanRow,
-} from '../../rules/plan'
-import { APPROVER, approvePlan, ensureMunicipalSample, readPlanInputs } from './municipal'
+import { planTemplateText, type MunicipalPlan } from '../../rules/plan'
+import { CheckedWording } from './CheckedWording'
+import { barangayCodes } from './counts'
+import { LaptopFrame } from './LaptopFrame'
 import { LlmWordingPanel } from './llm'
+import { APPROVER, approvePlan, readMunicipalScreen } from './municipal'
+import { useLaptopPlace } from './place'
+import styles from './PlanPage.module.css'
+import { planSteps, planStepsText } from './steps'
 
-// Screens 18–19: the merged table, the rule-based plan with its reasons, and
-// the editable text the officer approves. Plain until design/ lands.
-// NEEDS DESIGN: screens 18–19.
-
-const readPlanScreen = async (db: AgapayDb) => {
-  await ensureMunicipalSample(db)
-  return readPlanInputs(db)
-}
-
-const nameOf = (code: string) => barangayName(code) ?? code
-const ordinal = (n: number) => `${n}${n % 10 === 1 && n % 100 !== 11 ? 'st' : n % 10 === 2 && n % 100 !== 12 ? 'nd' : n % 10 === 3 && n % 100 !== 13 ? 'rd' : 'th'}`
-const addRanges = (ranges: CountRange[]): CountRange =>
-  ranges.reduce((sum, range) => ({ min: sum.min + range.min, max: sum.max + range.max }), { min: 0, max: 0 })
+// Screen 19a: the rule-based plan on the left (always there, with or without
+// the AI), the optional on-device AI's draft wording on the right, checked
+// number by number against the plan, and Approve. The approver is a role,
+// never a name. Never a dose.
 
 export default function PlanPage() {
-  const data = useDbQuery(['pairedDevices', 'receivedPayloads'], readPlanScreen)
+  const data = useDbQuery(['pairedDevices', 'receivedPayloads'], readMunicipalScreen)
+  const { sample } = useLaptopPlace()
 
-  if (data.status === 'loading') return <p>Loading…</p>
-  if (data.status === 'error') return <p role="alert">Could not read this laptop’s records.</p>
-
-  const { payloads, unverified, sampleBarangays } = data.data
-  const result = buildPlan(payloads, { sampleBarangays })
-  if (!result.ok) {
+  if (data.status !== 'ready') {
     return (
-      <>
-        <h1>Municipal plan</h1>
-        <p>{result.message}</p>
-        <p>
-          <Link to="/municipal">Scan the barangays’ QR codes</Link>
-        </p>
-      </>
+      <LaptopFrame active="plan" title="Plan">
+        {data.status === 'loading' ? (
+          <p className={styles.note}>Opening the records on this laptop…</p>
+        ) : (
+          <StateBlock tone="error" icon={WarningCircleIcon} title="Couldn't open the records" body="Nothing was lost. Your records are still saved on this laptop.">
+            <Button variant="secondary" onClick={() => window.location.reload()}>
+              Try again
+            </Button>
+          </StateBlock>
+        )}
+      </LaptopFrame>
     )
   }
-  const { plan } = result
-  const missing = DEMO_BARANGAYS.filter((place) => !plan.rows.some((row) => row.barangay === place.code))
-  const draft = planTemplateText(plan, DEMO_MUNICIPALITY.name)
-  const basis = plan.rows.map((row) => `${row.barangay}:${row.epiWeek}:${row.seq}`).join('|')
 
-  return (
-    <>
-      <h1>Municipal plan, week {plan.epiWeek}</h1>
-      <p>
-        {plan.rows.length} of {DEMO_BARANGAYS.length} barangays received.{' '}
-        {missing.length > 0 && (
-          <>
-            Waiting for {missing.map((place) => place.name).join(', ')}: <Link to="/municipal">scan</Link>.
-          </>
-        )}
-      </p>
-      {plan.rows.some((row) => row.sample) && (
-        <p>Sample data: {plan.rows.filter((row) => row.sample).map((row) => row.name).join(', ')} are pre-made demo QRs.</p>
-      )}
-      {unverified.length > 0 && (
-        <p role="alert">
-          {unverified.length} stored QR code{unverified.length === 1 ? '' : 's'} no longer match the paired phone’s key and
-          {unverified.length === 1 ? ' is' : ' are'} left out: {unverified.map((item) => nameOf(item.barangay)).join(', ')}.
-        </p>
-      )}
-
-      <MergedTable plan={plan} />
-      <Priority plan={plan} />
-      <Moves plan={plan} />
-      <HowComputed />
-      <PlanEditor key={basis} plan={plan} draft={draft} wordingPanel={LlmWordingPanel} />
-    </>
-  )
-}
-
-function rowTotals(counts: PlanRow['counts']) {
-  return {
-    exposed: sumCounts(AGE_BANDS.map((band) => counts.exposed[band])),
-    fast: sumCounts(HINGA_AGE_BANDS.map((band) => counts.fastBreathing[band])),
+  const { plan, handoff } = data.data
+  if (!plan) {
+    // NEEDS DESIGN (TASKS.md B5-UI): the plan with no barangay QR yet.
+    return (
+      <LaptopFrame active="plan" title="Plan">
+        <StateBlock icon={ListNumbersIcon} title="No barangay QR codes yet">
+          <ButtonLink to="/municipal" icon={<ScanIcon size={22} weight="bold" aria-hidden />}>
+            Scan a barangay QR
+          </ButtonLink>
+        </StateBlock>
+      </LaptopFrame>
+    )
   }
-}
 
-export function MergedTable({ plan }: { plan: MunicipalPlan }) {
-  const { totals } = plan
-  const cell = (count: Count) => formatCount(count)
+  const expected = barangayCodes([...plan.rows, ...handoff.devices, ...handoff.received].map((item) => item.barangay)).length
+  const basis = plan.rows.map((row) => `${row.barangay}:${row.epiWeek}:${row.seq}`).join('|')
   return (
-    <section aria-labelledby="table-heading">
-      <h2 id="table-heading">Merged counts</h2>
-      <table>
-        <caption>
-          Counts as each barangay sent them. "&lt;5" means 1 to 4; a sum that includes one is a range.
-        </caption>
-        <thead>
-          <tr>
-            <th scope="col">Barangay</th>
-            <th scope="col">Week</th>
-            <th scope="col">Export</th>
-            <th scope="col">Exposed to floodwater (all ages)</th>
-            <th scope="col">In the watch window now</th>
-            <th scope="col">Fast-breathing referrals (Hinga)</th>
-            <th scope="col">Urgent danger-sign referrals</th>
-            <th scope="col">Doxycycline capsules on hand</th>
-            <th scope="col">Of those, expiring within 6 weeks</th>
-            <th scope="col">Flags for clinician review</th>
-          </tr>
-        </thead>
-        <tbody>
-          {plan.rows.map((row) => {
-            const sums = rowTotals(row.counts)
-            return (
-              <tr key={row.barangay}>
-                <th scope="row">
-                  {row.name}
-                  {row.sample ? ' (sample data)' : ''}
-                </th>
-                <td>
-                  {row.epiWeek}
-                  {row.olderWeek ? ' (older week)' : ''}
-                </td>
-                <td>{row.seq}</td>
-                <td>{formatRange(sums.exposed)}</td>
-                <td>{cell(row.counts.inWatchWindow)}</td>
-                <td>{formatRange(sums.fast)}</td>
-                <td>{cell(row.counts.urgentReferrals)}</td>
-                <td>{cell(row.counts.doxyCapsulesOnHand)}</td>
-                <td>{cell(row.counts.doxyCapsulesExpiring6w)}</td>
-                <td>{cell(row.counts.clinicianReviewFlags)}</td>
-              </tr>
-            )
-          })}
-        </tbody>
-        <tfoot>
-          <tr>
-            <th scope="row">All {plan.rows.length}</th>
-            <td colSpan={2} />
-            <td>{formatRange(addRanges(AGE_BANDS.map((band) => totals.exposed[band])))}</td>
-            <td>{formatRange(totals.inWatchWindow)}</td>
-            <td>{formatRange(addRanges(HINGA_AGE_BANDS.map((band) => totals.fastBreathing[band])))}</td>
-            <td>{formatRange(totals.urgentReferrals)}</td>
-            <td>{formatRange(totals.doxyCapsulesOnHand)}</td>
-            <td>{formatRange(totals.doxyCapsulesExpiring6w)}</td>
-            <td>{formatRange(totals.clinicianReviewFlags)}</td>
-          </tr>
-        </tfoot>
-      </table>
-    </section>
+    <LaptopFrame
+      active="plan"
+      title={`Plan for week ${plan.epiWeek}`}
+      sub={[`From ${plan.rows.length} of ${expected} barangays`, sample ? 'Sample data' : null].filter(Boolean).join(' · ')}
+    >
+      <PlanBody key={basis} plan={plan} wordingPanel={LlmWordingPanel} />
+    </LaptopFrame>
   )
 }
 
-export function Priority({ plan }: { plan: MunicipalPlan }) {
+export function PlanSteps({ plan }: { plan: MunicipalPlan }) {
   return (
-    <section aria-labelledby="priority-heading">
-      <h2 id="priority-heading">Doctor teams: priority order</h2>
-      <ol>
-        {plan.priority.map((entry) => (
-          <li key={entry.barangay}>
-            <strong>{entry.name}</strong>: score {formatRange(entry.score)}
-            <br />
-            Why:{' '}
-            {entry.components
-              .map((part) => `${part.shown} ${part.label} ×${part.weight} = ${formatRange(part.points)}`)
-              .join('; ')}
-            .
-            {entry.tiedWith.length > 0 && (
-              <>
-                <br />
-                Same score as {entry.tiedWith.map(nameOf).join(', ')}; listed alphabetically.
-              </>
-            )}
+    <section aria-labelledby="plan-heading">
+      <h2 id="plan-heading" className={styles.heading}>
+        The plan
+      </h2>
+      <p className={styles.lead}>Made by fixed rules from the counts. Always available, with or without the AI.</p>
+      <ol className={styles.steps}>
+        {planSteps(plan).map((step, i) => (
+          <li key={step.title} className={styles.step}>
+            <span className={styles.stepNumber}>{i + 1}.</span>
+            <div>
+              <p className={styles.stepTitle}>{step.title}</p>
+              {step.reason && <p className={styles.stepReason}>{step.reason}</p>}
+            </div>
           </li>
         ))}
       </ol>
-    </section>
-  )
-}
-
-const NO_MOVE: Record<NonNullable<MunicipalPlan['noMoveReason']>, string> = {
-  'single-barangay': 'Only one barangay has sent counts.',
-  'no-doxycycline': 'No barangay reported doxycycline on hand.',
-  'none-expiring': 'No barangay reported capsules expiring within 6 weeks.',
-  'expiring-where-needed': `Every barangay with expiring capsules has ${FEW_IN_WATCH_WINDOW} or more residents in the watch window, so that stock stays there.`,
-  'no-target': `No barangay has ${FEW_IN_WATCH_WINDOW} or more residents in the watch window.`,
-}
-
-function moveReason(move: DoxyMove): string {
-  const { why } = move
-  return (
-    `${move.fromName} has ${formatCount(why.fromInWatchWindow)} residents in the watch window (fewer than ${FEW_IN_WATCH_WINDOW}) ` +
-    `and ${formatCount(why.fromOnHand)} capsules on hand, ${formatCount(why.fromExpiring)} of them expiring within 6 weeks. ` +
-    `${move.toName} is ${ordinal(why.toWatchRank)} by residents in the watch window (${formatCount(why.toInWatchWindow)}) ` +
-    `and ${ordinal(why.toOnHandRank)} by fewest capsules on hand (${formatCount(why.toOnHand)}).`
-  )
-}
-
-export function Moves({ plan }: { plan: MunicipalPlan }) {
-  return (
-    <section aria-labelledby="moves-heading">
-      <h2 id="moves-heading">Doxycycline stock moves, for the MHO to decide</h2>
-      {plan.moves.length === 0 ? (
-        <p>No move suggested. {plan.noMoveReason ? NO_MOVE[plan.noMoveReason] : ''}</p>
-      ) : (
-        <ul>
-          {plan.moves.map((move) => (
-            <li key={`${move.from}-${move.to}`}>
-              <strong>
-                {move.fromName} to {move.toName}
-              </strong>
-              : {move.capsulesUpTo === '<5' ? 'the few (<5)' : `up to ${formatCount(move.capsulesUpTo)}`} capsules that
-              expire within 6 weeks.
-              <br />
-              Why: {moveReason(move)}
-            </li>
-          ))}
-        </ul>
-      )}
-      <p>
-        Stock logistics only, never a dose or an amount per person. DOH: doxycycline only after consultation with a
-        health professional.
+      <p className={styles.dose}>
+        <InfoIcon size={18} weight="bold" aria-hidden />
+        No doses. Doxycycline is given only after consultation with a health professional (DOH).
       </p>
     </section>
   )
 }
 
-function HowComputed() {
-  return (
-    <details>
-      <summary>How this plan is computed</summary>
-      <ul>
-        <li>
-          Doctor-team score = urgent danger-sign referrals ×{PRIORITY_WEIGHTS.urgentReferrals} + fast-breathing referrals
-          ×{PRIORITY_WEIGHTS.fastBreathing} + residents in the watch window ×{PRIORITY_WEIGHTS.inWatchWindow}. A "&lt;5"
-          cell counts as 1 to 4, so a score can be a range: the highest minimum goes first, then the highest maximum,
-          then the name.
-        </li>
-        <li>
-          Doxycycline: capsules expiring within 6 weeks in a barangay with fewer than {FEW_IN_WATCH_WINDOW} residents in
-          the watch window (0 or "&lt;5") are suggested to move to a barangay with {FEW_IN_WATCH_WINDOW} or more. The
-          target is ranked by most residents in the window and by fewest capsules on hand, both counting the same; up to
-          the source’s expiring count.
-        </li>
-        <li>Each barangay counts with its most recent QR; a row from an earlier week is marked.</li>
-        <li>The same QR codes always give the same plan. Nothing is sent anywhere.</li>
-      </ul>
-    </details>
-  )
-}
-
-// The slot for B6's optional local-model wording panel. It gets the
-// structured plan and the template text, and hands back a rewording with
-// onUse; the plan is complete and approvable without it.
+// The slot for B6's optional on-device AI panel. It gets the structured plan
+// and the template text, and hands back its draft with onUse; the plan is
+// complete and approvable without it.
 export type WordingPanel = ComponentType<{ plan: MunicipalPlan; draft: string; onUse: (text: string) => void }>
 
-// The officer's editable text: starts as the template (`draft`), or a local
-// model's rewording once the officer picks it in the wording panel.
-export function PlanEditor({
-  plan,
-  draft,
-  wordingPanel: Wording,
-}: {
-  plan: MunicipalPlan
-  draft: string
-  wordingPanel?: WordingPanel
-}) {
-  const [text, setText] = useState(draft)
-  // The draft the text started from, and where it came from.
-  const [source, setSource] = useState<{ text: string; kind: 'template' | 'llm' }>({ text: draft, kind: 'template' })
-  const [note, setNote] = useState('')
+// The steps, the wording (the AI's draft once the officer takes it, or their
+// own words, or none), and Approve.
+export function PlanBody({ plan, wordingPanel: Wording }: { plan: MunicipalPlan; wordingPanel?: WordingPanel }) {
+  const toast = useToast()
+  const draft = useMemo(() => planTemplateText(plan, DEMO_MUNICIPALITY.name), [plan])
+  const reference = useMemo(() => `${draft}\n${planStepsText(plan)}`, [draft, plan])
+  const [text, setText] = useState('')
+  // The AI draft the text started from, if it did.
+  const [aiDraft, setAiDraft] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
-  const [approved, setApproved] = useState<{ at: string; text: string; note: string } | null>(null)
+  const [approvedText, setApprovedText] = useState<string | null>(null)
   const [problem, setProblem] = useState<string | null>(null)
-  const unchangedSinceApproval = approved !== null && approved.text === text && approved.note === note
 
-  function takeWording(wording: string) {
+  function takeDraft(wording: string) {
     setText(wording)
-    setSource({ text: wording, kind: 'llm' })
-  }
-
-  function startAgain() {
-    setText(draft)
-    setSource({ text: draft, kind: 'template' })
+    setAiDraft(wording)
   }
 
   async function onApprove() {
     setSaving(true)
     setProblem(null)
     try {
-      const now = new Date()
       await approvePlan(await getDb(), {
         plan,
-        draftText: source.text,
-        draftSource: source.kind,
+        draftText: aiDraft ?? '',
+        draftSource: aiDraft !== null ? 'llm' : 'template',
         finalText: text,
-        note,
-        now,
       })
-      setApproved({ at: now.toLocaleTimeString('en-PH', { hour: 'numeric', minute: '2-digit' }), text, note })
+      setApprovedText(text)
+      toast({ message: 'Plan approved and saved to the log.' })
     } catch {
-      setProblem('Could not save the approval on this laptop. Try again.')
+      setProblem("Couldn't save the approval on this laptop. Nothing was lost. Try again.")
     } finally {
       setSaving(false)
     }
   }
 
   return (
-    <section aria-labelledby="editor-heading">
-      <h2 id="editor-heading">Plan text</h2>
-      <p>Built from the numbers above. Edit it as needed, then approve. The approval is logged on this laptop.</p>
-      {Wording && <Wording plan={plan} draft={draft} onUse={takeWording} />}
-      <p>
-        <label>
-          Plan text
-          <br />
-          <textarea value={text} onChange={(event) => setText(event.target.value)} rows={18} cols={100} />
-        </label>
-      </p>
-      <p>
-        <button type="button" onClick={startAgain} disabled={text === draft && source.kind === 'template'}>
-          Start again from the computed text
-        </button>
-      </p>
-      <p>
-        <label>
-          Note for the log (optional) <input value={note} onChange={(event) => setNote(event.target.value)} size={60} />
-        </label>
-      </p>
-      <button type="button" onClick={() => void onApprove()} disabled={saving || !text.trim() || unchangedSinceApproval}>
-        {saving ? 'Saving…' : 'Approve plan'}
-      </button>
-      {problem && <p role="alert">{problem}</p>}
-      {approved && (
-        <p role="status">
-          Approved and logged at {approved.at} (approver: {APPROVER}). <Link to="/municipal/log">See the log</Link>.
-        </p>
-      )}
-    </section>
+    <>
+      <div className={styles.columns}>
+        <PlanSteps plan={plan} />
+        <div className={styles.wording}>
+          {Wording && <Wording plan={plan} draft={draft} onUse={takeDraft} />}
+          <CheckedWording value={text} onChange={setText} reference={reference} placeholder="Write the wording (optional)" />
+        </div>
+      </div>
+      <div className={styles.approveBar}>
+        {problem && (
+          <p role="alert" className={styles.problem}>
+            <WarningCircleIcon size={18} weight="bold" aria-hidden />
+            {problem}
+          </p>
+        )}
+        <div className={styles.approver}>
+          <Field label="Approved by">
+            {(input) => (
+              <select {...input} defaultValue={APPROVER}>
+                <option value={APPROVER}>{APPROVER}</option>
+              </select>
+            )}
+          </Field>
+        </div>
+        <div className={styles.approve}>
+          <Button
+            icon={<CheckIcon size={22} weight="bold" aria-hidden />}
+            onClick={() => void onApprove()}
+            disabled={saving || approvedText === text}
+          >
+            Approve plan
+          </Button>
+        </div>
+      </div>
+    </>
   )
 }

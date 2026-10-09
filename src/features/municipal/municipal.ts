@@ -3,7 +3,7 @@ import type { Approval, PairedDevice, Plan, ReceivedPayload } from '../../data/d
 import { DEMO_MUNICIPALITY } from '../../data/places'
 import { municipalSampleDevices, municipalSampleQrTexts } from '../../data/seed/municipal'
 import { decodeQr, type QrPayloadV1 } from '../../qr'
-import type { MunicipalPlan } from '../../rules/plan'
+import { buildPlan, type MunicipalPlan } from '../../rules/plan'
 import { classifyScan, receivedPayloadId, registryOf, type ScanOutcome } from './scan/classify'
 import { planShortSummary, planStepsText } from './steps'
 
@@ -124,6 +124,15 @@ export async function readPlanInputs(db: AgapayDb): Promise<PlanInputs> {
   }
   const sampleBarangays = new Set(devices.filter((device) => device.source === 'seed').map((device) => device.barangay))
   return { payloads, unverified, sampleBarangays }
+}
+
+// What screens 18 and 19 read: the handoff and the plan built from the
+// verified QRs (null before any barangay has sent counts).
+export async function readMunicipalScreen(db: AgapayDb) {
+  await ensureMunicipalSample(db)
+  const [handoff, inputs] = await Promise.all([readHandoff(db), readPlanInputs(db)])
+  const result = buildPlan(inputs.payloads, { sampleBarangays: inputs.sampleBarangays })
+  return { handoff, plan: result.ok ? result.plan : null, unverified: inputs.unverified }
 }
 
 // One line for the approval log, from the computed plan (screen 20's Plan

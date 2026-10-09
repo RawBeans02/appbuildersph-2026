@@ -1,0 +1,295 @@
+/* Screens 16–17 (design/Agapay Laptop.dc.html). Tokens only. */
+
+.heading {
+  font: var(--type-heading);
+}
+
+.lead {
+  margin-top: 6px;
+  font: var(--type-body);
+  color: var(--ink-2);
+}
+
+.note {
+  margin-top: var(--space-4);
+  font: var(--type-body);
+  color: var(--ink-2);
+}
+
+/* 16: home */
+.home {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  gap: var(--space-8);
+  margin-top: 28px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-6);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-1);
+}
+
+.cameraOff {
+  flex: 1;
+  min-height: 240px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+  border-radius: var(--r-md);
+  background: var(--sunken);
+  color: var(--ink-2);
+  font: var(--type-body-lg);
+  font-weight: 600;
+}
+
+.cardAction {
+  margin-top: var(--space-5);
+}
+
+.received {
+  display: flex;
+  flex-direction: column;
+}
+
+.receivedHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.count {
+  font: var(--type-body-lg);
+  font-weight: 800;
+}
+
+.countSmall {
+  font: var(--type-body);
+  font-weight: 800;
+}
+
+.list {
+  margin-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.rowText {
+  flex: 1;
+  min-width: 0;
+}
+
+.rowName {
+  font: var(--type-body-lg);
+  font-weight: 700;
+}
+
+.waitingName {
+  color: var(--ink-2);
+}
+
+.rowMeta {
+  font: var(--type-body-dense);
+  color: var(--ink-2);
+}
+
+.bottomAction {
+  margin-top: auto;
+  padding-top: var(--space-5);
+}
+
+/* 17: scanning */
+.scanning {
+  display: grid;
+  grid-template-columns: 640px minmax(0, 1fr);
+  gap: var(--space-8);
+  align-items: start;
+  margin-top: var(--space-6);
+}
+
+.banner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin-bottom: 14px;
+  padding: 14px var(--space-4);
+  border-radius: var(--r-md);
+}
+
+.bannerIcon {
+  flex: none;
+}
+
+.bannerTitle {
+  font: var(--type-body-lg);
+  font-weight: 800;
+}
+
+.bannerBody {
+  font: var(--type-body);
+  font-weight: 600;
+}
+
+.banner-ok {
+  background: var(--ok-tint);
+  color: var(--ok);
+}
+
+.banner-info {
+  background: var(--sunken);
+  color: var(--ink);
+}
+
+.banner-info .bannerBody {
+  color: var(--ink-2);
+}
+
+.banner-bad {
+  background: var(--bad-tint);
+  color: var(--bad);
+}
+
+.pairActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-top: var(--space-3);
+  width: max-content;
+}
+
+.camera {
+  position: relative;
+  width: 640px;
+  height: 400px;
+  overflow: hidden;
+  border-radius: var(--r-md);
+  background: var(--night-2);
+}
+
+.cameraShort {
+  height: 340px;
+}
+
+.camera[hidden] {
+  display: none;
+}
+
+.video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Mirrored, like looking in a mirror; the decoder reads the raw frame. */
+  transform: scaleX(-1);
+}
+
+.target {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 210px;
+  height: 210px;
+  transform: translate(-50%, -50%);
+  border: 3px solid var(--paper);
+  border-radius: var(--r-md);
+  box-shadow: 0 0 0 2px var(--scrim);
+}
+
+.targetOk {
+  width: 200px;
+  height: 200px;
+  border: 4px solid var(--ok-on-night);
+}
+
+.looking {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: var(--space-4);
+  font: var(--type-body-lg);
+  font-weight: 700;
+}
+
+.hint {
+  margin-top: var(--space-1);
+  font: var(--type-body);
+  color: var(--ink-2);
+}
+
+.camera + .hint {
+  margin-top: 14px;
+}
+
+.controls {
+  margin-top: 18px;
+  width: max-content;
+}
+
+.listNarrow {
+  margin-top: 10px;
+}
+
+.narrowRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--line);
+  font: var(--type-body-lg);
+}
+
+.narrowName {
+  font-weight: 700;
+}
+
+.waitingRow {
+  color: var(--ink-2);
+}
+
+.justNow {
+  margin: 0 calc(-1 * var(--space-2));
+  padding: var(--space-3) var(--space-2);
+  border-radius: var(--r-sm);
+  background: var(--ok-tint);
+}
+
+.justNow .narrowName {
+  font-weight: 800;
+}
+
+.receivedAt {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font: var(--type-body-dense);
+  font-weight: 700;
+  color: var(--ok);
+}
+
+.waitingWord {
+  font: var(--type-body-dense);
+  font-weight: 600;
+}
+
+.sideAction {
+  margin-top: var(--space-5);
+}

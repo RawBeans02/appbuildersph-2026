@@ -25,6 +25,7 @@ export const PLANNED_ROUTES: PlannedRoute[] = [
   { path: '/send', title: 'Send to the RHU', device: 'phone' },
   { path: '/privacy', title: 'Privacy & AI', device: 'phone' },
   { path: '/municipal', title: 'Municipal: scan barangay QRs', device: 'laptop' },
+  { path: '/municipal/merged', title: 'Merged view', device: 'laptop' },
   { path: '/municipal/plan', title: 'Municipal plan', device: 'laptop' },
   { path: '/municipal/log', title: 'Approval log', device: 'laptop' },
   { path: '/device', title: 'Device check', device: 'dev' },

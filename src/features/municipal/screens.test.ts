@@ -1,75 +1,82 @@
-import 'fake-indexeddb/auto'
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
-import { openAgapayDb } from '../../data/db/db'
-import { buildPlan, planTemplateText, type MunicipalPlan } from '../../rules/plan'
-import { loadMunicipalSample, readHandoff, readPlanInputs } from './municipal'
-import { MergedTable, Moves, PlanEditor, Priority, type WordingPanel } from './PlanPage'
-import { Slots } from './ScanPage'
+import { CheckedWording } from './CheckedWording'
+import { LogTable } from './LogPage'
+import { MergedTable } from './MergedPage'
+import { mergedView } from './merged'
+import { PlanBody, PlanSteps, type WordingPanel } from './PlanPage'
+import { sampleState, SAMPLE_NOW } from './testSample'
 
-// A render check of the plain screens with the sample barangays (no browser
-// on the build laptop; the live URL is checked by hand).
+// Render checks of the laptop screens' parts with the sample barangays (no
+// browser on the build laptop; the live URL is checked by hand).
 
-async function sampleState() {
-  const db = await openAgapayDb('municipal-screens-test')
-  await loadMunicipalSample(db, new Date('2026-10-09T08:30:00.000Z'))
-  const handoff = await readHandoff(db)
-  const inputs = await readPlanInputs(db)
-  db.close()
-  const result = buildPlan(inputs.payloads, { sampleBarangays: inputs.sampleBarangays })
-  if (!result.ok) throw new Error(result.code)
-  return { handoff, plan: result.plan }
-}
+const text = (html: string) =>
+  html.replace(/<[^>]+>/g, ' ').replace(/&#x27;/g, "'").replace(/&amp;/g, '&').replace(/\s+/g, ' ')
 
-const text = (html: string) => html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ')
-
-describe('municipal screens', () => {
-  it('show the 5 slots: 4 sample barangays received, Maligaya-D waiting for pairing', async () => {
-    const { handoff } = await sampleState()
-    const html = text(renderToStaticMarkup(createElement(Slots, handoff)))
-    expect(html).toContain('4 of 5 received.')
-    expect(html).toContain('Maligaya-D (SID-MAL) No phone paired yet: scan its pairing QR first. Waiting for its QR.')
-    expect(html).toMatch(/Bagong Silang-D \(SID-BGS\) · Sample data Phone paired, fingerprint [0-9A-F-]{19}\. Received export 3, week 2026-W41/)
-  })
-
-  it('show the merged table, the order with its reasons, and the move', async () => {
-    const { plan } = await sampleState()
-    const table = text(renderToStaticMarkup(createElement(MergedTable, { plan })))
-    expect(table).toContain('Bagong Silang-D (sample data) 2026-W41 3 142–145 64 9–15 5 10 0 12')
-    expect(table).toContain('All 4 238–256 103–106 17–32 6–9 144 30 18–21')
-    const priority = text(renderToStaticMarkup(createElement(Priority, { plan })))
-    expect(priority).toContain(
-      'Bagong Silang-D : score 97–109 Why: 5 urgent danger-sign referrals ×3 = 15; 9–15 fast-breathing referrals (Hinga) ×2 = 18–30; 64 residents in the watch window ×1 = 64.',
+describe('laptop screens', () => {
+  it('18: the merged table, with Maligaya-D waiting, ranges with en dashes, and the total row', async () => {
+    const { handoff, plan } = await sampleState()
+    const html = renderToStaticMarkup(createElement(MergedTable, { view: mergedView(plan, handoff.received, { now: SAMPLE_NOW }) }))
+    const table = text(html)
+    expect(table).toContain(
+      'Barangay Received Exposed, watch not started yet In watch window Fast-breathing referrals Doxycycline on hand Expiring in 6 weeks',
     )
-    const moves = text(renderToStaticMarkup(createElement(Moves, { plan })))
-    expect(moves).toContain('Riverside-D to Bagong Silang-D : up to 30 capsules that expire within 6 weeks.')
-    expect(moves).toContain('Bagong Silang-D is 1st by residents in the watch window (64) and 1st by fewest capsules on hand (10).')
-    expect(moves).toContain('never a dose')
+    expect(table).toContain('Maligaya-D Waiting – – – – –')
+    expect(table).toMatch(/Bagong Silang-D Priority \d{1,2}:\d{2} [AP]M · #3 142–145 64 9–15 10 0/)
+    expect(table).toContain('4 of 5 barangays 238–256 103–106 17–32 144 30')
+    expect(html).not.toContain('<a ') // rows open nothing (the detail isn't designed)
   })
 
-  it('put the template text in the editor', async () => {
+  it('19a: the steps, the dose note, an empty wording box and Approve; the AI panel slot gets the plan and template', async () => {
     const { plan } = await sampleState()
-    const draft = planTemplateText(plan as MunicipalPlan, 'San Isidro Demo')
-    const html = renderToStaticMarkup(createElement(PlanEditor, { plan, draft }))
-    expect(html).toContain('Draft plan for week 2026-W41, San Isidro Demo (SID)')
-    expect(html).toContain('Approve plan')
-  })
+    const steps = text(renderToStaticMarkup(createElement(PlanSteps, { plan })))
+    expect(steps).toContain('1. Send a doctor team to Bagong Silang-D first.')
+    expect(steps).toContain('2. Move 30 capsules from Riverside-D to Bagong Silang-D.')
+    expect(steps).toContain('No doses. Doxycycline is given only after consultation with a health professional (DOH).')
 
-  it('leave a slot for the optional wording panel, fed the structured plan and the template text', async () => {
-    const { plan } = await sampleState()
-    const draft = planTemplateText(plan, 'San Isidro Demo')
-    const seen: { plan?: MunicipalPlan; draft?: string } = {}
+    const seen: { plan?: unknown; draft?: string } = {}
     const FakePanel: WordingPanel = (props) => {
       seen.plan = props.plan
       seen.draft = props.draft
       return createElement('p', null, 'Wording panel here')
     }
-    const without = renderToStaticMarkup(createElement(PlanEditor, { plan, draft }))
-    expect(without).not.toContain('Wording panel here')
-    const withPanel = renderToStaticMarkup(createElement(PlanEditor, { plan, draft, wordingPanel: FakePanel }))
-    expect(withPanel).toContain('Wording panel here')
+    const body = renderToStaticMarkup(createElement(PlanBody, { plan, wordingPanel: FakePanel }))
+    expect(body).toContain('Wording panel here')
+    expect(body).toContain('placeholder="Write the wording (optional)"')
+    expect(text(body)).toContain('Approved by Municipal health officer')
+    expect(text(body)).toContain('Approve plan')
     expect(seen.plan).toBe(plan)
-    expect(seen.draft).toBe(draft)
+    expect(seen.draft).toContain('Draft plan for week 2026-W41, San Isidro Demo (SID)')
+  })
+
+  it('19a mismatch: the new number gets an outline mark with an icon, and the line names it', () => {
+    const html = renderToStaticMarkup(
+      createElement(CheckedWording, { value: 'Move 45 capsules to Bagong Silang-D.', onChange: () => {}, reference: 'Move 30 capsules.' }),
+    )
+    expect(html).toMatch(/<mark[^>]*>45<span[^>]*><svg/)
+    expect(text(html)).toContain("1 number doesn't match the plan: 45")
+  })
+
+  it('20: the log table, newest first, with the role and where the wording came from', () => {
+    const html = renderToStaticMarkup(
+      createElement(LogTable, {
+        rows: [
+          {
+            id: 'a',
+            day: 'Sat, Oct 10',
+            time: '9:31 AM',
+            approver: 'Municipal health officer',
+            plan: '1. Doctor team to Bagong Silang-D first.',
+            from: '5 of 5 barangays',
+            week: '2026-W41',
+            wording: 'AI draft, edited',
+          },
+        ],
+      }),
+    )
+    expect(text(html)).toContain(
+      'When Approved by Plan From Wording Sat, Oct 10 9:31 AM Municipal health officer 1. Doctor team to Bagong Silang-D first. 5 of 5 barangays 2026-W41 AI draft, edited',
+    )
   })
 })

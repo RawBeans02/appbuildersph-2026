@@ -1,0 +1,99 @@
+/* Screen 19a (design/Agapay Laptop.dc.html). Tokens only. */
+
+.note {
+  margin-top: var(--space-6);
+  font: var(--type-body);
+  color: var(--ink-2);
+}
+
+.columns {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 420px;
+  gap: 36px;
+  margin-top: var(--space-6);
+}
+
+.heading {
+  font: var(--type-heading);
+}
+
+.lead {
+  margin-top: var(--space-1);
+  font: var(--type-body-dense);
+  color: var(--ink-2);
+}
+
+.steps {
+  margin-top: var(--space-4);
+  border-top: 1px solid var(--line);
+}
+
+.step {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  padding: var(--space-4) 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.stepNumber,
+.stepTitle {
+  font: var(--type-body-lg);
+  font-weight: 800;
+}
+
+.stepReason {
+  margin-top: var(--space-1);
+  font: var(--type-body);
+  color: var(--ink-2);
+}
+
+.dose {
+  display: flex;
+  gap: 10px;
+  margin-top: var(--space-4);
+  font: var(--type-body-dense);
+  color: var(--ink-2);
+}
+
+.dose svg {
+  flex: none;
+  margin-top: 2px;
+}
+
+.wording {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-height: 0;
+}
+
+.approveBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: var(--space-4);
+  margin-top: var(--space-5);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--line);
+}
+
+.problem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: auto;
+  font: var(--type-body-dense);
+  font-weight: 600;
+  color: var(--bad);
+}
+
+.approver {
+  width: 300px;
+}
+
+.approve {
+  width: max-content;
+}

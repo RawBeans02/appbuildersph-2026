@@ -1,0 +1,150 @@
+/* Screen 18 (design/Agapay Laptop.dc.html). Tokens only. */
+
+.note {
+  margin-top: var(--space-6);
+  font: var(--type-body);
+  color: var(--ink-2);
+}
+
+.alert {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--r-md);
+  background: var(--bad-tint);
+  color: var(--bad);
+  font: var(--type-body);
+  font-weight: 600;
+}
+
+.table {
+  width: 100%;
+  margin-top: 28px;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font: var(--type-body-lg);
+}
+
+/* 2fr 1.1fr then five 1fr columns */
+.colName {
+  width: 24.7%;
+}
+
+.colReceived {
+  width: 13.6%;
+}
+
+.colNumber {
+  width: 12.34%;
+}
+
+.table th,
+.table td {
+  padding: 0 var(--space-3);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.table thead th {
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--ink);
+  font: var(--type-caption);
+  font-weight: 700;
+  color: var(--ink-2);
+  vertical-align: bottom;
+}
+
+.table tbody th,
+.table tbody td {
+  height: 60px;
+  border-bottom: 1px solid var(--line);
+}
+
+.table tbody th {
+  font-weight: 700;
+}
+
+.table .number {
+  text-align: right;
+  font: var(--type-mono);
+}
+
+.table thead .number {
+  font: var(--type-caption);
+  font-weight: 700;
+}
+
+.name {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.received {
+  font: var(--type-body-dense);
+  color: var(--ink-2);
+}
+
+.older {
+  display: block;
+}
+
+.priority th,
+.priority td {
+  background: var(--warn-tint);
+}
+
+.priority th {
+  font-weight: 800;
+}
+
+.priority .number {
+  font-weight: 700;
+}
+
+.expiring {
+  color: var(--warn);
+}
+
+.waiting th,
+.waiting td {
+  color: var(--ink-2);
+}
+
+.table tfoot th,
+.table tfoot td {
+  height: 60px;
+  border-top: 2px solid var(--ink);
+  font-weight: 800;
+}
+
+.table tfoot .number {
+  font-weight: 700;
+}
+
+.why {
+  display: flex;
+  gap: var(--space-3);
+  max-width: 820px;
+  margin-top: 22px;
+  font: var(--type-body-lg);
+}
+
+.why strong {
+  font-weight: 700;
+}
+
+.whyIcon {
+  flex: none;
+  margin-top: 2px;
+  color: var(--warn);
+}
+
+.footnote {
+  margin-top: auto;
+  padding-top: var(--space-6);
+  font: var(--type-body-dense);
+  color: var(--ink-2);
+}

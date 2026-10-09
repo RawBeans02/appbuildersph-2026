@@ -1,0 +1,78 @@
+/* Screen 20 (design/Agapay Laptop.dc.html). Tokens only. */
+
+.sub {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.note {
+  margin-top: var(--space-6);
+  font: var(--type-body);
+  color: var(--ink-2);
+}
+
+.table {
+  width: 100%;
+  margin-top: 28px;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font: var(--type-body);
+}
+
+.colWhen {
+  width: 180px;
+}
+
+.colWho {
+  width: 200px;
+}
+
+.colFrom,
+.colWording {
+  width: 150px;
+}
+
+.table th,
+.table td {
+  padding: var(--space-4) var(--space-1);
+  text-align: left;
+  vertical-align: top;
+}
+
+.table th + th,
+.table td,
+.table th + td {
+  padding-left: var(--space-4);
+}
+
+.table thead th {
+  padding-top: 0;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--ink);
+  font: var(--type-caption);
+  font-weight: 700;
+  color: var(--ink-2);
+}
+
+.table tbody th,
+.table tbody td {
+  border-bottom: 1px solid var(--line);
+}
+
+.table tbody th {
+  font-weight: 700;
+}
+
+.time {
+  display: block;
+  font-weight: 500;
+  color: var(--ink-2);
+}
+
+.week {
+  display: block;
+  font: var(--type-mono);
+  font-size: 14px;
+  color: var(--ink-2);
+}
