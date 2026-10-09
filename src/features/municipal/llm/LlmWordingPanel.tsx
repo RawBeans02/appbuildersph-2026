@@ -4,7 +4,7 @@ import { Button, Progress } from '../../../components'
 import { DEMO_BARANGAYS } from '../../../data/places'
 import { checkWebGPU } from '../../../lib/capabilities'
 import type { MunicipalPlan } from '../../../rules/plan'
-import { withPlanNotes, withReminder } from './check'
+import { withPlanNotes, withReminder, withRuleMoves } from './check'
 import { loadWordingEngine } from './llmEngine'
 import { WORDING_MODEL_NAME } from './model'
 import { createWording, type Wording } from './wording'
@@ -57,7 +57,7 @@ export function LlmWordingPanel({ plan, draft, onUse, children }: LlmWordingPane
   async function write() {
     await wording.draft(draft, plan, KNOWN_NAMES)
     const after = wording.getState()
-    if (after.status === 'done' && after.template === draft && after.check.ok) onUse(withReminder(withPlanNotes(after.text, draft)))
+    if (after.status === 'done' && after.template === draft && after.check.ok) onUse(withReminder(withPlanNotes(withRuleMoves(after.text, draft), draft)))
   }
   const writeAgain = (
     <div className={styles.again}>

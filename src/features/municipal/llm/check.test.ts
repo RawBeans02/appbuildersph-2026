@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { checkDraft, numbersIn, PLAN_REMINDER, withPlanNotes, withReminder, type PlanFacts } from './check'
+import { checkDraft, numbersIn, PLAN_REMINDER, withPlanNotes, withReminder, withRuleMoves, type PlanFacts } from './check'
 
 const TEMPLATE = `Draft plan for week 2026-W41, San Isidro Demo (SID)
 Doctor teams, in priority order (unahin ang nasa itaas):
@@ -157,5 +157,43 @@ describe('the prompt\'s sample scaffolding', () => {
       'It copies the sample from the instructions instead of the plan.',
     )
     expect(reasons(`ACTUAL PLAN: ${GOOD}`)).toContain('It copies the sample from the instructions instead of the plan.')
+  })
+})
+
+describe('stock moves the check must not let through (Codex review)', () => {
+  const MOVE = 'Consider moving up to 30 doxycycline capsules that expire within 6 weeks from Riverside-D to Maligaya-D, if the MHO approves.'
+  it('refuses a reversed move worded "to {from} from {to}"', () => {
+    const reversed = GOOD.replace(MOVE, 'Move 30 capsules to Riverside-D from Maligaya-D, for the MHO to decide.')
+    expect(reasons(reversed)).toContain('It reverses the move from Riverside-D to Maligaya-D.')
+  })
+  it('refuses a move sentence that carries a second amount', () => {
+    const inflated = GOOD.replace(MOVE, 'Move 9 capsules from Riverside-D to Maligaya-D for the MHO to decide; the plan said 30.')
+    expect(reasons(inflated)).toContain('It adds 9 to the move of up to 30 capsules from Riverside-D to Maligaya-D.')
+  })
+})
+
+describe('withRuleMoves', () => {
+  const template = [
+    'Doctor teams, in priority order:',
+    '1. Maligaya-D: score 14–20',
+    '',
+    'Doxycycline stock moves, for the MHO to decide (ilipat lamang kung aprubado):',
+    '- Riverside-D to Maligaya-D: up to 30 capsules that expire within 6 weeks.',
+    '',
+    'Paalala: counts only.',
+  ].join('\n')
+  it("replaces the model's move sentences with the rules' move lines", () => {
+    const used = withRuleMoves('Send the first doctor team to Maligaya-D. Move 30 capsules to Riverside-D from Maligaya-D.', template)
+    expect(used).toBe(
+      [
+        'Send the first doctor team to Maligaya-D.',
+        '',
+        'Doxycycline stock moves, for the MHO to decide (ilipat lamang kung aprubado):',
+        '- Riverside-D to Maligaya-D: up to 30 capsules that expire within 6 weeks.',
+      ].join('\n'),
+    )
+  })
+  it('leaves a draft alone when the template has no move section', () => {
+    expect(withRuleMoves('A plan.', 'Doctor teams:')).toBe('A plan.')
   })
 })

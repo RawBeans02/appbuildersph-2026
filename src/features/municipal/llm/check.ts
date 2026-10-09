@@ -88,6 +88,8 @@ function scorePattern(score: CountRange): RegExp {
   return max === undefined ? new RegExp(`(?<![\\d.,])${min}(?![\\d])`) : new RegExp(`(?<![\\d])${min}\\s*[–-]\\s*${max}(?![\\d])`)
 }
 
+const escapeRegExp = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
 const leftToTheMho = (sentence: string) => /\bMHO\b/.test(sentence) && /\b(?:decid\w*|approv\w*|aprubado)\b/i.test(sentence)
 
 export function checkDraft(draft: string, template: string, plan: PlanFacts, knownNames: readonly string[]): DraftCheck {
@@ -149,6 +151,19 @@ export function checkDraft(draft: string, template: string, plan: PlanFacts, kno
     else if (leftToTheMho(template) && !keptIn.some(leftToTheMho)) {
       reasons.push(`It turns the move of up to ${amount} capsules from ${move.fromName} to ${move.toName} into an order; keep "for the MHO to decide".`)
     }
+    // The names can come in the right order and still say the opposite ("to
+    // A from B"), or the sentence can carry a second, different amount (the
+    // laptop plan's moves; phase 2's alert templates word moves their own way).
+    const moveValue: NumberValue = move.capsulesUpTo === '<5' ? '<5' : Number(move.capsulesUpTo)
+    for (const sentence of leftToTheMho(template) ? keptIn : []) {
+      const reversed =
+        new RegExp(`\\bto\\s+${escapeRegExp(move.fromName)}`, 'i').test(sentence) ||
+        new RegExp(`\\bfrom\\s+${escapeRegExp(move.toName)}`, 'i').test(sentence)
+      if (reversed) reasons.push(`It reverses the move from ${move.fromName} to ${move.toName}.`)
+      // "6" is the 6-week expiry window every move line carries.
+      const others = numbersIn(sentence).filter((n) => n !== moveValue && n !== 6)
+      if (others.length) reasons.push(`It adds ${others.join(', ')} to the move of up to ${amount} capsules from ${move.fromName} to ${move.toName}.`)
+    }
   }
   for (const sentence of parts) {
     if (!MOVE_WORDS.test(sentence) || !STOCK_WORDS.test(sentence)) continue
@@ -171,6 +186,22 @@ export function checkDraft(draft: string, template: string, plan: PlanFacts, kno
 // no-dose, no-diagnosis line can't be lost in rewording.
 export const PLAN_REMINDER =
   'Paalala: this plan does not diagnose anyone and sets no dose; doxycycline only after consultation with a health professional.'
+
+// The stock moves in a used draft come from the rules, never from the model's
+// wording: its move sentences are dropped and the template's move lines (or
+// its "No stock move suggested" line) are put in their place.
+export function withRuleMoves(draft: string, template: string): string {
+  const lines = template.split('\n')
+  const start = lines.findIndex((line) => line.startsWith('Doxycycline stock moves'))
+  if (start < 0) return draft
+  const moves: string[] = [lines[start]]
+  for (const line of lines.slice(start + 1)) {
+    if (!line.trim()) break
+    moves.push(line)
+  }
+  const kept = sentences(draft).filter((sentence) => !(MOVE_WORDS.test(sentence) && STOCK_WORDS.test(sentence)))
+  return `${kept.join(' ')}\n\n${moves.join('\n')}`
+}
 
 // The template's notes that a short accepted summary leaves out: why no stock
 // move is suggested, what the plan is based on, an older week, and what "<5"
