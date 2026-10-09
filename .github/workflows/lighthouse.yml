@@ -1,0 +1,50 @@
+# Lighthouse (the lab test behind PageSpeed Insights) against a URL, on
+# demand: mobile emulation, the four categories the README reports. Runs on
+# GitHub's runner, not the 8 GB laptop. Scores are written to the job summary
+# and the full reports are kept as an artifact.
+name: Lighthouse
+
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: URL to test
+        default: https://appbuildersph-2026.vercel.app/
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Run Lighthouse (mobile)
+        env:
+          TARGET: ${{ inputs.url }}
+        run: |
+          npx -y lighthouse@12 "$TARGET" \
+            --only-categories=performance,accessibility,best-practices,seo \
+            --form-factor=mobile --throttling-method=simulate \
+            --output=json --output=html --output-path=./lighthouse \
+            --chrome-flags="--headless=new --no-sandbox" --quiet
+      - name: Scores to the job summary
+        run: |
+          node -e '
+            const r = require("./lighthouse.report.json");
+            const lines = ["## Lighthouse (mobile)", "", "URL: " + r.finalDisplayedUrl, "Lighthouse " + r.lighthouseVersion + ", " + r.fetchTime, "", "| Category | Score |", "|---|---|"];
+            for (const c of Object.values(r.categories)) lines.push("| " + c.title + " | " + Math.round(c.score * 100) + " |");
+            lines.push("", "| Metric | Value |", "|---|---|");
+            for (const id of ["first-contentful-paint","largest-contentful-paint","total-blocking-time","cumulative-layout-shift","speed-index"]) lines.push("| " + r.audits[id].title + " | " + r.audits[id].displayValue + " |");
+            require("fs").appendFileSync(process.env.GITHUB_STEP_SUMMARY, lines.join("\n") + "\n");
+            console.log(lines.join("\n"));
+          '
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-report
+          path: lighthouse.report.*
+          retention-days: 7
