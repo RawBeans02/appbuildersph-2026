@@ -150,3 +150,12 @@ describe('withPlanNotes', () => {
     expect(withPlanNotes('A plan.', 'Doctor teams:')).toBe('A plan.')
   })
 })
+
+describe('the prompt\'s sample scaffolding', () => {
+  it('refuses a draft that echoes the SAMPLE placeholders or the ACTUAL PLAN header', () => {
+    expect(reasons(`${GOOD} The doctor team for SAMPLE_PLACE has priority score SAMPLE_SCORE.`)).toContain(
+      'It copies the sample from the instructions instead of the plan.',
+    )
+    expect(reasons(`ACTUAL PLAN: ${GOOD}`)).toContain('It copies the sample from the instructions instead of the plan.')
+  })
+})

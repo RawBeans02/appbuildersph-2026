@@ -94,6 +94,9 @@ export function checkDraft(draft: string, template: string, plan: PlanFacts, kno
   const reasons: string[] = []
   const text = draft.trim()
   if (text.length < 40) reasons.push('The draft is empty or too short.')
+  // The prompt's sample exchange (prompt.ts) uses SAMPLE_ placeholders and an
+  // "ACTUAL PLAN" header; a draft that echoes them copied the wrong thing.
+  if (/\bSAMPLE|ACTUAL PLAN/i.test(text)) reasons.push('It copies the sample from the instructions instead of the plan.')
 
   // Numbers: each one must be a number of the plan.
   const allowed = numbersIn(template)

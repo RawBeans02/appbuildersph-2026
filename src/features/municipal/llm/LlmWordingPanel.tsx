@@ -157,7 +157,7 @@ export function LlmWordingPanel({ plan, draft, onUse, children }: LlmWordingPane
           <LaptopIcon size={16} weight="bold" aria-hidden />
           Written on this laptop · {WORDING_MODEL_NAME} · {(state.ms / 1000).toFixed(1)} s
         </p>
-        <p className={styles.body}>Check this short action summary against the full plan before approving.</p>
+        {state.check.ok && <p className={styles.body}>Check this short action summary against the full plan before approving.</p>}
         {!state.check.ok && (
           <div role="alert">
             <p className={styles.checkWarn}>
@@ -169,11 +169,14 @@ export function LlmWordingPanel({ plan, draft, onUse, children }: LlmWordingPane
                 <li key={reason}>{reason}</li>
               ))}
             </ul>
+            <p className={styles.body}>The same plan gives the same draft. Approve the plan as listed, or write the wording yourself.</p>
           </div>
         )}
       </>
     )
-    bottom = writeAgain
+    // The model writes at temperature 0: writing again from the same plan
+    // repeats a rejected draft, so only an accepted one offers it.
+    bottom = state.check.ok ? writeAgain : null
   } else if (state.status === 'error') {
     top = (
       <>
