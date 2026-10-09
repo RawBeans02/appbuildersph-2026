@@ -46,6 +46,11 @@ async function checkScreen(page: Page, { path, ready }: Screen) {
   await runAxe(page, path)
 }
 
+// axe checks each screen at rest: with reduced motion, nothing is mid-`rise`
+// (an element fading in reads as low contrast; WebKit caught 19f's first step
+// that way in CI 37987891797 and passed on retry).
+test.use({ reducedMotion: 'reduce' })
+
 async function runAxe(page: Page, path: string) {
   const { violations, passes, incomplete } = await new AxeBuilder({ page })
     .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
