@@ -1,12 +1,12 @@
-# _Project name (TBD, from ONE-PAGER.md)_
+# Agapay
 
-_Short description (TBD): one sentence on who it helps and what it does without the cloud._
+An offline web app for barangay health workers after a typhoon: an on-device camera breathing check for children, a leptospirosis watch list and medicine-box reading on the phone, handed to the municipal health officer as de-identified counts by QR code, with no internet needed.
 
 Built for the **AppBuildersPH Hackathon 2026** (Oct 9–10, 2026). Theme: **Local AI**. The challenge: "Build an AI product that remains genuinely useful when the cloud disappears."
 
 | | |
 |---|---|
-| **Team name** | _TBD (exactly as on the official participant list)_ |
+| **Team name** | Banana cue |
 | **Live URL** | https://appbuildersph-2026.vercel.app |
 | **Repository** | https://github.com/RawBeans02/appbuildersph-2026 |
 | **Demo video** | _TBD_ |
@@ -97,7 +97,7 @@ _Draft, filled in as features land._
 Self-hosted, unmodified: the OCR models in `public/models/ppocr/` and the pose model and YAMNet in `public/models/mediapipe/`, each with checksums, sources and the license text in a README there.
 
 ### Technologies and frameworks
-React + TypeScript, built with Vite as an installable web app (PWA: vite-plugin-pwa / Workbox service worker). On-device storage in IndexedDB (idb). Inference in Web Workers on WebAssembly (ONNX Runtime Web, MediaPipe Tasks, Tesseract.js) and, on the laptop only, WebGPU (WebLLM). Browser APIs: Cache Storage, Web Crypto (ECDSA P-256), camera (getUserMedia), BarcodeDetector. Tests: Vitest and Playwright in GitHub Actions. Every library and its license is in the table below.
+React + TypeScript, built with Vite as an installable web app (PWA: vite-plugin-pwa / Workbox service worker). On-device storage in IndexedDB (idb). Inference in Web Workers on WebAssembly (ONNX Runtime Web, MediaPipe Tasks, Tesseract.js) and, on the laptop only, WebGPU (WebLLM). Browser APIs: Cache Storage, Web Crypto (ECDSA P-256), camera (getUserMedia), BarcodeDetector. Tests: Vitest and Playwright in GitHub Actions. Small build scripts in Python with Pillow (synthetic labels). Every library and its license is in the table below.
 
 ### APIs and cloud services
 - **Vercel:** static hosting of the app and the self-hosted model files. No server code, no API routes.
@@ -110,7 +110,8 @@ React + TypeScript, built with Vite as an installable web app (PWA: vite-plugin-
 - **Prepared beforehand and kept outside this repo, no product code:** planning notes, the instructions for our research chat and agents, and a laptop memory-guard script (not needed to build or run the product). The research itself ran after the 1:00 PM reveal.
 - **First product code:** commits before `3f00b06` are process docs only; the first product code is `3f00b06` (Oct 9, 2:00:40 PM PH).
 - **Other products:** the team has built other products before this event; no code, data, prompts, designs or assets from them are used here.
-- **Designs:** the UI designs, tokens and images in `design/` were generated with Claude Design during the event.
+- **Designs:** the UI designs, tokens and images in `design/` are generated with Claude Design during the event (pending: the first exports haven't landed yet).
+- **Algorithms we reimplemented:** the OCR pre- and post-processing (`src/inference/ocr/`: DB box extraction and CTC decoding) follows PaddleOCR's published reference algorithms (Apache-2.0), written fresh in TypeScript. The seed's random generator is mulberry32, a public-domain algorithm by Tommy Ettinger (`src/data/seed/generate.ts`).
 - **Fonts, icons, images and other third-party assets,** with their licenses: _TBD (listed as they are added)_.
   - The synthetic test label `src/inference/ocr/fixtures/label.ppm` was rendered during the event with Pillow's bundled font, Aileron Regular (CC0). Its text is invented.
   - The synthetic demo label `docs/demo/label-doxy-24A.png` (the box scanned in the demo's stock step) was rendered during the event by `scripts/demo-label/make_label.py` with the same font, Aileron Regular (CC0). Its text is invented, with no brand, logo or company, and it is marked "DEMO · NOT A REAL MEDICINE · SAMPLE DATA".
@@ -158,7 +159,7 @@ _TBD: Performance, Accessibility, Best Practices and SEO, measured on pagespeed.
 |---|---|---|---|
 | Rovince Eduvane | RawBeans02 | Build lead | _TBD_ |
 | Vicente Seumal | ThirdyThirdy | _TBD_ | _TBD_ |
-| Adam Arous | _TBD_ | _TBD_ | _TBD_ |
+| Adam Arous | takashii18 | _TBD_ | _TBD_ |
 | Gabriel Syd Paguio | Syd7 | _TBD_ | _TBD_ |
 
-Teammates commit under their own GitHub accounts; no one outside the team commits.
+So far every commit comes from the owner's account (RawBeans02), written by the Lead and Sr. Builder AI sessions under the owner's direction; teammates who commit do so under their own accounts. No one outside the team contributes. Each member's actual contributions, code or not, are listed above.

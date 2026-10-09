@@ -71,11 +71,11 @@ Our difference: an ML-based check that refuses bad readings, built into the post
 
 **Business in one line (who pays, how it grows):** The MHO or LGU adopts it at no cost (a web app on BHWs' existing phones, no new hardware). It grows through a Local Health Board pilot, then the regional DOH center. A real pilot needs a privacy impact assessment and clinical validation of Hinga first.
 
-**Rubric check (score 1–5 against the official judging criteria in RULES.md; our own estimates):**
-| Criterion (weight) | Score | How we show it in the demo |
-|---|---|---|
-| Problem & Usefulness (25%) | 5 | The surge in leptospirosis cases, plus the BHW-to-MHO gap when the signal is down |
-| Local AI Implementation (25%) | 4.5 | Airplane mode, a live camera count, OCR, and an LLM on the laptop, all with no network |
-| Technical Execution (20%) | 4 | One phone and one laptop live; pre-made QRs; a recorded fallback for the sync step |
-| Innovation (15%) | 4.5 | The combination and the refuse-to-count gate, with honest neighbors named |
-| Product & Demo Quality (15%) | 4.5 | One flow, Claude Design UI, plain Filipino-context copy |
+**Rubric check (how the demo shows each official criterion in RULES.md):**
+| Criterion (weight) | How we show it in the demo |
+|---|---|
+| Problem & Usefulness (25%) | The surge in leptospirosis cases, plus the BHW-to-MHO gap when the signal is down |
+| Local AI Implementation (25%) | Airplane mode, a live camera count, OCR, and an LLM on the laptop, all with no network |
+| Technical Execution (20%) | One phone and one laptop live; pre-made QRs; a recorded fallback for the sync step |
+| Innovation (15%) | The combination and the refuse-to-count gate, with honest neighbors named |
+| Product & Demo Quality (15%) | One flow, Claude Design UI, plain Filipino-context copy |
