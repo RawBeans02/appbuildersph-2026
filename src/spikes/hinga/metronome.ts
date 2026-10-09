@@ -66,7 +66,8 @@ export function createMetronome(onPhase: (phase: number) => void): Metronome {
       running = true
       startMs = performance.now()
       if (sound) {
-        // iPhone: play through the ring/silent switch (Safari 17 and later).
+        // iPhone: ask to play through the ring/silent switch (the Audio Session
+        // API, where Safari supports it).
         const session = (navigator as AudioSessionNavigator).audioSession
         if (session) session.type = 'playback'
         ctx ??= new AudioContext()
