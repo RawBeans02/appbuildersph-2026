@@ -39,7 +39,9 @@ export function createWorkerHandler(
   async function init(id: number, backend: Backend) {
     ready = false
     try {
-      await runtime.init(backend, (progress) => post({ type: 'progress', id, progress }))
+      await runtime.init(backend, (progress, partial) =>
+        post(partial === undefined ? { type: 'progress', id, progress } : { type: 'progress', id, progress, partial }),
+      )
     } catch (error) {
       post(failure(id, 'init-failed', error))
       return

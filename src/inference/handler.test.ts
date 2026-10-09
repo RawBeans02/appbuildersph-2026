@@ -289,3 +289,24 @@ describe('createEchoRuntime', () => {
     expect(onProgress.mock.calls).toEqual([[1, '']])
   })
 })
+
+describe('createWorkerHandler: init detail', () => {
+  it('passes the detail a runtime reports while loading, such as MB fetched', async () => {
+    const runtime: Runtime = {
+      init: async (_backend, onProgress) => {
+        onProgress(0.5, { fetchedMB: 120 })
+        onProgress(0.9)
+      },
+      run: async (input) => input,
+    }
+    const posted: WorkerResponse[] = []
+    const handle = createWorkerHandler(runtime, (response) => posted.push(response))
+    handle({ type: 'init', id: 1, backend: wasm })
+    await flush()
+    expect(posted).toEqual([
+      { type: 'progress', id: 1, progress: 0.5, partial: { fetchedMB: 120 } },
+      { type: 'progress', id: 1, progress: 0.9 },
+      { type: 'ready', id: 1 },
+    ])
+  })
+})

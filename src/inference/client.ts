@@ -26,7 +26,7 @@ export type WorkerLike = {
 
 export type InitOptions = {
   // 0..1, e.g. while the runtime compiles or warms up the model.
-  onProgress?: (progress: number) => void
+  onProgress?: (progress: number, partial?: unknown) => void
 }
 
 export type RunOptions = {

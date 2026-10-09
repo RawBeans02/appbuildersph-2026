@@ -42,6 +42,7 @@ export type RunContext = {
 // postMessage, so run() should check its input, and its output must survive
 // structured cloning.
 export type Runtime<Input = unknown, Output = unknown> = {
-  init(backend: Backend, onProgress: (progress: number) => void): Promise<void>
+  // partial: runtime-defined detail, e.g. how many MB of weights are fetched.
+  init(backend: Backend, onProgress: (progress: number, partial?: unknown) => void): Promise<void>
   run(input: Input, context: RunContext): Promise<Output>
 }

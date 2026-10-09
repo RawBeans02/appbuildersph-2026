@@ -38,8 +38,17 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
         // The Tesseract.js worker and core are model files (prepared on
         // demand when that engine is on), not app shell.
-        globIgnores: ['**/worker.min-*.js', '**/tesseract-core-*.js'],
+        globIgnores: ['**/worker.min-*.js', '**/tesseract-core-*.js', '**/webllm.worker-*.js'],
         runtimeCaching: [
+          {
+            // The laptop's AI wording worker (WebLLM, about 6 MB, too big to
+            // precache for every phone): cached the first time the officer uses
+            // it online, which the model download needs anyway. Hashed file
+            // names never change, so cache-first is safe.
+            urlPattern: ({ url, sameOrigin }) => sameOrigin && /\/assets\/webllm\.worker-[\w-]+\.js$/.test(url.pathname),
+            handler: 'CacheFirst',
+            options: { cacheName: 'agapay-laptop-ai', expiration: { maxEntries: 4 } },
+          },
           {
             // Serve model and .wasm files from whichever model cache holds them,
             // else from the network (online only, and nothing is stored here).
