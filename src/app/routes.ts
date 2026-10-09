@@ -21,6 +21,7 @@ export const PLANNED_ROUTES: PlannedRoute[] = [
   { path: '/hinga', title: 'Hinga breathing check', device: 'phone' },
   { path: '/watch', title: 'Flood exposure watch', device: 'phone' },
   { path: '/stock', title: 'Medicine stock', device: 'phone' },
+  { path: '/compare', title: 'Exposure and stock', device: 'phone' },
   { path: '/send', title: 'Send to the RHU', device: 'phone' },
   { path: '/privacy', title: 'Privacy & AI', device: 'phone' },
   { path: '/municipal', title: 'Municipal: scan barangay QRs', device: 'laptop' },
