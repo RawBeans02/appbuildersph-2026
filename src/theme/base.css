@@ -108,3 +108,10 @@ svg {
     transition-delay: 0s !important;
   }
 }
+
+/* Sticky action bars (Confirm on the box-reader review, Home's primary, the
+   Compare footer) sit over the bottom of the page: a field that gets focus,
+   like the review's Expiry, scrolls into view above them, not under them. */
+html {
+  scroll-padding-bottom: 200px;
+}
