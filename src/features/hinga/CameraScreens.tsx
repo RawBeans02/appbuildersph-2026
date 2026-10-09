@@ -239,14 +239,8 @@ export function PrePermissionScreen({ onContinue, onCancel }: { onContinue(): vo
       <BottomSheet
         open
         onClose={onCancel}
-        title={
-          <>
-            <span className={styles.sheetIcon}>
-              <CameraIcon size={24} weight="bold" aria-hidden />
-            </span>
-            Next, allow the camera and microphone
-          </>
-        }
+        icon={<CameraIcon size={32} weight="bold" />}
+        title="Next, allow the camera and microphone"
       >
         <p className={styles.sheetText}>
           The camera counts breaths. The microphone listens for crying. Nothing is recorded, and nothing leaves this phone.
@@ -261,18 +255,7 @@ export function PrePermissionScreen({ onContinue, onCancel }: { onContinue(): vo
 export function CameraBlockedScreen({ onHandCount, onRetry, onClose }: { onHandCount(): void; onRetry(): void; onClose(): void }) {
   return (
     <NoCameraScreen onCancel={onClose} backLabel="Close">
-      <BottomSheet
-        open
-        onClose={onClose}
-        title={
-          <>
-            <span className={styles.sheetIcon}>
-              <CameraSlashIcon size={24} weight="bold" aria-hidden />
-            </span>
-            The camera is blocked
-          </>
-        }
-      >
+      <BottomSheet open onClose={onClose} icon={<CameraSlashIcon size={32} weight="bold" />} title="The camera is blocked">
         <p className={styles.sheetText}>
           Hinga can't count without it. To allow it, open this site's settings in your browser and turn on Camera.
         </p>
