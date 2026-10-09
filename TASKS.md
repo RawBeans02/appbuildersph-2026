@@ -31,9 +31,12 @@ Every task names the files or folders it **owns**, so agents pushing straight to
   - HTTPS (Vercel provides it) is required for WebGPU and service workers. If the model runtime uses threaded WASM or SharedArrayBuffer, set cross-origin isolation headers in `vercel.json` (COOP `same-origin`, COEP `require-corp` or `credentialless`) and check that the model/CDN hosts work with them.
   - Model weights: fetched on first load (e.g. from Hugging Face), then cached. Check Vercel's file-size limits before self-hosting weights. The first-load download goes under "What requires internet".
   - Put the live URL at the top of this file and of the README. The README also keeps run/recreate instructions: judges and verifiers may run it from the repo.
-- [ ] todo · CI: GitHub Actions on every push to `main` (npm ci, typecheck, lint, test, build), after the scaffold's scripts land · [lead] · owns: `.github/workflows/`
+- [ ] doing · CI: GitHub Actions on every push to `main` (npm ci, typecheck, lint, build, test) · [lead] · owns: `.github/workflows/`
+  - `npm test` fails until the first test file lands (the scaffold's capabilities test), so the first runs may be red on that step only.
 - [ ] todo · Theme from the `design/README.md` tokens, applied once; component library customized, no defaults · [sr] · owns: theme files
 - [ ] todo · _task_ · [owner] · owns: `<files/folders>` · design: `design/<screen>`
+
+**Model runtime note (for whoever adds it):** the service worker's precache list (`vite.config.ts`, `workbox.globPatterns`) doesn't include `.wasm`/`.mjs`, and Workbox skips files over 2 MB by default. Add the runtime's files (or a runtime cache rule) and raise `maximumFileSizeToCacheInBytes`, or the model won't work offline. Model weights go in the Cache API/OPFS, not the precache.
 
 **Wow-flow acceptance (every wow-flow task):** works end to end in airplane mode after the first load (the test: load once, go offline, reload, use the core feature) · model weights cached (Cache API/OPFS, persistent storage) so the second load is instant · user data stays on the device (IndexedDB/SQLite/OPFS) · inference off the main thread · capability check with a designed fallback · any cloud feature is optional and shows a clear offline state.
 
