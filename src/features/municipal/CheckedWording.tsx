@@ -15,6 +15,7 @@ export function CheckedWording({
   value,
   onChange,
   reference,
+  readOnly = false,
 }: {
   // The id a visible label points at (19d's "Wording (optional)"). The box's
   // name stays "Plan wording" in every state, which holds the label's word.
@@ -23,6 +24,8 @@ export function CheckedWording({
   onChange: (text: string) => void
   // The plan's own text: the rule-based template and the steps.
   reference: string
+  // Once the plan is approved (19g).
+  readOnly?: boolean
 }) {
   const check = useMemo(() => checkNumbers(value, reference), [value, reference])
   const line = checkLine(check)
@@ -35,6 +38,7 @@ export function CheckedWording({
           id={id}
           className={styles.field}
           value={value}
+          readOnly={readOnly}
           onChange={(event) => onChange(event.target.value)}
           onScroll={(event) => {
             if (marks.current) marks.current.scrollTop = event.currentTarget.scrollTop

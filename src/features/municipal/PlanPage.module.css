@@ -145,3 +145,48 @@
 .approve {
   width: max-content;
 }
+
+/* 19g: the approval, in the approve bar's place, on --surface. */
+.approved {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-top: var(--space-5);
+  padding: var(--space-5) var(--space-6);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+
+.seal {
+  flex: none;
+  color: var(--ok);
+}
+
+.approvedText {
+  flex: 1;
+  min-width: 0;
+}
+
+.approvedTitle {
+  font: var(--type-heading);
+  color: var(--ok);
+}
+
+.approvedBy {
+  margin-top: var(--space-1);
+  font: var(--type-body);
+  font-weight: 600;
+}
+
+.approvedNote {
+  font: var(--type-body);
+  color: var(--ink-2);
+}
+
+.approvedActions {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}

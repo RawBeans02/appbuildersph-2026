@@ -1,10 +1,20 @@
-import { CaretDownIcon, CheckIcon, InfoIcon, ListNumbersIcon, ScanIcon, WarningCircleIcon } from '@phosphor-icons/react'
+import {
+  CaretDownIcon,
+  CheckIcon,
+  CircleNotchIcon,
+  InfoIcon,
+  ListNumbersIcon,
+  QrCodeIcon,
+  ScanIcon,
+  SealCheckIcon,
+  WarningCircleIcon,
+} from '@phosphor-icons/react'
 import { useEffect, useMemo, useState, type ComponentType, type ReactNode } from 'react'
 import { Button, ButtonLink, Field, StateBlock, useToast } from '../../components'
 import { cx } from '../../components/cx'
 import { getDb } from '../../data/db/appDb'
 import { DEMO_MUNICIPALITY } from '../../data/places'
-import { clockTime } from '../../lib/format'
+import { clockTime, dateTime } from '../../lib/format'
 import { useHoldReload } from '../../lib/useHoldReload'
 import { useDbQuery } from '../../data/db/useDbQuery'
 import { planTemplateText, type MunicipalPlan } from '../../rules/plan'
@@ -173,16 +183,19 @@ export function PlanBody({
   // The AI draft the text started from, if it did.
   const [aiDraft, setAiDraft] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
-  const [approvedText, setApprovedText] = useState<string | null>(null)
-  const [approvalId, setApprovalId] = useState<string | null>(null)
+  // 19g: the approval just written (its log id and time); the plan and the
+  // wording are read-only from then on.
+  const [approved, setApproved] = useState<{ id: string; at: string } | null>(null)
   const [problem, setProblem] = useState<string | null>(null)
   // A new deploy waits while the officer has unapproved text in the editor.
-  useHoldReload(text !== '' && approvedText === null)
+  useHoldReload(text !== '' && approved === null)
   // 19e: a number the plan doesn't have keeps Approve off until it's fixed
   // or the draft is written again.
   const mismatch = useMemo(() => checkNumbers(text, reference).mismatched.length > 0, [text, reference])
 
   function takeDraft(wording: string) {
+    // Approved wording is read-only.
+    if (approved) return
     setText(wording)
     setAiDraft(wording)
   }
@@ -191,14 +204,15 @@ export function PlanBody({
     setSaving(true)
     setProblem(null)
     try {
+      const now = new Date()
       const id = await approvePlan(await getDb(), {
         plan,
         draftText: aiDraft ?? '',
         draftSource: aiDraft !== null ? 'llm' : 'template',
         finalText: text,
+        now,
       })
-      setApprovedText(text)
-      setApprovalId(id)
+      setApproved({ id, at: now.toISOString() })
       toast({ message: 'Plan approved and saved to the log.' })
     } catch {
       setProblem("Couldn't save the approval on this laptop. Nothing was lost. Try again.")
@@ -212,10 +226,10 @@ export function PlanBody({
   const box =
     aiDraft === null ? (
       <Field label="Wording" optional>
-        {(input) => <CheckedWording id={input.id} value={text} onChange={setText} reference={reference} />}
+        {(input) => <CheckedWording id={input.id} value={text} onChange={setText} reference={reference} readOnly={!!approved} />}
       </Field>
     ) : (
-      <CheckedWording value={text} onChange={setText} reference={reference} />
+      <CheckedWording value={text} onChange={setText} reference={reference} readOnly={!!approved} />
     )
   return (
     <>
@@ -231,34 +245,68 @@ export function PlanBody({
           )}
         </div>
       </div>
-      <div className={styles.approveBar}>
-        {approvalId && <ButtonLink to={`/municipal/return?approval=${encodeURIComponent(approvalId)}`} variant="secondary">Make return QR</ButtonLink>}
-        {problem && (
-          <p role="alert" className={styles.problem}>
-            <WarningCircleIcon size={18} weight="bold" aria-hidden />
-            {problem}
-          </p>
-        )}
-        <div className={styles.approver}>
-          <Field label="Approved by" trailingIcon={<CaretDownIcon size={20} weight="bold" />}>
-            {(input) => (
-              <select {...input} defaultValue={APPROVER}>
-                <option value={APPROVER}>{APPROVER}</option>
-              </select>
-            )}
-          </Field>
+      {approved ? (
+        // 19g: the approve bar turns into the approval, in place.
+        <section className={cx(styles.approved, 'rise')} aria-labelledby="approved-heading">
+          <SealCheckIcon size={32} weight="bold" className={cx(styles.seal, 'stamp')} aria-hidden />
+          <div className={styles.approvedText}>
+            <h2 id="approved-heading" className={styles.approvedTitle}>
+              Approved
+            </h2>
+            <p className={styles.approvedBy}>
+              By the {APPROVER} · {dateTime(approved.at)}
+            </p>
+            <p className={styles.approvedNote}>Saved to the approval log on this laptop.</p>
+          </div>
+          <div className={styles.approvedActions}>
+            <ButtonLink to="/municipal/log" variant="text">
+              Open the approval log
+            </ButtonLink>
+            <div className={styles.approve}>
+              <ButtonLink
+                to={`/municipal/return?approval=${encodeURIComponent(approved.id)}`}
+                icon={<QrCodeIcon size={22} weight="bold" aria-hidden />}
+              >
+                Make return QR
+              </ButtonLink>
+            </div>
+          </div>
+        </section>
+      ) : (
+        <div className={styles.approveBar}>
+          {problem && (
+            <p role="alert" className={styles.problem}>
+              <WarningCircleIcon size={18} weight="bold" aria-hidden />
+              {problem}
+            </p>
+          )}
+          <div className={styles.approver}>
+            <Field label="Approved by" trailingIcon={<CaretDownIcon size={20} weight="bold" />}>
+              {(input) => (
+                <select {...input} defaultValue={APPROVER}>
+                  <option value={APPROVER}>{APPROVER}</option>
+                </select>
+              )}
+            </Field>
+          </div>
+          {mismatch && <p className={styles.approveHint}>Fix the number to approve.</p>}
+          <div className={styles.approve}>
+            <Button
+              icon={
+                saving ? (
+                  <CircleNotchIcon className="spin" size={22} weight="bold" aria-hidden />
+                ) : (
+                  <CheckIcon size={22} weight="bold" aria-hidden />
+                )
+              }
+              onClick={() => void onApprove()}
+              disabled={saving || mismatch}
+            >
+              {saving ? 'Approving…' : 'Approve plan'}
+            </Button>
+          </div>
         </div>
-        {mismatch && <p className={styles.approveHint}>Fix the number to approve.</p>}
-        <div className={styles.approve}>
-          <Button
-            icon={<CheckIcon size={22} weight="bold" aria-hidden />}
-            onClick={() => void onApprove()}
-            disabled={saving || approvedText === text || mismatch}
-          >
-            Approve plan
-          </Button>
-        </div>
-      </div>
+      )}
     </>
   )
 }

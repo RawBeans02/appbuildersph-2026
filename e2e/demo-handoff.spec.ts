@@ -134,15 +134,22 @@ test('the full demo offline: phone wow flow, then pair, receive, merge and appro
     await pair.click()
     await expect(pair).toHaveCount(0)
 
-    // The counts QR, verified against the key just paired. The "Received this
-    // week" list marks Maligaya-D "Just now" (the result banner can sit under
-    // the camera's own banner on a laptop with no camera).
+    // The counts QR, verified against the key just paired. The result panel
+    // (17g) lists the checks this laptop ran, the paired phone's key under the
+    // signature line; the "Received this week" list marks Maligaya-D "Just now".
     await qrText.fill(countsText!)
     await check.click()
-    await expect(desk.getByRole('listitem').filter({ hasText: 'Maligaya-D' })).toContainText('Just now')
+    const result = desk.getByRole('region', { name: 'Maligaya-D received' })
+    await expect(result).toContainText('Signed by the paired Maligaya-D phone')
+    await expect(result).toContainText(`Key ${phoneFingerprint}`)
+    await expect(result).toContainText('Added to the merged view · 5 of 5 in')
+    await expect(desk.getByRole('status').filter({ hasText: 'Maligaya-D received. 5 of 5 barangays in.' })).toHaveCount(1)
+    const received = desk.getByRole('region', { name: 'Received this week' })
+    await expect(received.getByRole('listitem').filter({ hasText: 'Maligaya-D' })).toContainText('Just now')
 
-    // Merged view: Maligaya-D's counts as the phone sent them, beside the four samples.
-    await desk.getByRole('link', { name: /^Merged view \(\d of 5\)$/ }).click()
+    // Merged view: Maligaya-D's counts as the phone sent them, beside the four
+    // samples. At 5 of 5 the merged view is the scan screen's primary (17g).
+    await desk.getByRole('link', { name: 'Open the merged view' }).click()
     await expect(desk.getByRole('heading', { level: 1, name: 'Merged view' })).toBeVisible()
     await expect(desk.getByText(/· 5 of 5 barangays/)).toBeVisible()
     for (const name of BARANGAYS) {
@@ -174,7 +181,13 @@ test('the full demo offline: phone wow flow, then pair, receive, merge and appro
     const approve = desk.getByRole('button', { name: 'Approve plan' })
     await approve.click()
     await expect(desk.getByText('Plan approved and saved to the log.')).toBeVisible()
-    await expect(approve).toBeDisabled()
+    // 19g: the approve bar turns into the approval in place; the LoopStrip's
+    // step 5 says the return QR is ready.
+    const approval = desk.getByRole('region', { name: 'Approved', exact: true })
+    await expect(approval).toContainText('By the Municipal health officer · ')
+    await expect(approval).toContainText('Saved to the approval log on this laptop.')
+    await expect(approve).toHaveCount(0)
+    await expect(desk.getByRole('listitem').filter({ hasText: 'Back to the barangay' })).toContainText('Return QR ready')
 
     // Complete the return loop, still offline in both independent contexts.
     await expect(desk.getByText('Send a doctor team to Maligaya-D first.', { exact: true })).toBeVisible()
