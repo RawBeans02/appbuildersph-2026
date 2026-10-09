@@ -94,9 +94,36 @@ flowchart LR
   Otherwise the officer keeps the template wording and sees the reasons.
 - **Fallback**: without a usable WebGPU (none, or a software adapter) the panel says the AI is unavailable and the template is used. The officer edits and approves either way, and the approval log records whether the wording came from the model or the template.
 
-### Hinga (camera breathing check)
+### Hinga (camera breathing check, phone)
 
-_TODO (Lead)._
+- **What it is**: a screening aid that counts a calm child's breaths per minute from the phone's rear camera and compares the count with the WHO IMCI 2014 fast-breathing cut-off for the child's age. The result is "Fast breathing for age: refer", "Not fast breathing for age", or "No count" with the reason. It never diagnoses.
+- **Models**: MediaPipe Pose Landmarker lite, to find the torso, and YAMNet, to hear crying, on MediaPipe Tasks Vision and Audio 1.0.1 (sizes, sources and licenses: README).
+- **Runtime**:
+  - The pose model runs in a module Web Worker (`src/inference/hinga/`) on the CPU through WebAssembly; no GPU delegate, for iPhone safety. The main thread sends one video frame at a time as a transferred `ImageBitmap`, with one frame in flight.
+  - If the worker can't start, the tracker falls back to the main thread and the screen says which one runs and why (`POSE_IN_WORKER`).
+  - YAMNet runs in its own worker. The microphone is open only during the count, and its audio is classified in pieces of about 1 s and then dropped; it's never stored or sent.
+  - Both runtimes and models are read from the model cache.
+- **Counting** (`COUNT_METHOD = 'pose-torso'` in `src/inference/hinga/method.ts`; constants in `dsp.ts`):
+  1. The shoulders (landmarks 11 and 12, both required) and the hips (23 and 24, which may be out of frame) give the torso box, locked when the count starts.
+  2. Each frame gives two signals: the mean brightness inside the torso box and the height of the shoulder midpoint.
+  3. Both are resampled to 10 Hz, detrended and band-passed from 0.2 to 1.7 Hz (12 to 102 breaths per minute).
+  4. The rate is the spectral peak over sliding 30 s windows (5 s hop), checked against a zero-crossing count over the whole minute. A count is reported only if the two agree within 3/min, the windows agree within 6/min and the peak is clear (prominence at least 0.6). The signal with the clearer peak is used.
+  5. The count is compared with the cut-off for the age band (`src/rules/imci.ts`): 60/min or more under 2 months, 50 or more from 2 up to 12 months, 40 or more from 12 months up to 5 years (exactly 12 months uses 40).
+- **Refusals instead of guesses**:
+  - the recording is shorter than 50 s, below 5 frames per second or has a gap over 1 s
+  - the torso is lost in more than 20% of frames
+  - the torso box moves or changes size beyond its limits in more than 10% of frames
+  - there's no clear rhythm, or the counts disagree
+  - crying: either YAMNet crying class scores above 0.3 for more than 3 s of the minute
+  
+  If the microphone isn't allowed, the count still runs and the screen says "Cry check off".
+- **Danger signs**: the four WHO IMCI 2014 general danger signs (not able to drink or breastfeed, vomits everything, convulsions, lethargic or unconscious), plus chest indrawing and stridor in a calm child. Any tick makes the result an urgent referral, whatever the count. That's more cautious than IMCI 2014 for chest indrawing and stridor, on purpose, for a refer-only screening aid.
+- **Tests**:
+  - Synthetic breathing signals at 20, 30, 45 and 60/min with noise and drift come back within 2/min.
+  - White noise and random-walk noise refuse, and a motion step trips the gate.
+  - The IMCI bands are covered, including the 12-month edge; "vomits everything" alone is urgent.
+  - The real-phone trials are recorded in `docs/SPIKE-HINGA.md`.
+- **Settings are first settings**: every threshold above was set against synthetic signals, and changes only from measured phone trials. We claim no accuracy figure.
 
 ## Data and privacy
 
@@ -138,4 +165,5 @@ _TODO (Lead)._
 - **Laptop AI wording**: it needs WebGPU (desktop Chrome or Edge) and a large first download. A 0.5B model writes plainly at best. `checkDraft` is a word-level check and can't catch every rewording that changes the meaning, so the officer's review is the final safeguard.
 - **Storage**: if the browser refuses persistent storage, it may clear the models under storage pressure. The Prepare for offline screen then offers the download again.
 - **Pairing**: trust rests on the officer comparing fingerprints. A lost phone's key stays trusted until the laptop pairs a new one ("Reset sample data and pairing" forgets keys on a device).
+- **Hinga**: the pose model's own card says it isn't intended for life-critical decisions, and it isn't tested on children; we test only on ourselves, breathing to a metronome. The head and both shoulders must be in view. Camera breath counts are least reliable with movement, crying and young infants, which is why it refuses rather than guesses. All thresholds are untuned until the phone trials.
 - **Data and clinical use**: synthetic data only, never real patients. Agapay is a research prototype and screening aid, not a registered medical device: it never diagnoses or doses, and its output is "refer". The watch window and medical sources are cited in the README (Medical sources).
