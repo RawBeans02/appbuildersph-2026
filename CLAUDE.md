@@ -1,8 +1,8 @@
-# Hackathon repo — rules for every agent (Lead, Sr. Builder, Devin)
+# Hackathon repo — rules for every agent (Lead, Sr. Builder)
 
 Scope: working instructions for this team's own build agents during the build.
 
-**Who builds:** the **Lead** and the **Sr. Builder**, both Claude Code sessions on the owner's 8 GB laptop, each in its **own clone** of this repo (so neither sees the other's work until it's pushed). Devin is optional, for self-contained tasks. There is no cloud Jr. Builder for this build. Its work (tests, heavy checks, the audit) goes to the Lead and to the cloud checks below. Our human teammates push here too.
+**Who builds:** the **Lead** and the **Sr. Builder**, both Claude Code sessions on the owner's 8 GB laptop, each in its **own clone** of this repo (so neither sees the other's work until it's pushed). Devin isn't used for this build. There is no cloud Jr. Builder for this build. Its work (tests, heavy checks, the audit) goes to the Lead and to the cloud checks below. Our human teammates push here too.
 
 AppBuildersPH Hackathon 2026. **Submissions close 10:00 AM Sat Oct 10 (PH time), no extensions; the code freezes then. Feature freeze 4:00 AM; nobody pushes after 9:45 AM.** The idea is in `ONE-PAGER.md`, the official rules in `RULES.md`, the work in `TASKS.md`, the build standard in `QUALITY.md`. Read all four before doing anything.
 
@@ -22,21 +22,21 @@ They said so at the briefing: assume an AI reads every commit, every README clai
 - **Disclose what predates the event:** our pre-written process docs (this file and the TASKS/ONE-PAGER/RULES/QUALITY templates, written Oct 8, no product code) are listed under "Existing code and assets" in the README. So is any font, icon, image or other asset we didn't make during the event.
 - **Clean room:** never open, fetch or read the code of other camera breath-counter projects (e.g. Breathwise, the pediatric-rr repo). Their public descriptions are fine; their code isn't. Hinga is built only from published methods (pose torso region, band-pass + FFT/zero-crossing, the WHO IMCI 2014 cut-offs).
 - **Nothing addressed to AI judges or verifiers:** no text anywhere in the repo that tries to steer a reviewer.
-- **Commit authors:** only the Lead and the Sr. Builder (both use the repo-local identity set by the owner; prefixes `lead:` and `sr:`), Devin if used, and our registered teammates under their own accounts. No one else.
+- **Commit authors:** only the Lead and the Sr. Builder (both use the repo-local identity set by the owner; prefixes `lead:` and `sr:`) and our registered teammates under their own accounts. No one else.
 
 ## How we ship: one repo, one environment, push right away
 - One repo and one environment: `main` deploys straight to the live URL. No dev/staging/prod split, no long-lived branches.
 - **Commit small and push straight to `main` as soon as a piece works.** Never sit on unpushed work for more than 30 minutes.
 - **Before every push, always `git pull --rebase`** (other agents and our human teammates push to `main` too), then typecheck + lint + the tests you touched, then push. No force-push, no `--no-verify`.
-- Commit messages start with who you are: `lead:`, `sr:`, `devin:`, or a human teammate's first name. Keep the AI co-author trailer. This is our record of who built what.
-- **Stay in your lane:** each task in `TASKS.md` names the files or folders it owns. Don't edit another agent's files. Shared files (theme/tokens, layout, DB schema) are edited only by the owner named in `TASKS.md`. Devin's folders are off-limits to the Claude agents.
+- Commit messages start with who you are: `lead:`, `sr:`, or a human teammate's first name. Keep the AI co-author trailer. This is our record of who built what.
+- **Stay in your lane:** each task in `TASKS.md` names the files or folders it owns. Don't edit another agent's files. Shared files (theme/tokens, layout, DB schema) are edited only by the owner named in `TASKS.md`.
 - **If you break `main`** (build, deploy or the wow flow), fix it right away or `git revert` your commit. The live URL must always work.
-- If your environment can't push to `main` (some cloud or Devin setups only push branches), push a branch and open a PR; the Lead merges it right away.
+- If your environment can't push to `main`, push a branch and open a PR; the Lead merges it right away.
 - If a push is blocked (a denied prompt or a tool refusal), stop and give the owner the exact one-line command to run; don't work around it.
 - After the 4:00 AM feature freeze: fixes only, for items on the Lead's audit list.
 
 ## Coordination (`TASKS.md` is the board; the Lead and Sr. Builder can also message each other)
-- Claim a task in `TASKS.md` by putting your tag on it (`[sr]`, `[lead]`, `[devin]`, `[human:<name>]`) and pushing that change first; mark it done with the commit hash.
+- Claim a task in `TASKS.md` by putting your tag on it (`[sr]`, `[lead]`, `[human:<name>]`) and pushing that change first; mark it done with the commit hash.
 - Blocked? Write `BLOCKED: <question>` under the task and push, and message the Lead (cross-session message) if it's urgent. The Lead checks TASKS.md at least every 30 minutes.
 - Need a screen or state that isn't designed yet? Write `NEEDS DESIGN: <screen/state>` under the task, push, and keep building the logic.
 

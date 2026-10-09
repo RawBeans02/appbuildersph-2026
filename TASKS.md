@@ -1,6 +1,6 @@
 # TASKS — source of truth for who does what
 
-Tags: `[lead]` `[sr]` (Sr. Builder, local) `[devin]` (Devin, optional) `[human:<name>]`. There is no Jr. Builder for this build; the Lead and the Sr. Builder both build.
+Tags: `[lead]` `[sr]` (Sr. Builder, local) `[human:<name>]` (until teammates come online, human tasks are `[human:Rovs]`). No Devin for this build. There is no Jr. Builder for this build; the Lead and the Sr. Builder both build.
 Status: `todo` → `doing` → `done` (pushed to `main`, with the commit hash)
 Under a task: `BLOCKED: <question>` · `NEEDS DESIGN: <screen/state>`
 Every task names the files or folders it **owns**, so agents pushing straight to `main` don't collide.
@@ -65,9 +65,9 @@ Until `design/` lands, build the logic plus plain, unstyled screens and write `N
 **Lead**
 - [ ] doing · B1 Hinga spike S1 (see "Spike" below) · [lead]
 - [ ] todo · B2 Hinga in the app (after S1 passes): age band + readiness, framing, 60 s count, refusals (motion, torso lost, readings disagree, crying), result (fast / not fast against the WHO IMCI 2014 cut-offs) with danger signs → URGENT, save to the record; screens 2–7. Cry detection: YAMNet via MediaPipe's audio classifier, on the device; microphone audio is never stored · [lead] · owns: `src/features/hinga/`, `src/inference/hinga/`, `src/rules/imci.ts`
-- [x] done · B3 QR payload v1: schema, compact encoding, ECDSA P-256 sign/verify (Web Crypto), small-cell suppression ("<5"), age bands only, epi-week not dates, each QR under 800 bytes; unit tests · [lead] (→ [devin] PR 1 if the owner confirms Devin) · owns: `src/qr/` · 04817fe (e61978c..04817fe)
+- [x] done · B3 QR payload v1: schema, compact encoding, ECDSA P-256 sign/verify (Web Crypto), small-cell suppression ("<5"), age bands only, epi-week not dates, each QR under 800 bytes; unit tests · [lead] · owns: `src/qr/` · 04817fe (e61978c..04817fe)
   - API and wire format for A6 and B5: `src/qr/README.md`. Measured in `src/qr/codec.test.ts` (Vitest, Node 20): a realistic payload is 282 bytes of QR text, the largest valid one 343.
-- [ ] doing · B4 Synthetic data: "San Isidro Demo" (Maligaya-D, Bagong Silang-D, Santo Niño-D, Mabini-D, Riverside-D), residents "Residente 001…", lots "DEMO-LOT-…", plus 4 pre-made signed barangay QRs for the laptop demo; the generator and seed are in the repo · [lead] (→ [devin] PR 2 if confirmed) · owns: `src/data/seed/`, `scripts/seed/`
+- [ ] doing · B4 Synthetic data: "San Isidro Demo" (Maligaya-D, Bagong Silang-D, Santo Niño-D, Mabini-D, Riverside-D), residents "Residente 001…", lots "DEMO-LOT-…", plus 4 pre-made signed barangay QRs for the laptop demo; the generator and seed are in the repo · [lead] · owns: `src/data/seed/`, `scripts/seed/`
   - part 1 (phone seed) done · d6b5dc3 (b29fec5..d6b5dc3); part 2 (4 pre-made signed barangay QRs) doing, with B5
 - [ ] doing · B5 Municipal laptop view: scan a QR (BarcodeDetector, with a JS decoder fallback), verify, merge the 5 barangays, merged table, rule-based plan (doctor-team priority, stock moves), approve + log; screens 16–20 except the AI panel · [lead] · owns: `src/features/municipal/`, `src/rules/plan.ts`, `src/qr/pairing.ts`
   - Needs DB v2 stores from the Sr. Builder (`db.ts` owns the schema): received payloads and paired device keys. Pre-made barangays' keys come from the seed (B4 part 2).

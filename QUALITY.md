@@ -84,7 +84,7 @@ The challenge (`RULES.md`): an AI product that stays genuinely useful when the c
 - Tests where they pay: unit tests for the core logic (parsing, money math, AI output handling and validation, offline storage) and one end-to-end test of the main flow, including a run with the network off (in CI, not on the laptop).
 - Prefer established libraries and APIs over custom infrastructure. Check each license allows our use, and list it in the README.
 - `docs/ARCHITECTURE.md`: a diagram, key decisions, the AI pipeline (model, prompt, validation, fallback) and its limitations. Every presenter must be able to explain it.
-- Provenance: commit messages start with the author (`lead:`, `sr:`, `devin:`, or a human teammate's first name), and the AI co-author trailers stay. This backs the AI disclosure and "who built what".
+- Provenance: commit messages start with the author (`lead:`, `sr:`, or a human teammate's first name), and the AI co-author trailers stay. This backs the AI disclosure and "who built what".
 
 ## Feature-freeze audit (4:00 AM)
 The Lead audits the repo and the live URL against this file **before changing any code** (PageSpeed/Lighthouse runs on pagespeed.web.dev, not on the laptop):

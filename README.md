@@ -96,7 +96,6 @@ Every AI session that touched this project:
 - **The owner's separate Claude session ("Account Admin", an AI):** drafted the pre-event process docs on Oct 8, sets up and monitors the laptop (starts the agent sessions, watches memory), relays briefing details, and runs read-only audits; it writes no product code.
 - **Claude** (chat, Research mode): research and idea selection.
 - **Claude Design**: all UI design.
-- **Devin**: _TBD (listed with its commits only if used)._
 
 A cloud "Jr. Builder" agent named in early commits was planned but never used.
 
@@ -125,9 +124,9 @@ _TBD: Performance, Accessibility, Best Practices and SEO, measured on pagespeed.
 ## Team
 | Name (as on appbuildersph.com/hackathon/participants) | GitHub | Role | Contributions |
 |---|---|---|---|
-| Rovince Eduvane | RawBeans02 | _TBD_ | _TBD_ |
-| _TBD_ | | | |
-| _TBD_ | | | |
-| _TBD_ | | | |
+| Rovince Eduvane | RawBeans02 | Build lead | _TBD_ |
+| Vicente Seumal | _TBD_ | _TBD_ | _TBD_ |
+| Adam Arous | _TBD_ | _TBD_ | _TBD_ |
+| Gabriel Syd Paguio | _TBD_ | _TBD_ | _TBD_ |
 
 Teammates commit under their own GitHub accounts; no one outside the team commits.
