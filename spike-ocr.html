@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>OCR spike</title>
+  </head>
+  <body>
+    <main>
+      <h1>OCR spike (throwaway test page)</h1>
+      <p>PP-OCRv5 mobile on onnxruntime-web, on this device. Use only synthetic labels or our own photos of medicine boxes, never patient data.</p>
+      <p id="shell">Offline app shell: checking…</p>
+      <p id="backend">Checking this device…</p>
+      <p id="status" role="status">Starting…</p>
+      <p>
+        <label>Take a photo <input id="camera" type="file" accept="image/*" capture="environment" disabled /></label>
+      </p>
+      <p>
+        <label>Choose a photo <input id="file" type="file" accept="image/*" disabled /></label>
+      </p>
+      <canvas id="canvas" width="0" height="0" style="max-width: 100%; height: auto"></canvas>
+      <h2>Text</h2>
+      <ol id="lines"></ol>
+      <h2>Report (copy this into the results)</h2>
+      <pre id="report" style="white-space: pre-wrap"></pre>
+    </main>
+    <script type="module" src="/spikes/ocr/main.ts"></script>
+  </body>
+</html>

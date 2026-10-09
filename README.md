@@ -35,12 +35,13 @@ _TBD: the target user, the problem, and why it matters._
 | Part | Runs on | Model / runtime |
 |---|---|---|
 | App shell (HTML, JS, CSS), cached by a service worker | The user's browser | No model yet |
+| OCR spike (`spike-ocr.html`, a test page not linked from the app): text detection and recognition on a photo | The user's browser, in a Web Worker, WebAssembly, single-threaded | PP-OCRv5 mobile detection + English recognition on ONNX Runtime Web 1.30 |
 | _TBD: the on-device AI_ | | |
 
 ## What requires internet
 | Part | Why it needs internet | What happens offline |
 |---|---|---|
-| First visit to the live URL | Downloads the app shell, which the service worker then caches | After the first visit, the app shell opens offline |
+| First visit to the live URL | Downloads the app shell, which the service worker then caches. For now this includes the OCR spike's model files and the ONNX Runtime WebAssembly file: the precache totals 26,594 KiB (Workbox's figure in the build output) | After the first visit, the app shell and the OCR spike open offline |
 | _TBD_ | | |
 
 ## Why does this product benefit from running AI locally?
@@ -57,7 +58,10 @@ _TBD: what stays on the device, human review of AI output, limitations, how the 
 ### Models used
 | Model | Parameters / quantization | Download size | Source | License |
 |---|---|---|---|---|
-| _TBD_ | | | | |
+| PP-OCRv5_mobile_det (text detection), ONNX export, used by the OCR spike | Not stated by the source | 4,826,518 bytes | ONNX: [ilaylow/PP_OCRv5_mobile_onnx](https://huggingface.co/ilaylow/PP_OCRv5_mobile_onnx) `ppocrv5_det.onnx` @ `f97b337`; original: [PaddlePaddle/PP-OCRv5_mobile_det](https://huggingface.co/PaddlePaddle/PP-OCRv5_mobile_det) | Apache-2.0 |
+| en_PP-OCRv5_mobile_rec (English text recognition), ONNX export, used by the OCR spike | Parameters not stated; FP32, ONNX opset 11 (per the export's README and `config.json`) | 7,830,888 bytes, plus a 1,416-byte dictionary | ONNX: [monkt/paddleocr-onnx](https://huggingface.co/monkt/paddleocr-onnx) `languages/english/` @ `7b02d0a`; original: [PaddlePaddle/en_PP-OCRv5_mobile_rec](https://huggingface.co/PaddlePaddle/en_PP-OCRv5_mobile_rec) | Apache-2.0 |
+
+Self-hosted, unmodified, in `public/models/ppocr/` with their checksums, sources and the license text (`public/models/ppocr/README.md`).
 
 ### Technologies and frameworks
 _TBD_
@@ -72,6 +76,7 @@ _TBD_
 - **Other products:** the team has built other products before this event; no code, data, prompts, designs or assets from them are used here.
 - **Designs:** the UI designs, tokens and images in `design/` were generated with Claude Design during the event.
 - **Fonts, icons, images and other third-party assets,** with their licenses: _TBD (listed as they are added)_.
+  - The synthetic test label `spikes/ocr/fixtures/label.ppm` was rendered during the event with Pillow's bundled font, Aileron Regular (CC0). Its text is invented.
 
 ### AI development tools
 Every AI session that touched this project:
@@ -97,6 +102,8 @@ A cloud "Jr. Builder" agent named in early commits was planned but never used.
 | [Playwright](https://playwright.dev) (`@playwright/test`) | End-to-end offline test in CI (Chromium) | Apache-2.0 |
 | [ESLint](https://eslint.org), `@eslint/js`, [typescript-eslint](https://typescript-eslint.io), `eslint-plugin-react-hooks`, `eslint-plugin-react-refresh`, `globals` | Linting | MIT |
 | `@types/react`, `@types/react-dom`, `@types/node` ([DefinitelyTyped](https://github.com/DefinitelyTyped/DefinitelyTyped)) | Type definitions | MIT |
+| [ONNX Runtime Web](https://onnxruntime.ai) (`onnxruntime-web`) | On-device model inference (WebAssembly) for the OCR spike | MIT |
+| [Pillow](https://python-pillow.org) | Renders the synthetic test label (`spikes/ocr/fixtures/make_label.py`); a development tool, not shipped | MIT-CMU |
 
 ## Lighthouse (mobile, measured at feature freeze)
 _TBD: Performance, Accessibility, Best Practices and SEO, measured on pagespeed.web.dev against the live URL._

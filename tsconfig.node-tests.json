@@ -1,12 +1,11 @@
 {
   "compilerOptions": {
-    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node-tests.tsbuildinfo",
     "target": "es2023",
     "lib": ["ES2023", "DOM", "DOM.Iterable"],
     "module": "esnext",
     "moduleResolution": "bundler",
-    "types": ["vite/client", "vite-plugin-pwa/vanillajs"],
-    "jsx": "react-jsx",
+    "types": ["node", "vite/client"],
     "noEmit": true,
     "skipLibCheck": true,
     "allowImportingTsExtensions": true,
@@ -15,9 +14,7 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
     "erasableSyntaxOnly": true
   },
-  "include": ["src", "spikes"],
-  "exclude": ["spikes/**/*.model.test.ts"]
+  "include": ["spikes/**/*.model.test.ts"]
 }
