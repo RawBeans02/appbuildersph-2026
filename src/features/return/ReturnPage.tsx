@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react'
 import { Button, ButtonLink, Field } from '../../components'
+import { cx } from '../../components/cx'
 import { getDb } from '../../data/db/appDb'
 import { useDbQuery } from '../../data/db/useDbQuery'
 import { LaptopFrame } from '../municipal/LaptopFrame'
@@ -35,7 +36,7 @@ export default function ReturnPage() {
     {data.status === 'ready' && <>
       <p className={styles.meta}>Saved approval · Week {data.data.plan.epiWeek} · Synthetic sample data</p>
       <p>Only approved structured actions relevant to the selected barangay are included.</p>
-      {recipients.length === 0 ? <p>No doctor-team or stock-transfer actions apply to this approval.</p> : <>
+      {recipients.length === 0 ? <p className={styles.empty}>No doctor-team or stock-transfer actions apply to this approval.</p> : <>
         <Field label="Recipient barangay">{(input) => <select {...input} value={selected} disabled={busy} onChange={(e) => { setBarangay(e.target.value); setQr(null) }}>{recipients.map((row) => <option key={row.barangay} value={row.barangay}>{row.name}</option>)}</select>}</Field>
         <Button disabled={busy} onClick={() => void make()}>{busy ? 'Making the QR…' : 'Generate return QR'}</Button>
       </>}
@@ -43,7 +44,8 @@ export default function ReturnPage() {
     {error && <p role="alert" className={styles.error}>{error}</p>}
     {qr && <>
       <Instructions packet={qr.packet} />
-      <div className={styles.qr}><QrImage text={qr.text} label="Approved return instructions QR" /></div>
+      {/* 22a: the QR plays `reveal` once, as it is made, then stays still. */}
+      <div className={cx(styles.qr, 'reveal-qr')}><QrImage text={qr.text} label="Approved return instructions QR" /></div>
       <p>On the barangay phone, open Receive RHU instructions. Before first trust, compare this fingerprint:</p>
       <code className={styles.fingerprint}>{qr.fingerprint}</code>
       <p className={styles.meta}>Approval ID: {qr.packet.approvalId}. Hold the laptop steady and raise the brightness if needed.</p>
