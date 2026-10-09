@@ -29,3 +29,26 @@ jobs:
       - run: npm run lint
       - run: npm run build
       - run: npm test
+
+  # The offline end-to-end test: built app, real service worker, network cut
+  # off in the browser. Runs here, never on the laptop.
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+        env:
+          CI: true
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces
+          path: test-results/
+          retention-days: 3
