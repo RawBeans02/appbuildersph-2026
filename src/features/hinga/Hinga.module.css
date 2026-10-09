@@ -26,8 +26,17 @@
 .saveBar {
   position: sticky;
   bottom: 0;
+  gap: var(--space-2);
+  padding-top: 10px;
   border-top: 1px solid var(--line);
   background: var(--paper);
+}
+
+/* Above a Save that's still off: what turns it on. */
+.saveHint {
+  font: var(--type-body-dense);
+  color: var(--ink-2);
+  text-align: center;
 }
 
 .title {
@@ -64,9 +73,9 @@
   margin-top: var(--space-6);
 }
 
-.none {
-  composes: group;
-  margin-top: var(--space-2);
+/* "None of these" closes the danger-sign list on a --paper row. */
+.noneRow {
+  background: var(--paper);
 }
 
 .groupTitle {

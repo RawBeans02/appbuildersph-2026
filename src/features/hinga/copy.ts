@@ -1,4 +1,4 @@
-import { DANGER_SIGNS, fastBreathingCutoff, type DangerSign } from '../../rules/imci'
+import { fastBreathingCutoff, type DangerSign } from '../../rules/imci'
 import type { CountRefusal } from './countSession'
 
 // Hinga's words, from design/COPY.md (screens 2–7, L8a, L8b, L9b) word for
@@ -28,19 +28,28 @@ export function ageBand(ageMonths: number): AgeBand | null {
   return { ...band, cutoff }
 }
 
-// The danger-sign rows, in src/rules/imci.ts's order (the four IMCI 2014
-// general danger signs, then chest indrawing and stridor): the label, the
-// term in brackets (shown lighter), and the words for the URGENT band's line.
+// The danger-sign rows (design pass 1b, 6a/6b): the label, the term in
+// brackets (shown lighter), and the words for the URGENT band's line. Keyed in
+// src/rules/imci.ts's order.
 export const DANGER_SIGN_COPY: Record<DangerSign, { label: string; term: string | null; inLine: string }> = {
   'unable-to-drink': { label: "Can't drink or breastfeed", term: null, inLine: "can't drink or breastfeed" },
-  'vomits-everything': { label: 'Vomits everything', term: 'sumusuka ng lahat', inLine: 'vomits everything' },
+  'vomits-everything': { label: 'Vomits everything', term: null, inLine: 'vomits everything' },
   convulsions: { label: 'Convulsions', term: 'kombulsyon', inLine: 'convulsions' },
-  lethargic: { label: 'Very sleepy or hard to wake', term: 'lethargic or unconscious', inLine: 'very sleepy or hard to wake' },
+  lethargic: { label: 'Very sleepy or hard to wake', term: null, inLine: 'very sleepy or hard to wake' },
   'chest-indrawing': { label: 'Chest pulls in when breathing in', term: 'chest indrawing', inLine: 'chest indrawing' },
-  stridor: { label: 'Harsh noise when breathing in, while calm', term: 'stridor', inLine: 'stridor' },
+  stridor: { label: 'Harsh noise when breathing in', term: 'stridor', inLine: 'stridor' },
 }
 
-export const DANGER_SIGN_IDS: readonly DangerSign[] = DANGER_SIGNS.map((sign) => sign.id)
+// The checklist's order on screen (pass 1b): the two breathing signs, then the
+// four IMCI 2014 general danger signs. "None of these" follows them.
+export const DANGER_SIGN_ROWS: readonly DangerSign[] = [
+  'chest-indrawing',
+  'stridor',
+  'unable-to-drink',
+  'vomits-everything',
+  'convulsions',
+  'lethargic',
+]
 
 // "a", "a and b", "a, b and c"
 export function joinAnd(parts: readonly string[]): string {
@@ -99,7 +108,7 @@ export function savedText(residentName: string | null, signs: number, time: stri
   return {
     // NEEDS DESIGN: the title when no resident is linked.
     title: residentName ? `Saved to ${residentName}'s record` : 'Saved to the record',
-    detail: `${signs === 0 ? 'No danger signs ticked' : `${signs} danger sign${signs === 1 ? '' : 's'} ticked`} · ${time}`,
+    detail: `${signs === 0 ? 'No danger signs' : `${signs} danger sign${signs === 1 ? '' : 's'} ticked`} · ${time}`,
   }
 }
 

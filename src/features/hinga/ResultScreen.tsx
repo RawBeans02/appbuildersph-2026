@@ -6,7 +6,7 @@ import type { HingaCheck } from '../../data/db/types'
 import { hingaOutcome, type DangerSign } from '../../rules/imci'
 import { buildHingaCheck, newCheckId, type CountMethodUsed } from './check'
 import { CryOffNote } from './CameraScreens'
-import { bandText, DANGER_SIGN_COPY, DANGER_SIGN_IDS, HEADLINES, metaLine, savedText, SCREENING_NOTE, timeText, type AgeBand, type ResultKind } from './copy'
+import { bandText, DANGER_SIGN_COPY, DANGER_SIGN_ROWS, HEADLINES, metaLine, savedText, SCREENING_NOTE, timeText, type AgeBand, type ResultKind } from './copy'
 import { answered, tickNone, tickSign, type DangerAnswer, type LinkedResident } from './flow'
 import styles from './Hinga.module.css'
 import { ResultBand } from './ResultBand'
@@ -135,6 +135,7 @@ export function ResultScreen(props: {
         </div>
       ) : (
         <div className={`${styles.footer} ${styles.saveBar}`}>
+          {!answered(answer) && <p className={styles.saveHint}>Tick any danger signs, or None of these, to save.</p>}
           <Button tagalog="I-save" disabled={!answered(answer) || saving} onClick={() => void save()}>
             {kind === 'urgent' ? 'Save as URGENT' : 'Save to the record'}
           </Button>
@@ -152,32 +153,30 @@ export function ResultScreen(props: {
 function DangerSigns({ answer, onChange }: { answer: DangerAnswer<DangerSign>; onChange(answer: DangerAnswer<DangerSign>): void }) {
   const ticked = answer.signs.length
   return (
-    <>
-      <div className={styles.signs}>
-        <div className={styles.groupHead}>
-          <h2 className={styles.groupTitle}>Check for danger signs</h2>
-          <p>{ticked ? `${ticked} ticked` : 'Tick any you see, or None of these. One tick makes this URGENT.'}</p>
-        </div>
-        {DANGER_SIGN_IDS.map((sign) => {
-          const { label, term } = DANGER_SIGN_COPY[sign]
-          return (
-            <CheckRow
-              key={sign}
-              label={
-                <>
-                  {label}
-                  {term && <span className={styles.term}> ({term})</span>}
-                </>
-              }
-              checked={answer.signs.includes(sign)}
-              onChange={(on) => onChange(tickSign(answer, sign, on))}
-            />
-          )
-        })}
+    <div className={styles.signs}>
+      <div className={styles.groupHead}>
+        <h2 className={styles.groupTitle}>Check for danger signs</h2>
+        <p>{ticked ? `${ticked} ticked` : 'Tick any you see, or None of these. Any sign makes this URGENT.'}</p>
       </div>
-      <div className={styles.none}>
+      {DANGER_SIGN_ROWS.map((sign) => {
+        const { label, term } = DANGER_SIGN_COPY[sign]
+        return (
+          <CheckRow
+            key={sign}
+            label={
+              <>
+                {label}
+                {term && <span className={styles.term}> ({term})</span>}
+              </>
+            }
+            checked={answer.signs.includes(sign)}
+            onChange={(on) => onChange(tickSign(answer, sign, on))}
+          />
+        )
+      })}
+      <div className={styles.noneRow}>
         <CheckRow label="None of these" checked={answer.none} onChange={(on) => onChange(tickNone(answer, on))} />
       </div>
-    </>
+    </div>
   )
 }

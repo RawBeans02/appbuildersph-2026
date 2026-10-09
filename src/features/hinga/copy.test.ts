@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { DANGER_SIGNS } from '../../rules/imci'
-import { ageBand, bandText, DANGER_SIGN_COPY, joinAnd, metaLine, refusalText, savedText } from './copy'
+import { ageBand, bandText, DANGER_SIGN_COPY, DANGER_SIGN_ROWS, joinAnd, metaLine, refusalText, savedText } from './copy'
 
 const toddler = ageBand(18)!
 
@@ -17,15 +17,16 @@ describe('Hinga copy (design/COPY.md)', () => {
     expect(ageBand(60)).toBeNull()
   })
 
-  it('has a row for every danger sign in imci.ts, in its order', () => {
+  it('has a row for every danger sign in imci.ts, in the pass 1b order', () => {
     expect(Object.keys(DANGER_SIGN_COPY)).toEqual(DANGER_SIGNS.map((sign) => sign.id))
-    expect(Object.values(DANGER_SIGN_COPY).map(({ label, term }) => (term ? `${label} (${term})` : label))).toEqual([
-      "Can't drink or breastfeed",
-      'Vomits everything (sumusuka ng lahat)',
-      'Convulsions (kombulsyon)',
-      'Very sleepy or hard to wake (lethargic or unconscious)',
+    expect([...DANGER_SIGN_ROWS].sort()).toEqual(DANGER_SIGNS.map((sign) => sign.id).sort())
+    expect(DANGER_SIGN_ROWS.map((sign) => DANGER_SIGN_COPY[sign]).map(({ label, term }) => (term ? `${label} (${term})` : label))).toEqual([
       'Chest pulls in when breathing in (chest indrawing)',
-      'Harsh noise when breathing in, while calm (stridor)',
+      'Harsh noise when breathing in (stridor)',
+      "Can't drink or breastfeed",
+      'Vomits everything',
+      'Convulsions (kombulsyon)',
+      'Very sleepy or hard to wake',
     ])
   })
 
@@ -67,7 +68,7 @@ describe('Hinga copy (design/COPY.md)', () => {
   it("writes 6c's confirmation", () => {
     expect(savedText('Residente 010', 0, '8:32 AM')).toEqual({
       title: "Saved to Residente 010's record",
-      detail: 'No danger signs ticked · 8:32 AM',
+      detail: 'No danger signs · 8:32 AM',
     })
     expect(savedText(null, 1, '8:32 AM').detail).toBe('1 danger sign ticked · 8:32 AM')
     expect(savedText(null, 2, '8:32 AM').detail).toBe('2 danger signs ticked · 8:32 AM')
