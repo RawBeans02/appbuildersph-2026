@@ -1,4 +1,5 @@
 /// <reference types="vitest/config" />
+import { execSync } from 'node:child_process'
 import { readdirSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import react from '@vitejs/plugin-react'
@@ -13,7 +14,21 @@ const spikePages = Object.fromEntries(
     .map((file) => [file.slice(0, -'.html'.length), fileURLToPath(new URL(`./${file}`, import.meta.url))]),
 )
 
+// The build's version, for /device's Demo readiness: the commit (Vercel's, or
+// the local checkout's) and when it was built. Only the device page reads it.
+function gitShortSha(): string {
+  if (process.env.VERCEL_GIT_COMMIT_SHA) return process.env.VERCEL_GIT_COMMIT_SHA.slice(0, 7)
+  try {
+    return execSync('git rev-parse --short=7 HEAD', { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim()
+  } catch {
+    return 'unknown'
+  }
+}
+
 export default defineConfig({
+  define: {
+    __APP_BUILD__: JSON.stringify({ sha: gitShortSha(), builtAt: new Date().toISOString() }),
+  },
   plugins: [
     react(),
     VitePWA({
