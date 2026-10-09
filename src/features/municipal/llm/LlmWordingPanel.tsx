@@ -1,20 +1,21 @@
-import { ArrowClockwiseIcon, CheckCircleIcon, CircleNotchIcon, InfoIcon, LaptopIcon, WarningIcon } from '@phosphor-icons/react'
+import { ArrowClockwiseIcon, CircleNotchIcon, InfoIcon, LaptopIcon, WarningIcon } from '@phosphor-icons/react'
 import { useEffect, useState, useSyncExternalStore, type ReactNode } from 'react'
 import { Button, Progress } from '../../../components'
 import { DEMO_BARANGAYS } from '../../../data/places'
 import { checkWebGPU } from '../../../lib/capabilities'
 import type { MunicipalPlan } from '../../../rules/plan'
-import { checkNumbers } from '../numberCheck'
-import { checkDraft, withReminder } from './check'
+import { withReminder } from './check'
 import { loadWordingEngine } from './llmEngine'
 import { WORDING_MODEL_NAME } from './model'
 import { createWording, type Wording } from './wording'
 import styles from './LlmWordingPanel.module.css'
 
-// Screen 19's AI panel (19a done, 19b downloading, 19c drafting, 19d off): an
-// optional local model rewords the rule-based plan. The plan and Approve work
-// without it. A draft that changes a number, a move or the priority order is
-// never offered, and the fixed no-dose reminder is added to every draft used.
+// Screen 19's AI card (19a done, 19b downloading, 19c drafting, 19d off): an
+// optional local model rewords the rule-based plan. The officer's wording box
+// sits inside the card (children). A draft that passes the check (no new
+// number, every move and priority in place) goes straight into that box with
+// the fixed no-dose reminder; one that doesn't is never handed over, and the
+// reasons show. The plan and Approve work without any of it.
 
 let shared: Wording | null = null
 
@@ -31,81 +32,62 @@ function getWording(): Wording {
 }
 
 const KNOWN_NAMES = DEMO_BARANGAYS.map((place) => place.name)
-// The draft with each number marked, read by the plan screen's own number
-// check: a number the plan doesn't have is outlined with an icon (never color
-// alone); one it has is only highlighted for the officer to check, never
-// called a match.
-function markNumbers(text: string, template: string): ReactNode[] {
-  return checkNumbers(text, template).segments.map((segment, i) =>
-    segment.number === undefined ? (
-      segment.text
-    ) : segment.number === 'found' ? (
-      <span key={i} className={styles.found}>
-        {segment.text}
-      </span>
-    ) : (
-      <span key={i} className={styles.mismatch}>
-        <WarningIcon size={14} weight="bold" aria-label="not in the plan" />
-        {segment.text}
-      </span>
-    ),
-  )
-}
 
 export type LlmWordingPanelProps = {
   plan: MunicipalPlan
   // The rule-based template text the model rewords.
   draft: string
+  // Gets the checked draft, with the no-dose reminder.
   onUse: (text: string) => void
+  // The officer's wording box, shown inside the card except while writing.
+  children?: ReactNode
 }
 
-export function LlmWordingPanel({ plan, draft, onUse }: LlmWordingPanelProps) {
+export function LlmWordingPanel({ plan, draft, onUse, children }: LlmWordingPanelProps) {
   const [wording] = useState(getWording)
   const state = useSyncExternalStore(wording.subscribe, wording.getState, wording.getState)
-  const [useError, setUseError] = useState<string[] | null>(null)
 
   useEffect(() => {
     if (wording.getState().status === 'checking') void wording.checkAvailable()
   }, [wording])
 
-  const write = () => {
-    setUseError(null)
-    void wording.draft(draft, plan, KNOWN_NAMES)
+  async function write() {
+    await wording.draft(draft, plan, KNOWN_NAMES)
+    const after = wording.getState()
+    if (after.status === 'done' && after.template === draft && after.check.ok) onUse(withReminder(after.text))
   }
   const writeAgain = (
-    <Button variant="text" icon={<ArrowClockwiseIcon size={16} weight="bold" aria-hidden />} onClick={write}>
-      Write it again
-    </Button>
+    <div className={styles.again}>
+      <Button variant="text" icon={<ArrowClockwiseIcon size={16} weight="bold" aria-hidden />} onClick={() => void write()}>
+        Write it again
+      </Button>
+    </div>
   )
   const stale = (state.status === 'done' || state.status === 'drafting') && state.template !== draft
 
-  function applyDraft(text: string) {
-    // The plan may have changed since the draft was checked: check again now.
-    const check = checkDraft(text, draft, plan, KNOWN_NAMES)
-    if (check.ok) onUse(withReminder(text))
-    else setUseError(check.reasons)
-  }
-
-  let content: ReactNode
+  // `top` above the officer's box, `bottom` under it.
+  let top: ReactNode
+  let bottom: ReactNode = null
+  let showBox = true
   if (state.status === 'checking') {
-    content = <p className={styles.body}>Checking this laptop…</p>
+    top = <p className={styles.body}>Checking this laptop…</p>
   } else if (state.status === 'unavailable') {
-    content = (
+    top = (
       <>
         <p className={styles.stateTitle}>The writing AI is off on this laptop</p>
         <p className={styles.body}>This laptop can't run it. The plan still works: approve it as listed, or write the wording yourself.</p>
       </>
     )
   } else if (stale) {
-    content = (
+    top = (
       <>
         <p className={styles.stateTitle}>The plan changed since this draft</p>
         <p className={styles.body}>Write the wording again from the new plan.</p>
-        <div className={styles.actions}>{writeAgain}</div>
       </>
     )
+    bottom = writeAgain
   } else if (state.status === 'downloading' || state.status === 'loading') {
-    content = (
+    top = (
       <>
         <p className={styles.stateTitle}>{state.status === 'downloading' ? 'Downloading the writing AI' : 'Loading the writing AI'}</p>
         <p className={styles.body}>First time only. After this it runs on this laptop with no internet.</p>
@@ -132,7 +114,8 @@ export function LlmWordingPanel({ plan, draft, onUse }: LlmWordingPanelProps) {
       </>
     )
   } else if (state.status === 'drafting') {
-    content = (
+    showBox = false
+    top = (
       <>
         <p className={styles.device}>
           <LaptopIcon size={16} weight="bold" aria-hidden />
@@ -154,60 +137,44 @@ export function LlmWordingPanel({ plan, draft, onUse }: LlmWordingPanelProps) {
       </>
     )
   } else if (state.status === 'done') {
-    const reasons = useError ?? (state.check.ok ? null : state.check.reasons)
-    content = (
+    top = (
       <>
         <p className={styles.device}>
           <LaptopIcon size={16} weight="bold" aria-hidden />
           Written on this laptop · {WORDING_MODEL_NAME} · {(state.ms / 1000).toFixed(1)} s
         </p>
-        <div className={styles.box}>{markNumbers(state.text, state.template)}</div>
-        <div className={styles.checkRow}>
-          {reasons ? (
-            <span className={styles.checkWarn}>
+        {!state.check.ok && (
+          <div role="alert">
+            <p className={styles.checkWarn}>
               <WarningIcon size={18} weight="bold" aria-hidden />
-              The draft doesn't match the plan, so the plan's wording stays
-            </span>
-          ) : (
-            <span className={styles.checkOk}>
-              <CheckCircleIcon size={18} weight="bold" aria-hidden />
-              No new numbers found; check each number against the table above
-            </span>
-          )}
-          {writeAgain}
-        </div>
-        {reasons && (
-          <ul className={styles.reasons}>
-            {reasons.map((reason) => (
-              <li key={reason}>{reason}</li>
-            ))}
-          </ul>
-        )}
-        {!reasons && (
-          <div className={styles.actions}>
-            <Button variant="secondary" onClick={() => applyDraft(state.text)}>
-              Use this wording
-            </Button>
+              The draft didn't match the plan, so it wasn't used
+            </p>
+            <ul className={styles.reasons}>
+              {state.check.reasons.map((reason) => (
+                <li key={reason}>{reason}</li>
+              ))}
+            </ul>
           </div>
         )}
       </>
     )
+    bottom = writeAgain
   } else if (state.status === 'error') {
-    content = (
+    top = (
       <>
         <p className={styles.stateTitle}>The writing AI didn't finish</p>
         <p className={styles.body}>{state.message} The plan still works: approve it as listed, or write the wording yourself.</p>
-        <div className={styles.actions}>{writeAgain}</div>
       </>
     )
+    bottom = writeAgain
   } else {
-    content = (
+    top = (
       <>
         <p className={styles.body}>
           A small language model on this laptop can reword the plan. It may not change any number, and you still check and approve.
         </p>
         <div className={styles.actions}>
-          <Button variant="secondary" onClick={write}>
+          <Button variant="secondary" onClick={() => void write()}>
             Write the wording with AI
           </Button>
         </div>
@@ -220,7 +187,9 @@ export function LlmWordingPanel({ plan, draft, onUse }: LlmWordingPanelProps) {
       <h2 id="ai-wording" className={styles.title}>
         Draft wording by the on-device AI: check before approving
       </h2>
-      {content}
+      {top}
+      {showBox && children && <div className={styles.slot}>{children}</div>}
+      {bottom}
     </section>
   )
 }
