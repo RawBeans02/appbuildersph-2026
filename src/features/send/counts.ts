@@ -80,8 +80,9 @@ export function collectRawCounts(records: PhoneRecords, today: string): RawCount
     if (resident) exposed[ageBand(ageInMonths(resident.birthDate, today))] += 1
   }
 
-  // Hinga referrals from this ISO week. A danger-sign result counts as URGENT
-  // only; a plain fast result counts by age band.
+  // Hinga referrals from this ISO week. An URGENT result (a danger sign, or
+  // fast breathing under 2 months) counts as URGENT only; a plain fast result
+  // counts by age band.
   const week = isoWeek(localDate(today))
   const thisWeek = referralsOf(records.hingaChecks.filter((check) => isoWeek(new Date(check.checkedAt)) === week))
   const fastBreathing = zeroBands(HINGA_AGE_BANDS)

@@ -6,7 +6,19 @@ import type { HingaCheck } from '../../data/db/types'
 import { hingaOutcome, type DangerSign } from '../../rules/imci'
 import { buildHingaCheck, newCheckId, type CountMethodUsed } from './check'
 import { CryOffNote } from './CameraScreens'
-import { bandText, DANGER_SIGN_COPY, DANGER_SIGN_ROWS, HEADLINES, metaLine, savedText, SCREENING_NOTE, timeText, type AgeBand, type ResultKind } from './copy'
+import {
+  bandText,
+  DANGER_SIGN_COPY,
+  DANGER_SIGN_ROWS,
+  HEADLINES,
+  metaLine,
+  recheckText,
+  savedText,
+  SCREENING_NOTE,
+  timeText,
+  type AgeBand,
+  type ResultKind,
+} from './copy'
 import { answered, tickNone, tickSign, type DangerAnswer, type LinkedResident } from './flow'
 import styles from './Hinga.module.css'
 import { ResultBand } from './ResultBand'
@@ -89,7 +101,7 @@ export function ResultScreen(props: {
           <>
             <h2 className={styles.sectionTitle}>When to check again</h2>
             <p className={styles.recheck}>
-              In 5 days if the child isn't getting better. Right away if breathing gets faster or harder, or the child can't drink.{' '}
+              {recheckText(band)}{' '}
               <span className={styles.source}>(WHO IMCI 2014)</span>
             </p>
             <p className={styles.warnNote}>

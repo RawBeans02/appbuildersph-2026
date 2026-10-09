@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { DANGER_SIGNS } from '../../rules/imci'
-import { ageBand, bandText, DANGER_SIGN_COPY, DANGER_SIGN_ROWS, joinAnd, metaLine, refusalText, savedText } from './copy'
+import { ageBand, bandText, DANGER_SIGN_COPY, DANGER_SIGN_ROWS, joinAnd, metaLine, recheckText, refusalText, savedText } from './copy'
 
 const toddler = ageBand(18)!
 
@@ -46,6 +46,33 @@ describe('Hinga copy (design/COPY.md)', () => {
       'Fast for 1 to 4 years (cut-off 40), and convulsions, chest indrawing and stridor.',
     )
     expect(bandText('urgent', 30, toddler, ['stridor']).line).toBe('Not fast for 1 to 4 years (cut-off 40), but stridor.')
+  })
+
+  it('gives fast breathing under 2 months its own URGENT reason, with no diagnosis', () => {
+    const baby = ageBand(1)!
+    expect(bandText('urgent', 64, baby, [])).toEqual({
+      label: 'Urgent · fast breathing',
+      perMin: 64,
+      line: 'Fast breathing under 2 months (60 or more).',
+    })
+    // A sign ticked as well: the sign is named, as for any age.
+    expect(bandText('urgent', 64, baby, ['stridor']).line).toBe('Fast for Under 2 months (cut-off 60), and stridor.')
+    // 2 months and over keep the "refer today" band.
+    expect(bandText('fast', 50, ageBand(2)!, []).label).toBe('Fast breathing for age')
+  })
+
+  it('has no 5-day recheck under 2 months', () => {
+    expect(recheckText(ageBand(0)!)).toBe(
+      'Bring the baby back right away if breathing gets fast or hard, the baby feeds poorly, has a fever or feels cold.',
+    )
+    expect(recheckText(ageBand(1)!)).not.toMatch(/5 days/)
+    expect(recheckText(ageBand(2)!)).toMatch(/^In 5 days/)
+    expect(recheckText(toddler)).toMatch(/^In 5 days/)
+  })
+
+  it('writes no em dashes in the result lines', () => {
+    const lines = [bandText('urgent', 64, ageBand(1)!, []).line, recheckText(ageBand(1)!), recheckText(toddler)]
+    for (const line of lines) expect(line).not.toMatch(/\u2014/)
   })
 
   it('joins words with "and"', () => {

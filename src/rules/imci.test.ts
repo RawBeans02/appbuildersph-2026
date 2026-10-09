@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { ageInMonths } from '../features/send/counts'
-import { ageBandLabel, completedMonths, DANGER_SIGNS, fastBreathingCutoff, hingaOutcome } from './imci'
+import { ageBandLabel, completedMonths, DANGER_SIGNS, fastBreathingCutoff, hingaOutcome, isYoungInfant } from './imci'
 
 describe('WHO IMCI 2014 fast-breathing cut-offs', () => {
   it.each([
@@ -49,7 +49,22 @@ describe('check outcome', () => {
     expect(hingaOutcome({ breathsPerMinute: 40, ageMonths: 12, dangerSigns: [] })).toBe('fast')
     expect(hingaOutcome({ breathsPerMinute: 39, ageMonths: 12, dangerSigns: [] })).toBe('not-fast')
     expect(hingaOutcome({ breathsPerMinute: 45, ageMonths: 11, dangerSigns: [] })).toBe('not-fast')
-    expect(hingaOutcome({ breathsPerMinute: 60, ageMonths: 1, dangerSigns: [] })).toBe('fast')
+    expect(hingaOutcome({ breathsPerMinute: 59, ageMonths: 1, dangerSigns: [] })).toBe('not-fast')
+  })
+
+  it('refers fast breathing under 2 months urgently (IMCI 2014 young infant), and keeps "refer today" from 2 months', () => {
+    expect(hingaOutcome({ breathsPerMinute: 60, ageMonths: 0, dangerSigns: [] })).toBe('urgent')
+    expect(hingaOutcome({ breathsPerMinute: 60, ageMonths: 1, dangerSigns: [] })).toBe('urgent')
+    expect(hingaOutcome({ breathsPerMinute: 75, ageMonths: 1.9, dangerSigns: [] })).toBe('urgent')
+    // Unchanged: 2 to 11 months at 50, 1 to 4 years at 40.
+    expect(hingaOutcome({ breathsPerMinute: 50, ageMonths: 2, dangerSigns: [] })).toBe('fast')
+    expect(hingaOutcome({ breathsPerMinute: 50, ageMonths: 11, dangerSigns: [] })).toBe('fast')
+    expect(hingaOutcome({ breathsPerMinute: 40, ageMonths: 12, dangerSigns: [] })).toBe('fast')
+    expect(hingaOutcome({ breathsPerMinute: 40, ageMonths: 48, dangerSigns: [] })).toBe('fast')
+  })
+
+  it('knows the IMCI young infant: under 2 months', () => {
+    expect([0, 1, 1.9, 2, 12, -1].map(isYoungInfant)).toEqual([true, true, true, false, false, false])
   })
 
   it('lists the four IMCI 2014 general danger signs, plus chest indrawing and stridor as severe signs', () => {

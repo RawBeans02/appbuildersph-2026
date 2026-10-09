@@ -1,4 +1,4 @@
-import { fastBreathingCutoff, type DangerSign } from '../../rules/imci'
+import { fastBreathingCutoff, isYoungInfant, type DangerSign } from '../../rules/imci'
 import type { CountRefusal } from './countSession'
 
 // Hinga's words, from design/COPY.md (screens 2–7, L8a, L8b, L9b) word for
@@ -67,6 +67,11 @@ export function bandText(kind: ResultKind, perMin: number, band: AgeBand, signs:
     case 'not-fast':
       return { label: 'Not fast breathing for age', perMin, line: `The cut-off for ${band.label} is ${band.cutoff}.` }
     case 'urgent':
+      // NEEDS DESIGN (review fix): fast breathing under 2 months is URGENT on
+      // its own (src/rules/imci.ts), with no danger sign ticked.
+      if (signs.length === 0 && isYoungInfant(band.firstMonth)) {
+        return { label: 'Urgent · fast breathing', perMin, line: `Fast breathing under 2 months (${band.cutoff} or more).` }
+      }
       return {
         label: 'Urgent · danger sign',
         perMin,
@@ -83,6 +88,15 @@ export const HEADLINES: Record<ResultKind, { tagalog: string; english: string }>
   fast: { tagalog: 'I-refer ngayong araw', english: 'Refer to the midwife or RHU today.' },
   urgent: { tagalog: 'I-refer agad', english: "URGENT: bring the child to the RHU now. Don't wait for the next check." },
   'not-fast': { tagalog: 'Hindi mabilis ang paghinga', english: 'Not fast breathing for this age.' },
+}
+
+// "When to check again" on 7a. The 5-day recheck is the older children's
+// (WHO IMCI 2014); under 2 months there is no 5-day wait, only the signs to
+// come back for right away (NEEDS DESIGN, review fix).
+export function recheckText(band: AgeBand): string {
+  return isYoungInfant(band.firstMonth)
+    ? 'Bring the baby back right away if breathing gets fast or hard, the baby feeds poorly, has a fever or feels cold.'
+    : "In 5 days if the child isn't getting better. Right away if breathing gets faster or harder, or the child can't drink."
 }
 
 export const timeText = (iso: string) => new Date(iso).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })

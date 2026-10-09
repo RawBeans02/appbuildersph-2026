@@ -8,14 +8,28 @@ import type { HingaOutcome } from '../data/db/types'
 //   under 2 months:            60 breaths per minute or more
 //   2 months up to 12 months:  50 or more
 //   12 months up to 5 years:   40 or more (a child of exactly 12 months uses 40)
+//
+// Under 2 months, fast breathing is URGENT, not "refer today". The Chart
+// Booklet's young-infant section (sick young infant up to 2 months, printed
+// page 41) lists fast breathing, 60 a minute or more, on its own as a sign of
+// very severe disease (possible serious bacterial infection): refer URGENTLY. A
+// barangay health worker can't give the treatment that goes with it, so
+// Hinga refers every under-2-months count at or over 60 urgently, whatever
+// the baby's age in days. That is a conservative choice for a referral-only
+// tool, not a classification.
 
 export const MAX_AGE_MONTHS = 60
+
+// The IMCI young infant: under 2 months.
+export const YOUNG_INFANT_MONTHS = 2
+
+export const isYoungInfant = (ageMonths: number) => ageMonths >= 0 && ageMonths < YOUNG_INFANT_MONTHS
 
 // The cut-off in breaths per minute, or null when the age is outside the IMCI
 // range (under 5 years) or not a valid age.
 export function fastBreathingCutoff(ageMonths: number): number | null {
   if (!Number.isFinite(ageMonths) || ageMonths < 0 || ageMonths >= MAX_AGE_MONTHS) return null
-  if (ageMonths < 2) return 60
+  if (ageMonths < YOUNG_INFANT_MONTHS) return 60
   if (ageMonths < 12) return 50
   return 40
 }
@@ -59,7 +73,8 @@ export type DangerSign = (typeof DANGER_SIGNS)[number]['id']
 
 // The check's outcome: any sign in DANGER_SIGNS makes it urgent, whatever the count;
 // otherwise fast or not fast against the cut-off, or refused when the camera
-// could not count. null when the age is outside the IMCI range.
+// could not count. Fast breathing under 2 months is urgent too (see the top of
+// this file). null when the age is outside the IMCI range.
 export function hingaOutcome(input: {
   breathsPerMinute: number | null
   ageMonths: number
@@ -69,5 +84,6 @@ export function hingaOutcome(input: {
   if (cutoff === null) return null
   if (input.dangerSigns.length > 0) return 'urgent'
   if (input.breathsPerMinute === null) return 'refused'
-  return input.breathsPerMinute >= cutoff ? 'fast' : 'not-fast'
+  if (input.breathsPerMinute < cutoff) return 'not-fast'
+  return isYoungInfant(input.ageMonths) ? 'urgent' : 'fast'
 }
