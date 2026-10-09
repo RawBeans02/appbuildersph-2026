@@ -5,7 +5,7 @@ Status: `todo` → `doing` → `done` (pushed to `main`, with the commit hash), 
 Under a task: `BLOCKED: <question>` · `NEEDS DESIGN: <screen/state>`
 Every task names the files or folders it **owns**, so agents pushing straight to `main` don't collide.
 
-**Live URL:** https://agapaymo.pages.dev (Cloudflare Pages since Sat 3:54 AM, 46f105d; every push to `main` deploys, so never push during a rehearsal or the pitch. The old Vercel URL stays on Fri 9:59 PM's build.)  ·  **Phase 2:** off on the live site (midnight scope check, 85317bb)  ·  **Scope check:** 12:00 AM (held)  ·  **Feature freeze:** 4:00 AM (held; pass 2 polish on screens already built ran to 4:45 AM)  ·  **Deploy freeze:** 8:30 AM (no pushes to `main` after it)  ·  **Submit by:** 9:00 AM (hard close 10:00 AM Sat, code freeze)
+**No pushes after 9:45 AM** (code freeze 10:00 AM).  ·  **Live URL:** https://agapaymo.pages.dev (Cloudflare Pages since Sat 3:54 AM, 46f105d; every push to `main` deploys, so never push during a rehearsal or the pitch. The old Vercel URL stays on Fri 9:59 PM's build.)  ·  **Phase 2:** off on the live site (midnight scope check, 85317bb)  ·  **Scope check:** 12:00 AM (held)  ·  **Feature freeze:** 4:00 AM (held; pass 2 polish on screens already built ran to 4:45 AM)  ·  **Deploy freeze:** 8:30 AM (no pushes to `main` after it)  ·  **Submit by:** 9:00 AM (hard close 10:00 AM Sat, code freeze)
 
 **Designs:** all UI comes from Claude Design: `design/` (exports, tokens, copy + `design/README.md`). Link the screen on every UI task; no UI task starts before its screen exists.
 
@@ -36,7 +36,7 @@ Every task names the files or folders it **owns**, so agents pushing straight to
 - Submit on the Cerebral Valley event page by 9:00 AM · [human:Rovs]
 - Keep every Claude Code session transcript unedited until judging is over · [human:Rovs]
 - Demo Day prep: models on every demo device, airplane-mode run, on site by 12:00 PM · [human]
-- Lead, before the 8:30 AM deploy freeze: the final secret check of the git history, and the ~8:30 AM mock-verifier pass · [lead]
+- Lead, before the 8:30 AM deploy freeze: the ~8:30 AM mock-verifier pass · [lead] (the secret check is done)
 
 ## Now (the wow flow)
 - [x] done · Claude Design pass 1: design system (tokens) + every wow-flow screen in all states (default, loading, empty, error), **plus the model download/initialization progress, "running on this device" and offline indicator states** → `design/` + `design/README.md` · [lead] · owns: `design/`
@@ -210,7 +210,7 @@ The brief (from the team's phone-test feedback) goes to Claude Design. Build fro
   - [ ] todo · README Team table: each member's contribution sentence (now _TBD_) · [human:Rovs]
 - [ ] todo · ~1-minute demo video, wow moment in the first 10 s, showing it working with the network off (+ a longer backup for Demo Day) · [human] · its making is disclosed in the README (ef7af1c, 887858e); the README's video link is still _TBD_
 - [ ] todo · keep every Claude Code session transcript unedited until judging is over (`~/.claude/projects/`, `~/.claude-extra/projects/`): they back the AI-paced history if it's ever questioned · [human:Rovs]
-- [ ] todo · final secret check of the whole git history (the repo is public) · [lead] · no commit records it yet; before the 8:30 AM deploy freeze
+- [x] done · final secret check of the whole git history (the repo is public) · [lead] · Sat ~5:20 AM: `git log -p --all` (113,617 lines) has no API key, token, password, private key or credentialed database URL; `.env` files are not tracked (self-audit #2 found the same at 0432022)
 - [ ] todo · mock-verifier self-audit (read-only, as the organizers' AI agents would check us): ~4 PM after the first deploy, 4:00 AM at the freeze, ~8:30 AM before submitting; fix P0s first · [lead] · the ~4 PM run is audit B (fixes in A11, ccd6065) and the 4:00 AM run is self-audit #2 (6b6f989); the ~8:30 AM run is left
 - [ ] todo · X/LinkedIn post **with the video attached** (its URL is the required "X / LinkedIn video URL"): #AppBuildersPH, tag Cognition and Devin · [human] · the README's post link is still _TBD_
 - [ ] todo · submit on the Cerebral Valley event page: project name, short description, team members, repo, demo video, X/LinkedIn video URL, what runs locally, what requires internet, the five disclosures, and the "Why local?" answer (copy from the README) · [human:Rovs]
