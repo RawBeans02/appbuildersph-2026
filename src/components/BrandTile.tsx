@@ -1,28 +1,23 @@
-// I1, the brand tile (design pass 2): the app icon at any size, inline so
-// nothing new is precached. Stand-in until Claude Design's brand-tile.svg
-// lands: the "a" is set in the app's font instead of an outlined path.
+// I1, the brand tile (design pass 2, design/svg/brand-tile.svg): the app icon
+// at any size, inline so nothing new is precached. The "a" is an outlined
+// path, so it needs no font; colours are the tokens.
 export function BrandTile({ size = 32, className }: { size?: number; className?: string }) {
   return (
     <svg
       className={className}
       width={size}
       height={size}
-      viewBox="0 0 48 48"
+      viewBox="0 0 96 96"
       aria-hidden
       focusable="false"
       style={{ flex: 'none' }}
     >
-      <rect width="48" height="48" rx="10" fill="var(--ink)" />
-      <text
-        x="21"
-        y="35"
-        textAnchor="middle"
+      <rect width="96" height="96" rx="24" fill="var(--ink)" />
+      <path
         fill="var(--paper)"
-        style={{ font: '800 34px var(--font-ui)' }}
-      >
-        a
-      </text>
-      <circle cx="35.5" cy="33" r="3.5" fill="var(--warn-fill)" />
+        d="M42 69Q38.1 69 35 67.6Q32 66.3 30.2 63.7Q28.5 61.2 28.5 57.8Q28.5 53.2 31.6 50.3Q34.7 47.4 40.4 45.9Q46.2 44.4 54 44L54 42.9Q54 39.8 52.3 38.6Q50.6 37.4 47.7 37.4Q45.5 37.4 43.8 38.5Q42 39.6 41.4 41.5L30.6 37.8Q32.6 34.1 37.1 31.5Q41.6 28.9 48.4 28.9Q56.8 28.9 61.5 32.5Q66.2 36.2 66.2 44.1L66.2 53.9Q66.2 56.6 66.4 59.3Q66.5 62 66.8 64.3Q67.1 66.6 67.5 68.1L55.6 68.1L54.3 63.6Q52.2 66.7 49 67.9Q45.9 69 42 69ZM46.5 60.5Q48.8 60.5 50.5 59.8Q52.2 59.1 53.1 57.3Q54 55.6 54 52.4L54 51.4Q47.1 51.8 44.4 53.2Q41.8 54.7 41.8 56.7Q41.8 58.4 43.1 59.5Q44.5 60.5 46.5 60.5Z"
+      />
+      <circle cx="76" cy="63.8" r="5.5" fill="var(--warn-fill)" />
     </svg>
   )
 }

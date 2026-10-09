@@ -1,5 +1,4 @@
 import {
-  ArrowRightIcon,
   CaretRightIcon,
   DownloadSimpleIcon,
   PackageIcon,
@@ -12,7 +11,7 @@ import { useEffect, useId, useRef, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { useFlowMode } from '../../app/flow'
 import { Link } from '../../app/Link'
-import { BrandTile, Button, LocalStatus } from '../../components'
+import { BrandTile, Button, LocalStatus, LoopArt } from '../../components'
 import { cx } from '../../components/cx'
 import { usePlace } from '../../data/db/usePlace'
 import { formatMB } from '../../lib/format'
@@ -55,7 +54,7 @@ const FEATURES: { icon: Icon; title: string; text: string; to: string }[] = [
   },
 ]
 
-// Stands in for the I2 loop drawing until it lands: its labels in order.
+// The I2 loop's labels, under its nodes in order.
 const LOOP = ['This phone', 'QR', 'RHU laptop', 'QR', 'This phone']
 
 // The phone's offline models, the same byte total Prepare downloads.
@@ -195,14 +194,9 @@ function NoSignalCard({ title }: { title: ReactNode }) {
     <>
       <div className={styles.content}>
         {title}
-        <ol className={styles.loop}>
-          {LOOP.map((label, i) => (
-            <li key={i} className={styles.loopStep}>
-              {i > 0 && <ArrowRightIcon size={16} weight="bold" aria-hidden />}
-              {label}
-            </li>
-          ))}
-        </ol>
+        <div className={styles.loop}>
+          <LoopArt labels={LOOP} draw />
+        </div>
         <p className={styles.body}>
           The AI runs on this phone and your records stay here. Only name-free counts leave, in a QR you show to the RHU
           laptop. The approved plan comes back the same way. After the one-time download, none of it needs internet.

@@ -1,0 +1,41 @@
+/* I2, the compact loop (design/svg/loop-compact.svg): the drawing, with its
+   labels as HTML under the five nodes (10/30/50/70/90% of 335). */
+.figure {
+  width: 100%;
+  max-width: 335px;
+  margin: 0;
+}
+
+.art {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.labels {
+  position: relative;
+  height: 20px;
+  margin: var(--space-1) 0 0;
+  padding: 0;
+  list-style: none;
+  font: var(--type-caption);
+  color: var(--ink-2);
+}
+
+.labels li {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.labels li:first-child {
+  transform: none;
+  left: 0 !important;
+}
+
+.labels li:last-child {
+  transform: none;
+  left: auto !important;
+  right: 0;
+}
