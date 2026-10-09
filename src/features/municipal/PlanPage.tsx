@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, type ComponentType } from 'react'
 import { Link } from '../../app/Link'
 import { getDb } from '../../data/db/appDb'
 import type { AgapayDb } from '../../data/db/db'
@@ -79,6 +79,7 @@ export default function PlanPage() {
       <Priority plan={plan} />
       <Moves plan={plan} />
       <HowComputed />
+      {/* TODO(B6): pass wordingPanel={LlmWordingPanel} from './llm' once it is on main. */}
       <PlanEditor key={basis} plan={plan} draft={draft} />
     </>
   )
@@ -256,30 +257,54 @@ function HowComputed() {
   )
 }
 
-// `draft` is the template text; B6 may pass a local model's rewording with
-// draftSource 'llm'. Either way the officer edits and approves the final text.
+// The slot for B6's optional local-model wording panel. It gets the
+// structured plan and the template text, and hands back a rewording with
+// onUse; the plan is complete and approvable without it.
+export type WordingPanel = ComponentType<{ plan: MunicipalPlan; draft: string; onUse: (text: string) => void }>
+
+// The officer's editable text: starts as the template (`draft`), or a local
+// model's rewording once the officer picks it in the wording panel.
 export function PlanEditor({
   plan,
   draft,
-  draftSource = 'template',
+  wordingPanel: Wording,
 }: {
   plan: MunicipalPlan
   draft: string
-  draftSource?: 'template' | 'llm'
+  wordingPanel?: WordingPanel
 }) {
   const [text, setText] = useState(draft)
+  // The draft the text started from, and where it came from.
+  const [source, setSource] = useState<{ text: string; kind: 'template' | 'llm' }>({ text: draft, kind: 'template' })
   const [note, setNote] = useState('')
   const [saving, setSaving] = useState(false)
   const [approved, setApproved] = useState<{ at: string; text: string; note: string } | null>(null)
   const [problem, setProblem] = useState<string | null>(null)
   const unchangedSinceApproval = approved !== null && approved.text === text && approved.note === note
 
+  function takeWording(wording: string) {
+    setText(wording)
+    setSource({ text: wording, kind: 'llm' })
+  }
+
+  function startAgain() {
+    setText(draft)
+    setSource({ text: draft, kind: 'template' })
+  }
+
   async function onApprove() {
     setSaving(true)
     setProblem(null)
     try {
       const now = new Date()
-      await approvePlan(await getDb(), { plan, draftText: draft, draftSource, finalText: text, note, now })
+      await approvePlan(await getDb(), {
+        plan,
+        draftText: source.text,
+        draftSource: source.kind,
+        finalText: text,
+        note,
+        now,
+      })
       setApproved({ at: now.toLocaleTimeString('en-PH', { hour: 'numeric', minute: '2-digit' }), text, note })
     } catch {
       setProblem('Could not save the approval on this laptop. Try again.')
@@ -292,6 +317,7 @@ export function PlanEditor({
     <section aria-labelledby="editor-heading">
       <h2 id="editor-heading">Plan text</h2>
       <p>Built from the numbers above. Edit it as needed, then approve. The approval is logged on this laptop.</p>
+      {Wording && <Wording plan={plan} draft={draft} onUse={takeWording} />}
       <p>
         <label>
           Plan text
@@ -300,7 +326,7 @@ export function PlanEditor({
         </label>
       </p>
       <p>
-        <button type="button" onClick={() => setText(draft)} disabled={text === draft}>
+        <button type="button" onClick={startAgain} disabled={text === draft && source.kind === 'template'}>
           Start again from the computed text
         </button>
       </p>

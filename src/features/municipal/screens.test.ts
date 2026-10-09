@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 import { openAgapayDb } from '../../data/db/db'
 import { buildPlan, planTemplateText, type MunicipalPlan } from '../../rules/plan'
 import { loadMunicipalSample, readHandoff, readPlanInputs } from './municipal'
-import { MergedTable, Moves, PlanEditor, Priority } from './PlanPage'
+import { MergedTable, Moves, PlanEditor, Priority, type WordingPanel } from './PlanPage'
 import { Slots } from './ScanPage'
 
 // A render check of the plain screens with the sample barangays (no browser
@@ -54,5 +54,22 @@ describe('municipal screens', () => {
     const html = renderToStaticMarkup(createElement(PlanEditor, { plan, draft }))
     expect(html).toContain('Draft plan for week 2026-W41, San Isidro Demo (SID)')
     expect(html).toContain('Approve plan')
+  })
+
+  it('leave a slot for the optional wording panel, fed the structured plan and the template text', async () => {
+    const { plan } = await sampleState()
+    const draft = planTemplateText(plan, 'San Isidro Demo')
+    const seen: { plan?: MunicipalPlan; draft?: string } = {}
+    const FakePanel: WordingPanel = (props) => {
+      seen.plan = props.plan
+      seen.draft = props.draft
+      return createElement('p', null, 'Wording panel here')
+    }
+    const without = renderToStaticMarkup(createElement(PlanEditor, { plan, draft }))
+    expect(without).not.toContain('Wording panel here')
+    const withPanel = renderToStaticMarkup(createElement(PlanEditor, { plan, draft, wordingPanel: FakePanel }))
+    expect(withPanel).toContain('Wording panel here')
+    expect(seen.plan).toBe(plan)
+    expect(seen.draft).toBe(draft)
   })
 })
