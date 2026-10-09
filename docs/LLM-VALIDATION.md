@@ -98,7 +98,7 @@ Raw texts, facts, times and guard results are in
   **12.4 / 12.6 / 12.0 seconds**, with no failed dependency requests. Integrated
   UI texts and hardware/browser details are also in the results JSON. Build,
   lint, app/E2E typechecks and the clean **950-test** unit run passed.
-- Chromium production suite: 26 passed, 7 skipped (opt-in real-model and
+- Integrated Chromium production suite: 27 passed, 7 skipped (opt-in real-model and
   phase-2-only cases included). The independent-context signed return loop,
   reset/trust/duplicate/stale receipt checks, offline OCR and axe checks passed.
   The harness labels this machine "CI runner"; these were local runs.
