@@ -76,3 +76,34 @@
   font-size: 14px;
   color: var(--ink-2);
 }
+
+/* B25: the full approved text, opened from its row. */
+.full {
+  margin-top: var(--space-2);
+}
+
+.full summary {
+  cursor: pointer;
+  font: var(--type-body-dense);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.fullText {
+  margin-top: var(--space-2);
+  white-space: pre-wrap;
+  font: var(--type-body-dense);
+}
+
+/* 20c: the approval just made in this session, for the visit. */
+.justNow th,
+.justNow td {
+  background: var(--ok-tint);
+}
+
+.justNowWord {
+  display: block;
+  color: var(--ok);
+  font-weight: 700;
+}

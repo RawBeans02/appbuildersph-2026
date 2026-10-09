@@ -1,15 +1,18 @@
 import { ClockCounterClockwiseIcon, ListNumbersIcon, LockSimpleIcon, WarningCircleIcon } from '@phosphor-icons/react'
+import { useState } from 'react'
 import { Button, ButtonLink, StateBlock } from '../../components'
+import { cx } from '../../components/cx'
 import { useDbQuery } from '../../data/db/useDbQuery'
 import { LaptopFrame } from './LaptopFrame'
 import styles from './LogPage.module.css'
-import { logRow, type LogRow } from './log'
-import { readApprovalLog } from './municipal'
+import { justApproved, logRow, type LogRow } from './log'
+import { readApprovalLog, type LogEntry } from './municipal'
 import { useLaptopPlace } from './place'
 
 // Screen 20: every approved plan on this laptop, newest first. Approvers are
 // roles, never names. Entries can't be edited; a new approval is a new row.
-// Rows don't open anything (the detail view isn't designed).
+// Each row opens its full approved text (B25). The newest, when approved in
+// this browser session, is "Just now" on --ok-tint and lands once (20c).
 
 export default function LogPage() {
   const data = useDbQuery(['approvals', 'plans'], readApprovalLog)
@@ -46,12 +49,20 @@ export default function LogPage() {
           </ButtonLink>
         </StateBlock>
       )}
-      {data.status === 'ready' && data.data.length > 0 && <LogTable rows={data.data.map(logRow)} />}
+      {data.status === 'ready' && data.data.length > 0 && <LogList entries={data.data} />}
     </LaptopFrame>
   )
 }
 
-export function LogTable({ rows }: { rows: LogRow[] }) {
+function LogList({ entries }: { entries: LogEntry[] }) {
+  const rows = entries.map(logRow)
+  const [justNow] = useState(() => justApproved(rows))
+  return <LogTable rows={rows} justNow={justNow} />
+}
+
+type JustNow = { id: string; land: boolean } | null
+
+export function LogTable({ rows, justNow = null }: { rows: LogRow[]; justNow?: JustNow }) {
   return (
     <table className={styles.table}>
       <colgroup>
@@ -72,13 +83,22 @@ export function LogTable({ rows }: { rows: LogRow[] }) {
       </thead>
       <tbody>
         {rows.map((row) => (
-          <tr key={row.id}>
+          <tr key={row.id} className={cx(justNow?.id === row.id && styles.justNow, justNow?.id === row.id && justNow.land && 'land')}>
             <th scope="row">
               {row.day}
               <span className={styles.time}>{row.time}</span>
+              {justNow?.id === row.id && <span className={styles.justNowWord}>Just now</span>}
             </th>
             <td>{row.approver}</td>
-            <td>{row.plan}</td>
+            <td>
+              {row.plan}
+              {row.text && (
+                <details className={styles.full}>
+                  <summary>Full approved text</summary>
+                  <p className={styles.fullText}>{row.text}</p>
+                </details>
+              )}
+            </td>
             <td>
               {row.from}
               {row.week && <span className={styles.week}>{row.week}</span>}

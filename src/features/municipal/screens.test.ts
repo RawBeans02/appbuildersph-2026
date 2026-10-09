@@ -98,6 +98,7 @@ describe('laptop screens', () => {
             from: '5 of 5 barangays',
             week: '2026-W41',
             wording: 'AI draft, edited',
+            text: null,
           },
         ],
       }),
@@ -105,5 +106,30 @@ describe('laptop screens', () => {
     expect(text(html)).toContain(
       'When Approved by Plan From Wording Sat, Oct 10 9:31 AM Municipal health officer 1. Doctor team to Bagong Silang-D first. 5 of 5 barangays 2026-W41 AI draft, edited',
     )
+    expect(html).not.toContain('Just now')
+    expect(html).not.toContain('<details')
+  })
+
+  it('20c and B25: the newest approval from this session is "Just now" and lands; each row opens its full text; the return QR link stays', () => {
+    const row = {
+      id: 'b',
+      day: 'Sat, Oct 10',
+      time: '10:52 AM',
+      approver: 'Municipal health officer',
+      plan: '1. Doctor team to Maligaya-D first.',
+      from: '5 of 5 barangays',
+      week: '2026-W41',
+      wording: 'Written by the officer' as const,
+      text: 'Send a doctor team to Maligaya-D first.\nMove 30 capsules from Riverside-D to Maligaya-D.',
+    }
+    const html = renderToStaticMarkup(createElement(LogTable, { rows: [row, { ...row, id: 'a', time: '9:31 AM', text: null }], justNow: { id: 'b', land: true } }))
+    const [, , newest, older] = html.split('<tr') // before, the header row, then the two rows
+    expect(text(newest)).toContain('Sat, Oct 10 10:52 AM Just now Municipal health officer 1. Doctor team to Maligaya-D first. Full approved text')
+    expect(newest).toContain('Send a doctor team to Maligaya-D first.\nMove 30 capsules from Riverside-D to Maligaya-D.')
+    expect(newest).toMatch(/^[^>]* land"/)
+    expect(text(newest)).toContain('Written by the officer Make return QR')
+    expect(older).not.toContain('Just now')
+    expect(older).not.toMatch(/^[^>]*land/)
+    expect(text(older)).toContain('Make return QR')
   })
 })

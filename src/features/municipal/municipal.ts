@@ -7,6 +7,7 @@ import { buildPlan, type MunicipalPlan } from '../../rules/plan'
 import { classifyScan, receivedPayloadId, registryOf, type ScanOutcome } from './scan/classify'
 import { planShortSummary, planStepsText } from './steps'
 import { noteScanned } from './justReceived'
+import { noteApproved } from './log'
 
 // The municipal laptop's records: paired phones, received QRs, plans and
 // approvals, all in this browser's IndexedDB. Nothing here goes online.
@@ -185,6 +186,7 @@ export async function approvePlan(db: AgapayDb, input: ApproveInput): Promise<st
   }
   await db.plans.put(plan)
   await db.approvals.put(approval)
+  noteApproved(id)
   return id
 }
 
