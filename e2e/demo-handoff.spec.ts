@@ -165,6 +165,11 @@ test('the full demo offline: phone wow flow, then pair, receive, merge and appro
     await expect(desk.getByRole('heading', { level: 1, name: /^Plan for week \d{4}-W\d{2}$/ })).toBeVisible()
     await expect(desk.getByText(/^From 5 of 5 barangays/)).toBeVisible()
     await expect(desk.getByRole('heading', { level: 2, name: 'The plan' })).toBeVisible()
+    // 19h: with no writing AI (no WebGPU on the runner) the wording box opens
+    // only on "Write the wording yourself"; the plan approves without it.
+    await expect(desk.getByText('Wording is optional. The plan on the left is complete.')).toBeVisible()
+    await expect(desk.getByRole('textbox', { name: 'Plan wording' })).toHaveCount(0)
+    await desk.getByRole('button', { name: 'Write the wording yourself' }).click()
     await expect(desk.getByRole('textbox', { name: 'Plan wording' })).toHaveValue('')
     const approve = desk.getByRole('button', { name: 'Approve plan' })
     await approve.click()
