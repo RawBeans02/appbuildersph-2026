@@ -27,6 +27,7 @@ _TBD: the target user, the problem, and why it matters._
   npm run build     # production build into dist/, including the service worker
   npm run preview   # serve dist/ locally to test the PWA and offline mode
   npm run typecheck && npm run lint && npm test
+  npx playwright install chromium && npm run test:e2e   # offline e2e test (builds, serves, runs Chromium)
   ```
 - Any demo data in the app is invented sample data and is labeled as such.
 
@@ -93,6 +94,7 @@ A cloud "Jr. Builder" agent named in early commits was planned but never used.
 | [Workbox](https://github.com/GoogleChrome/workbox) (via vite-plugin-pwa) | Service worker precaching, shipped in `sw.js` | MIT |
 | [TypeScript](https://www.typescriptlang.org) | Type checking | Apache-2.0 |
 | [Vitest](https://vitest.dev) | Unit tests | MIT |
+| [Playwright](https://playwright.dev) (`@playwright/test`) | End-to-end offline test in CI (Chromium) | Apache-2.0 |
 | [ESLint](https://eslint.org), `@eslint/js`, [typescript-eslint](https://typescript-eslint.io), `eslint-plugin-react-hooks`, `eslint-plugin-react-refresh`, `globals` | Linting | MIT |
 | `@types/react`, `@types/react-dom`, `@types/node` ([DefinitelyTyped](https://github.com/DefinitelyTyped/DefinitelyTyped)) | Type definitions | MIT |
 

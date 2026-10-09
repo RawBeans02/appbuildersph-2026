@@ -16,3 +16,6 @@ __pycache__/
 *.onnx
 *.safetensors
 *.bin
+# Playwright output
+test-results/
+playwright-report/
