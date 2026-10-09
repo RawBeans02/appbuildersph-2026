@@ -25,6 +25,13 @@
   font: 800 18px/24px var(--font-ui);
 }
 
+/* 1e: the h1 sits right under the brand row (Header's own top padding goes;
+   this outranks Header.module.css's single class). */
+.brandRow + header {
+  padding-top: 0;
+  padding-bottom: var(--space-3);
+}
+
 .iconButton {
   flex: none;
   display: flex;
@@ -59,8 +66,15 @@
   margin-left: calc(-1 * var(--space-2));
 }
 
+/* 1e/1g text buttons at 17 px, still 700 (two classes outrank the Button's). */
+.purpose .howLink,
+.receive .receiveLink {
+  font: var(--type-body-md);
+  font-weight: 700;
+}
+
 .card {
-  margin: var(--space-5) var(--space-5) 0;
+  margin: var(--space-1) var(--space-5) 0;
   padding: var(--space-4) 18px;
   border: 1px solid var(--line);
   border-radius: var(--r-lg);
@@ -117,7 +131,7 @@
 }
 
 .today {
-  margin: var(--space-6) var(--space-5) 6px;
+  margin: var(--space-6) var(--space-5) var(--space-2);
   font: var(--type-heading);
 }
 
@@ -134,7 +148,7 @@
   display: grid;
   grid-template-columns: 40px minmax(0, 1fr) 22px;
   align-items: center;
-  gap: var(--space-4);
+  gap: 14px;
   width: 100%;
   min-height: 72px;
   padding: var(--space-4) var(--space-4) var(--space-4) var(--space-5);
@@ -160,6 +174,14 @@
 /* 1g: the instructions row on the visit right after they were saved. */
 .taskJust {
   background: var(--ok-tint);
+}
+
+.taskJust .taskIconNeutral {
+  background: var(--surface);
+}
+
+.taskJust .caret {
+  color: var(--ink-2);
 }
 
 .taskIcon {
@@ -218,7 +240,7 @@
 .breathing {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: var(--space-1);
   padding: var(--space-4) var(--space-5) 0;
 }
 
@@ -238,6 +260,7 @@
 
 .breathingUrgent {
   color: var(--bad);
+  font-weight: 700;
 }
 
 /* 1g: the way to receive instructions, a text button (Home keeps one primary). */

@@ -90,7 +90,7 @@ describe('the words', () => {
   })
 
   it('uses the singular for one line', () => {
-    expect(linesFoundText(1)).toBe('1 line found. The box is the line the phone read. The numbers match the fields below.')
+    expect(linesFoundText(1)).toBe('1 line found. The box is the line the phone read. The number matches the field below.')
     expect(photoAlt(1)).toBe('The box you photographed, with the 1 line the reader found outlined.')
     expect(readLinesStatus(1)).toBe('Read 1 line on this phone. Check the numbered fields.')
   })

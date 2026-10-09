@@ -158,7 +158,7 @@ describe('taskRows', () => {
     })
     expect(row(rows({ openFlags: 3 }), 'flag')).toMatchObject({
       title: '3 flags waiting for clinician review',
-      meta: 'They go in the next QR as a count.',
+      meta: 'They go in the next QR as counts.',
     })
     expect(keys(rows({ openFlags: 0 }))).not.toContain('flag')
   })

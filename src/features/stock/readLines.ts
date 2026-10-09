@@ -66,7 +66,7 @@ const linesText = (count: number) => (count === 1 ? '1 line' : `${count} lines`)
 
 export const linesFoundText = (count: number) =>
   count === 1
-    ? '1 line found. The box is the line the phone read. The numbers match the fields below.'
+    ? '1 line found. The box is the line the phone read. The number matches the field below.'
     : `${count} lines found. Each box is a line the phone read. The numbers match the fields below.`
 
 export const photoAlt = (count: number) =>

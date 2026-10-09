@@ -1,10 +1,11 @@
-import { CheckCircleIcon, ImageIcon, InfoIcon, ScanIcon, WarningCircleIcon } from '@phosphor-icons/react'
+import { CameraIcon, CheckCircleIcon, DownloadSimpleIcon, HouseIcon, InfoIcon, ScanIcon, WarningCircleIcon } from '@phosphor-icons/react'
 import { useCallback, useId, useRef, useState, type MouseEvent } from 'react'
 import { navigate } from '../../app/router'
 import { useFlowMode } from '../../app/flow'
 import { Button, ButtonLink, CheckLines, CheckRow, Field, FlowTopBar } from '../../components'
 import { cx } from '../../components/cx'
 import { getDb } from '../../data/db/appDb'
+import { barangayName } from '../../data/places'
 import { placeLine, usePlace } from '../../data/db/usePlace'
 import { markJustReceived } from '../home/justReceived'
 import { useQrScanner } from '../municipal/scan/useQrScanner'
@@ -19,6 +20,25 @@ import styles from './Return.module.css'
 
 type Preview = Awaited<ReturnType<typeof previewReceipt>>
 
+// Two groups a line ("5E21-9A0C" over "77B4-D31F"), never split inside one.
+// The hyphen between the lines stays in the text, visually hidden, so the
+// fingerprint still reads and copies whole.
+function FingerprintLines({ value }: { value: string }) {
+  const groups = value.split('-')
+  const half = Math.ceil(groups.length / 2)
+  return <>
+    <span>{groups.slice(0, half).join('-')}</span>
+    {groups.length > 1 && <span className="visually-hidden">-</span>}
+    <span>{groups.slice(half).join('-')}</span>
+  </>
+}
+
+// 21a·3: "Week 2026-W41 · 2 actions for Maligaya-D"
+function savedLine({ packet }: Preview): string {
+  const n = packet.actions.length
+  return `Week ${packet.epiWeek} · ${n} ${n === 1 ? 'action' : 'actions'} for ${barangayName(packet.barangay) ?? packet.barangay}`
+}
+
 const CAMERA_OFF = ['denied', 'no-camera', 'unsupported', 'error']
 
 export default function ReceivePage() {
@@ -32,6 +52,7 @@ export default function ReceivePage() {
   // Guards a double tap and a second scan while one is being checked.
   const working = useRef(false)
   const trustId = useId()
+  const hintId = useId()
   const scanner = useQrScanner((value) => { void verify(value) })
   const view = saved ? 'saved' : preview ? 'preview' : 'read'
 
@@ -90,6 +111,7 @@ export default function ReceivePage() {
   }
 
   const where = placeLine([place.barangay], place.sample)
+  const needsCompare = !!preview?.needsTrust && !compared
   const alert = error && <p role="alert" className={styles.alert}>
     <WarningCircleIcon size={22} weight="bold" aria-hidden />
     <span>{error}</span>
@@ -108,7 +130,7 @@ export default function ReceivePage() {
           Receive RHU instructions
         </h1>
         {where && <p className={styles.receivePlace}>{where}</p>}
-        <p className={styles.purpose}>Instructions from the RHU laptop, checked on this phone.</p>
+        {view === 'read' && <p className={styles.purpose}>Instructions from the RHU laptop, checked on this phone.</p>}
       </div>
 
       {view === 'read' && <>
@@ -124,7 +146,7 @@ export default function ReceivePage() {
           </Button>
           <label className={styles.fileButton}>
             <input type="file" accept="image/*" className="visually-hidden" onChange={(e) => { void image(e.target.files?.[0]); e.target.value = '' }} />
-            <ImageIcon size={22} weight="bold" aria-hidden />
+            <CameraIcon size={22} weight="bold" aria-hidden />
             Choose a QR image
           </label>
           <div className={styles.paste}>
@@ -144,8 +166,7 @@ export default function ReceivePage() {
         {preview.needsTrust && <section className={styles.trust} aria-labelledby={trustId}>
           <h2 id={trustId} className={styles.trustTitle}>Compare with the RHU laptop</h2>
           <p>The first time, check that this fingerprint matches the one on the RHU laptop's screen.</p>
-          {/* Two groups a line ("5E21-9A0C-", "77B4-D31F"), never split inside one. */}
-          <code className={styles.trustKey}>{(preview.fingerprint.match(/.{1,10}/g) ?? []).map((half, i) => <span key={i}>{half}</span>)}</code>
+          <code className={styles.trustKey}><FingerprintLines value={preview.fingerprint} /></code>
           <CheckRow className={styles.trustRow} label="The fingerprint matches the RHU laptop" checked={compared} onChange={setCompared} />
         </section>}
       </>}
@@ -157,18 +178,20 @@ export default function ReceivePage() {
         <h2 ref={focusHeading} tabIndex={-1} className={styles.doneTitle}>
           {saved === 'saved' ? 'Instructions saved on this phone' : 'Already saved on this phone'}
         </h2>
+        {preview && <p className={styles.doneBody}>{savedLine(preview)}</p>}
       </div>}
     </div>
 
     {view === 'preview' && <div className={cx(styles.footer, styles.footerLine)}>
       {alert}
-      <Button tagalog="I-save" disabled={!!preview?.needsTrust && !compared} onClick={() => void save()}>Save on this phone</Button>
+      {needsCompare && <p id={hintId} className={styles.saveHint}>Compare the fingerprint first.</p>}
+      <Button tagalog="I-save" icon={<DownloadSimpleIcon size={22} weight="bold" aria-hidden />} disabled={needsCompare} aria-describedby={needsCompare ? hintId : undefined} onClick={() => void save()}>Save on this phone</Button>
       <div className={styles.center}>
         <Button variant="text" onClick={cancel}>Cancel preview</Button>
       </div>
     </div>}
     {view === 'saved' && <div className={styles.footer}>
-      <ButtonLink to="/" tagalog="Bumalik sa Home" onClick={backHome}>Back to Home</ButtonLink>
+      <ButtonLink to="/" tagalog="Bumalik sa Home" icon={<HouseIcon size={22} weight="bold" aria-hidden />} onClick={backHome}>Back to Home</ButtonLink>
     </div>}
     <p role="status" className="visually-hidden">{spoken}</p>
   </div>

@@ -128,7 +128,7 @@ export function taskRows({ summary, instructions, justReceived, today, aiBytes }
       icon: 'flag',
       tone: 'neutral',
       title: `${count(summary.openFlags, 'flag', 'flags')} waiting for clinician review`,
-      meta: `${summary.openFlags === 1 ? 'It goes' : 'They go'} in the next QR as a count.`,
+      meta: summary.openFlags === 1 ? 'It goes in the next QR as a count.' : 'They go in the next QR as counts.',
       to: '/compare',
     })
   }

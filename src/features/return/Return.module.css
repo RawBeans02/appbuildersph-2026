@@ -102,6 +102,13 @@
   gap: 2px;
 }
 
+/* 21a: the instructions sit flat on paper, not in a card. */
+.receiveBody .card {
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
 .receiveTitle {
   font: var(--type-title);
 }
@@ -112,8 +119,9 @@
 }
 
 .purpose {
-  margin-top: var(--space-3);
+  margin-top: var(--space-1);
   font: 400 17px/25px var(--font-ui);
+  color: var(--ink-2);
 }
 
 .video {
@@ -191,6 +199,13 @@
   transform: scale(0.98);
 }
 
+/* Under reduced motion only the fill changes. */
+@media (prefers-reduced-motion: reduce) {
+  .fileButton:active {
+    transform: none;
+  }
+}
+
 .fileButton:has(input:focus-visible) {
   outline: 3px solid var(--ink);
   outline-offset: 3px;
@@ -207,14 +222,20 @@ textarea.pasteInput {
   word-break: break-all;
 }
 
-/* First trust: compare the key with the RHU laptop's screen. */
+/* First trust: compare the key with the RHU laptop's screen. 16 px all
+   round: the check row's own 12 px padding makes up the bottom. */
 .trust {
   display: grid;
   gap: var(--space-3);
-  padding: var(--space-5) var(--space-5) var(--space-2);
+  padding: var(--space-4) var(--space-4) var(--space-1);
+  border: 1px solid var(--line);
   border-radius: var(--r-lg);
-  background: var(--warn-tint);
+  background: var(--surface);
   font: var(--type-body);
+}
+
+.trust > p {
+  color: var(--ink-2);
 }
 
 .trustTitle {
@@ -226,8 +247,9 @@ textarea.pasteInput {
   font: var(--type-mono-lg);
 }
 
+/* Two groups a line; the hyphen between the lines is visually hidden. */
 .trustKey span {
-  display: inline-block;
+  display: block;
 }
 
 /* The row's box lines up with the text above it. */
@@ -263,6 +285,18 @@ textarea.pasteInput {
 .doneTitle {
   margin-top: 18px;
   font: var(--type-heading-lg);
+}
+
+.doneBody {
+  margin-top: var(--space-2);
+  font: var(--type-body-md);
+  color: var(--ink-2);
+}
+
+/* "Compare the fingerprint first." over the disabled Save. */
+.saveHint {
+  font: var(--type-body-dense);
+  color: var(--ink-2);
 }
 
 /* The primary's bar at the bottom of the screen, as on the other flows. */

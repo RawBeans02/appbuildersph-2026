@@ -1,4 +1,4 @@
-import { ArrowRightIcon, CircleNotchIcon, DropIcon, FileTextIcon, ShieldCheckIcon, WarningIcon, WindIcon } from '@phosphor-icons/react'
+import { ArrowRightIcon, CircleNotchIcon, DropIcon, FileTextIcon, QrCodeIcon, ShieldCheckIcon, WarningIcon, WindIcon } from '@phosphor-icons/react'
 import { lazy, Suspense, useCallback, useEffect, useState } from 'react'
 import { Link } from '../../app/Link'
 import { navigate } from '../../app/router'
@@ -205,7 +205,7 @@ export default function HomePage() {
         )}
         {!loading && (
           <div className={styles.receive}>
-            <ButtonLink to="/receive" variant="text" className={styles.receiveLink}>
+            <ButtonLink to="/receive" variant="text" className={styles.receiveLink} icon={<QrCodeIcon size={20} weight="bold" aria-hidden />}>
               Got a QR from the RHU? Scan it
             </ButtonLink>
           </div>
