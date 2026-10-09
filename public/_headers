@@ -1,0 +1,8 @@
+# Cloudflare Pages headers (the free fallback host). Mirrors vercel.json:
+# the service worker is always revalidated, hashed assets are cached for a
+# year. Vercel ignores this file.
+/sw.js
+  Cache-Control: public, max-age=0, must-revalidate
+
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable

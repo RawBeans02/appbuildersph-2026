@@ -31,3 +31,9 @@ Before turning it on:
 - `credentialless` lets the page load cross-origin files (for example model weights from a CDN) without them sending a `Cross-Origin-Resource-Policy` header, as long as the request needs no cookies. Safari didn't support `credentialless` when this was written (check before relying on it); there, use `require-corp`, and every cross-origin file must then send `Cross-Origin-Resource-Policy: cross-origin` or be loaded with CORS. Check the model host's response headers.
 - The service worker serves `index.html` from its cache, with the headers it had when it was cached. The new headers reach a returning user only after `index.html` changes and the precache refreshes it, which every build with code changes does.
 - After deploying, check the device check on the live URL shows **Cross-origin isolated: Yes**, and rerun `docs/OFFLINE-SMOKE-TEST.md`.
+
+## Fallback host: Cloudflare Pages (free)
+Used only if Vercel can't deploy (e.g. its Hobby daily deployment limit). It serves the core offline app; the phase 2 backend (`api/`, Postgres, GPT-6 Luna) runs only on Vercel, so phase 2 stays off there (don't set `VITE_PHASE2`).
+- Build command `npm run build`, output directory `dist`, environment variable `NODE_VERSION=22`.
+- `public/_headers` mirrors `vercel.json`'s caching headers. With no `404.html` in `dist`, Cloudflare Pages serves `index.html` for unknown paths (single-page app), so the app's own 404 still works.
+- Every file is under Cloudflare's 25 MiB per-file limit (the largest is the ONNX Runtime WebAssembly file, about 14 MB).
