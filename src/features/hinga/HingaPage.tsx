@@ -113,7 +113,10 @@ function HingaFlow({ session }: { session: CountSession }) {
           onStartCount={startCount}
           onRetry={retry}
           onContinue={continueWithoutCount}
-          onBack={() => setStep('setup')}
+          onBack={() => {
+            session.clearOutcome()
+            setStep('setup')
+          }}
         />
       )}
       {view === 'result' && (
