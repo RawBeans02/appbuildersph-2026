@@ -12,6 +12,7 @@ import {
   type Deps,
 } from '../handlers.js'
 import { phDay } from '../luna/alerts.js'
+import { DOXY_CAVEAT, MHO_CONDITION, WATCH_CAVEAT } from '../luna/facts.js'
 import type { Fetcher } from '../luna/draft.js'
 import {
   SIGNATURE_HEADER,
@@ -155,6 +156,34 @@ describe('alerts on Postgres', () => {
     expect(list.decided).toHaveLength(4)
     expect(list.audit.map((entry) => entry.action)).toEqual(['alert-rejected', 'alert-approved', 'alert-approved', 'alert-approved', 'alerts-draft'])
     expect(list.ai).toMatchObject({ on: false, reason: 'daily-limit' })
+  })
+
+  it('stores a reply that left out its caveats WITH them, and appends a caveat an edited approval left out', async () => {
+    // This stand-in drops the stock move's condition and its doxycycline line.
+    const stripping: Fetcher = async (_url, init) => {
+      const template = JSON.parse(JSON.parse(String(init!.body)).messages[1].content).template as string
+      const content = template.replace(` ${DOXY_CAVEAT}`, '').replace(`, ${MHO_CONDITION}`, '')
+      return new Response(JSON.stringify({ choices: [{ message: { content } }] }))
+    }
+    const now = new Date((clock += 1000))
+    const deps: Deps = { env, openStore, now: () => now, ai: { fetch: stripping, sleep: async () => undefined } }
+    const drafted = await body<DraftAlertsResponse>(await handleAlertsDraft(viewPost('/api/alerts-draft', { municipality: 'SID' }), deps))
+    const move = drafted.alerts.find((alert) => alert.kind === 'move-stock')!
+    expect(move.source).toBe('luna')
+    const stored = await getPool(databaseUrl).query<{ text: string }>('SELECT text FROM alerts WHERE id = $1', [move.id])
+    expect(stored.rows[0].text).toBe(move.text)
+    expect(stored.rows[0].text.endsWith(`\n\nGo ahead only if the municipal health officer agrees. ${DOXY_CAVEAT}`)).toBe(true)
+
+    // Riverside-D's watch alert (the template: the day's 3 calls are used) edited without its referral line.
+    const watch = drafted.alerts.find((alert) => alert.barangay === 'SID-RIV')!
+    const edited = watch.text.replace(WATCH_CAVEAT, '').trim()
+    const approved = await handleAlertsApprove(
+      viewPost('/api/alerts-approve', { id: watch.id, approverRole: 'Provincial health officer', text: edited }),
+      realDeps(),
+    )
+    expect(approved.status).toBe(200)
+    const row = await getPool(databaseUrl).query<{ text: string; status: string }>('SELECT text, status FROM alerts WHERE id = $1', [watch.id])
+    expect(row.rows[0]).toEqual({ text: `${edited}\n\n${WATCH_CAVEAT}`, status: 'approved' })
   })
 
   it('keeps the alert columns free of anything but codes, facts and roles', async () => {

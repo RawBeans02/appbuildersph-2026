@@ -6,6 +6,7 @@ import { NOW } from '../test/fixtures.js'
 import { scenarioPayloads } from '../test/lunaScenario.js'
 import { approveAlert, draftAlerts, listAlerts, phDay, rejectAlert } from './alerts.js'
 import type { Fetcher } from './draft.js'
+import { CAVEATS, DOCTOR_TEAM_CAVEAT, DOXY_CAVEAT, MHO_CONDITION, WATCH_CAVEAT } from './facts.js'
 
 // Drafting, the AI gates and the decisions, on the in-memory store, with
 // OpenAI mocked.
@@ -96,6 +97,28 @@ describe('drafting alerts', () => {
     ])
   })
 
+  it('stores a GPT-6 Luna reply that left out the safety caveats WITH them', async () => {
+    // The stand-in drops every caveat: the doctor team's, the move's condition
+    // and its doxycycline line, and the watch referral.
+    const strip = (template: string) =>
+      template
+        .replace(DOCTOR_TEAM_CAVEAT, '')
+        .replace(` ${DOXY_CAVEAT}`, '')
+        .replace(`, ${MHO_CONDITION}`, '')
+        .replace(WATCH_CAVEAT, '')
+        .trim()
+    const luna = model(strip)
+    const result = await draftAlerts(store, ENV, 'SID', NOW, { fetch: luna.fetcher })
+    expect(result.alerts.map((alert) => alert.source)).toEqual(['luna', 'luna', 'luna', 'luna'])
+    for (const alert of result.alerts) {
+      const reply = strip(alert.templateText)
+      expect(reply.toLowerCase()).not.toContain(CAVEATS[alert.kind][0].phrase.toLowerCase())
+      expect(alert.text).toBe(`${reply}\n\n${CAVEATS[alert.kind].map((caveat) => caveat.sentence).join(' ')}`)
+      expect(store.alerts.get(alert.id)?.text).toBe(alert.text)
+    }
+    expect(result.alerts[1].text.endsWith(`Go ahead only if the municipal health officer agrees. ${DOXY_CAVEAT}`)).toBe(true)
+  })
+
   it('kill switch: with LUNA_ENABLED off, templates only and no call', async () => {
     const luna = model((template) => template)
     const result = await draftAlerts(store, { ...ENV, lunaEnabled: false }, 'SID', NOW, { fetch: luna.fetcher })
@@ -166,6 +189,18 @@ describe('deciding', () => {
     const { alert } = await approveAlert(store, { id: move.id, municipality: 'SID', role: 'Regional officer', text: edited }, NOW)
     expect(alert.text).toBe(edited)
     expect(store.auditLog.at(-1)?.detail).toMatchObject({ edited: true })
+  })
+
+  it('appends a safety caveat an edited wording left out, then checks and stores it', async () => {
+    const [team, move] = await drafts()
+    const edited = `${move.text.replace(` ${DOXY_CAVEAT}`, '').replace(`, ${MHO_CONDITION}`, '')} Please confirm by radio.`
+    const { alert } = await approveAlert(store, { id: move.id, municipality: 'SID', role: 'Regional officer', text: edited }, NOW)
+    expect(alert.text).toBe(`${edited}\n\nGo ahead only if the municipal health officer agrees. ${DOXY_CAVEAT}`)
+    expect(store.alerts.get(move.id)).toMatchObject({ status: 'approved', text: alert.text })
+
+    const shortened = team.text.replace(` ${DOCTOR_TEAM_CAVEAT}`, '')
+    const approved = await approveAlert(store, { id: team.id, municipality: 'SID', role: 'Regional officer', text: shortened }, NOW)
+    expect(approved.alert.text).toBe(`${shortened}\n\n${DOCTOR_TEAM_CAVEAT}`)
   })
 
   it('refuses an edited wording with look-alike digits or an e-mail address', async () => {

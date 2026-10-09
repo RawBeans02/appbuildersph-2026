@@ -1,7 +1,16 @@
 import { describe, expect, it } from 'vitest'
 import { scenarioPayloads } from '../test/lunaScenario.js'
 import { checkAlertText, LINK_REASON } from './check.js'
-import { alertCandidates, MAX_ALERTS, type AlertCandidate } from './facts.js'
+import {
+  alertCandidates,
+  DOCTOR_TEAM_CAVEAT,
+  DOXY_CAVEAT,
+  MAX_ALERTS,
+  MHO_CONDITION,
+  WATCH_CAVEAT,
+  withCaveats,
+  type AlertCandidate,
+} from './facts.js'
 
 const candidates = alertCandidates(scenarioPayloads())
 const byKind = (kind: AlertCandidate['kind'], barangay?: string) =>
@@ -38,10 +47,32 @@ describe('alert facts', () => {
   it('write the template from the facts alone', () => {
     expect(byKind('doctor-team').templateText).toBe(
       'Send a doctor team to Maligaya-D first this week (2026-W41). Maligaya-D has the highest priority score, 27–36: ' +
-        '<5 urgent danger-sign referrals ×3, 6 fast-breathing referrals ×2 and 12 residents in the leptospirosis watch window ×1.',
+        '<5 urgent danger-sign referrals ×3, 6 fast-breathing referrals ×2 and 12 residents in the leptospirosis watch window ×1. ' +
+        'The score ranks barangays by screening counts only; the doctor team decides who needs care.',
     )
     expect(byKind('move-stock').templateText).toContain('Move up to 30 doxycycline capsules that expire within 6 weeks from Bagong Silang-D to Maligaya-D')
     expect(byKind('watch', 'SID-RIV').templateText).toContain('Riverside-D has 7 residents in the leptospirosis watch window this week (2026-W41)')
+  })
+
+  it("carry each kind's fixed safety caveats, which withCaveats puts back when a wording leaves them out", () => {
+    const move = byKind('move-stock')
+    expect(move.templateText).toContain(`to Maligaya-D, ${MHO_CONDITION}.`)
+    expect(move.templateText.endsWith(DOXY_CAVEAT)).toBe(true)
+    expect(byKind('doctor-team').templateText.endsWith(DOCTOR_TEAM_CAVEAT)).toBe(true)
+    expect(byKind('watch', 'SID-RIV').templateText.endsWith(WATCH_CAVEAT)).toBe(true)
+    // Every template already has its caveats: unchanged.
+    for (const candidate of candidates) expect(withCaveats(candidate.templateText, candidate.kind)).toBe(candidate.templateText)
+
+    const bare = 'Move up to 30 doxycycline capsules expiring within 6 weeks from Bagong Silang-D to Maligaya-D.'
+    const kept = withCaveats(bare, 'move-stock')
+    expect(kept).toBe(`${bare}\n\nGo ahead only if the municipal health officer agrees. ${DOXY_CAVEAT}`)
+    expect(withCaveats(kept, 'move-stock')).toBe(kept)
+    // Case and spacing aside, a caveat that's there isn't added twice.
+    expect(withCaveats(`If the municipal  health officer agrees, ${bare.toLowerCase()} ${DOXY_CAVEAT.toUpperCase()}`, 'move-stock')).not.toContain('\n')
+    expect(withCaveats('Maligaya-D first.', 'doctor-team')).toBe(`Maligaya-D first.\n\n${DOCTOR_TEAM_CAVEAT}`)
+    expect(withCaveats('Riverside-D: keep watching.', 'watch')).toBe(`Riverside-D: keep watching.\n\n${WATCH_CAVEAT}`)
+    // Each kind's caveats pass the check, appended to a faithful rewording.
+    expect(checkAlertText(kept, move)).toEqual({ ok: true })
   })
 
   it('give nothing when there are no reports, and at most MAX_ALERTS', () => {

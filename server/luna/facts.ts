@@ -71,13 +71,45 @@ export const MAX_ALERTS = 8
 
 const nameOf = (code: string) => barangayName(code) ?? code
 
+// The safety caveats each kind of alert always carries, in its template and in
+// any wording that replaces it: a GPT-6 Luna reply or an officer's edit that
+// leaves one out gets it appended (withCaveats) before the check and before
+// it's stored, the way the laptop's plan keeps its reminder (withReminder in
+// src/features/municipal/llm/check.ts). A caveat counts as there when its
+// phrase is (case and spacing aside).
+export type Caveat = { phrase: string; sentence: string }
+
+export const DOXY_CAVEAT = 'Doxycycline is given only after consultation with a health professional.'
+export const MHO_CONDITION = 'if the municipal health officer agrees'
+export const DOCTOR_TEAM_CAVEAT = 'The score ranks barangays by screening counts only; the doctor team decides who needs care.'
+export const WATCH_CAVEAT = 'Refer anyone with fever, muscle pain or red eyes to the RHU; a health professional decides who needs care.'
+
+const wholeSentence = (text: string): Caveat => ({ phrase: text.replace(/\.$/, ''), sentence: text })
+
+export const CAVEATS: Record<AlertKind, readonly Caveat[]> = {
+  'doctor-team': [wholeSentence(DOCTOR_TEAM_CAVEAT)],
+  'move-stock': [{ phrase: MHO_CONDITION, sentence: `Go ahead only ${MHO_CONDITION}.` }, wholeSentence(DOXY_CAVEAT)],
+  watch: [wholeSentence(WATCH_CAVEAT)],
+}
+
+const normalized = (text: string) => text.toLowerCase().replace(/\s+/g, ' ')
+
+// The wording with every caveat of its kind: unchanged when all are there,
+// else the missing ones appended after a blank line.
+export function withCaveats(text: string, kind: AlertKind): string {
+  const have = normalized(text)
+  const missing = CAVEATS[kind].filter((caveat) => !have.includes(normalized(caveat.phrase))).map((caveat) => caveat.sentence)
+  return missing.length ? `${text.trim()}\n\n${missing.join(' ')}` : text
+}
+
 function doctorTeamText(facts: DoctorTeamFacts): string {
   return (
     `Send a doctor team to ${facts.name} first this week (${facts.epiWeek}). ` +
     `${facts.name} has the highest priority score, ${formatRange(facts.score)}: ` +
     `${formatCount(facts.urgentReferrals)} urgent danger-sign referrals ×3, ` +
     `${formatRange(facts.fastBreathing)} fast-breathing referrals ×2 and ` +
-    `${formatCount(facts.inWatchWindow)} residents in the leptospirosis watch window ×1.`
+    `${formatCount(facts.inWatchWindow)} residents in the leptospirosis watch window ×1. ` +
+    DOCTOR_TEAM_CAVEAT
   )
 }
 
@@ -85,11 +117,11 @@ function moveStockText(facts: MoveStockFacts): string {
   const amount = facts.capsulesUpTo === '<5' ? 'the few (<5)' : `up to ${formatCount(facts.capsulesUpTo)}`
   return (
     `Move ${amount} doxycycline capsules that expire within 6 weeks from ${facts.fromName} to ${facts.toName}, ` +
-    `if the municipal health officer agrees. ` +
+    `${MHO_CONDITION}. ` +
     `${facts.fromName} has ${formatCount(facts.fromInWatchWindow)} residents in the watch window and ` +
     `${formatCount(facts.fromOnHand)} capsules on hand; ${facts.toName} has ${formatCount(facts.toInWatchWindow)} ` +
     `in the watch window and ${formatCount(facts.toOnHand)} capsules on hand. ` +
-    `Doxycycline is given only after consultation with a health professional.`
+    DOXY_CAVEAT
   )
 }
 
@@ -99,7 +131,7 @@ function watchText(facts: WatchFacts): string {
     `(${facts.epiWeek}), day 5 to 15 after floodwater contact, with ${formatCount(facts.urgentReferrals)} urgent ` +
     `referrals, ${formatRange(facts.fastBreathing)} fast-breathing referrals and ` +
     `${formatCount(facts.clinicianReviewFlags)} flags for clinician review. ` +
-    `Keep up the watch checks and refer anyone with fever, muscle pain or red eyes to the RHU.`
+    `Keep up the watch checks. ${WATCH_CAVEAT}`
   )
 }
 

@@ -17,7 +17,7 @@ import { MAX_REPORT_ROWS } from '../reports.js'
 import type { AlertRecord, NewAlert, Store } from '../store.js'
 import { checkAlertText } from './check.js'
 import { requestWording, type Fetcher } from './draft.js'
-import { alertCandidates, type AlertCandidate, type AlertFacts } from './facts.js'
+import { alertCandidates, withCaveats, type AlertCandidate, type AlertFacts } from './facts.js'
 
 // Phase 2 alerts: draft from the facts (template always, GPT-6 Luna's wording
 // only when it's on, under the day's limit, and passes the check), then a
@@ -94,9 +94,11 @@ async function word(candidate: AlertCandidate, store: Store, env: ServerEnv, sta
     sleep: ai.sleep,
   })
   if (!outcome.ok) return { ...template, aiNote: outcome.reason }
-  const check = checkAlertText(outcome.text, candidate)
+  // A reply that left out a safety caveat gets it back before the check.
+  const text = withCaveats(outcome.text, candidate.kind)
+  const check = checkAlertText(text, candidate)
   if (!check.ok) return { ...template, checkReasons: check.reasons, aiNote: 'check-failed' }
-  return { text: outcome.text, source: 'luna', checkReasons: [], aiNote: null }
+  return { text, source: 'luna', checkReasons: [], aiNote: null }
 }
 
 // POST /api/alerts-draft: one draft per alert the facts call for.
@@ -150,8 +152,9 @@ async function draftOf(store: Store, id: string, municipality?: string): Promise
   return alert
 }
 
-// POST /api/alerts-approve: an edited wording is checked again against the
-// alert's facts before it can be approved.
+// POST /api/alerts-approve: an edited wording gets back any safety caveat it
+// left out, then is checked again against the alert's facts before it can be
+// approved.
 export async function approveAlert(
   store: Store,
   input: { id: string; municipality?: string; role: string; text?: string },
@@ -159,8 +162,8 @@ export async function approveAlert(
 ): Promise<DecideResponse> {
   const alert = await draftOf(store, input.id, input.municipality)
   const edited = input.text !== undefined && input.text.trim() !== alert.text.trim()
-  const text = edited ? input.text!.trim() : alert.text
-  if (edited) {
+  const text = withCaveats(edited ? input.text!.trim() : alert.text, alert.kind)
+  if (text !== alert.text) {
     const check = checkAlertText(text, { facts: alert.facts as AlertFacts, templateText: alert.templateText })
     if (!check.ok) throw new HttpError('check-failed', "The edited wording doesn't match the alert's facts.", {}, check.reasons)
   }
