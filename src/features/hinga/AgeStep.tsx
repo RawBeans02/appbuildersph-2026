@@ -1,4 +1,4 @@
-import { CaretDownIcon } from '@phosphor-icons/react'
+import { ArrowRightIcon, CaretDownIcon } from '@phosphor-icons/react'
 import { useState } from 'react'
 import { Button, CheckRow, Field, FlowTopBar, RadioRow } from '../../components'
 import type { AgapayDb } from '../../data/db/db'
@@ -87,7 +87,11 @@ export function AgeStep({ child, onChange, onNext, onBack }: { child: Child; onC
         </div>
       </div>
       <div className={styles.footer}>
-        <Button disabled={band === null || !child.calm} onClick={onNext}>
+        <Button
+          disabled={band === null || !child.calm}
+          iconEnd={<ArrowRightIcon size={22} weight="bold" aria-hidden />}
+          onClick={onNext}
+        >
           Next: point the camera
         </Button>
       </div>
