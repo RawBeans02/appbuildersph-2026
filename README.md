@@ -197,7 +197,13 @@ A cloud "Jr. Builder" agent named in early commits was planned but never used.
 | [Pillow](https://python-pillow.org) | Renders the synthetic test label (`src/inference/ocr/fixtures/make_label.py`) and the synthetic demo label (`scripts/demo-label/make_label.py`); a development tool, not shipped | MIT-CMU |
 
 ## Lighthouse (mobile, measured at feature freeze)
-_TBD: Performance, Accessibility, Best Practices and SEO, measured on pagespeed.web.dev against the live URL._
+Measured with Lighthouse 12.8.2 (mobile emulation, simulated throttling), the same lab test PageSpeed Insights runs, by the on-demand GitHub Actions workflow `.github/workflows/lighthouse.yml` against the live URL. The full report is kept as the run's artifact.
+
+| Run | Performance | Accessibility | Best Practices | SEO |
+|---|---|---|---|---|
+| [Fri Oct 9, 5:58 PM PH](https://github.com/RawBeans02/appbuildersph-2026/actions/runs/37914606334) | 86 | 100 | 100 | 91 |
+
+Re-measured at the feature freeze; the latest run is the one that counts. Accessibility is also checked on every push by axe-core on 14 screens (`docs/MEASUREMENTS.md`, method 6).
 
 ## Team
 | Name (as on appbuildersph.com/hackathon/participants) | GitHub | Role | Contributions |
