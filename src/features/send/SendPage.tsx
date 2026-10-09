@@ -45,7 +45,9 @@ export default function SendPage() {
   const [today] = useState(localToday)
   const week = weekOf(today)
   const [view, setView] = useState<View>('list')
-  const [shown, setShown] = useState<{ qr: Exported; at: Date } | null>(null)
+  // made: this QR was made by the last tap (not the same export shown again),
+  // so it plays `reveal-qr` once (14e).
+  const [shown, setShown] = useState<{ qr: Exported; at: Date; made: boolean } | null>(null)
   // null: the pairing sheet is closed.
   const [pairing, setPairing] = useState<PairingQr | 'making' | null>(null)
   const working = useRef(false)
@@ -76,7 +78,7 @@ export default function SendPage() {
     try {
       const qr = again ?? (await createExport(await getDb(), today))
       if (qr.ok) {
-        setShown({ qr, at: new Date() })
+        setShown({ qr, at: new Date(), made: !again })
         go('qr')
       } else {
         go('error')
@@ -110,7 +112,7 @@ export default function SendPage() {
         <h1 ref={focusHeading} tabIndex={-1} className={styles.qrTitle}>
           Show this to the municipal laptop
         </h1>
-        <div className={cx(styles.qrBox, styles.qrBoxShown)}>
+        <div className={cx(styles.qrBox, styles.qrBoxShown, shown.made && 'reveal-qr')}>
           <QrImage text={text} label="QR code with this week's counts" />
         </div>
         <p className={styles.code}>
@@ -145,8 +147,9 @@ export default function SendPage() {
       <div className={styles.screen}>
         {header}
         <div className={styles.shared}>
+          {/* This view only opens from the "Done, it was scanned" tap, so the check stamps (14c). */}
           <span className={styles.sharedIcon} aria-hidden>
-            <CheckCircleIcon size={34} weight="bold" />
+            <CheckCircleIcon className="stamp" size={34} weight="bold" />
           </span>
           {/* The screen's h1 is the header's; the design draws this one as the headline. */}
           <h2 ref={focusHeading} tabIndex={-1} className={styles.sharedTitle}>
