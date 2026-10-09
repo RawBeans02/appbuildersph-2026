@@ -74,23 +74,27 @@ function Row({
   resident,
   status,
   today,
+  added,
   onOpen,
 }: {
   entry: WatchEntry
   resident: Resident | undefined
   status: RowStatus
   today: string
+  // Put on the list by the last "Start the watch" in this visit (9a).
+  added: boolean
   onOpen: () => void
 }) {
   const kinds = kindWords(entry.kinds) + (entry.lastExposedOn === today ? ' today' : '')
   return (
-    <li>
+    <li className={cx(added && 'land')}>
       <button type="button" className={styles.row} aria-haspopup="dialog" onClick={onOpen}>
         <span className={styles.rowMain}>
           <span className={styles.rowName}>{resident?.name ?? entry.residentId}</span>
           <span className={styles.rowMeta}>{[resident?.householdId, resident?.purok, kinds].filter(Boolean).join(' · ')}</span>
-          {(entry.higherRisk || status) && (
+          {(entry.higherRisk || status || added) && (
             <span className={styles.rowTags}>
+              {added && <span className={cx(styles.status, styles.statusChecked)}>Added today</span>}
               {entry.higherRisk && (
                 <Pill tone="warn" icon={<WarningIcon size={16} weight="bold" aria-hidden />}>
                   Higher risk
@@ -189,12 +193,14 @@ export function WatchList({
   data,
   place,
   today,
+  justAdded,
   onMarkMore,
   onLogFlood,
 }: {
   data: DbQueryState<ListData>
   place: string
   today: string
+  justAdded: ReadonlySet<string>
   onMarkMore: () => void
   onLogFlood: () => void
 }) {
@@ -274,6 +280,7 @@ export function WatchList({
               resident={people.get(entry.residentId)}
               status={rowStatus(checks, entry.residentId, entry.firstExposedOn, today)}
               today={today}
+              added={justAdded.has(entry.residentId)}
               onOpen={() => setOpenId(entry.residentId)}
             />
           ))}
