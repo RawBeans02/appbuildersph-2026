@@ -79,7 +79,7 @@ Until `design/` lands, build the logic plus plain, unstyled screens and write `N
   - Needs DB v2 stores from the Sr. Builder (`db.ts` owns the schema): received payloads and paired device keys. Pre-made barangays' keys come from the seed (B4 part 2).
   - DB v2 landed in ab600a0 (receivedPayloads, pairedDevices, plans); B5 codes against it directly.
   - NEEDS DESIGN: screens 16–20 (scan + the 5 barangay slots, pairing confirm, merged table, plan + edit + approve, approval log). Plain, unstyled screens until `design/` lands.
-- [ ] todo · B6 Local LLM wording (optional): WebLLM Llama-3.2-1B on the laptop, prompt constrained to the plan's numbers, output checked so it can't change a count, template fallback when WebGPU or the model isn't available. No WebLLM test on the 8 GB Mac without messaging Account Admin first · [sr] (moved from the Lead while design pass 1 runs) · owns: `src/features/municipal/llm/`
+- [ ] doing · B6 Local LLM wording (optional): WebLLM Llama-3.2-1B on the laptop, prompt constrained to the plan's numbers, output checked so it can't change a count, template fallback when WebGPU or the model isn't available. No WebLLM test on the 8 GB Mac without messaging Account Admin first · [sr] (moved from the Lead while design pass 1 runs) · owns: `src/features/municipal/llm/`
 - [ ] todo · B7 `docs/ARCHITECTURE.md` + the README sections as features land · [lead]
 
 **Decision points:** ~4:30 PM design pass 1 lands → UI phase · **7:00 PM** S1 Hinga kill call (fallback: a tap-to-select chest region; then a guided tap counter) and AMD (dropped unless a Ryzen AI laptop is confirmed) · **12:00 AM** scope check · **4:00 AM** feature freeze.
