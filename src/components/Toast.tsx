@@ -16,12 +16,27 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   }, [])
   useEffect(() => () => clearTimeout(timer.current), [])
 
+  // "Or until the next tap": a tap anywhere but the toast itself closes it, so
+  // it never sits over what the next step shows (e.g. the laptop's return QR).
+  const box = useRef<HTMLDivElement>(null)
+  const open = toast !== null
+  useEffect(() => {
+    if (!open) return
+    const close = (event: PointerEvent) => {
+      if (event.target instanceof Node && box.current?.contains(event.target)) return
+      clearTimeout(timer.current)
+      setToast(null)
+    }
+    document.addEventListener('pointerdown', close, true)
+    return () => document.removeEventListener('pointerdown', close, true)
+  }, [open])
+
   return (
     <ToastContext.Provider value={show}>
       {children}
       <div className={styles.region} role="status" aria-live="polite">
         {toast && (
-          <div key={toast.key} className={`${styles.toast} rise`}>
+          <div key={toast.key} ref={box} className={`${styles.toast} rise`}>
             <CheckCircleIcon className={styles.icon} size={22} weight="bold" aria-hidden />
             <span className={styles.message}>{toast.message}</span>
             {toast.action && (
