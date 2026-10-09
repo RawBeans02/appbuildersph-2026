@@ -60,10 +60,14 @@ function stored(text: string, seq: number, week = '2026-W41'): ReceivedPayload {
   }
 }
 
+// The demo: Saturday Oct 10, 2026, 09:00 in Manila (week 2026-W41). Never today's date.
+const NOW = new Date('2026-10-10T01:00:00.000Z')
+
 const context = (overrides: Partial<ScanContext> = {}): ScanContext => ({
   municipality: 'SID',
   devices: [paired],
   received: [],
+  now: NOW,
   ...overrides,
 })
 
@@ -141,6 +145,51 @@ describe('counts QRs', () => {
       expect(outcome.code).toBe(code)
       expect(describeOutcome(outcome)).toContain(message)
     }
+  })
+})
+
+describe('the report week (a phone with its date set wrong)', () => {
+  it('refuses a far-future week before it can replace anything, and says to check the phone', async () => {
+    const current = stored(await countsQr({ seq: 3 }), 3)
+    const outcome = expectKind(await classifyScan(await countsQr({ seq: 1, week: '2099-W01' }), context({ received: [current] })), 'invalid')
+    expect(outcome).toMatchObject({
+      source: 'counts',
+      code: 'week-out-of-range',
+      barangay: 'SID-MAL',
+      epiWeek: '2099-W01',
+      fingerprint: paired.fingerprint,
+    })
+    expect(describeOutcome(outcome)).toBe(
+      "This report's week (2099-W01) is not this week or the last 8 weeks. Check the date on the phone, then make the QR again. Nothing was saved.",
+    )
+  })
+
+  it('lets a real report replace a far-future one stored before this check', async () => {
+    const future = stored(await countsQr({ seq: 1, week: '2099-W01' }), 1, '2099-W01')
+    const outcome = expectKind(await classifyScan(await countsQr({ seq: 2 }), context({ received: [future] })), 'new')
+    expect(outcome.replaces).toEqual([future])
+  })
+
+  it('accepts this week, and a week 8 weeks back', async () => {
+    expect((await classifyScan(await countsQr({ week: '2026-W41' }), context())).kind).toBe('new')
+    expect((await classifyScan(await countsQr({ week: '2026-W33' }), context())).kind).toBe('new')
+  })
+
+  it('refuses a week 9 weeks back', async () => {
+    const outcome = expectKind(await classifyScan(await countsQr({ week: '2026-W32' }), context()), 'invalid')
+    expect(outcome.code).toBe('week-out-of-range')
+  })
+
+  it('takes next week only once it is at most 2 days away (Manila time)', async () => {
+    const nextWeek = await countsQr({ week: '2026-W42' })
+    // Friday 23:59 in Manila: Monday is more than 2 days away.
+    const friday = new Date('2026-10-09T15:59:00.000Z')
+    expect((await classifyScan(nextWeek, context({ now: friday }))).kind).toBe('invalid')
+    // Saturday 00:00 in Manila: Monday is 2 days away.
+    const saturday = new Date('2026-10-09T16:00:00.000Z')
+    expect((await classifyScan(nextWeek, context({ now: saturday }))).kind).toBe('new')
+    // Two weeks ahead never.
+    expect((await classifyScan(await countsQr({ week: '2026-W43' }), context({ now: saturday }))).kind).toBe('invalid')
   })
 })
 

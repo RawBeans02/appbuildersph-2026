@@ -85,7 +85,7 @@ export function ensureMunicipalSample(db: AgapayDb): Promise<boolean> {
 // barangay's older one). Pairing waits for the officer: see pairDevice.
 export async function receiveScan(db: AgapayDb, text: string, now = new Date()): Promise<ScanOutcome> {
   const { devices, received } = await readHandoff(db)
-  const outcome = await classifyScan(text, { municipality: LAPTOP_MUNICIPALITY, devices, received })
+  const outcome = await classifyScan(text, { municipality: LAPTOP_MUNICIPALITY, devices, received, now })
   if (outcome.kind === 'new') {
     await db.receivedPayloads.put(toReceived(outcome.text, outcome.payload, outcome.fingerprint, now))
     for (const old of outcome.replaces) await db.receivedPayloads.delete(old.id)

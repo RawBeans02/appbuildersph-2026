@@ -24,9 +24,9 @@ beforeAll(async () => {
   phoneFingerprint = await keyFingerprint(phone.publicJwk)
 })
 
-const countsQr = (seq: number, key = phone.privateKey) =>
+const countsQr = (seq: number, key = phone.privateKey, epiWeek = '2026-W41') =>
   encodeQr(
-    createPayload({ municipality: 'SID', barangay: 'SID-STN', epiWeek: '2026-W41', seq, counts: { ...NO_COUNTS, inWatchWindow: 5 } }),
+    createPayload({ municipality: 'SID', barangay: 'SID-STN', epiWeek, seq, counts: { ...NO_COUNTS, inWatchWindow: 5 } }),
     key,
   )
 
@@ -120,6 +120,21 @@ describe('scan results', () => {
     ])
     expect(banner?.lines.every((line) => line.status === 'ok')).toBe(true)
     expect((await readHandoff(db)).received.map((item) => item.seq)).toEqual([4])
+    db.close()
+  })
+
+  it('17h a week far in the future (the phone date is wrong): refused, nothing saved, this week still lands', async () => {
+    const db = await pairedLaptop()
+    const banner = scanBanner(await receiveScan(db, await countsQr(1, phone.privateKey, '2099-W01'), NOW), { formatTime: clock })
+    expect(banner).toMatchObject({ kind: 'not-valid', tone: 'bad' })
+    expect(banner?.lines).toEqual([
+      READ,
+      { status: 'ok', text: 'Signed by the paired Santo Niño-D phone', detail: `Key ${phoneFingerprint}` },
+      { status: 'failed', text: "This report's week (2099-W01) is not this week or the last 8 weeks." },
+    ])
+    expect(banner?.body).toBe('Check the date on the phone, then make the QR again. Nothing was saved.')
+    expect((await readHandoff(db)).received).toEqual([])
+    expect((await receiveScan(db, await countsQr(2), NOW)).kind).toBe('new')
     db.close()
   })
 

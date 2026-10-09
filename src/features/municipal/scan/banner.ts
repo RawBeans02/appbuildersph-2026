@@ -1,4 +1,4 @@
-import { compareExports, type ScanOutcome } from './classify'
+import { WEEK_OUT_OF_RANGE_NEXT, compareExports, weekOutOfRange, type ScanOutcome } from './classify'
 import { formatClock, nameOf } from '../counts'
 
 // What one scan shows in the result panel beside the camera (screens 17g and
@@ -121,6 +121,13 @@ export function scanBanner(
           [READ, { status: 'failed', text: `No phone is paired for ${name} yet. Nothing was saved.` }],
           "Scan the pairing QR on that phone's Send screen first, then its counts QR.",
         )
+      }
+      if (outcome.source === 'counts' && outcome.code === 'week-out-of-range') {
+        // The signature checked out; the phone's date is wrong.
+        const checked: ScanCheck[] = [READ]
+        if (outcome.fingerprint) checked.push(signed(name, outcome.fingerprint))
+        checked.push({ status: 'failed', text: weekOutOfRange(outcome.epiWeek ?? '?') })
+        return notValid(checked, WEEK_OUT_OF_RANGE_NEXT)
       }
       // Not an AgapayMo QR, damaged, or another version.
       return notValid([UNREADABLE])

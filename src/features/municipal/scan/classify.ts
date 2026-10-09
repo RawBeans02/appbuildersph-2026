@@ -1,10 +1,13 @@
 import type { PairedDevice, ReceivedPayload } from '../../../data/db/types'
 import { barangayName } from '../../../data/places'
 import {
+  MAX_REPORT_AGE_WEEKS,
+  acceptedWeeks,
   decodePairing,
   decodeQr,
   formatCount,
   isPairingText,
+  weekAccepted,
   type KeyRegistry,
   type Pairing,
   type PairingErrorCode,
@@ -20,7 +23,14 @@ export type ScanContext = {
   municipality: string
   devices: readonly PairedDevice[]
   received: readonly ReceivedPayload[]
+  // The laptop's clock: a report week must be this week (in Manila, or next
+  // week once it's 2 days away) or one of the 8 before it (src/qr/weeks.ts).
+  now: Date
 }
+
+// A counts QR that verified but whose week is outside the accepted weeks (a
+// phone's date set wrong): refused before it can replace anything.
+export type ScanErrorCode = QrErrorCode | 'week-out-of-range'
 
 export type ScanOutcome =
   // A verified counts QR to store; `replaces` are this barangay's older QRs.
@@ -35,9 +45,12 @@ export type ScanOutcome =
   | {
       kind: 'invalid'
       source: 'counts' | 'pairing'
-      code: QrErrorCode | PairingErrorCode
+      code: ScanErrorCode | PairingErrorCode
       detail: string
       barangay?: string
+      // week-out-of-range only: the report's week, and the key that signed it.
+      epiWeek?: string
+      fingerprint?: string
     }
 
 export const receivedPayloadId = (payload: { barangay: string; epiWeek: string; seq: number }) =>
@@ -74,10 +87,26 @@ export async function classifyScan(text: string, context: ScanContext): Promise<
   if (payload.municipality !== context.municipality) {
     return { kind: 'other-municipality', municipality: payload.municipality, barangay: payload.barangay }
   }
+  // Before any replacing: a far-future week would otherwise win over every
+  // real report from that phone, which would then be ignored as "older".
+  const weeks = acceptedWeeks(context.now)
+  if (!weekAccepted(payload.epiWeek, weeks)) {
+    return {
+      kind: 'invalid',
+      source: 'counts',
+      code: 'week-out-of-range',
+      detail: `Week ${payload.epiWeek} is outside ${weeks.earliest} to ${weeks.latest}`,
+      barangay: payload.barangay,
+      epiWeek: payload.epiWeek,
+      fingerprint: result.keyFingerprint,
+    }
+  }
   const sameBarangay = context.received.filter((received) => received.barangay === payload.barangay)
   const existing = sameBarangay.find((received) => compareExports(received, payload) === 0)
   if (existing) return { kind: 'already-received', payload, existing }
-  const newer = sameBarangay.filter((received) => compareExports(received, payload) > 0)
+  // A far-future QR stored before this check existed never counts as newer:
+  // the real report replaces it.
+  const newer = sameBarangay.filter((received) => compareExports(received, payload) > 0 && received.epiWeek <= weeks.latest)
   if (newer.length > 0) {
     const newest = newer.reduce((a, b) => (compareExports(b, a) > 0 ? b : a))
     return { kind: 'older', payload, newest }
@@ -89,6 +118,11 @@ export async function classifyScan(text: string, context: ScanContext): Promise<
 
 const nameOf = (code: string) => barangayName(code) ?? code
 const exportOf = (item: { epiWeek: string; seq: number }) => `export ${item.seq}, week ${item.epiWeek}`
+
+// The words for a report week outside the accepted weeks (classify, banner).
+export const weekOutOfRange = (epiWeek: string) =>
+  `This report's week (${epiWeek}) is not this week or the last ${MAX_REPORT_AGE_WEEKS} weeks.`
+export const WEEK_OUT_OF_RANGE_NEXT = 'Check the date on the phone, then make the QR again. Nothing was saved.'
 
 const INVALID_COUNTS: Record<QrErrorCode, (barangay: string) => string> = {
   'not-agapay': () => "This is not an AgapayMo QR code. Scan the QR on the barangay phone's Send screen.",
@@ -128,6 +162,7 @@ export function describeOutcome(outcome: ScanOutcome): string {
       return `This QR is for municipality ${outcome.municipality} (${outcome.barangay}). This laptop receives only its own barangays.`
     case 'invalid':
       if (outcome.source === 'pairing') return INVALID_PAIRING[outcome.code as PairingErrorCode]
+      if (outcome.code === 'week-out-of-range') return `${weekOutOfRange(outcome.epiWeek ?? '?')} ${WEEK_OUT_OF_RANGE_NEXT}`
       return INVALID_COUNTS[outcome.code as QrErrorCode](nameOf(outcome.barangay ?? 'this barangay'))
   }
 }

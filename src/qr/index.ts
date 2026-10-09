@@ -64,3 +64,11 @@ export {
   type PairingErrorCode,
   type PairingResult,
 } from './pairing.js'
+export {
+  MAX_REPORT_AGE_WEEKS,
+  WEEK_MARGIN_DAYS,
+  acceptedWeeks,
+  manilaWeek,
+  weekAccepted,
+  type WeekWindow,
+} from './weeks.js'
