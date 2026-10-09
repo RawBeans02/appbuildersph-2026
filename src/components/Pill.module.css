@@ -30,8 +30,10 @@
   color: var(--ink-2);
 }
 
+/* On a tinted row (B22): surface fill, and it keeps an edge in its own colour. */
 .onTint {
   background: var(--surface);
+  box-shadow: inset 0 0 0 1px currentColor;
 }
 
 /* URGENT is the only solid pill. */

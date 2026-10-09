@@ -6,6 +6,7 @@ import { decodeQr, type QrPayloadV1 } from '../../qr'
 import { buildPlan, type MunicipalPlan } from '../../rules/plan'
 import { classifyScan, receivedPayloadId, registryOf, type ScanOutcome } from './scan/classify'
 import { planShortSummary, planStepsText } from './steps'
+import { noteScanned } from './justReceived'
 
 // The municipal laptop's records: paired phones, received QRs, plans and
 // approvals, all in this browser's IndexedDB. Nothing here goes online.
@@ -87,6 +88,7 @@ export async function receiveScan(db: AgapayDb, text: string, now = new Date()):
   if (outcome.kind === 'new') {
     await db.receivedPayloads.put(toReceived(outcome.text, outcome.payload, outcome.fingerprint, now))
     for (const old of outcome.replaces) await db.receivedPayloads.delete(old.id)
+    noteScanned(receivedPayloadId(outcome.payload))
   }
   return outcome
 }

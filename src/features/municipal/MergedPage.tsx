@@ -1,8 +1,10 @@
 import { ClockIcon, FlagIcon, ListNumbersIcon, WarningCircleIcon } from '@phosphor-icons/react'
+import { useState } from 'react'
 import { Button, ButtonLink, Pill, StateBlock } from '../../components'
 import { cx } from '../../components/cx'
 import { useDbQuery } from '../../data/db/useDbQuery'
 import { nameOf } from './counts'
+import { firstShowing, newestScanned } from './justReceived'
 import { LaptopFrame } from './LaptopFrame'
 import { mergedView, type MergedCells, type MergedView } from './merged'
 import styles from './MergedPage.module.css'
@@ -45,6 +47,10 @@ export default function MergedPage() {
 
   const { plan, handoff, unverified } = data.data
   const view = mergedView(plan, handoff.received)
+  // 18c: the newest QR scanned on this laptop in this session, if the plan uses it.
+  const scanned = newestScanned(handoff.received)
+  const used = scanned && plan?.rows.some((row) => `${row.barangay}:${row.epiWeek}:${row.seq}` === scanned.id)
+  const newest = used ? { barangay: scanned.barangay, id: scanned.id } : undefined
   const sub = [view.epiWeek ? `Week ${view.epiWeek}` : null, `${view.received} of ${view.expected} barangays`, sample ? 'Sample data' : null]
     .filter(Boolean)
     .join(' · ')
@@ -73,7 +79,7 @@ export default function MergedPage() {
           paired phone's key. Scan it again.
         </p>
       )}
-      <MergedTable view={view} />
+      <MergedTable view={view} newest={newest} />
       {view.partial && <p className={styles.partial}>{view.partial}</p>}
       {view.why && (
         <div className={styles.why}>
@@ -91,7 +97,10 @@ export default function MergedPage() {
   )
 }
 
-export function MergedTable({ view }: { view: MergedView }) {
+// `newest`: the row that just came in (18c), "Just now" on --ok-tint for the
+// visit; it lands the first time the merged view shows it.
+export function MergedTable({ view, newest }: { view: MergedView; newest?: { barangay: string; id: string } }) {
+  const [landId] = useState(() => (newest && firstShowing(newest.id) ? newest.id : null))
   return (
     <table className={styles.table}>
       <colgroup>
@@ -130,7 +139,14 @@ export function MergedTable({ view }: { view: MergedView }) {
               ))}
             </tr>
           ) : (
-            <tr key={row.barangay} className={cx(row.priority && styles.priority)}>
+            <tr
+              key={row.barangay}
+              className={cx(
+                row.priority && styles.priority,
+                newest?.barangay === row.barangay && styles.justNow,
+                newest?.barangay === row.barangay && landId === newest.id && 'land',
+              )}
+            >
               <th scope="row">
                 <span className={styles.name}>
                   {row.name}
@@ -143,6 +159,7 @@ export function MergedTable({ view }: { view: MergedView }) {
               </th>
               <td className={styles.received}>
                 {row.received}
+                {newest?.barangay === row.barangay && <span className={styles.justNowWord}>Just now</span>}
                 {row.olderWeek && <span className={styles.older}>Week {row.olderWeek}</span>}
               </td>
               {COLUMNS.map((column) => (

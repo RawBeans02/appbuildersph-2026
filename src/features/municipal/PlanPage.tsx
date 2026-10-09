@@ -1,8 +1,10 @@
 import { CaretDownIcon, CheckIcon, InfoIcon, ListNumbersIcon, ScanIcon, WarningCircleIcon } from '@phosphor-icons/react'
-import { useMemo, useState, type ComponentType, type ReactNode } from 'react'
+import { useEffect, useMemo, useState, type ComponentType, type ReactNode } from 'react'
 import { Button, ButtonLink, Field, StateBlock, useToast } from '../../components'
+import { cx } from '../../components/cx'
 import { getDb } from '../../data/db/appDb'
 import { DEMO_MUNICIPALITY } from '../../data/places'
+import { clockTime } from '../../lib/format'
 import { useHoldReload } from '../../lib/useHoldReload'
 import { useDbQuery } from '../../data/db/useDbQuery'
 import { planTemplateText, type MunicipalPlan } from '../../rules/plan'
@@ -14,6 +16,7 @@ import { APPROVER, approvePlan, readMunicipalScreen } from './municipal'
 import { checkNumbers } from './numberCheck'
 import { useLaptopPlace } from './place'
 import styles from './PlanPage.module.css'
+import { planChangedSinceShown, rememberPlanShown } from './planShown'
 import { planSteps, planStepsText } from './steps'
 
 // Screen 19a: the rule-based plan on the left (always there, with or without
@@ -63,25 +66,65 @@ export default function PlanPage() {
       title={`Plan for week ${plan.epiWeek}`}
       sub={[`From ${plan.rows.length} of ${expected} barangays`, sample ? 'Sample data' : null].filter(Boolean).join(' · ')}
     >
-      <PlanBody key={basis} plan={plan} wordingPanel={LlmWordingPanel} />
+      <PlanBody
+        key={basis}
+        plan={plan}
+        wordingPanel={LlmWordingPanel}
+        basis={{ received: plan.rows.length, expected, latestAt: latestReceivedAt(handoff.received, plan) }}
+        basisKey={basis}
+      />
     </LaptopFrame>
   )
 }
 
-export function PlanSteps({ plan }: { plan: MunicipalPlan }) {
+// The newest received time among the exports the plan uses.
+function latestReceivedAt(received: readonly { barangay: string; epiWeek: string; seq: number; receivedAt: string }[], plan: MunicipalPlan): string | null {
+  const used = new Set(plan.rows.map((row) => `${row.barangay}:${row.epiWeek}:${row.seq}`))
+  const times = received.filter((item) => used.has(`${item.barangay}:${item.epiWeek}:${item.seq}`)).map((item) => item.receivedAt)
+  return times.length ? times.reduce((a, b) => (a > b ? a : b)) : null
+}
+
+// Where the plan's inputs came from (19f): the reports in, and the newest one.
+export type PlanBasis = { received: number; expected: number; latestAt: string | null }
+
+// 19f: the plan as a rule trace. Each step is a node on a rail with its rule's
+// reason. The rail draws and the steps rise only when a new report changed the
+// plan since this laptop last showed it (animate); otherwise nothing moves.
+export function PlanSteps({ plan, basis, animate = false }: { plan: MunicipalPlan; basis?: PlanBasis; animate?: boolean }) {
+  const steps = planSteps(plan)
   return (
     <section aria-labelledby="plan-heading">
       <h2 id="plan-heading" className={styles.heading}>
         The plan
       </h2>
-      <p className={styles.lead}>Made by fixed rules from the counts. Always available, with or without the AI.</p>
-      <ol className={styles.steps}>
-        {planSteps(plan).map((step, i) => (
-          <li key={step.title} className={styles.step}>
-            <span className={styles.stepNumber}>{i + 1}.</span>
+      <p className={styles.lead}>
+        {basis
+          ? [
+              `Made by fixed rules from ${basis.received} of ${basis.expected} reports`,
+              basis.latestAt ? `updated ${clockTime(new Date(basis.latestAt))}` : null,
+            ]
+              .filter(Boolean)
+              .join(' · ')
+          : 'Made by fixed rules from the counts. Always available, with or without the AI.'}
+      </p>
+      <ol className={cx(styles.steps, animate && styles.drawRail)}>
+        {steps.map((step, i) => (
+          <li
+            key={step.title}
+            className={cx(styles.step, animate && 'rise')}
+            style={animate ? { animationDelay: `calc(${i} * var(--stagger))` } : undefined}
+          >
+            <span className={styles.stepNumber} aria-hidden>
+              {i + 1}
+            </span>
             <div>
+              <span className="visually-hidden">{i + 1}. </span>
               <p className={styles.stepTitle}>{step.title}</p>
-              {step.reason && <p className={styles.stepReason}>{step.reason}</p>}
+              {step.reason && (
+                <p className={styles.stepReason}>
+                  <strong className={styles.why}>Why:</strong> {step.reason}
+                </p>
+              )}
             </div>
           </li>
         ))}
@@ -107,7 +150,22 @@ export type WordingPanel = ComponentType<{
 
 // The steps, the wording (the AI's draft once the officer takes it, or their
 // own words, or none), and Approve.
-export function PlanBody({ plan, wordingPanel: Wording }: { plan: MunicipalPlan; wordingPanel?: WordingPanel }) {
+export function PlanBody({
+  plan,
+  wordingPanel: Wording,
+  basis,
+  basisKey,
+}: {
+  plan: MunicipalPlan
+  wordingPanel?: WordingPanel
+  basis?: PlanBasis
+  // The received exports behind the plan; the rail draws when they changed.
+  basisKey?: string
+}) {
+  const [animateSteps] = useState(() => basisKey !== undefined && planChangedSinceShown(basisKey))
+  useEffect(() => {
+    if (basisKey !== undefined) rememberPlanShown(basisKey)
+  }, [basisKey])
   const toast = useToast()
   const draft = useMemo(() => planTemplateText(plan, DEMO_MUNICIPALITY.name), [plan])
   const reference = useMemo(() => `${draft}\n${planStepsText(plan)}`, [draft, plan])
@@ -162,7 +220,7 @@ export function PlanBody({ plan, wordingPanel: Wording }: { plan: MunicipalPlan;
   return (
     <>
       <div className={styles.columns}>
-        <PlanSteps plan={plan} />
+        <PlanSteps plan={plan} basis={basis} animate={animateSteps} />
         <div className={styles.wording}>
           {Wording ? (
             <Wording plan={plan} draft={draft} onUse={takeDraft}>

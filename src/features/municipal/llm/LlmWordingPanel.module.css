@@ -113,3 +113,24 @@
   justify-content: flex-end;
   margin-top: var(--space-2);
 }
+
+/* 19h: no writing AI on this laptop, one row. */
+.offRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+}
+
+.offText {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font: var(--type-body);
+  color: var(--ink-2);
+}
+
+.offText svg {
+  flex: none;
+}

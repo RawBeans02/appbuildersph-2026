@@ -26,27 +26,69 @@
 }
 
 .steps {
-  margin-top: var(--space-4);
-  border-top: 1px solid var(--line);
+  position: relative;
+  margin-top: var(--space-5);
+}
+
+/* The rule rail: a 2 px line behind the step numbers. */
+.steps::before {
+  content: '';
+  position: absolute;
+  top: 16px;
+  bottom: 16px;
+  left: 15px;
+  width: 2px;
+  background: var(--line);
+  transform-origin: top;
+}
+
+/* 19f: the rail draws downward when a new report changed the plan. */
+.drawRail::before {
+  animation: drawDown var(--dur-draw) var(--ease-in-out) backwards;
+}
+
+@keyframes drawDown {
+  from {
+    transform: scaleY(0);
+  }
 }
 
 .step {
+  position: relative;
   display: grid;
-  grid-template-columns: 36px minmax(0, 1fr);
-  padding: var(--space-4) 0;
-  border-bottom: 1px solid var(--line);
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: var(--space-4);
+  padding-bottom: var(--space-5);
 }
 
-.stepNumber,
+.stepNumber {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--r-full);
+  background: var(--ink);
+  color: var(--paper);
+  font: var(--type-caption);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
 .stepTitle {
+  padding-top: 3px;
   font: var(--type-body-lg);
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .stepReason {
   margin-top: var(--space-1);
   font: var(--type-body);
   color: var(--ink-2);
+}
+
+.why {
+  font-weight: 700;
+  color: var(--ink);
 }
 
 .dose {

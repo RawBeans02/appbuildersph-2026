@@ -47,6 +47,8 @@ export type LlmWordingPanelProps = {
 export function LlmWordingPanel({ plan, draft, onUse, children }: LlmWordingPanelProps) {
   const [wording] = useState(getWording)
   const state = useSyncExternalStore(wording.subscribe, wording.getState, wording.getState)
+  // 19h: with no writing AI, the officer's box opens only when asked for.
+  const [writeOwn, setWriteOwn] = useState(false)
 
   useEffect(() => {
     if (wording.getState().status === 'checking') void wording.checkAvailable()
@@ -73,11 +75,22 @@ export function LlmWordingPanel({ plan, draft, onUse, children }: LlmWordingPane
   if (state.status === 'checking') {
     top = <p className={styles.body}>Checking this laptop…</p>
   } else if (state.status === 'unavailable') {
-    top = (
-      <>
-        <p className={styles.stateTitle}>The writing AI is off on this laptop</p>
-        <p className={styles.body}>This laptop can't run it. The plan still works: approve it as listed, or write the wording yourself.</p>
-      </>
+    // 19h: the panel collapses to one row; the plan is complete without it.
+    return (
+      <section className={styles.panel} aria-label="Wording (optional)">
+        <div className={styles.offRow}>
+          <p className={styles.offText}>
+            <InfoIcon size={20} weight="bold" aria-hidden />
+            Wording is optional. The plan on the left is complete.
+          </p>
+          {!writeOwn && (
+            <Button variant="text" onClick={() => setWriteOwn(true)}>
+              Write the wording yourself
+            </Button>
+          )}
+        </div>
+        {writeOwn && children && <div className={styles.slot}>{children}</div>}
+      </section>
     )
   } else if (stale) {
     top = (
