@@ -2,6 +2,7 @@ import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
 import { CheckedWording } from './CheckedWording'
+import { DoctorTeamOrder } from './DoctorTeamOrder'
 import { LogTable } from './LogPage'
 import { MergedTable } from './MergedPage'
 import { mergedView } from './merged'
@@ -30,6 +31,20 @@ describe('laptop screens', () => {
     expect(table).toMatch(/Bagong Silang-D Priority \d{1,2}:\d{2} [AP]M · #3 142–145 6 0 10 0/)
     expect(table).toContain('4 of 5 barangays 238–256 6 0 144 30')
     expect(html).not.toContain('<a ') // rows open nothing (the detail isn't designed)
+  })
+
+  it('18d: the doctor-team order, in priority order, with the legend, the Priority pill and a text line per bar', async () => {
+    const { plan } = await sampleState()
+    const html = renderToStaticMarkup(createElement(DoctorTeamOrder, { plan: plan! }))
+    const panel = text(html)
+    expect(panel).toContain(
+      'Doctor-team order Made by fixed rules from the counts: URGENT referrals count 3 times, fast-breathing referrals 2 times, people in the watch window once.',
+    )
+    expect(panel).toContain('URGENT referrals × 3 Fast-breathing referrals × 2 In the watch window × 1')
+    expect(panel).toMatch(/^.* × 1 Bagong Silang-D Priority \S+ score \S+ = URGENT referrals \S+ × 3 \+ fast-breathing referrals \S+ × 2 \+ in the watch window \S+ × 1/)
+    expect(html.match(/<li class="[^"]*row/g)).toHaveLength(plan!.priority.length)
+    expect(html).not.toContain('<tr') // never table rows: the merged table's rows keep their names
+    expect(html).not.toContain('fill"') // nothing just landed: static bars
   })
 
   it('19a: the steps, the dose note, an empty wording box and Approve; the AI panel slot gets the plan and template', async () => {

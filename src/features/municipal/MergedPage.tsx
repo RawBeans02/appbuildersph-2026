@@ -3,7 +3,9 @@ import { useState } from 'react'
 import { Button, ButtonLink, Pill, StateBlock } from '../../components'
 import { cx } from '../../components/cx'
 import { useDbQuery } from '../../data/db/useDbQuery'
+import type { MunicipalPlan } from '../../rules/plan'
 import { nameOf } from './counts'
+import { DoctorTeamOrder } from './DoctorTeamOrder'
 import { firstShowing, newestScanned } from './justReceived'
 import { LaptopFrame } from './LaptopFrame'
 import { mergedView, type MergedCells, type MergedView } from './merged'
@@ -79,16 +81,7 @@ export default function MergedPage() {
           paired phone's key. Scan it again.
         </p>
       )}
-      <MergedTable view={view} newest={newest} />
-      {view.partial && <p className={styles.partial}>{view.partial}</p>}
-      {view.why && (
-        <div className={styles.why}>
-          <FlagIcon size={22} weight="bold" className={styles.whyIcon} aria-hidden />
-          <p>
-            <strong>Why {view.why.name} first:</strong> {view.why.reason}
-          </p>
-        </div>
-      )}
+      <MergedBody plan={plan} view={view} newest={newest} />
       <p className={styles.footnote}>
         Ranges include counts sent as “&lt;5” (1 to 4 people), which phones use to protect small households. No names,
         birthdays or addresses reach this laptop.
@@ -97,10 +90,34 @@ export default function MergedPage() {
   )
 }
 
-// `newest`: the row that just came in (18c), "Just now" on --ok-tint for the
-// visit; it lands the first time the merged view shows it.
-export function MergedTable({ view, newest }: { view: MergedView; newest?: { barangay: string; id: string } }) {
+type Newest = { barangay: string; id: string }
+
+// 18d's doctor-team order, then why the first comes first, then the table.
+// The report that just came in lands (18c) and its bar fills (18d) the first
+// time the merged view shows it.
+function MergedBody({ plan, view, newest }: { plan: MunicipalPlan | null; view: MergedView; newest?: Newest }) {
   const [landId] = useState(() => (newest && firstShowing(newest.id) ? newest.id : null))
+  const landing = newest !== undefined && landId === newest.id
+  return (
+    <>
+      {plan && <DoctorTeamOrder plan={plan} filling={landing ? newest.barangay : undefined} />}
+      {view.why && (
+        <div className={styles.why}>
+          <FlagIcon size={22} weight="bold" className={styles.whyIcon} aria-hidden />
+          <p>
+            <strong>Why {view.why.name} first:</strong> {view.why.reason}
+          </p>
+        </div>
+      )}
+      <MergedTable view={view} newest={newest} land={landing} />
+      {view.partial && <p className={styles.partial}>{view.partial}</p>}
+    </>
+  )
+}
+
+// `newest`: the row that just came in (18c), "Just now" on --ok-tint for the
+// visit; `land` plays its arrival (the first time the merged view shows it).
+export function MergedTable({ view, newest, land = false }: { view: MergedView; newest?: Newest; land?: boolean }) {
   return (
     <table className={styles.table}>
       <colgroup>
@@ -144,7 +161,7 @@ export function MergedTable({ view, newest }: { view: MergedView; newest?: { bar
               className={cx(
                 row.priority && styles.priority,
                 newest?.barangay === row.barangay && styles.justNow,
-                newest?.barangay === row.barangay && landId === newest.id && 'land',
+                newest?.barangay === row.barangay && land && 'land',
               )}
             >
               <th scope="row">
