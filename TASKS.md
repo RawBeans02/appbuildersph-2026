@@ -19,12 +19,14 @@ Every task names the files or folders it **owns**, so agents pushing straight to
 
 ## Now (the wow flow)
 - [ ] todo · Claude Design pass 1: design system (tokens) + every wow-flow screen in all states (default, loading, empty, error), **plus the model download/initialization progress, "running on this device" and offline indicator states** → `design/` + `design/README.md` · [lead] · owns: `design/`
-- [ ] doing · Scaffold + first deploy, **idea-agnostic, no designed UI** (~30–45 min) · [sr] · owns: `package.json`, the lockfile, `vite.config.ts`, `tsconfig*.json`, the ESLint config, `index.html`, `vercel.json`, `public/`, `src/main.tsx`, `src/App.tsx` (placeholder), `src/lib/`, `docs/OFFLINE-SMOKE-TEST.md`
+- [ ] doing · Scaffold + first deploy, **idea-agnostic, no designed UI** (~30–45 min) · [sr] · owns: `package.json`, the lockfile, `vite.config.ts`, `tsconfig*.json`, the ESLint config, `index.html`, `vercel.json`, `public/`, `src/main.tsx`, `src/App.tsx` (placeholder), `src/lib/`, `docs/OFFLINE-SMOKE-TEST.md`, `docs/DEPLOY.md`
   - Vite + React + TS; npm scripts `dev`, `build`, `preview`, `typecheck`, `lint`, `test` (Vitest, with at least one real test) so CI can call them.
   - PWA shell with `vite-plugin-pwa`: manifest, service worker precaching the app shell, and an offline fallback. The hello page is a plain, unstyled placeholder (no product name, no theme, no shadcn).
   - `src/lib/capabilities.ts`: WebGPU present (and an adapter available), `navigator.deviceMemory` where supported, storage estimate, `navigator.storage.persist()`. Unit-tested.
   - `src/lib/useOnlineStatus.ts`: online/offline status hook.
   - `vercel.json`: SPA fallback, plus the COOP/COEP headers written in but commented out (or behind a flag) until a runtime needs them.
+  - Done differently: JSON has no comments and Vercel rejects unknown keys, so the COOP/COEP block waits, ready to paste, in `docs/DEPLOY.md` (with the `credentialless` vs `require-corp` and service-worker caveats). The placeholder page shows "Cross-origin isolated: yes/no" to check it after.
+  - NEEDS DESIGN: app icon (192 and 512 px PNG, plus a maskable version), favicon, and the manifest name/short name/theme and background colors. The manifest has a placeholder name, white colors and no icons until then, so browsers won't offer to install it yet; the offline shell works without them.
   - `docs/OFFLINE-SMOKE-TEST.md`: load the live URL, go offline, reload, the shell still works. Run it on the first deploy and record the result (device, browser) under this task.
   - `npm install` and production builds only through the guard.
   - Hosting: **Vercel, a NEW project on the owner's personal account**, linked to this repo only; `main` deploys to production. Never touch any other Vercel project. The owner does the Vercel login and the GitHub-app repo selection ("Only select repositories"); give him the exact clicks or command.

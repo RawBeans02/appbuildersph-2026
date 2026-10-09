@@ -1,9 +1,97 @@
+import { useEffect, useState } from 'react'
+import {
+  checkCapabilities,
+  requestPersistentStorage,
+  type DeviceCapabilities,
+  type WebGPUSupport,
+} from './lib/capabilities'
+import { useOnlineStatus } from './lib/useOnlineStatus'
+
 // Placeholder until the designed screens land from design/. Unstyled on purpose.
+// It lists what this device supports, so we can check phones and laptops on the live URL.
+
+function formatBytes(bytes: number): string {
+  return bytes >= 1e9 ? `${(bytes / 1e9).toFixed(1)} GB` : `${Math.round(bytes / 1e6)} MB`
+}
+
+function describeWebGPU(webgpu: WebGPUSupport): string {
+  switch (webgpu.status) {
+    case 'unsupported':
+      return 'Not supported in this browser'
+    case 'no-adapter':
+      return 'Supported, but no usable GPU'
+    case 'available':
+      return [
+        `Available (${[webgpu.vendor, webgpu.architecture].filter(Boolean).join(' ') || 'unknown GPU'})`,
+        `shader-f16 ${webgpu.shaderF16 ? 'yes' : 'no'}`,
+        `max buffer ${formatBytes(webgpu.maxBufferSize)}`,
+        webgpu.isFallbackAdapter ? 'software fallback' : '',
+      ]
+        .filter(Boolean)
+        .join(', ')
+  }
+}
+
+function describePersisted(persisted: boolean | null): string {
+  if (persisted === null) return 'Not supported'
+  return persisted ? 'Yes' : 'No'
+}
+
 export default function App() {
+  const online = useOnlineStatus()
+  const [caps, setCaps] = useState<DeviceCapabilities | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    checkCapabilities().then((result) => {
+      if (!cancelled) setCaps(result)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  async function askForPersistentStorage() {
+    const persisted = await requestPersistentStorage()
+    setCaps((current) => current && { ...current, persisted })
+  }
+
   return (
     <main>
       <h1>Placeholder</h1>
       <p>The app shell is live. The designed screens replace this page.</p>
+      <p>Network: {online ? 'Online' : 'Offline'}</p>
+
+      <h2>Device check</h2>
+      {caps === null ? (
+        <p>Checking this device…</p>
+      ) : (
+        <dl>
+          <dt>WebGPU</dt>
+          <dd>{describeWebGPU(caps.webgpu)}</dd>
+          <dt>Device memory</dt>
+          <dd>{caps.deviceMemoryGB === null ? 'Not reported' : `${caps.deviceMemoryGB} GB (browser-rounded)`}</dd>
+          <dt>CPU threads</dt>
+          <dd>{caps.logicalCores ?? 'Not reported'}</dd>
+          <dt>Storage</dt>
+          <dd>
+            {caps.storage === null
+              ? 'Not reported'
+              : `${formatBytes(caps.storage.usageBytes)} used of ${formatBytes(caps.storage.quotaBytes)} quota`}
+          </dd>
+          <dt>Persistent storage</dt>
+          <dd>
+            {describePersisted(caps.persisted)}{' '}
+            {caps.persisted === false && (
+              <button type="button" onClick={askForPersistentStorage}>
+                Request
+              </button>
+            )}
+          </dd>
+          <dt>Cross-origin isolated</dt>
+          <dd>{caps.crossOriginIsolated ? 'Yes' : 'No'}</dd>
+        </dl>
+      )}
     </main>
   )
 }
