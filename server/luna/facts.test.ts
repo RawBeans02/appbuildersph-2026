@@ -1,0 +1,103 @@
+import { describe, expect, it } from 'vitest'
+import { scenarioPayloads } from '../test/lunaScenario.js'
+import { checkAlertText } from './check.js'
+import { alertCandidates, MAX_ALERTS, type AlertCandidate } from './facts.js'
+
+const candidates = alertCandidates(scenarioPayloads())
+const byKind = (kind: AlertCandidate['kind'], barangay?: string) =>
+  candidates.find((candidate) => candidate.kind === kind && (barangay === undefined || candidate.barangay === barangay))!
+
+describe('alert facts', () => {
+  it('follow the plan rules: doctor team first, the stock move, then watch alerts', () => {
+    expect(candidates.map((candidate) => [candidate.kind, candidate.barangay, candidate.audience])).toEqual([
+      ['doctor-team', 'SID-MAL', ['SID-MAL']],
+      ['move-stock', 'SID-BGS', ['SID-BGS', 'SID-MAL']],
+      ['watch', 'SID-MAL', ['SID-MAL']],
+      ['watch', 'SID-RIV', ['SID-RIV']],
+    ])
+    // Urgent "<5" ×3 (3–12) + fast-breathing 6 ×2 + 12 in the window: a range, as on the laptop.
+    expect(byKind('doctor-team').facts).toMatchObject({ score: { min: 27, max: 36 }, urgentReferrals: '<5', inWatchWindow: 12 })
+    expect(byKind('move-stock').facts).toMatchObject({ from: 'SID-BGS', to: 'SID-MAL', capsulesUpTo: 30, toOnHand: 10 })
+  })
+
+  it('are deterministic: same reports in any order, same alerts and wording', () => {
+    expect(alertCandidates(scenarioPayloads())).toEqual(candidates)
+    expect(alertCandidates([...scenarioPayloads()].reverse())).toEqual(candidates)
+    expect(JSON.stringify(alertCandidates(scenarioPayloads()))).toBe(JSON.stringify(candidates))
+  })
+
+  it('hold only codes, demo names, the week, counts and ranges', () => {
+    for (const candidate of candidates) {
+      const values = JSON.stringify(candidate.facts).match(/"[^"]*"/g) ?? []
+      for (const value of values) {
+        expect(value).toMatch(/^"(?:[a-zA-Z]+|SID|SID-[A-Z]{3}|2026-W\d\d|<5|[A-Z][a-z]+(?: [A-Z][a-z]+)?-D|doctor-team|move-stock)"$/)
+      }
+    }
+  })
+
+  it('write the template from the facts alone', () => {
+    expect(byKind('doctor-team').templateText).toBe(
+      'Send a doctor team to Maligaya-D first this week (2026-W41). Maligaya-D has the highest priority score, 27–36: ' +
+        '<5 urgent danger-sign referrals ×3, 6 fast-breathing referrals ×2 and 12 residents in the leptospirosis watch window ×1.',
+    )
+    expect(byKind('move-stock').templateText).toContain('Move up to 30 doxycycline capsules that expire within 6 weeks from Bagong Silang-D to Maligaya-D')
+    expect(byKind('watch', 'SID-RIV').templateText).toContain('Riverside-D has 7 residents in the leptospirosis watch window this week (2026-W41)')
+  })
+
+  it('give nothing when there are no reports, and at most MAX_ALERTS', () => {
+    expect(alertCandidates([])).toEqual([])
+    expect(candidates.length).toBeLessThanOrEqual(MAX_ALERTS)
+  })
+})
+
+describe('the wording check (the laptop panel’s positional check)', () => {
+  it('passes every template against its own facts', () => {
+    for (const candidate of candidates) expect(checkAlertText(candidate.templateText, candidate)).toEqual({ ok: true })
+  })
+
+  it('passes a faithful rewording', () => {
+    const move = byKind('move-stock')
+    const text =
+      'If the municipal health officer agrees, move up to 30 doxycycline capsules expiring within 6 weeks from Bagong Silang-D to Maligaya-D. ' +
+      'Doxycycline is given only after consultation with a health professional.'
+    expect(checkAlertText(text, move)).toEqual({ ok: true })
+    const team = byKind('doctor-team')
+    expect(checkAlertText('Maligaya-D comes first for a doctor team in 2026-W41: priority score 27–36, from <5 urgent referrals, 6 fast-breathing referrals and 12 people in the watch window.', team)).toEqual({ ok: true })
+  })
+
+  const rejects = (text: string, candidate: AlertCandidate) => {
+    const result = checkAlertText(text, candidate)
+    expect(result.ok).toBe(false)
+    return result.ok ? [] : result.reasons
+  }
+
+  it('rejects a changed or extra number', () => {
+    const team = byKind('doctor-team')
+    expect(rejects(team.templateText.replace('27–36', '27–37'), team).join(' ')).toMatch(/numbers that are not in the plan: 37/)
+    expect(rejects(`${team.templateText} About 40 more people may follow.`, team).join(' ')).toMatch(/40/)
+    const watch = byKind('watch', 'SID-RIV')
+    expect(rejects(watch.templateText.replace('has 7 residents', 'has 12 residents'), watch).join(' ')).toMatch(/score|12/)
+  })
+
+  it('rejects a dose, a schedule or a diagnosis', () => {
+    const move = byKind('move-stock')
+    expect(rejects(`${move.templateText} Give each exposed person one dose.`, move).join(' ')).toMatch(/dose|per person/)
+    expect(rejects(`${move.templateText} Take it once a day.`, move).join(' ')).toMatch(/schedule|take medicine/)
+    const watch = byKind('watch', 'SID-MAL')
+    expect(rejects(`${watch.templateText} This is a leptospirosis diagnosis.`, watch).join(' ')).toMatch(/diagnosis/)
+  })
+
+  it('rejects a new barangay or a different stock move', () => {
+    const watch = byKind('watch', 'SID-RIV')
+    expect(rejects(`${watch.templateText} Mabini-D should also prepare.`, watch).join(' ')).toMatch(/Mabini-D/)
+    const move = byKind('move-stock')
+    const flipped = move.templateText.replace('from Bagong Silang-D to Maligaya-D', 'from Maligaya-D to Bagong Silang-D')
+    expect(rejects(flipped, move).length).toBeGreaterThan(0)
+  })
+
+  it('rejects a link and an overlong text', () => {
+    const team = byKind('doctor-team')
+    expect(rejects(`${team.templateText} See https://example.com`, team)).toEqual(['The wording adds a link.'])
+    expect(rejects(team.templateText.repeat(5), team).join(' ')).toMatch(/longer than/)
+  })
+})

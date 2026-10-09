@@ -1,5 +1,6 @@
 import { BARANGAY_PATTERN, MUNICIPALITY_PATTERN, isPlainObject, toPublicJwk, type PublicJwk } from '../src/qr/index.js'
 import { HttpError } from './http.js'
+import { MAX_ALERT_TEXT } from './luna/check.js'
 import {
   FINGERPRINT_PATTERN,
   MAX_CODE_LENGTH,
@@ -7,6 +8,7 @@ import {
   MAX_SYNC_KEYS,
   MAX_SYNC_REPORTS,
   NONCE_PATTERN,
+  ROLE_PATTERN,
   type EnrollBody,
   type SignedEnvelope,
   type SyncData,
@@ -91,4 +93,50 @@ export function validateSyncData(value: unknown): SyncData {
     return text
   })
   return { barangayKeys: keys, reports: texts }
+}
+
+// --- Phase 2 alerts ------------------------------------------------------------
+
+const ALERT_ID = /^\d{1,18}$/
+// Printable text and line breaks only (no other control characters).
+const isPlainText = (text: string) =>
+  [...text].every((char) => char === '\n' || (char.charCodeAt(0) >= 0x20 && char.charCodeAt(0) !== 0x7f))
+
+function alertId(value: unknown): string {
+  if (typeof value !== 'string' || !ALERT_ID.test(value)) bad('id must be an alert id (digits).')
+  return value
+}
+
+function role(value: unknown, what: string): string {
+  if (typeof value !== 'string' || !ROLE_PATTERN.test(value)) {
+    bad(`${what} must be a role of 3 to 60 letters, e.g. Provincial health officer (a role, not a name).`)
+  }
+  return value
+}
+
+export function validateDraftBody(value: unknown): { municipality: string } {
+  const body = object(value, ['municipality'], 'The body')
+  return { municipality: municipalityOf(body.municipality) }
+}
+
+export function validateApproveBody(value: unknown): { id: string; role: string; text?: string } {
+  const withText = isPlainObject(value) && Object.hasOwn(value, 'text')
+  const body = object(value, withText ? ['id', 'approverRole', 'text'] : ['id', 'approverRole'], 'The body')
+  const result = { id: alertId(body.id), role: role(body.approverRole, 'approverRole') }
+  if (!withText) return result
+  const { text } = body
+  if (typeof text !== 'string' || text.trim().length === 0 || text.length > MAX_ALERT_TEXT || !isPlainText(text)) {
+    bad(`text must be plain text of 1 to ${MAX_ALERT_TEXT} characters.`)
+  }
+  return { ...result, text }
+}
+
+export function validateRejectBody(value: unknown): { id: string; role: string } {
+  const body = object(value, ['id', 'role'], 'The body')
+  return { id: alertId(body.id), role: role(body.role, 'role') }
+}
+
+// The inbox asks for nothing: who it's for comes from the signing key.
+export function validateInboxData(value: unknown): void {
+  object(value, [], 'data')
 }

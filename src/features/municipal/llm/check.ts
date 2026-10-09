@@ -1,4 +1,4 @@
-import { formatCount, formatRange, type Count, type CountRange } from '../../../qr'
+import { formatCount, formatRange, type Count, type CountRange } from '../../../qr/index.js'
 
 // Checks a model's draft against the rule-based plan it rewords. The draft is
 // offered only if every number in it is the plan's, each tied to the right

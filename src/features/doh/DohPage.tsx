@@ -7,6 +7,7 @@ import { useOnlineStatus } from '../../lib/useOnlineStatus'
 import type { ReportsResponse } from '../../../server/protocol'
 import { problemText, type ApiResult, type SyncProblem } from '../municipal/sync/client'
 import { SecretInput } from '../municipal/sync/SecretInput'
+import { AlertsPanel } from './AlertsPanel'
 import styles from './DohPage.module.css'
 import { dohView, fetchReports, savedCode, type DohCells, type DohView } from './view'
 
@@ -36,6 +37,8 @@ type Load =
 export default function DohPage() {
   const online = useOnlineStatus()
   const [load, setLoad] = useState<Load>(() => (savedCode.get() ? { status: 'loading' } : { status: 'code', problem: null }))
+  // The code typed in this tab (savedCode keeps it only once the server took it).
+  const [activeCode, setActiveCode] = useState<string | null>(() => savedCode.get())
 
   // The server's answer for `code`, as the page's state.
   const apply = useCallback((code: string, result: ApiResult<ReportsResponse>) => {
@@ -44,6 +47,7 @@ export default function DohPage() {
       setLoad({ status: 'ready', response: result.value })
     } else if (result.problem.kind === 'wrong-code') {
       savedCode.clear()
+      setActiveCode(null)
       setLoad({ status: 'code', problem: result.problem })
     } else {
       setLoad({ status: 'problem', problem: result.problem })
@@ -62,17 +66,19 @@ export default function DohPage() {
   }, [online, apply])
 
   const open = (code: string) => {
+    setActiveCode(code)
     setLoad({ status: 'loading' })
     void fetchReports(code, DEMO_MUNICIPALITY.code).then((result) => apply(code, result))
   }
 
   const forget = () => {
     savedCode.clear()
+    setActiveCode(null)
     setLoad({ status: 'code', problem: null })
   }
 
   const retry = () => {
-    const code = savedCode.get()
+    const code = activeCode ?? savedCode.get()
     if (code) open(code)
     else setLoad({ status: 'code', problem: null })
   }
@@ -125,6 +131,7 @@ export default function DohPage() {
       ) : (
         <Reports view={dohView(load.response)} />
       )}
+      {online && activeCode && (load.status === 'ready' || load.status === 'problem') && <AlertsPanel code={activeCode} />}
     </div>
   )
 }

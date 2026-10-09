@@ -5,6 +5,7 @@ import {
   signEnvelope,
   type EnrollResponse,
   type HealthResponse,
+  type InboxResponse,
   type SyncData,
   type SyncResponse,
 } from '../../../../server/protocol'
@@ -24,6 +25,10 @@ export type SyncProblem =
   | { kind: 'not-registered' }
   | { kind: 'clock' }
   | { kind: 'rate-limited'; retryAfter: number }
+  // The alerts (DOH view): an edited wording that didn't pass the check, with
+  // the check's reasons; an alert someone already decided.
+  | { kind: 'check-failed'; reasons: string[] }
+  | { kind: 'already-decided' }
   | { kind: 'failed' }
 
 export type ApiResult<T> = { ok: true; value: T } | { ok: false; problem: SyncProblem }
@@ -53,6 +58,12 @@ export async function callApi<T>(fetcher: Fetcher, path: string, init: RequestIn
       return { ok: false, problem: { kind: 'clock' } }
     case 'rate-limited':
       return { ok: false, problem: { kind: 'rate-limited', retryAfter: Math.max(1, Number(response.headers.get('retry-after')) || 60) } }
+    case 'check-failed': {
+      const reasons = isPlainObject(body) && Array.isArray(body.reasons) ? body.reasons.filter((r): r is string => typeof r === 'string') : []
+      return { ok: false, problem: { kind: 'check-failed', reasons } }
+    }
+    case 'already-decided':
+      return { ok: false, problem: { kind: 'already-decided' } }
     default:
       return { ok: false, problem: { kind: 'failed' } }
   }
@@ -82,6 +93,17 @@ export async function uploadSync(
   return callApi<SyncResponse>(fetcher, '/api/sync', { method: 'POST', headers: jsonHeaders(signed.signature), body: signed.body })
 }
 
+// The approved alerts for this device: a laptop's for its municipality, a
+// phone's for its barangay. Signed like a sync; nothing is stored.
+export async function fetchInbox(
+  device: { privateKey: CryptoKey; fingerprint: string },
+  fetcher: Fetcher = fetch,
+  now = new Date(),
+): Promise<ApiResult<InboxResponse>> {
+  const signed = await signEnvelope(device.privateKey, device.fingerprint, {}, { now })
+  return callApi<InboxResponse>(fetcher, '/api/inbox', { method: 'POST', headers: jsonHeaders(signed.signature), body: signed.body })
+}
+
 // Whether the server has sync set up; null when it can't be reached.
 export async function readHealth(fetcher: Fetcher = fetch): Promise<HealthResponse | null> {
   const result = await callApi<HealthResponse>(fetcher, '/api/health', { method: 'GET' })
@@ -103,6 +125,10 @@ export function problemText(problem: SyncProblem): { title: string; body: string
       return { title: "This laptop's clock is off", body: 'Set the date and time to automatic, then sync again.' }
     case 'rate-limited':
       return { title: 'Too many tries', body: `Wait ${problem.retryAfter} seconds, then try again.` }
+    case 'check-failed':
+      return { title: "The wording doesn't match the alert's facts", body: problem.reasons.join(' ') }
+    case 'already-decided':
+      return { title: 'Someone already decided this alert', body: 'The list now shows what was decided.' }
     case 'failed':
       return { title: "Sync didn't finish", body: 'Nothing on this laptop changed. Try again.' }
   }

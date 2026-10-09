@@ -121,9 +121,13 @@ export type ErrorCode =
   | 'bad-signature'
   | 'replayed'
   | 'wrong-code'
+  | 'not-found'
+  | 'already-decided'
+  | 'check-failed'
   | 'server-error'
 
-export type ErrorResponse = { ok: false; error: ErrorCode; message: string }
+// `reasons`: why an edited alert didn't pass the check (check-failed).
+export type ErrorResponse = { ok: false; error: ErrorCode; message: string; reasons?: string[] }
 
 export type HealthResponse = {
   ok: true
@@ -161,3 +165,71 @@ export async function signEnvelope<T>(
   }
   return signBody(privateKey, JSON.stringify(envelope))
 }
+
+// --- Phase 2 alerts (server/luna/) -------------------------------------------
+
+// Why the AI wording isn't used: switched off (LUNA_ENABLED), no key, no daily
+// limit set, the day's limit used up, or the model failed or wasn't reachable.
+export type AiOffReason = 'disabled' | 'no-key' | 'no-limit' | 'daily-limit'
+
+export type AiStatus = { model: string } & ({ on: true; callsToday: number; dailyLimit: number } | { on: false; reason: AiOffReason })
+
+export type AlertView = {
+  id: string
+  kind: 'doctor-team' | 'move-stock' | 'watch'
+  municipality: string
+  barangay: string
+  audience: string[]
+  epiWeek: string
+  // The wording offered (or approved): GPT-6 Luna's when it passed the check,
+  // else the template.
+  text: string
+  templateText: string
+  // Codes, demo place names, the ISO week, counts as sent ("<5") and ranges.
+  facts: Record<string, unknown>
+  source: 'luna' | 'template'
+  // Why GPT-6 Luna's wording was not used (its check failed), if it wasn't.
+  checkReasons: string[]
+  // Why the template is shown when the AI wasn't asked or didn't answer.
+  aiNote: string | null
+  status: 'draft' | 'approved' | 'rejected'
+  createdAt: string
+  // Roles, never names.
+  decidedByRole: string | null
+  decidedAt: string | null
+}
+
+// POST /api/alerts-draft { municipality } (view code).
+export type DraftAlertsResponse = { ok: true; ai: AiStatus; alerts: AlertView[] }
+
+export type AuditView = { at: string; actor: string; action: string; detail: Record<string, unknown> }
+
+// GET /api/alerts?municipality=SID (view code).
+export type AlertsResponse = { ok: true; ai: AiStatus; drafts: AlertView[]; decided: AlertView[]; audit: AuditView[] }
+
+// POST /api/alerts-approve { id, approverRole, text? } and
+// POST /api/alerts-reject { id, role } (view code).
+export type DecideResponse = { ok: true; alert: AlertView }
+
+// POST /api/inbox, signed like a sync (data: {}), by an enrolled laptop key
+// (its municipality's approved alerts) or a vouched phone key (its barangay's).
+export type InboxAlert = {
+  id: string
+  kind: AlertView['kind']
+  barangay: string
+  epiWeek: string
+  text: string
+  approvedAt: string
+  approvedByRole: string
+}
+
+export type InboxResponse = {
+  ok: true
+  scope: { device: 'laptop' | 'phone'; municipality: string; barangays: string[] | null }
+  checkedAt: string
+  alerts: InboxAlert[]
+}
+
+// A role the officer types when deciding, e.g. "Provincial health officer":
+// letters, spaces, dots, hyphens and apostrophes, 3 to 60 characters.
+export const ROLE_PATTERN = /^[A-Za-z][A-Za-z .'-]{2,59}$/

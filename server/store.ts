@@ -50,6 +50,43 @@ export type AuditEntry = {
 
 export type ReportWrite = 'stored' | 'kept-newer' | 'unchanged'
 
+export type AlertKind = 'doctor-team' | 'move-stock' | 'watch'
+export type AlertStatus = 'draft' | 'approved' | 'rejected'
+
+// An alert as drafted (server/luna/): the facts it's built from, the template
+// made from them, the wording offered (GPT-6 Luna's when it passed the check,
+// else the template) and, once a person decides, the decision.
+export type NewAlert = {
+  municipality: string
+  barangay: string
+  // The barangays whose phones read it once approved.
+  audience: string[]
+  epiWeek: string
+  kind: AlertKind
+  text: string
+  templateText: string
+  facts: unknown
+  source: 'luna' | 'template'
+  checkReasons: string[]
+  // Why the template is shown: the AI was off, failed or didn't pass the check.
+  aiNote: string | null
+  draftedBy: string
+  batch: string
+  createdAt: Date
+}
+
+export type AlertRecord = NewAlert & {
+  id: string
+  status: AlertStatus
+  // A role, never a person's name.
+  approvedByRole: string | null
+  approvedAt: Date | null
+  decidedByRole: string | null
+  decidedAt: Date | null
+}
+
+export type AlertDecision = { status: 'approved' | 'rejected'; role: string; at: Date; text: string }
+
 export interface Store {
   // Adds one hit to `key`'s window starting at `windowStart` and returns the
   // window's count. Drops windows that started before `purgeBefore`.
@@ -74,6 +111,22 @@ export interface Store {
   latestReports(municipality: string, limit: number): Promise<ReportRecord[]>
 
   audit(entry: AuditEntry): Promise<void>
+  // The newest audit rows of these actions for one municipality.
+  auditTrail(municipality: string, actions: readonly string[], limit: number): Promise<AuditEntry[]>
+
+  // Phase 2 alerts. One call to the model from the day's limit: false once
+  // `limit` calls were taken on `day` (YYYY-MM-DD).
+  takeLunaCall(day: string, limit: number): Promise<boolean>
+  lunaCalls(day: string): Promise<number>
+  insertAlerts(alerts: NewAlert[]): Promise<AlertRecord[]>
+  getAlert(id: string): Promise<AlertRecord | null>
+  // Decides a draft; null when it isn't a draft any more.
+  decideAlert(id: string, decision: AlertDecision): Promise<AlertRecord | null>
+  listAlerts(municipality: string, statuses: readonly AlertStatus[], limit: number): Promise<AlertRecord[]>
+  // Approved alerts of a municipality, or only those for these barangays.
+  approvedAlerts(municipality: string, barangays: readonly string[] | null, limit: number): Promise<AlertRecord[]>
+  // The barangays a phone key is vouched for (normally one).
+  phoneKeys(fingerprint: string): Promise<BarangayKeyRecord[]>
 
   // Runs `work` in one database transaction (all or nothing).
   transaction<T>(work: (store: Store) => Promise<T>): Promise<T>

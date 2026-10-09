@@ -6,12 +6,18 @@ import type { Store } from './store.js'
 // rate_limits table so every function instance shares them. Checked before
 // any code or signature is looked at, so they also slow down guessing.
 
-export type Route = 'enroll' | 'sync' | 'reports'
+export type Route = 'enroll' | 'sync' | 'reports' | 'alerts-draft' | 'alerts' | 'alerts-decide' | 'inbox'
 
 export const LIMITS: Record<Route, { max: number; windowMs: number }> = {
   enroll: { max: 5, windowMs: 10 * 60_000 },
   sync: { max: 30, windowMs: 60_000 },
   reports: { max: 60, windowMs: 60_000 },
+  // Each draft request can call the model once per alert (at most 8), on top
+  // of the daily limit (LUNA_DAILY_LIMIT).
+  'alerts-draft': { max: 5, windowMs: 10 * 60_000 },
+  alerts: { max: 60, windowMs: 60_000 },
+  'alerts-decide': { max: 30, windowMs: 60_000 },
+  inbox: { max: 30, windowMs: 60_000 },
 }
 
 // Windows older than this are deleted as new hits come in.
