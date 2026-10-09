@@ -7,7 +7,8 @@ import type { Store } from '../store.js'
 // and counts only ("SID" is the demo's San Isidro Demo).
 
 export const ENROLL_CODE = 'test-enroll-code'
-export const VIEW_CODE = 'test-view-code'
+// Both at least MIN_CODE_LENGTH (16) characters, as the server requires.
+export const VIEW_CODE = 'test-doh-view-code'
 // Not a real database: the unit tests hand the handlers an in-memory store.
 export const TEST_DATABASE_URL = 'postgres://unit-test.invalid/agapay'
 export const NOW = new Date('2026-10-10T01:00:00.000Z')
@@ -43,6 +44,7 @@ export function deps(store: Store, overrides: Partial<Deps['env']> = {}, now: Da
       databaseUrl: TEST_DATABASE_URL,
       enrollCode: ENROLL_CODE,
       viewCode: VIEW_CODE,
+      weakCodes: { enroll: false, view: false },
       // The AI is off unless a test turns it on, always with a mocked fetch.
       openaiApiKey: null,
       openaiModel: 'gpt-6-luna',

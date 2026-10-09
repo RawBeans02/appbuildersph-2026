@@ -101,10 +101,11 @@ export function resetHealthCache(): void {
   lastPing = null
 }
 
-// GET /api/health: whether each setting is present and the database answers.
-// Booleans only, never a value.
+// GET /api/health: whether each setting is present, whether each code is long
+// enough to be used, and whether the database answers. Booleans only, never a
+// value.
 export async function handleHealth(_request: Request, deps: Deps): Promise<Response> {
-  const { databaseUrl, enrollCode, viewCode } = deps.env
+  const { databaseUrl, enrollCode, viewCode, weakCodes } = deps.env
   let reachable = false
   if (databaseUrl) {
     const now = deps.now().getTime()
@@ -122,8 +123,12 @@ export async function handleHealth(_request: Request, deps: Deps): Promise<Respo
   const body: HealthResponse = {
     ok: true,
     database: { configured: databaseUrl !== null, reachable },
-    enrollConfigured: enrollCode !== null,
-    viewConfigured: viewCode !== null,
+    // Set at all; a code too short (MIN_CODE_LENGTH) is set but not strong
+    // enough, and its routes answer 503 "not configured".
+    enrollConfigured: enrollCode !== null || weakCodes.enroll,
+    viewConfigured: viewCode !== null || weakCodes.view,
+    enrollCodeStrongEnough: enrollCode !== null,
+    viewCodeStrongEnough: viewCode !== null,
   }
   return json(200, body)
 }

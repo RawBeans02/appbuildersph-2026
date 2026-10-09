@@ -136,8 +136,12 @@ export type ErrorResponse = { ok: false; error: ErrorCode; message: string; reas
 export type HealthResponse = {
   ok: true
   database: { configured: boolean; reachable: boolean }
+  // Whether each code is set at all…
   enrollConfigured: boolean
   viewConfigured: boolean
+  // …and long enough to be used (16 characters or more, after trimming).
+  enrollCodeStrongEnough: boolean
+  viewCodeStrongEnough: boolean
 }
 
 const encoder = new TextEncoder()

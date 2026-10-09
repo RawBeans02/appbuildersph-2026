@@ -168,7 +168,7 @@ describe('register and sync against the server handlers', () => {
   })
 
   it('reads the server health, or null when it cannot', async () => {
-    expect(await readHealth(fetcherFor(server))).toMatchObject({ database: { configured: true }, enrollConfigured: true })
+    expect(await readHealth(fetcherFor(server))).toMatchObject({ database: { configured: true }, enrollConfigured: true, enrollCodeStrongEnough: true })
     expect(await readHealth(async () => Promise.reject(new TypeError('offline')))).toBeNull()
   })
 })

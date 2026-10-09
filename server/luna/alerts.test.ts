@@ -18,6 +18,7 @@ const ENV: ServerEnv = {
   databaseUrl: 'postgres://unit-test.invalid/agapay',
   enrollCode: 'e',
   viewCode: 'v',
+  weakCodes: { enroll: false, view: false },
   openaiApiKey: 'test-key-not-real',
   openaiModel: 'gpt-6-luna',
   lunaEnabled: true,

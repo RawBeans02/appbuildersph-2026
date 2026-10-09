@@ -30,7 +30,8 @@ async function readSaved(): Promise<Saved> {
   return { enrollment, fingerprint: identity?.fingerprint ?? null, last }
 }
 
-const serverReady = (health: HealthResponse) => health.database.configured && health.enrollConfigured
+// The enroll code must be set and long enough (the server treats a short one as not set).
+const serverReady = (health: HealthResponse) => health.database.configured && health.enrollCodeStrongEnough
 
 export default function SyncPage() {
   const online = useOnlineStatus()

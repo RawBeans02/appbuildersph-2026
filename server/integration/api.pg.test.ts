@@ -261,6 +261,13 @@ describe('enroll, sync and the DOH view on Postgres', () => {
 
   it('reports a reachable database in health', async () => {
     const response = await handleHealth(new Request('https://agapay.test/api/health'), realDeps())
-    expect(await body(response)).toEqual({ ok: true, database: { configured: true, reachable: true }, enrollConfigured: true, viewConfigured: true })
+    expect(await body(response)).toEqual({
+      ok: true,
+      database: { configured: true, reachable: true },
+      enrollConfigured: true,
+      viewConfigured: true,
+      enrollCodeStrongEnough: true,
+      viewCodeStrongEnough: true,
+    })
   })
 })

@@ -113,6 +113,8 @@ describe('health', () => {
       database: { configured: true, reachable: true },
       enrollConfigured: true,
       viewConfigured: true,
+      enrollCodeStrongEnough: true,
+      viewCodeStrongEnough: true,
     } satisfies HealthResponse)
     expect(text).not.toContain('test-enroll-code')
     expect(text).not.toContain('unit-test.invalid')
@@ -122,7 +124,14 @@ describe('health', () => {
     const none = await body<HealthResponse>(
       await handleHealth(new Request('https://agapay.test/api/health'), deps(store, { databaseUrl: null, enrollCode: null, viewCode: null })),
     )
-    expect(none).toEqual({ ok: true, database: { configured: false, reachable: false }, enrollConfigured: false, viewConfigured: false })
+    expect(none).toEqual({
+      ok: true,
+      database: { configured: false, reachable: false },
+      enrollConfigured: false,
+      viewConfigured: false,
+      enrollCodeStrongEnough: false,
+      viewCodeStrongEnough: false,
+    })
     const down = deps(store)
     down.openStore = async () => Promise.reject(new Error('connection refused'))
     const result = await body<HealthResponse>(await handleHealth(new Request('https://agapay.test/api/health'), down))
