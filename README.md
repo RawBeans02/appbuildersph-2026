@@ -12,7 +12,6 @@ Named Agapay until Oct 9, 9 PM, when the team renamed it AgapayMo (internal iden
 | **Demo video** | _TBD_ |
 | **X / LinkedIn post (video)** | _TBD_ |
 
-> This README is filled in as the build lands. Sections marked _TBD_ are not done yet.
 
 ## The problem
 After a typhoon, a flooded barangay can be without signal for days. That is exactly when its **barangay health workers** (BHWs, volunteers using their own phones) have the most to track:
@@ -63,7 +62,7 @@ prepared. The final video recording and posted submission link remain pending.
 ## What runs locally
 | Part | Runs on | Model / runtime |
 |---|---|---|
-| App shell (HTML, JS, CSS), cached by a service worker | The user's browser | No model yet |
+| App shell (HTML, JS, CSS), cached by a service worker | The user's browser | No model |
 | Records (residents, flood exposures, breathing checks, medicine stock, flags, approvals; on the municipal laptop also the paired phones' public keys, the received QR codes and the approved plans) | IndexedDB in the user's browser; they never leave the device except as the de-identified QR | No model |
 | De-identified export (Send screen): counts by age band, small numbers shown as "<5", signed with the phone's own key and drawn as a QR | The user's browser (Web Crypto ECDSA P-256; the private key can't be read out) | No model |
 | Approved return instructions (`AGPR1`): approval ID, municipality, recipient, reporting week, approval time/role, structured doctor-team and stock-transfer actions, municipal public key and signature; first trust requires fingerprint comparison; duplicate receipts are idempotent and older approvals cannot replace newer ones | ECDSA P-256 in the laptop and phone browsers; trusted keys and instructions in the existing IndexedDB metadata store. No cloud enrollment or phase 2 required | No model |
@@ -151,7 +150,7 @@ The diagram, the pipelines, the key decisions and the limitations are in [`docs/
 | MediaPipe Pose Landmarker lite (BlazePose GHUM 3D lite: a pose detector and a 33-point landmark model), used by Hinga and the Hinga spike to find the torso | float16 (per the download path); parameters not stated by the source | 5,777,746 bytes | [Google MediaPipe model storage](https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task), listed in the [Pose Landmarker docs](https://developers.google.com/edge/mediapipe/solutions/vision/pose_landmarker); [model card](https://storage.googleapis.com/mediapipe-assets/Model%20Card%20BlazePose%20GHUM%203D.pdf) | Apache-2.0 (per the model card) |
 | YAMNet (an audio event classifier with 521 classes, trained on AudioSet), used by Hinga to notice crying during the count | float32 (per the download path); parameters not stated by the source | 4,126,810 bytes | [Google MediaPipe model storage](https://storage.googleapis.com/mediapipe-models/audio_classifier/yamnet/float32/1/yamnet.tflite), listed in the [Audio Classifier docs](https://developers.google.com/edge/mediapipe/solutions/audio/audio_classifier); original: [tensorflow/models `research/audioset/yamnet`](https://github.com/tensorflow/models/tree/master/research/audioset/yamnet) | Apache-2.0 (the tensorflow/models LICENSE covers `research/`) |
 | Tesseract `eng` LSTM, `4.0.0_best_int`: fallback medicine-box reader for iPhone, **off** unless switched on in `src/inference/ocr/engine.ts` | Not stated by the source; integer-quantized ("best_int") | 2,952,873 bytes (gzip), plus the Tesseract.js worker (111,307 bytes) and its core with WebAssembly built in (3,899,472 bytes) | [`@tesseract.js-data/eng`](https://www.npmjs.com/package/@tesseract.js-data/eng) 1.0.0; original: [tesseract-ocr/tessdata](https://github.com/tesseract-ocr/tessdata) | Apache-2.0 (data), MIT (npm package) |
-| Qwen2.5-0.5B-Instruct, WebLLM build `Qwen2.5-0.5B-Instruct-q4f16_1-MLC` (`q4f32_1` when the GPU lacks shader-f16): the optional AI wording of the municipal plan, laptop only | 0.5B parameters (model name); 4-bit weights (WebLLM `q4f16_1` / `q4f32_1`) | _TBD (measured on first run)_ | Weights: [mlc-ai/Qwen2.5-0.5B-Instruct-q4f16_1-MLC](https://huggingface.co/mlc-ai/Qwen2.5-0.5B-Instruct-q4f16_1-MLC); WebGPU library: [mlc-ai/binary-mlc-llm-libs](https://github.com/mlc-ai/binary-mlc-llm-libs); original: [Qwen/Qwen2.5-0.5B-Instruct](https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct) | Apache-2.0 (the original model). The MLC conversion and library repositories state no license of their own |
+| Qwen2.5-0.5B-Instruct, WebLLM build `Qwen2.5-0.5B-Instruct-q4f16_1-MLC` (`q4f32_1` when the GPU lacks shader-f16): the optional AI wording of the municipal plan, laptop only | 0.5B parameters (model name); 4-bit weights (WebLLM `q4f16_1` / `q4f32_1`) | Not measured on our devices (the panel shows the MB fetched during the first download) | Weights: [mlc-ai/Qwen2.5-0.5B-Instruct-q4f16_1-MLC](https://huggingface.co/mlc-ai/Qwen2.5-0.5B-Instruct-q4f16_1-MLC); WebGPU library: [mlc-ai/binary-mlc-llm-libs](https://github.com/mlc-ai/binary-mlc-llm-libs); original: [Qwen/Qwen2.5-0.5B-Instruct](https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct) | Apache-2.0 (the original model). The MLC conversion and library repositories state no license of their own |
 | GPT-6 Luna (OpenAI, `gpt-6-luna`, or the model named in `OPENAI_CHAT_MODEL`): the optional phase 2 alert wording, called server-side only (`server/luna/draft.ts`), never by the browser and never by the offline core. Off unless the owner sets `LUNA_ENABLED`, a key and a daily limit (`LUNA_DAILY_LIMIT`); otherwise every alert uses its template wording. It gets one alert's facts (barangay codes and demo place names, the ISO week, counts as sent with "<5", ranges) and the template, nothing else; its reply is checked like the laptop's AI wording and a person approves every alert | Not stated by OpenAI (closed model) | None: it runs in OpenAI's cloud | [OpenAI API](https://platform.openai.com), Chat Completions | Proprietary (OpenAI's terms). The one closed model, disclosed as the exception in `CLAUDE.md` |
 
 Self-hosted, unmodified: the OCR models in `public/models/ppocr/` and the pose model and YAMNet in `public/models/mediapipe/`, each with checksums, sources and the license text in a README there.
@@ -227,15 +226,16 @@ A cloud "Jr. Builder" agent named in early commits was planned but never used.
 | [MediaPipe Tasks Audio](https://github.com/google-ai-edge/mediapipe) (`@mediapipe/tasks-audio` 1.0.1) | On-device audio classification (WebAssembly) for Hinga's cry check; copied into the site at build time the same way | Apache-2.0 |
 | [Pillow](https://python-pillow.org) | Renders the synthetic test label (`src/inference/ocr/fixtures/make_label.py`) and the synthetic demo label (`scripts/demo-label/make_label.py`); a development tool, not shipped | MIT-CMU |
 
-## Lighthouse (mobile, measured at feature freeze)
+## Lighthouse (mobile)
 Measured with Lighthouse 12.8.2 (mobile emulation, simulated throttling), the same lab test PageSpeed Insights runs, by the on-demand GitHub Actions workflow `.github/workflows/lighthouse.yml` against the live URL. The full report is kept as the run's artifact.
 
 | Run | Performance | Accessibility | Best Practices | SEO |
 |---|---|---|---|---|
+| [Sat Oct 10, 4:35 AM PH](https://github.com/RawBeans02/appbuildersph-2026/actions/runs/37987917415), https://agapaymo.pages.dev at `0432022` (after design pass 2), median of 3 runs (Performance 80, 87, 89; median LCP 4.0 s) | 87 | 100 | 100 | 100 |
 | [Fri Oct 9, 6:09 PM PH](https://github.com/RawBeans02/appbuildersph-2026/actions/runs/37915694829), median of 3 runs (Performance 66, 99, 99) | 99 | 100 | 100 | 100 |
 | [Fri Oct 9, 5:58 PM PH](https://github.com/RawBeans02/appbuildersph-2026/actions/runs/37914606334), single run, before the `robots.txt` and first-load fixes | 86 | 100 | 100 | 91 |
 
-Single runs vary on GitHub's shared runners (one of the three runs above scored 66, with 2,120 ms of blocking time), so we report the median of three and show every run. Re-measured at the feature freeze; the latest median is the one that counts. Accessibility is also checked on every push by axe-core on 14 screens (`docs/MEASUREMENTS.md`, method 6).
+Single runs vary on GitHub's shared runners (one of the three runs above scored 66, with 2,120 ms of blocking time), so we report the median of three and show every run. Each row names its date, host and build; the newest median counts. The Friday rows were measured on the first host (Vercel), before design pass 2. Accessibility is also checked on every push by axe-core on 16 screens, plus the phase 2 lock screen (`docs/MEASUREMENTS.md`, method 6).
 
 ## Team
 
@@ -250,4 +250,4 @@ Human rows stay pending until each member's actual work is confirmed.
 | Adam Arous | takashii18 | Support: idea creation and design | _TBD_ |
 | Gabriel Syd Paguio | Syd7 | Co-builder | The signed offline return QR from the laptop's approval to the barangay phone ([PR #7](https://github.com/RawBeans02/appbuildersph-2026/pull/7), with OpenAI Codex), and the local LLM cache and prompt fixes and their validation ([PR #8](https://github.com/RawBeans02/appbuildersph-2026/pull/8), with OpenAI Codex); more _TBD_ |
 
-The original core was built with the Lead and Sr. Builder AI sessions under the owner's direction. The offline return QR (PR #7) and the local LLM fixes (PR #8) add the Codex work disclosed above; PR #8's commit b015507 has no AI co-author line but is Codex work too. AI tools and Git authorship do not establish a person's actual contribution; the human contribution rows remain pending confirmation in `docs/FINAL-VALIDATION.md`.
+The original core was built with the Lead and Sr. Builder AI sessions under the owner's direction. The offline return QR (PR #7) and the local LLM fixes (PR #8) add the Codex work disclosed above; the `codex:` commits are Syd's Codex work, and two of them, 294aa38 (PR #7) and b015507 (PR #8), have no AI co-author line. AI tools and Git authorship do not establish a person's actual contribution; the human contribution rows remain pending confirmation in `docs/FINAL-VALIDATION.md`.

@@ -10,7 +10,7 @@ on:
     inputs:
       url:
         description: URL to test
-        default: https://appbuildersph-2026.vercel.app/
+        default: https://agapaymo.pages.dev/
         required: true
       runs:
         description: Number of runs (the median is reported)

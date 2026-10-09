@@ -1,6 +1,6 @@
 # Deploy
 
-The app is a static build (`dist/`) on **Vercel**. `main` deploys straight to production; there is no other environment.
+The app is a static build (`dist/`) on **Cloudflare Pages** at https://agapaymo.pages.dev since Sat 3:54 AM (the section "Live host: Cloudflare Pages" below). `main` deploys straight to production; there is no other environment. Vercel was the first host (until its daily deployment cap on Fri night) and still runs the optional phase 2 functions; its setup follows.
 
 ## First-time setup (the owner, once)
 1. Go to vercel.com and sign in to the owner's **personal** account.

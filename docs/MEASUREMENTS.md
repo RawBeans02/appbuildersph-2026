@@ -86,4 +86,3 @@ result decides the actual-phone S2 gate. Default-core build precache:
 | Oct 9, CI run 37905165994 | Demo label read offline: "Read on this phone in 1.2 s, after 0.6 s loading the reader for the first time" | `e2e/ocr-offline.spec.ts` log | GitHub Actions runner (not a phone) |
 | Oct 9, CI run 37904919331 | The same test: 1.4 s, after 0.7 s loading | `e2e/ocr-offline.spec.ts` log | GitHub Actions runner (not a phone) |
 | Oct 9, CI run 37897385876 | PP-OCRv5 on the synthetic label in Node: detection 366 ms, recognition 334 ms | `ocr.model.test.ts` log | GitHub Actions runner (not a phone) |
-| Oct 9 | Hinga's first pose model start: 6894 ms, in a background worker | Shown on `/hinga`, reported by the owner | The owner's laptop browser (exact laptop and browser to be filled in) |

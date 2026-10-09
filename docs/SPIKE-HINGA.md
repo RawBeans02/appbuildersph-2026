@@ -1,6 +1,6 @@
 # Hinga spike (S1): phone test protocol and results
 
-This throwaway spike decides whether Hinga, the camera breathing-rate check, can be built on a pose-tracked torso region. The kill call is at 7:00 PM (`TASKS.md`, decision points). The page is https://appbuildersph-2026.vercel.app/spike-hinga.html (not linked from the app).
+This throwaway spike decides whether Hinga, the camera breathing-rate check, can be built on a pose-tracked torso region. The kill call is at 7:00 PM (`TASKS.md`, decision points). The page is https://agapaymo.pages.dev/spike-hinga.html (not linked from the app).
 
 ## What the spike does
 1. The rear camera (about 640x480) films the person's upper body. MediaPipe Pose Landmarker lite (VIDEO mode, CPU, on the device) finds the shoulders and hips; their box is the torso region.

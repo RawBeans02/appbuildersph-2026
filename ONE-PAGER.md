@@ -13,7 +13,7 @@ Context: DOH reported 11,965 leptospirosis cases as of Sept 9, 2026, 46% higher 
 **Our solution (one sentence):** AgapayMo is an offline web app. On the BHW's phone, it checks a child's breathing rate with the camera (Hinga), turns a logged flood event into a leptospirosis watch list, and reads medicine-box lot and expiry dates to compare stock against need. It then passes only de-identified counts to the MHO's laptop by QR code, where a rule-based plan, optionally drafted by a local language model, waits for the officer's approval.
 
 **The wow flow, step by step (the ~1-minute video and the 5-minute live demo; airplane mode on from second one, "Runs on this phone" visible):**
-1. **Hinga:** the presenter breathes to a 45/min metronome as a "2-year-old"; the result is "Fast breathing for age: refer to the midwife or RHU now". Moving the phone makes it refuse to count.
+1. **Hinga** (live only if the phone trials pass; otherwise the guided hand count, said to be the fallback): the presenter breathes to a 45/min metronome as a "2-year-old"; the result is "Fast breathing for age: refer to the midwife or RHU now". Moving the phone makes it refuse to count.
 2. **Flood event:** log the flood and tap 3 households as exposed, which opens the day-5–15 watch window.
 3. **Stock:** scan a mock "DEMO" doxycycline box. The lot and expiry are read on the phone; the BHW confirms them.
 4. **Exposure × stock:** "12 exposed · 40 capsules · 30 expire in 6 weeks → flag for clinician review." Never a dose.
@@ -32,7 +32,7 @@ Context: DOH reported 11,965 leptospirosis cases as of Sept 9, 2026, 46% higher 
   - YAMNet cry detection
   - PP-OCRv5 mobile (ONNX Runtime Web, WASM), with Tesseract.js as the iPhone fallback
   - records in IndexedDB, and QR generation
-- **Laptop:** QR scanning, the merge and plan rules, and the optional AI wording: Qwen2.5-0.5B-Instruct (Apache-2.0) on WebLLM, WebGPU only; without WebGPU the template wording is used. The municipal laptop is our 8 GB M2 MacBook Air unless a teammate laptop is confirmed. An AMD (Lemonade on Ryzen AI) path only if a Ryzen AI laptop is confirmed by 7 PM.
+- **Laptop:** QR scanning, the merge and plan rules, and the optional AI wording: Qwen2.5-0.5B-Instruct (Apache-2.0) on WebLLM, WebGPU only; without WebGPU the template wording is used. The municipal laptop is our 8 GB M2 MacBook Air.
 
 Sizes go in the README as measured in our build.
 
@@ -57,7 +57,7 @@ Our difference: an ML-based check that refuses bad readings, built into the post
 - Frontend: Vite + React + TypeScript PWA (vite-plugin-pwa), static.
 - Data: IndexedDB on the device.
 - AI: MediaPipe Tasks (vision + audio), ONNX Runtime Web (PP-OCRv5), Tesseract.js fallback, WebLLM (laptop, optional).
-- Hosting: Vercel; CI: GitHub Actions (checks + offline e2e).
+- Hosting: Cloudflare Pages (https://agapaymo.pages.dev; Vercel until its daily deployment cap on Fri night, and for the phase 2 functions); CI: GitHub Actions (checks + offline e2e).
 
 **Out of scope for this build:**
 - dengue checks
