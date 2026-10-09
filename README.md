@@ -15,11 +15,26 @@ Built for the **AppBuildersPH Hackathon 2026** (Oct 9–10, 2026). Theme: **Loca
 > This README is filled in as the build lands. Sections marked _TBD_ are not done yet.
 
 ## The problem
-_TBD: the target user, the problem, and why it matters._
+After a typhoon, a flooded barangay can be without signal for days. That is exactly when its **barangay health workers** (BHWs, volunteers using their own phones) have the most to track:
+- **Leptospirosis:** who waded through floodwater, so they can be watched for symptoms 5 to 15 days later. DOH counted 11,965 leptospirosis cases as of Sept 9, 2026, 46% more than the same period last year ([Daily Tribune, Sept 29, 2026](https://tribune.net.ph/2026/09/29/leptospirosis-cases-dip-slightly-but-2026-total-still-up-46)).
+- **Children in the evacuation center:** which ones are breathing fast for their age, the WHO IMCI warning sign for pneumonia.
+- **Doxycycline on hand:** how much there is, and how much expires soon.
+
+The **municipal health officer** (MHO) decides where doctor teams and medicine go, but with paper records and no signal that picture arrives late. Agapay keeps all of it on the BHW's phone with no internet, and hands the MHO only the counts, by QR code.
 
 ## Try it
 - **Live URL:** https://appbuildersph-2026.vercel.app
-- **Offline test:** open the live URL once and wait until the model shows as ready. Then turn on airplane mode, reload, and use it. _(Exact steps TBD.)_
+- **Offline test (phone or laptop):**
+  1. Online, open the live URL and tap **Prepare for offline** (a one-time download of the on-device AI; sizes under "What requires internet").
+  2. Turn on airplane mode and reload.
+  3. **Phone:**
+     - **Watch list:** tap households HH-03, HH-07 and HH-10, then confirm.
+     - **Stock:** scan the synthetic demo label [`docs/demo/label-doxy-24A.png`](docs/demo/label-doxy-24A.png), shown on another screen, or type it in. Enter quantity 30 and confirm.
+     - **Compare:** it shows "12 exposed · 40 … · 30 expire within 6 weeks". Flag it.
+     - **Hinga:** check breathing with the camera, or count by hand.
+     - **Send:** shows the QR.
+  4. **Laptop (desktop Chrome):** open `/municipal`. Scan the phone's pairing QR, then its counts QR (or paste their text). Then Merged view → Plan → Approve → Approval log. The optional AI wording needs WebGPU and one online use first.
+  5. `/device` → **Reset sample data** puts the demo back to today's sample data without re-downloading the models.
 - **Run or recreate it locally:** needs Node.js 20.19+ (or 22.12+) and npm.
   ```sh
   npm ci            # install the exact versions in package-lock.json
@@ -57,7 +72,10 @@ _TBD: the target user, the problem, and why it matters._
 | App updates | When a new version is deployed, the service worker fetches the new app shell on the next online visit | The cached version keeps working offline |
 
 ## Why does this product benefit from running AI locally?
-_TBD: the answer, true to the code._
+- **It's needed when there is no signal.** The days after a typhoon are when phones have no data, and the health worker still has to check children and log exposures. Every AI step runs on the device: the camera breathing count, the cry check, the medicine-box reading, and the laptop's plan wording. Our CI tests run the app with the network cut off (see `e2e/`).
+- **The data is about children and patients.** Names, birth dates and households never leave the phone. Only signed, de-identified counts move, from one screen to the other by QR. There is no server at all.
+- **The breathing count needs live video.** It reads a steady stream of camera frames for a full minute. Sending that to a server would be slow, costly on mobile data, and impossible offline.
+- **No cost per use.** There are no API bills for a municipality, and it runs on the phones health workers already have.
 
 ## Related work
 Camera-based breath counting for the WHO IMCI fast-breathing check has prior art: [Breathwise](https://devpost.com/software/breathwise-j9pfb4) (Devpost, RevenueCat Shipaton 2026), an open-source pediatric respiratory-rate project on GitHub ([tthitima53-del/pediatric-rr-](https://github.com/tthitima53-del/pediatric-rr-)), the AIRR research project (Malaria Consortium), and [Lucy et al. 2021](https://pubmed.ncbi.nlm.nih.gov/34715683/) (smartphone video in children with pneumonia). We found Breathwise after choosing this idea. Agapay Hinga is our own implementation, built from scratch during the hackathon; no code from these projects was used. What's different: an ML pipeline (pose-tracked torso region, on-device cry detection, a motion-quality gate that refuses unreliable counts) and the barangay workflow around it (flood exposure → leptospirosis watch list → medicine stock → de-identified QR → municipal plan), all offline.
@@ -69,10 +87,30 @@ Offline health record systems also exist (iClinicSys and SHINE OS+ have offline 
 - Leptospirosis: symptoms 5 to 15 days after flood exposure, and doxycycline "may be given as prophylaxis to people exposed to floodwaters, but only after consultation with a health professional" (DOH Usec. Balboa, [Manila Times, Sept 3, 2026](https://www.manilatimes.net/2026/09/03/news/doh-leptospirosis-cases-in-ph-12-lower-than-last-year/2418017)). Agapay's watch window and its never-a-dose rule follow this.
 
 ## Architecture
-_TBD: a summary here; the diagram, decisions, the on-device AI pipeline and its limitations will be in `docs/ARCHITECTURE.md`._
+One offline-first web app (Vite, React, TypeScript, a service worker), static on Vercel.
+- **Phone screens:**
+  - Records live in IndexedDB.
+  - The models are downloaded once into Cache Storage and run in Web Workers: MediaPipe Pose and YAMNet for Hinga, PP-OCRv5 on ONNX Runtime Web (WebAssembly) for the medicine-box reader.
+  - Fixed, unit-tested rules make every decision: the WHO IMCI cut-offs, the day-5–15 watch window, and the exposure × stock flag.
+- **The handoff:** the phone shows a QR with de-identified counts, signed with its own ECDSA P-256 key, and the laptop scans it.
+- **Laptop screens:** they verify each QR, merge the barangays and compute the plan by rules. An optional small language model (Qwen2.5-0.5B on WebLLM, WebGPU) only rewords the plan, under a check that rejects any new number, dose or barangay. The officer approves.
+
+The diagram, the pipelines, the key decisions and the limitations are in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 ## Responsible AI
-_Draft, filled in as features land._
+- **A research prototype and screening aid, not a registered medical device.**
+  - It never diagnoses and never recommends a dose; its outputs refer people to the midwife, RHU or physician.
+  - Doxycycline appears only as stock counts and a flag for clinician review, following DOH's advice that it be given only after consultation with a health professional (see Medical sources).
+- **People decide; the AI suggests:**
+  - The health worker confirms every field the box reader reads before anything is saved.
+  - The officer edits and approves every plan.
+  - The language model only rewords a plan that fixed rules already computed.
+- **Privacy by design:**
+  - Records stay on the device, and nothing is sent to a server.
+  - The QR carries counts only: no names, birth dates, households, puroks or exact dates. Counts from 1 to 4 show as "<5", and the fields don't overlap, so a hidden cell can't be worked out by subtraction.
+  - Photos, video and microphone audio are never stored or sent.
+- **Synthetic data only:** everything in the demo is invented ("San Isidro Demo", residents "Residente 001…") and labeled as sample data. We never tested on patients or children.
+- **Honest about limits:** no accuracy figure is claimed for any model. Thresholds are first settings, and the limitations are listed in `docs/ARCHITECTURE.md`.
 
 ### Hinga, the breathing check
 - **A screening aid, not a diagnosis.** Its only outputs are "fast breathing for age: refer" or "not fast breathing for age" against the WHO IMCI 2014 cut-offs, and "urgent" when the health worker ticks any of the WHO IMCI 2014 general danger signs (not able to drink or breastfeed, vomits everything, convulsions, lethargic or unconscious) or chest indrawing or stridor in a calm child. Referring urgently on chest indrawing and stridor is more cautious than IMCI 2014 (where chest indrawing alone at 2–59 months classifies as pneumonia), by design: the app only refers. The screen says "Screening aid only. Not a diagnosis."
