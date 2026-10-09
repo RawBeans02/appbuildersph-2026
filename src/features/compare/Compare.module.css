@@ -1,0 +1,220 @@
+/* Screen 13a/13b: three metric rows, the rule's reasons, the doxycycline
+   lots, the DOH dose note, and one action at the bottom. */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100dvh - var(--nav-offset, 0px));
+}
+
+.content {
+  flex: 1;
+  padding-bottom: var(--space-5);
+}
+
+.header {
+  padding: var(--space-1) var(--space-5) 0;
+}
+
+.title {
+  font: var(--type-title);
+}
+
+.place {
+  margin-top: 2px;
+  font: var(--type-body);
+  color: var(--ink-2);
+}
+
+.flagged {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin: var(--space-4) var(--space-5) 0;
+  padding: 14px var(--space-4);
+  border-radius: var(--r-md);
+  background: var(--ok-tint);
+  color: var(--ok);
+}
+
+.flaggedIcon {
+  flex: none;
+}
+
+.flaggedTitle {
+  font: 800 17px/24px var(--font-ui);
+}
+
+.flaggedMeta {
+  font: var(--type-body-dense);
+  font-weight: 600;
+}
+
+.rows {
+  margin-top: var(--space-4);
+  border-top: 1px solid var(--line);
+}
+
+.metric {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  border-bottom: 1px solid var(--line);
+}
+
+.metricNumber {
+  font: 800 34px/38px var(--font-ui);
+  font-variant-numeric: tabular-nums;
+}
+
+.metricLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font: 700 18px/24px var(--font-ui);
+}
+
+.metricWarn {
+  color: var(--warn);
+}
+
+.heading {
+  margin: 22px var(--space-5) var(--space-2);
+  font: var(--type-heading);
+}
+
+.reasons {
+  margin: 0 var(--space-5);
+  padding-left: 22px;
+  font: 400 17px/25px var(--font-ui);
+  list-style: disc;
+}
+
+.reasons li + li {
+  margin-top: 6px;
+}
+
+/* The lots list sits right under its heading. */
+.heading + .rows {
+  margin-top: 0;
+}
+
+.lot {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-5);
+  border-bottom: 1px solid var(--line);
+}
+
+.lotCode {
+  font: 700 16px/22px var(--font-mono);
+}
+
+.lotStatus {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font: var(--type-body-dense);
+  color: var(--ink-2);
+}
+
+.expiring {
+  font-weight: 700;
+  color: var(--warn);
+}
+
+.expired {
+  font-weight: 700;
+  color: var(--bad);
+}
+
+.lotCount {
+  font: 700 16px/22px var(--font-ui);
+  white-space: nowrap;
+}
+
+.noLots {
+  margin: 0 var(--space-5);
+  font: var(--type-body);
+}
+
+.doseNote {
+  display: flex;
+  gap: var(--space-3);
+  margin: 18px var(--space-5) 0;
+  padding: 14px var(--space-4);
+  border-radius: var(--r-md);
+  background: var(--sunken);
+  font: var(--type-body);
+}
+
+.doseIcon {
+  flex: none;
+}
+
+.footer {
+  position: sticky;
+  bottom: var(--nav-offset, 0px);
+  padding: var(--space-3) var(--space-5) var(--space-5);
+  background: var(--paper);
+}
+
+.footerLine {
+  border-top: 1px solid var(--line);
+}
+
+/* Loading: Home 1b's skeletons in --sunken. */
+.loading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 18px var(--space-5) 0;
+  font: var(--type-body-dense);
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.skeletonPlace,
+.skeletonNumber,
+.skeletonLabel {
+  display: block;
+  border-radius: 6px;
+  background: var(--sunken);
+}
+
+.skeletonPlace {
+  width: 150px;
+  height: 18px;
+  margin-top: 6px;
+}
+
+.skeletonRow {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  border-bottom: 1px solid var(--line);
+}
+
+.skeletonNumber {
+  width: 44px;
+  height: 34px;
+  border-radius: var(--r-sm);
+}
+
+.skeletonLabel {
+  width: 190px;
+  height: 16px;
+}
+
+.skeletonRow:nth-child(2) .skeletonLabel {
+  width: 170px;
+}
+
+.skeletonRow:nth-child(3) .skeletonLabel {
+  width: 150px;
+}

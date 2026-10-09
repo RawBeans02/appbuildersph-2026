@@ -12,6 +12,8 @@ test('reads the demo doxycycline box offline with the on-device OCR', async ({ p
 
   await context.setOffline(true)
   await page.goto('/stock')
+  // No camera in headless Chromium: the scan screen offers a photo instead.
+  await page.getByRole('button', { name: 'Scan a box' }).click()
   await page.getByLabel('Scan a medicine box', { exact: true }).setInputFiles('docs/demo/label-doxy-24A.png')
 
   await expect(page.getByRole('heading', { name: 'Check what was read' })).toBeVisible({ timeout: 120_000 })

@@ -1,244 +1,145 @@
-import { useEffect, useState, type FormEvent } from 'react'
-import { Link } from '../../app/Link'
-import { getDb } from '../../data/db/appDb'
-import type { AgapayDb } from '../../data/db/db'
-import { useDbQuery } from '../../data/db/useDbQuery'
-import { OCR_ENGINE, OCR_ENGINE_LABEL, OCR_ENGINE_OVERRIDDEN } from '../../inference/ocr/engine'
+import { useEffect, useRef, useState, type RefObject } from 'react'
+import { useFlowMode } from '../../app/flow'
 import { isReaderLoaded, readBox, warmUpReader } from '../../inference/ocr/ocrClient'
-import { CHECK_BELOW, parseLabel, type LabelField, type LabelReading } from '../../rules/label'
-import { draftFromReading, saveStockLot, UNITS, validateDraft, type StockDraft } from './stock'
+import type { OcrLine } from '../../inference/ocr/pipeline'
+import { useModelsPrepared } from '../../lib/useModelsPrepared'
+import { parseLabel } from '../../rules/label'
+import { ReaderFailedScreen, UnreadableScreen } from './ReadFailedScreen'
+import { ReadingScreen, type ReadingPhase } from './ReadingScreen'
+import { ReviewScreen, type ScanResult } from './ReviewScreen'
+import { ScanScreen } from './ScanScreen'
+import { StockList } from './StockList'
+import { nothingRead } from './stock'
 
-// Screens 10-12: scan a medicine box, review what was read, confirm. The box
-// is read on this phone; the photo is never stored. Plain until design/ lands.
-// NEEDS DESIGN: screens 10-12.
-
-const readStock = (db: AgapayDb) => db.stockLots.list({ limit: 500 })
+// /stock: the list (12a/12b), and the scan flow over it: the camera (10a),
+// reading on this phone (L6a/L6b), the review (11a) or typing it in, and the
+// two errors (L9c couldn't read, L9b the reader didn't start). The photo
+// lives in memory only and is let go when the flow leaves it; nothing is
+// saved without Confirm. The bottom nav hides inside the flow.
 
 type Step =
   | { name: 'list' }
-  | { name: 'reading'; photoUrl: string }
-  | {
-      name: 'review'
-      photoUrl: string | null
-      reading: LabelReading | null
-      lines: string[]
-      // Reading time, and the model load before it (null when it was loaded already).
-      ms: number | null
-      loadMs: number | null
-    }
+  | { name: 'camera' }
+  | { name: 'reading'; phase: ReadingPhase; fraction: number | null }
+  | { name: 'review'; scan: ScanResult | null }
+  | { name: 'unreadable' }
+  | { name: 'reader-failed' }
 
-const EMPTY_DRAFT: StockDraft = { drug: '', strength: '', lot: '', expiry: '', quantity: 0, unit: 'capsule' }
+type Photo = { blob: Blob; url: string }
 
-function CheckNote({ field }: { field: LabelField | null | undefined }) {
-  if (field === undefined) return null
-  if (!field) return <> (not read: please type it)</>
-  return field.confidence < CHECK_BELOW ? <> (check this: read with low confidence)</> : null
+function abortRead(read: RefObject<AbortController | null>) {
+  read.current?.abort()
+  read.current = null
 }
 
 export default function StockPage() {
-  const stock = useDbQuery(['stockLots'], readStock)
   const [step, setStep] = useState<Step>({ name: 'list' })
-  const [draft, setDraft] = useState<StockDraft>(EMPTY_DRAFT)
-  const [problems, setProblems] = useState<string[]>([])
-  const [error, setError] = useState<string | null>(null)
+  const [photo, setPhoto] = useState<Photo | null>(null)
+  // The read in progress; a newer read, Cancel or leaving replaces it.
+  const current = useRef<AbortController | null>(null)
+  const prepared = useModelsPrepared('phone')
+  useFlowMode(step.name !== 'list')
 
-  const photoUrl = step.name === 'list' ? null : step.photoUrl
-  useEffect(() => () => void (photoUrl && URL.revokeObjectURL(photoUrl)), [photoUrl])
+  // "The photo is deleted when you leave": its object URL goes with it.
+  useEffect(() => () => void (photo && URL.revokeObjectURL(photo.url)), [photo])
+  // Leaving /stock mid-read stops the read.
+  useEffect(() => () => abortRead(current), [])
 
-  async function onPhoto(file: File) {
-    setError(null)
-    const url = URL.createObjectURL(file)
-    setStep({ name: 'reading', photoUrl: url })
+  function stopReading() {
+    abortRead(current)
+  }
+
+  function go(next: Step) {
+    stopReading()
+    setPhoto(null)
+    setStep(next)
+  }
+
+  function onPhoto(blob: Blob) {
+    const next = { blob, url: URL.createObjectURL(blob) }
+    setPhoto(next)
+    void read(next)
+  }
+
+  async function read(source: Photo) {
+    stopReading()
+    const controller = new AbortController()
+    current.current = controller
+    const live = () => current.current === controller
+
+    const wasLoaded = isReaderLoaded()
+    setStep({ name: 'reading', phase: wasLoaded ? 'finding' : 'loading', fraction: null })
+    let loadMs: number | null = null
     try {
-      const wasLoaded = isReaderLoaded()
       const loadStart = performance.now()
       await warmUpReader()
-      const loadMs = wasLoaded ? null : performance.now() - loadStart
-      const start = performance.now()
-      const lines = await readBox(file)
-      const reading = parseLabel(lines)
-      setDraft(draftFromReading(reading))
-      setProblems([])
-      setStep({
-        name: 'review',
-        photoUrl: url,
-        reading,
-        lines: lines.map((line) => line.text),
-        ms: performance.now() - start,
-        loadMs,
-      })
-    } catch (cause) {
-      setStep({ name: 'list' })
-      setError(
-        `Could not read the box: ${cause instanceof Error ? cause.message : String(cause)}. If the reader isn't downloaded yet, prepare it for offline first.`,
-      )
+      if (!wasLoaded) loadMs = performance.now() - loadStart
+    } catch (error) {
+      if (!live()) return
+      console.error('The box reader did not start:', error)
+      current.current = null
+      setStep({ name: 'reader-failed' })
+      return
     }
-  }
+    if (!live()) return
 
-  function addManually() {
-    setDraft(EMPTY_DRAFT)
-    setProblems([])
-    setStep({ name: 'review', photoUrl: null, reading: null, lines: [], ms: null, loadMs: null })
-  }
-
-  async function onConfirm(event: FormEvent) {
-    event.preventDefault()
-    if (step.name !== 'review') return
-    const found = validateDraft(draft)
-    setProblems(found)
-    if (found.length) return
-    await saveStockLot(await getDb(), draft, step.reading)
-    setStep({ name: 'list' })
-  }
-
-  const set = <K extends keyof StockDraft>(key: K, value: StockDraft[K]) => setDraft((d) => ({ ...d, [key]: value }))
-
-  if (step.name === 'reading') {
-    return (
-      <>
-        <h1>Reading the box…</h1>
-        <img src={step.photoUrl} alt="The box you photographed" style={{ maxWidth: '100%' }} />
-        <p role="status">Reading on this phone…</p>
-      </>
+    const start = performance.now()
+    let lines: OcrLine[]
+    try {
+      lines = await readBox(source.blob, {
+        signal: controller.signal,
+        onProgress: ({ stage, fraction }) => {
+          if (live()) setStep({ name: 'reading', phase: stage === 'detect' ? 'finding' : 'reading', fraction })
+        },
+      })
+    } catch (error) {
+      if (!live()) return
+      console.error('The box was not read:', error)
+      current.current = null
+      setStep({ name: 'unreadable' })
+      return
+    }
+    if (!live()) return
+    current.current = null
+    const readMs = performance.now() - start
+    const reading = parseLabel(lines)
+    setStep(
+      nothingRead(reading)
+        ? { name: 'unreadable' }
+        : { name: 'review', scan: { reading, lines: lines.map((line) => line.text), readMs, loadMs } },
     )
   }
 
-  if (step.name === 'review') {
-    const r = step.reading
-    return (
-      <>
-        <h1>{r ? 'Check what was read' : 'Add stock by hand'}</h1>
-        {step.photoUrl && <img src={step.photoUrl} alt="The box you photographed" style={{ maxWidth: '100%' }} />}
-        {step.ms !== null && (
-          <p>
-            Read on this phone in {(step.ms / 1000).toFixed(1)} s
-            {step.loadMs === null
-              ? ' (the reader was already loaded)'
-              : `, after ${(step.loadMs / 1000).toFixed(1)} s loading the reader for the first time`}
-            . Correct anything that's wrong.
-          </p>
-        )}
-        <form onSubmit={(event) => void onConfirm(event)}>
-          <p>
-            <label>
-              Medicine <input value={draft.drug} onChange={(e) => set('drug', e.target.value)} required />
-            </label>
-            <CheckNote field={r ? r.drug : undefined} />
-          </p>
-          <p>
-            <label>
-              Strength <input value={draft.strength} onChange={(e) => set('strength', e.target.value)} />
-            </label>
-          </p>
-          <p>
-            <label>
-              Lot number <input value={draft.lot} onChange={(e) => set('lot', e.target.value)} required />
-            </label>
-            <CheckNote field={r ? r.lot : undefined} />
-          </p>
-          <p>
-            <label>
-              Expiry <input type="month" value={draft.expiry} onChange={(e) => set('expiry', e.target.value)} required />
-            </label>
-            <CheckNote field={r ? r.expiry : undefined} />
-          </p>
-          <p>
-            <label>
-              How many on hand{' '}
-              <input
-                type="number"
-                inputMode="numeric"
-                min={1}
-                step={1}
-                value={draft.quantity || ''}
-                onChange={(e) => set('quantity', Number(e.target.value))}
-                required
-              />
-            </label>{' '}
-            <label>
-              Unit{' '}
-              <select value={draft.unit} onChange={(e) => set('unit', e.target.value)}>
-                {UNITS.map((unit) => (
-                  <option key={unit}>{unit}</option>
-                ))}
-              </select>
-            </label>
-          </p>
-          {problems.length > 0 && (
-            <ul role="alert">
-              {problems.map((problem) => (
-                <li key={problem}>{problem}</li>
-              ))}
-            </ul>
-          )}
-          <button type="submit">Confirm and save</button>{' '}
-          <button type="button" onClick={() => setStep({ name: 'list' })}>
-            Cancel
-          </button>
-        </form>
-        {step.lines.length > 0 && (
-          <details>
-            <summary>All text read from the box</summary>
-            <ul>
-              {step.lines.map((line, i) => (
-                <li key={i}>{line}</li>
-              ))}
-            </ul>
-          </details>
-        )}
-      </>
-    )
-  }
+  const toList = () => go({ name: 'list' })
+  const toCamera = () => go({ name: 'camera' })
+  const typeIn = () => go({ name: 'review', scan: null })
 
-  return (
-    <>
-      <h1>Medicine stock</h1>
-      <p>
-        <label>
-          Scan a medicine box{' '}
-          <input
-            type="file"
-            accept="image/*"
-            capture="environment"
-            onChange={(e) => {
-              const file = e.target.files?.[0]
-              e.target.value = ''
-              if (file) void onPhoto(file)
-            }}
-          />
-        </label>
-      </p>
-      <p>
-        <button type="button" onClick={addManually}>
-          Add by hand
-        </button>
-      </p>
-      {error && (
-        <p role="alert">
-          {error} <Link to="/prepare">Prepare for offline</Link>
-        </p>
-      )}
-      {OCR_ENGINE_OVERRIDDEN && <p>Test setting: boxes are read with {OCR_ENGINE_LABEL[OCR_ENGINE]}.</p>}
-      <h2>On hand</h2>
-      {stock.status === 'loading' ? (
-        <p>Loading…</p>
-      ) : stock.status === 'error' ? (
-        <p role="alert">Could not read the stock records on this phone.</p>
-      ) : stock.data.length === 0 ? (
-        <p>No stock recorded yet. Scan a box to add one.</p>
-      ) : (
-        <ul>
-          {[...stock.data]
-            .sort((a, b) => a.expiry.localeCompare(b.expiry))
-            .map((lot) => (
-              <li key={lot.id}>
-                {lot.drug} {lot.strength}, lot {lot.lot}, expires {lot.expiry}: {lot.quantity} {lot.unit}
-                {lot.quantity === 1 ? '' : 's'}
-                {lot.sample ? ' (sample data)' : ''}
-              </li>
-            ))}
-        </ul>
-      )}
-    </>
-  )
+  switch (step.name) {
+    case 'camera':
+      return <ScanScreen onClose={toList} onPhoto={onPhoto} onTypeIn={typeIn} />
+    case 'reading':
+      return <ReadingScreen photoUrl={photo?.url ?? null} phase={step.phase} fraction={step.fraction} onCancel={toCamera} />
+    case 'review':
+      return (
+        <ReviewScreen
+          scan={step.scan}
+          photoUrl={photo?.url ?? null}
+          onBack={toList}
+          onScanAgain={toCamera}
+          onSaved={toList}
+        />
+      )
+    case 'unreadable':
+      return <UnreadableScreen photoUrl={photo?.url ?? null} onBack={toCamera} onScanAgain={toCamera} onTypeIn={typeIn} />
+    case 'reader-failed':
+      return (
+        <ReaderFailedScreen
+          prepared={prepared}
+          onBack={toCamera}
+          onRetry={() => (photo ? void read(photo) : toCamera())}
+        />
+      )
+    default:
+      return <StockList onScan={toCamera} onTypeIn={typeIn} />
+  }
 }

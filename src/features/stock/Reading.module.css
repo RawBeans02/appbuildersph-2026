@@ -1,0 +1,13 @@
+.title {
+  margin: var(--space-6) var(--space-5) 0;
+}
+
+.progress {
+  margin: var(--space-4) var(--space-5) 0;
+}
+
+.note {
+  margin: 14px var(--space-5) 0;
+  font: var(--type-body);
+  color: var(--ink-2);
+}

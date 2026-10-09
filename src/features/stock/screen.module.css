@@ -1,0 +1,57 @@
+/* The frame the stock screens share: a full-height column whose action bar
+   stays at the bottom (above the nav on the list, at the very bottom inside
+   the scan flow, where the nav is hidden). */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100dvh - var(--nav-offset, 0px));
+}
+
+.content {
+  flex: 1;
+}
+
+.footer {
+  position: sticky;
+  bottom: var(--nav-offset, 0px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-5) var(--space-5);
+  background: var(--paper);
+}
+
+.footerLine {
+  border-top: 1px solid var(--line);
+}
+
+/* A centered text button under the primary ("Scan again"). */
+.footerLink {
+  display: flex;
+  justify-content: center;
+  margin-top: calc(-1 * var(--space-2));
+}
+
+.title {
+  font: var(--type-title);
+}
+
+.titleStrong {
+  font-weight: 800;
+}
+
+/* The box photo on the reading and error screens. */
+.photo {
+  display: block;
+  width: calc(100% - 2 * var(--space-5));
+  height: 210px;
+  margin: var(--space-1) var(--space-5) 0;
+  border-radius: var(--r-lg);
+  background: var(--sunken);
+  object-fit: cover;
+}
+
+.photoShort {
+  height: 170px;
+}

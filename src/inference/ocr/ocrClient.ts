@@ -56,9 +56,21 @@ export async function warmUpReader(): Promise<void> {
   readerLoaded = true
 }
 
+// Where a reading is: finding the text (detection), then reading it
+// (recognition, line by line). fraction is the share of lines read so far,
+// null while it isn't known.
+export type ReadProgress = { stage: 'detect' | 'recognize'; fraction: number | null }
+
+export type ReadOptions = {
+  signal?: AbortSignal
+  onProgress?: (progress: ReadProgress) => void
+}
+
 // Reads a photo of a medicine box with this device's engine (engine.ts).
-export async function readBox(photo: Blob, signal?: AbortSignal): Promise<OcrLine[]> {
+export async function readBox(photo: Blob, { signal, onProgress }: ReadOptions = {}): Promise<OcrLine[]> {
+  onProgress?.({ stage: 'detect', fraction: null })
   if (OCR_ENGINE === 'tesseract') {
+    // Tesseract reports no stages here: it stays on the first one.
     const [{ readWithTesseract }, small] = await Promise.all([
       import('../tesseract/reader'),
       downscaleImage(photo, { type: 'image/png' }),
@@ -67,5 +79,22 @@ export async function readBox(photo: Blob, signal?: AbortSignal): Promise<OcrLin
   }
   const pixels = await imageToPixels(photo)
   const client = await getOcrClient()
-  return (await client.run<OcrOutput>(pixels, { signal })).lines
+  const output = await client.run<OcrOutput>(pixels, { signal, onProgress: onProgress && stageTracker(onProgress) })
+  return output.lines
+}
+
+// Turns the worker's 0..1 progress into stages. The pipeline reports once
+// when detection ends, then after each line it reads (pipeline.ts), so the
+// first report starts the second stage and the rest measure the lines read.
+export function stageTracker(onProgress: (progress: ReadProgress) => void): (progress: number) => void {
+  let detectedAt: number | null = null
+  return (progress) => {
+    if (detectedAt === null) {
+      detectedAt = progress
+      onProgress({ stage: 'recognize', fraction: 0 })
+      return
+    }
+    const fraction = detectedAt >= 1 ? 1 : (progress - detectedAt) / (1 - detectedAt)
+    onProgress({ stage: 'recognize', fraction: Math.min(1, Math.max(0, fraction)) })
+  }
 }

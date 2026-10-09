@@ -1,0 +1,40 @@
+/* L9c and L9b: one line of what happened, then one next step. */
+
+.block {
+  padding: var(--space-6) var(--space-5) 0;
+}
+
+.blockTop {
+  padding-top: var(--space-2);
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--r-full);
+  background: var(--bad-tint);
+  color: var(--bad);
+}
+
+.iconLarge {
+  width: 64px;
+  height: 64px;
+}
+
+.title {
+  margin-top: var(--space-4);
+}
+
+.titleLarge {
+  margin-top: 18px;
+  font: 800 28px/34px var(--font-ui);
+}
+
+.body {
+  margin-top: var(--space-2);
+  font: 400 18px/26px var(--font-ui);
+  text-wrap: pretty;
+}

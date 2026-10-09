@@ -1,0 +1,185 @@
+/* Screen 12a/12b: the link row to screen 13, then lots grouped by expiry. */
+
+.compare {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 64px;
+  margin: 0 var(--space-5);
+  padding: var(--space-3) 14px var(--space-3) var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.compare:hover {
+  background: var(--sunken);
+}
+
+.compareText {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.compareTitle {
+  font: 800 17px/24px var(--font-ui);
+}
+
+.compareMeta {
+  font: var(--type-body-dense);
+  color: var(--ink-2);
+}
+
+.caret {
+  flex: none;
+  color: var(--ink-3);
+}
+
+.heading {
+  margin: 22px var(--space-5) 6px;
+  font: var(--type-heading);
+}
+
+.rows {
+  border-top: 1px solid var(--line);
+}
+
+.row {
+  display: flex;
+  gap: var(--space-3);
+  padding: 14px var(--space-5);
+  border-bottom: 1px solid var(--line);
+}
+
+.rowExpiring {
+  background: var(--warn-tint);
+}
+
+.rowMain {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.rowTitle {
+  font: 700 18px/24px var(--font-ui);
+}
+
+.rowMeta {
+  font: var(--type-body-dense);
+  color: var(--ink-2);
+}
+
+.lotCode {
+  font-family: var(--font-mono);
+}
+
+.pill {
+  margin-top: 6px;
+}
+
+/* A text button, aligned with the row's text. */
+.remove {
+  margin: var(--space-1) 0 calc(-1 * var(--space-3)) calc(-1 * var(--space-2));
+}
+
+.count {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+}
+
+.countNumber {
+  font: 800 22px/26px var(--font-ui);
+  font-variant-numeric: tabular-nums;
+}
+
+.countUnit {
+  font: var(--type-caption);
+  font-weight: 400;
+  color: var(--ink-2);
+}
+
+.empty {
+  margin-top: 72px;
+}
+
+/* Loading: Home 1b's skeletons in --sunken. */
+.loading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 2px var(--space-5) 0;
+  font: var(--type-body-dense);
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.skeletonPlace,
+.skeletonHeading,
+.skeletonTitle,
+.skeletonMeta {
+  display: block;
+  border-radius: 6px;
+  background: var(--sunken);
+}
+
+.skeletonPlace {
+  width: 150px;
+  height: 18px;
+  margin-top: 6px;
+}
+
+.skeletonLink {
+  height: 64px;
+  margin: var(--space-3) var(--space-5) 0;
+  border-radius: var(--r-md);
+  background: var(--sunken);
+}
+
+.skeletonHeading {
+  width: 170px;
+  height: 22px;
+  margin: 26px var(--space-5) 14px;
+}
+
+.skeletonRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--line);
+}
+
+.skeletonTitle {
+  width: 170px;
+  height: 16px;
+}
+
+.skeletonMeta {
+  width: 120px;
+  height: 12px;
+}
+
+.skeletonRow:nth-child(2) .skeletonTitle {
+  width: 190px;
+}
+
+.skeletonRow:nth-child(2) .skeletonMeta {
+  width: 100px;
+}
+
+.skeletonRow:nth-child(3) .skeletonTitle {
+  width: 160px;
+}
+
+.skeletonRow:nth-child(3) .skeletonMeta {
+  width: 140px;
+}

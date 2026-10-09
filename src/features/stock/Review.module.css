@@ -1,0 +1,140 @@
+.content {
+  padding: var(--space-1) var(--space-5) var(--space-5);
+}
+
+.readInfo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.thumb {
+  flex: none;
+  width: 96px;
+  height: 72px;
+  border-radius: var(--r-sm);
+  background: var(--sunken);
+  object-fit: cover;
+}
+
+.readText {
+  font: var(--type-body-dense);
+  color: var(--ink-2);
+}
+
+.line {
+  display: block;
+}
+
+.title {
+  margin-top: var(--space-5);
+}
+
+.titleFirst {
+  margin-top: var(--space-1);
+}
+
+.sub {
+  margin-top: var(--space-1);
+  font: 400 17px/25px var(--font-ui);
+  color: var(--ink-2);
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-top: var(--space-5);
+}
+
+/* Lot numbers in the mono face, as everywhere else. */
+.mono {
+  font-family: var(--font-mono);
+}
+
+/* An input or select with a Phosphor icon at its right end. */
+.withIcon {
+  position: relative;
+  display: block;
+}
+
+.fieldIcon {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  transform: translateY(-50%);
+  color: var(--ink);
+  pointer-events: none;
+}
+
+/* The month picker opens from the whole icon area; the browser's own
+   indicator is invisible over the Phosphor icon. */
+.month {
+  position: relative;
+  padding-right: var(--space-12);
+}
+
+.month::-webkit-calendar-picker-indicator {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: var(--space-12);
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.quantity {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 10px;
+}
+
+.number {
+  font-variant-numeric: tabular-nums;
+}
+
+.select {
+  appearance: none;
+  padding-right: var(--space-12);
+  cursor: pointer;
+}
+
+.saveError {
+  margin-top: var(--space-4);
+}
+
+.disclosure {
+  margin-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 52px;
+  font: 700 16px/24px var(--font-ui);
+  list-style: none;
+  cursor: pointer;
+}
+
+.summary::-webkit-details-marker {
+  display: none;
+}
+
+.disclosure[open] .caret {
+  transform: rotate(180deg);
+}
+
+.lines {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding-bottom: var(--space-2);
+  font: var(--type-mono);
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
