@@ -91,6 +91,57 @@
   border-bottom: 1px solid var(--line);
 }
 
+/* 16b: the newest report scanned this session, for the visit. */
+.rowNow {
+  margin: 0 calc(-1 * var(--space-2));
+  padding: 14px var(--space-2);
+  border-radius: var(--r-sm);
+  background: var(--ok-tint);
+}
+
+.justNowWord {
+  color: var(--ok);
+  font-weight: 700;
+}
+
+/* 16b: the received meter, one 8 px segment per barangay, 4 px apart, with
+   its name under it. Received: ink. Waiting: --sunken with a dashed edge. */
+.meter {
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  gap: var(--space-1);
+  margin-top: 14px;
+}
+
+.meterItem {
+  min-width: 0;
+}
+
+.meterSeg {
+  display: block;
+  height: 8px;
+  border-radius: 2px;
+}
+
+.meterIn {
+  background: var(--ink);
+}
+
+.meterWaiting {
+  border: 1px dashed var(--line-strong);
+  background: var(--sunken);
+}
+
+.meterName {
+  display: block;
+  margin-top: var(--space-1);
+  font: var(--type-caption);
+  font-weight: 400;
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
+
 .rowText {
   flex: 1;
   min-width: 0;
@@ -197,7 +248,52 @@
 }
 
 .cameraShort {
-  height: 340px;
+  height: 280px;
+}
+
+/* 17g/17h: a scan's result, the checks this laptop ran. */
+.result {
+  margin-bottom: 14px;
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface);
+}
+
+.resultTitle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: var(--space-3);
+  font: var(--type-heading);
+}
+
+.resultTitle svg {
+  flex: none;
+}
+
+.result-ok {
+  color: var(--ok);
+}
+
+.result-info {
+  color: var(--ink-2);
+}
+
+.result-bad {
+  color: var(--bad);
+}
+
+.resultBody {
+  margin-top: var(--space-3);
+  font: var(--type-body);
+  color: var(--ink-2);
+}
+
+.resultNext {
+  margin-top: var(--space-3);
+  font: var(--type-body);
+  font-weight: 600;
 }
 
 .camera[hidden] {
