@@ -172,6 +172,25 @@
   text-wrap: pretty;
 }
 
+/* 14d: the receipt above the primary. */
+.receipt {
+  align-self: stretch;
+  margin-bottom: var(--space-3);
+  font: var(--type-body-dense);
+  color: var(--ink-2);
+  text-align: center;
+  text-wrap: pretty;
+}
+
+.receiptMono {
+  margin-top: var(--space-1);
+  font: var(--type-mono);
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
 .qrActions {
   display: flex;
   flex-direction: column;

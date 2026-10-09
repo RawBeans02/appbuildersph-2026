@@ -20,6 +20,7 @@ import { collectRawCounts } from './counts'
 import { createExport, createPairingQr, readPhoneRecords, type ExportResult, type PairingQr } from './exportQr'
 import { resolvePlace } from './identity'
 import { QrImage } from './QrImage'
+import { exportReceipt } from './receipt'
 import styles from './SendPage.module.css'
 import { useWakeLock } from './wakeLock'
 import { reusableExport, suppressCounts, weekOf, whatLeaves, type CountSection } from './whatLeaves'
@@ -102,6 +103,7 @@ export default function SendPage() {
 
   if (view === 'qr' && shown) {
     const { payload, text } = shown.qr
+    const receipt = exportReceipt(shown.qr)
     return (
       <div className={styles.screen}>
         <FlowTopBar backKind="close" onBack={() => go('list')} />
@@ -118,6 +120,14 @@ export default function SendPage() {
           Hold the phone steady in front of the laptop's camera. Turn the brightness up if it doesn't scan.
         </p>
         <div className={styles.qrActions}>
+          {/* 14d: the receipt, every value read from this export. */}
+          <div className={styles.receipt}>
+            <p>This QR holds {receipt.counts} counts and no names.</p>
+            <p className={styles.receiptMono}>
+              {receipt.bytes} bytes · signed on this phone · export #{receipt.seq}
+            </p>
+            <p className={styles.receiptMono}>Key {receipt.fingerprint}</p>
+          </div>
           <Button tagalog="Tapos na" onClick={() => go('shared')}>
             Done, it was scanned
           </Button>
