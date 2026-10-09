@@ -43,7 +43,7 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
         // The Tesseract.js worker and core are model files (prepared on
         // demand when that engine is on), not app shell.
-        globIgnores: ['**/worker.min-*.js', '**/tesseract-core-*.js', '**/webllm.worker-*.js'],
+        globIgnores: ['**/worker.min-*.js', '**/tesseract-core-*.js', '**/webllm.worker-*.js', 'splash/**'],
         runtimeCaching: [
           {
             // The laptop's AI wording worker (WebLLM, about 6 MB, too big to

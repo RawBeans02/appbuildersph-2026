@@ -151,6 +151,7 @@ React + TypeScript, built with Vite as an installable web app (PWA: vite-plugin-
 - **Other products:** the team has built other products before this event; no code, data, prompts, designs or assets from them are used here.
 - **Designs:** the screens, tokens, copy, components and app icons in `design/` were made with Claude Design during the event (pass 1 landed in `7397da7`). The photos in `design/assets/` are mockup placeholders made with OpenAI gpt-image-2; they never ship in the app.
 - **Algorithms we reimplemented:** the OCR pre- and post-processing (`src/inference/ocr/`: DB box extraction and CTC decoding) follows PaddleOCR's published reference algorithms (Apache-2.0), written fresh in TypeScript. The seed's random generator is mulberry32, a public-domain algorithm by Tommy Ettinger (`src/data/seed/generate.ts`).
+- **Launch splashes and logo lockups** (`public/splash/`, `design/brand/`): made during the event with a script from Claude Design's app icon and the Atkinson Hyperlegible Next font (OFL); no AI image generation.
 - **Fonts, icons, images and other third-party assets,** with their licenses:
   - Fonts: Atkinson Hyperlegible Next and Atkinson Hyperlegible Mono (Braille Institute of America), SIL Open Font License 1.1. The woff2 files were downloaded from Google Fonts and are self-hosted in `public/fonts/` with their license texts, so they work offline.
   - Icons in the UI: Phosphor Icons (`@phosphor-icons/react`, MIT; see Open-source libraries).
