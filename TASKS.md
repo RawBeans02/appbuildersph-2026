@@ -38,7 +38,7 @@ Every task names the files or folders it **owns**, so agents pushing straight to
 - [x] done · Storage-persistence request flow for a later model-download screen: ask for persistent storage, check free space against the download size (logic only, no UI), with tests · [sr] · owns: `src/lib/storage.ts` · aac81b7
 - [x] done · Runtime-agnostic model cache: Cache API, keyed by model id + version, download progress callback, size integrity check, eviction of old versions, with mocked tests · [sr] · owns: `src/lib/modelCache.ts` · d27441c
 - [x] done · Device-check page shows the inference backend the app would pick and why: WebGPU only where safe, WASM single-threaded on iPhone/iOS Safari, WASM threads only when cross-origin isolated (pure, unit-tested function) · [sr] · owns: `src/lib/backend.ts`, `src/App.tsx` (placeholder) · f1502e8
-- [ ] doing · Image downscale helper (long side ≤ 1280 px, OffscreenCanvas with a canvas fallback) for any vision input, unit-tested · [sr] · owns: `src/lib/image.ts`
+- [x] done · Image downscale helper (long side ≤ 1280 px, OffscreenCanvas with a canvas fallback) for any vision input, unit-tested · [sr] · owns: `src/lib/image.ts` · 0e236b9
 - [x] done · `docs/OFFLINE-SMOKE-TEST.md`: a section for when a runtime exists (its `.wasm` and the model file both load after a reload in airplane mode) · [sr] · owns: `docs/OFFLINE-SMOKE-TEST.md` · c2e47e6
 - [ ] todo · Theme from the `design/README.md` tokens, applied once; component library customized, no defaults · [sr] · owns: theme files
 - [ ] todo · _task_ · [owner] · owns: `<files/folders>` · design: `design/<screen>`
