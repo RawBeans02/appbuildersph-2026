@@ -1,0 +1,156 @@
+/* The LoopStrip (design pass 2, A3): a 64 px band under the screen's title,
+   full content width, on --surface with a --line bottom border. Tokens only. */
+
+.band {
+  display: flex;
+  min-height: 64px;
+  margin: var(--space-5) -44px 0;
+  padding: 0 44px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.steps {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: stretch;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
+.step:first-child {
+  flex: none;
+}
+
+/* 2 px --line-strong connectors with a small arrowhead. */
+.connector {
+  flex: 1 1 auto;
+  min-width: 20px;
+  display: flex;
+  align-items: center;
+  margin: 0 var(--space-3);
+  color: var(--line-strong);
+}
+
+.line {
+  flex: 1;
+  height: 2px;
+  border-radius: 1px;
+  background: currentColor;
+  transform-origin: left center;
+}
+
+.arrow {
+  flex: none;
+  margin-left: -5px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* On approval, the connector to step 5 draws (scaleX, from the left). */
+.drawLine {
+  animation: draw-across var(--dur-draw) var(--ease-in-out) backwards;
+}
+
+@keyframes draw-across {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+.body {
+  position: relative;
+  flex: none;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 10px 0;
+}
+
+.icon {
+  flex: none;
+  color: var(--ink);
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  font: var(--type-caption);
+  color: var(--ink);
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font: var(--type-caption);
+  font-weight: 400;
+  color: var(--ink-2);
+}
+
+/* Done: check-circle in --ok in place of the step's icon. */
+.done .icon {
+  color: var(--ok);
+}
+
+/* Not reached. */
+.waiting .icon,
+.waiting .label,
+.waiting .status {
+  color: var(--ink-3);
+}
+
+/* The current screen: the label at 700, with a 32 × 4 ink bar under it, as in
+   the nav. */
+.current .label {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.current .body::after {
+  content: '';
+  position: absolute;
+  left: 30px;
+  bottom: 0;
+  width: 32px;
+  height: 4px;
+  border-radius: 2px 2px 0 0;
+  background: var(--ink);
+}
+
+/* Step 1's mini meter: 5 segments of 24 × 6, 4 px apart. */
+.meter {
+  display: inline-flex;
+  gap: var(--space-1);
+}
+
+.seg {
+  width: 24px;
+  height: 6px;
+  border-radius: 1px;
+}
+
+.segIn {
+  background: var(--ink);
+}
+
+.segWaiting {
+  border: 1px dashed var(--line-strong);
+  background: var(--sunken);
+}

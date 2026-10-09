@@ -26,19 +26,6 @@
   padding: 0 var(--space-2);
 }
 
-.tile {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  padding-bottom: var(--space-1);
-  border-radius: var(--r-sm);
-  background: var(--ink);
-  color: var(--paper);
-  font: 800 30px/30px var(--font-ui);
-}
-
 .name {
   font: var(--type-heading);
   font-weight: 800;
@@ -130,6 +117,13 @@
 
 .sub {
   margin-top: var(--space-1);
+  font: var(--type-body);
+  color: var(--ink-2);
+}
+
+.purpose {
+  max-width: 720px;
+  margin-top: var(--space-2);
   font: var(--type-body);
   color: var(--ink-2);
 }

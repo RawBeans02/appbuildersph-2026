@@ -9,15 +9,19 @@ import {
 } from '@phosphor-icons/react'
 import type { ReactNode } from 'react'
 import { Link } from '../../app/Link'
-import { LocalStatus } from '../../components'
+import { usePath } from '../../app/router'
+import { BrandTile, LocalStatus } from '../../components'
 import { cx } from '../../components/cx'
 import { PHASE2 } from '../../lib/phase2'
 import styles from './LaptopFrame.module.css'
 import { useLaptopAiReady } from './laptopAi'
+import { stepForScreen } from './loop'
+import { LoopStrip } from './LoopStrip'
 import { useLaptopPlace } from './place'
 
 // The municipal laptop's frame (1280 × 800 design): the LaptopNav sidebar,
-// then the screen with its title (the one h1) and the line under it.
+// then the screen with its title (the one h1), the line under it, an
+// optional purpose line, and the LoopStrip (design pass 2, A3).
 
 export type LaptopSection = 'scan' | 'merged' | 'plan' | 'log' | 'sync'
 
@@ -36,9 +40,7 @@ export function LaptopNav({ active }: { active: LaptopSection }) {
   return (
     <nav aria-label="Municipal" className={styles.nav}>
       <div className={styles.brand}>
-        <span className={styles.tile} aria-hidden>
-          a
-        </span>
+        <BrandTile size={36} />
         <div>
           <p className={styles.name}>AgapayMo</p>
           <p className={styles.role}>Municipal view</p>
@@ -74,16 +76,20 @@ export function LaptopFrame({
   active,
   title,
   sub,
+  purpose,
   action,
   children,
 }: {
   active: LaptopSection
   title: ReactNode
   sub?: ReactNode
+  // What the screen is for, under the sub line (16b).
+  purpose?: ReactNode
   // The screen's primary action, on the right of the title (screen 18).
   action?: ReactNode
   children: ReactNode
 }) {
+  const path = usePath()
   return (
     <div className={styles.frame}>
       <LaptopNav active={active} />
@@ -92,9 +98,11 @@ export function LaptopFrame({
           <div>
             <h1 className={styles.title}>{title}</h1>
             {sub && <p className={styles.sub}>{sub}</p>}
+            {purpose && <p className={styles.purpose}>{purpose}</p>}
           </div>
           {action && <div className={styles.action}>{action}</div>}
         </header>
+        <LoopStrip current={stepForScreen(active, path)} />
         {children}
       </div>
     </div>
