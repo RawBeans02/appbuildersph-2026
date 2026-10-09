@@ -1,4 +1,4 @@
-import { expect, test, type BrowserContext } from '@playwright/test'
+import { chromium, expect, test, type BrowserContext } from '@playwright/test'
 import { DEMO_SCAN_LABEL } from '../src/data/seed/demoLabel'
 import { prepareForOffline } from './prepare'
 import { openPage } from './lock'
@@ -94,7 +94,10 @@ test('the full demo offline: phone wow flow, then pair, receive, merge and appro
   expect(countsText).toMatch(/^AGP1\./)
 
   // ---- The municipal laptop ---------------------------------------------------
-  const laptop = await browser.newContext()
+  // The municipal laptop runs Chrome (the wording model needs WebGPU), so in
+  // the WebKit (iPhone) run only the phone is WebKit and the laptop is Chromium.
+  const laptopBrowser = browserName === 'chromium' ? browser : await chromium.launch()
+  const laptop = await laptopBrowser.newContext()
   const laptopElsewhere: string[] = []
   watchOrigin(laptop, origin, laptopElsewhere)
   try {
@@ -105,8 +108,7 @@ test('the full demo offline: phone wow flow, then pair, receive, merge and appro
     await desk.waitForFunction(() => navigator.serviceWorker.controller !== null)
     await laptop.setOffline(true)
     const reopened = await desk.goto('/municipal')
-    // Chromium-only in Playwright (see offline.spec.ts).
-    if (browserName === 'chromium') expect(reopened?.fromServiceWorker()).toBe(true)
+    expect(reopened?.fromServiceWorker()).toBe(true)
     await expect(desk.getByRole('heading', { level: 1, name: 'Barangay reports' })).toBeVisible()
 
     // No camera on this laptop: the scan screen's fallback takes the QR text.
@@ -169,6 +171,7 @@ test('the full demo offline: phone wow flow, then pair, receive, merge and appro
     await expect(entry).toContainText('Rules only')
   } finally {
     await laptop.close()
+    if (laptopBrowser !== browser) await laptopBrowser.close()
   }
 
   expect(phoneElsewhere, 'phone requests to other origins').toEqual([])

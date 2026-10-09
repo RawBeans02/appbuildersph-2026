@@ -25,6 +25,13 @@ test('no camera: 45 breaths counted by hand are fast for 1 to 4 years and saved 
 
   // Fake timers from the first load; time runs normally until pauseAt.
   await page.clock.install()
+  // No camera, on every runner: WebKit's test browser has a mock camera, and
+  // the premise here is a phone whose camera can't be used.
+  await page.addInitScript(() => {
+    if (navigator.mediaDevices) {
+      navigator.mediaDevices.getUserMedia = () => Promise.reject(new DOMException('Requested device not found', 'NotFoundError'))
+    }
+  })
   await openPage(page, '/hinga')
   await expect(page.locator('html')).toHaveAttribute('data-shell-status', 'ready', { timeout: 30_000 })
   const hinga = page.locator('[data-hinga-screen]')
