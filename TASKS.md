@@ -11,19 +11,27 @@ Every task names the files or folders it **owns**, so agents pushing straight to
 
 **Model:** Opus 5.5 for every agent. **Effort:** Lead ultracode · Sr. max or ultracode. If an agent hits a usage limit, the Lead reassigns its open tasks here.
 
+**Stack (locked Fri ~2:00 PM):** Vite + React + TypeScript as an offline-first PWA (`vite-plugin-pwa`), static on Vercel, npm. The on-device model runtime (WebLLM, transformers.js / ONNX Runtime Web, MediaPipe…) is picked with the idea; don't install one before that.
+
 **Heavy checks:** the hosting build and GitHub Actions CI run in the cloud on every push. Locally, heavy jobs go through the guard, one at a time across both agents (`CLAUDE.md`).
 
 **Judging (official weights, `RULES.md`):** Problem & Usefulness 25% · Local AI Implementation 25% · Technical Execution 20% · Innovation 15% · Product & Demo Quality 15%. Every wow-flow task must also work with the network off (`QUALITY.md`, "Local AI").
 
 ## Now (the wow flow)
 - [ ] todo · Claude Design pass 1: design system (tokens) + every wow-flow screen in all states (default, loading, empty, error), **plus the model download/initialization progress, "running on this device" and offline indicator states** → `design/` + `design/README.md` · [lead] · owns: `design/`
-- [ ] todo · Scaffold + first deploy of a "hello" page to the live URL (non-UI) · [sr] · owns: project config
+- [ ] todo · Scaffold + first deploy, **idea-agnostic, no designed UI** (~30–45 min) · [sr] · owns: `package.json`, the lockfile, `vite.config.ts`, `tsconfig*.json`, the ESLint config, `index.html`, `vercel.json`, `public/`, `src/main.tsx`, `src/App.tsx` (placeholder), `src/lib/`, `docs/OFFLINE-SMOKE-TEST.md`
+  - Vite + React + TS; npm scripts `dev`, `build`, `preview`, `typecheck`, `lint`, `test` (Vitest, with at least one real test) so CI can call them.
+  - PWA shell with `vite-plugin-pwa`: manifest, service worker precaching the app shell, and an offline fallback. The hello page is a plain, unstyled placeholder (no product name, no theme, no shadcn).
+  - `src/lib/capabilities.ts`: WebGPU present (and an adapter available), `navigator.deviceMemory` where supported, storage estimate, `navigator.storage.persist()`. Unit-tested.
+  - `src/lib/useOnlineStatus.ts`: online/offline status hook.
+  - `vercel.json`: SPA fallback, plus the COOP/COEP headers written in but commented out (or behind a flag) until a runtime needs them.
+  - `docs/OFFLINE-SMOKE-TEST.md`: load the live URL, go offline, reload, the shell still works. Run it on the first deploy and record the result (device, browser) under this task.
+  - `npm install` and production builds only through the guard.
   - Hosting: **Vercel, a NEW project on the owner's personal account**, linked to this repo only; `main` deploys to production. Never touch any other Vercel project. The owner does the Vercel login and the GitHub-app repo selection ("Only select repositories"); give him the exact clicks or command.
   - HTTPS (Vercel provides it) is required for WebGPU and service workers. If the model runtime uses threaded WASM or SharedArrayBuffer, set cross-origin isolation headers in `vercel.json` (COOP `same-origin`, COEP `require-corp` or `credentialless`) and check that the model/CDN hosts work with them.
   - Model weights: fetched on first load (e.g. from Hugging Face), then cached. Check Vercel's file-size limits before self-hosting weights. The first-load download goes under "What requires internet".
   - Put the live URL at the top of this file and of the README. The README also keeps run/recreate instructions: judges and verifiers may run it from the repo.
-- [ ] todo · CI: GitHub Actions on every push to `main` (install, typecheck, lint, unit tests, production build) · [lead] · owns: `.github/workflows/`
-- [ ] todo · Offline shell: service worker / PWA caches the app shell; the page loads in airplane mode after the first visit · [owner] · owns: `<files/folders>`
+- [ ] todo · CI: GitHub Actions on every push to `main` (npm ci, typecheck, lint, test, build), after the scaffold's scripts land · [lead] · owns: `.github/workflows/`
 - [ ] todo · Theme from the `design/README.md` tokens, applied once; component library customized, no defaults · [sr] · owns: theme files
 - [ ] todo · _task_ · [owner] · owns: `<files/folders>` · design: `design/<screen>`
 
