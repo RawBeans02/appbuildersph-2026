@@ -191,7 +191,8 @@ export type AlertView = {
   templateText: string
   // Codes, demo place names, the ISO week, counts as sent ("<5") and ranges.
   facts: Record<string, unknown>
-  source: 'luna' | 'template'
+  // 'edited': the approving officer changed the wording ("Edited by the officer").
+  source: 'luna' | 'template' | 'edited'
   // Why GPT-6 Luna's wording was not used (its check failed), if it wasn't.
   checkReasons: string[]
   // Why the template is shown when the AI wasn't asked or didn't answer.

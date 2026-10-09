@@ -74,6 +74,12 @@ const NOTE: Record<string, string> = {
 // Where the wording came from, and what the check says: never "all
 // numbers match".
 export function sourceLine(alert: Pick<AlertView, 'source' | 'aiNote' | 'checkReasons'>): { tag: string; line: string } {
+  if (alert.source === 'edited') {
+    return {
+      tag: 'Edited by the officer',
+      line: "The officer's wording, checked again against the facts: no new numbers, doses or barangays found.",
+    }
+  }
   if (alert.source === 'luna') {
     return {
       tag: 'Written by GPT-6 Luna',

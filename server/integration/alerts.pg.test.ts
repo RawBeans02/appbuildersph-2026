@@ -182,8 +182,15 @@ describe('alerts on Postgres', () => {
       realDeps(),
     )
     expect(approved.status).toBe(200)
-    const row = await getPool(databaseUrl).query<{ text: string; status: string }>('SELECT text, status FROM alerts WHERE id = $1', [watch.id])
-    expect(row.rows[0]).toEqual({ text: `${edited}\n\n${WATCH_CAVEAT}`, status: 'approved' })
+    const row = await getPool(databaseUrl).query<{ text: string; status: string; source: string }>('SELECT text, status, source FROM alerts WHERE id = $1', [
+      watch.id,
+    ])
+    // The officer's wording is tagged as theirs.
+    expect(row.rows[0]).toEqual({ text: `${edited}\n\n${WATCH_CAVEAT}`, status: 'approved', source: 'edited' })
+    // Approved as written, GPT-6 Luna's stays GPT-6 Luna's.
+    expect((await handleAlertsApprove(viewPost('/api/alerts-approve', { id: move.id, municipality: 'SID', approverRole: 'Regional officer' }), realDeps())).status).toBe(200)
+    const kept = await getPool(databaseUrl).query<{ source: string }>('SELECT source FROM alerts WHERE id = $1', [move.id])
+    expect(kept.rows[0].source).toBe('luna')
   })
 
   it("counts only billed calls in luna_usage: a refused parameter's call is given back", async () => {

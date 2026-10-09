@@ -68,7 +68,8 @@ export type NewAlert = {
   text: string
   templateText: string
   facts: unknown
-  source: 'luna' | 'template'
+  // 'edited': an officer changed the wording when approving it.
+  source: 'luna' | 'template' | 'edited'
   checkReasons: string[]
   // Why the template is shown: the AI was off, failed or didn't pass the check.
   aiNote: string | null
@@ -87,7 +88,8 @@ export type AlertRecord = NewAlert & {
   decidedAt: Date | null
 }
 
-export type AlertDecision = { status: 'approved' | 'rejected'; role: string; at: Date; text: string }
+// `source`: 'edited' when the approving officer changed the wording.
+export type AlertDecision = { status: 'approved' | 'rejected'; role: string; at: Date; text: string; source?: 'edited' }
 
 export interface Store {
   // Adds one hit to `key`'s window starting at `windowStart` and returns the

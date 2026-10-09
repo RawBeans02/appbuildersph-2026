@@ -56,6 +56,13 @@ describe('alerts panel words', () => {
     for (const line of [luna.line, failed.line]) expect(line).not.toMatch(/all numbers match/i)
   })
 
+  it('tags an officer-edited wording "Edited by the officer", never GPT-6 Luna', () => {
+    const edited = sourceLine({ source: 'edited', aiNote: null, checkReasons: [] })
+    expect(edited.tag).toBe('Edited by the officer')
+    expect(`${edited.tag} ${edited.line}`).not.toMatch(/Written by GPT-6 Luna/)
+    expect(edited.line).toMatch(/checked again/)
+  })
+
   it('says when a newer draft replaced the alert', async () => {
     const superseded = async () => new Response(JSON.stringify({ ok: false, error: 'superseded', message: 'x' }), { status: 409 })
     const result = await alertsApi.reject('code', 'SID', '7', 'Regional officer', superseded)

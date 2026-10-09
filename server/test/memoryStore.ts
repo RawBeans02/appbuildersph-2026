@@ -166,6 +166,7 @@ export function createMemoryStore(): MemoryStore {
         ...alert,
         status: decision.status,
         text: decision.text,
+        source: decision.source ?? alert.source,
         decidedByRole: decision.role,
         decidedAt: decision.at,
         approvedByRole: approved ? decision.role : null,

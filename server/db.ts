@@ -107,6 +107,14 @@ export const SCHEMA: readonly string[] = [
       ALTER TABLE alerts ADD CONSTRAINT alerts_status_v2 CHECK (status IN ('draft', 'approved', 'rejected', 'superseded'));
     END IF;
   END $$`,
+  // An officer's edit makes the source 'edited' (the first CHECK, from ADD
+  // COLUMN, is alerts_source_check).
+  `DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'alerts_source_v2') THEN
+      ALTER TABLE alerts DROP CONSTRAINT IF EXISTS alerts_source_check;
+      ALTER TABLE alerts ADD CONSTRAINT alerts_source_v2 CHECK (source IN ('luna', 'template', 'edited'));
+    END IF;
+  END $$`,
 ]
 
 // Any fixed number: concurrent cold starts take this transaction lock, so two
@@ -490,10 +498,19 @@ export function createPgStore(db: pg.Pool | pg.PoolClient, inTransaction = false
       const approved = decision.status === 'approved'
       const result = await db.query<AlertRow>(
         `UPDATE alerts SET status = $2, text = $3, decided_by_role = $4, decided_at = $5,
-           approved_by_role = $6, approved_at = $7
+           approved_by_role = $6, approved_at = $7, source = COALESCE($8, source)
          WHERE id = $1 AND status = 'draft'
          RETURNING ${ALERT_COLUMNS}`,
-        [id, decision.status, decision.text, decision.role, decision.at, approved ? decision.role : null, approved ? decision.at : null],
+        [
+          id,
+          decision.status,
+          decision.text,
+          decision.role,
+          decision.at,
+          approved ? decision.role : null,
+          approved ? decision.at : null,
+          decision.source ?? null,
+        ],
       )
       return result.rows[0] ? alertRecord(result.rows[0]) : null
     },

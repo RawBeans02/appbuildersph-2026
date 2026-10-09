@@ -204,7 +204,9 @@ export async function approveAlert(
     const check = checkAlertText(text, { facts: alert.facts as AlertFacts, templateText: alert.templateText })
     if (!check.ok) throw new HttpError('check-failed', "The edited wording doesn't match the alert's facts.", {}, check.reasons)
   }
-  const decided = (await store.decideAlert(alert.id, { status: 'approved', role: input.role, at: now, text })) ?? (await lostRace(store, alert.id))
+  // An officer's wording is theirs: never "Written by GPT-6 Luna" any more.
+  const decision = { status: 'approved' as const, role: input.role, at: now, text, ...(edited ? { source: 'edited' as const } : {}) }
+  const decided = (await store.decideAlert(alert.id, decision)) ?? (await lostRace(store, alert.id))
   await store.audit({
     at: now,
     actor: input.role,

@@ -279,6 +279,22 @@ describe('deciding', () => {
     expect(approved.alert.text).toBe(`${shortened}\n\n${DOCTOR_TEAM_CAVEAT}`)
   })
 
+  it('tags an officer-edited wording "edited", never still GPT-6 Luna\'s', async () => {
+    const luna = model((template) => `Update: ${template}`)
+    const [team, move] = (await draftAlerts(store, ENV, 'SID', NOW, { fetch: luna.fetcher })).alerts
+    expect([team.source, move.source]).toEqual(['luna', 'luna'])
+    // Approved as written: still GPT-6 Luna's.
+    expect((await approveAlert(store, { id: team.id, municipality: 'SID', role: 'Regional officer' }, NOW)).alert.source).toBe('luna')
+    // Spacing only isn't an edit.
+    expect((await approveAlert(store, { id: move.id, municipality: 'SID', role: 'Regional officer', text: `  ${move.text}  ` }, NOW)).alert.source).toBe('luna')
+    const [, , watch] = (await draftAlerts(store, ENV, 'SID', NOW, { fetch: luna.fetcher })).alerts
+    const { alert } = await approveAlert(store, { id: watch.id, municipality: 'SID', role: 'Regional officer', text: watch.text.replace('Update: ', '') }, NOW)
+    expect(alert.source).toBe('edited')
+    expect(store.alerts.get(watch.id)?.source).toBe('edited')
+    // The audit log keeps where the draft came from, and that it was edited.
+    expect(store.auditLog.at(-1)?.detail).toMatchObject({ source: 'luna', edited: true })
+  })
+
   it('refuses an edited wording with look-alike digits or an e-mail address', async () => {
     const [team, move] = await drafts()
     for (const [alert, text] of [
