@@ -1,0 +1,54 @@
+/* The design tokens from design/README.md (Claude Design, pass 1), verbatim,
+   plus the type scale as font shorthands. The one place colors, spacing,
+   radii, shadows and type are defined; components only use these. */
+
+:root {
+  /* neutrals */
+  --paper: #F7F4ED;        /* app background */
+  --surface: #FFFDFA;      /* cards, sheets, fields, nav */
+  --sunken: #EBE6DD;       /* insets, skeletons, info notes */
+  --line: #D9D3CA;         /* dividers (decorative) */
+  --line-strong: #7B7369;  /* field and checkbox borders, 4.6:1 on surface */
+  --ink-3: #696259;        /* captions, placeholders, 5.5:1 on paper */
+  --ink-2: #4D463F;        /* secondary text, 8.5:1 */
+  --ink: #221D18;          /* text, primary buttons, 15.2:1 */
+  /* camera screens */
+  --night: #161310;
+  --night-2: #2A2621;
+  --on-night-2: #C7C3BD;   /* primary text on dark is --paper */
+  /* status */
+  --ok: #1D6835;       --ok-tint: #DFF6E2;     --ok-on-night: #83DC97;
+  --warn: #805216;     --warn-tint: #FDEEC5;   --warn-fill: #F4C352;
+  --bad: #AC2724;      --bad-tint: #FFE8E5;    --bad-fill: #B32322;   --bad-on-night: #FB988D;
+  --info: var(--ink-2); --info-tint: var(--sunken);
+  /* on this device: only the local-AI indicator and its sheet */
+  --device: #0D6880;   --device-tint: #DFF2F9; --device-on-night: #91CFE5;
+  /* disabled on dark */
+  --disabled-night-bg: #3B362F; --disabled-night-fg: #A49D93;
+
+  /* spacing (4 px base) */
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 20px;
+  --space-6: 24px; --space-8: 32px; --space-10: 40px; --space-12: 48px; --space-16: 64px;
+  /* radius */
+  --r-sm: 8px; --r-md: 12px; --r-lg: 16px; --r-xl: 24px; --r-full: 999px;
+  /* elevation (2 levels) */
+  --shadow-1: 0 1px 2px rgba(34,29,24,.08), 0 1px 1px rgba(34,29,24,.04);
+  --shadow-2: 0 12px 32px rgba(34,29,24,.18), 0 2px 8px rgba(34,29,24,.10);
+  /* scrim */
+  --scrim: rgba(22,19,16,.5);
+
+  /* type (design/README.md, Type) */
+  --font-ui: 'Atkinson Hyperlegible Next', system-ui, sans-serif;
+  --font-mono: 'Atkinson Hyperlegible Mono', ui-monospace, monospace;
+  --type-metric: 800 56px/56px var(--font-ui);
+  --type-display: 800 34px/40px var(--font-ui);
+  --type-title: 700 26px/32px var(--font-ui);
+  --type-heading: 700 20px/26px var(--font-ui);
+  --type-body-lg: 500 18px/26px var(--font-ui);
+  --type-button: 700 18px/24px var(--font-ui);
+  --type-body: 400 16px/24px var(--font-ui);
+  --type-body-dense: 400 15px/22px var(--font-ui);
+  --type-caption: 600 14px/20px var(--font-ui);
+  --type-mono: 500 16px/22px var(--font-mono);
+  --type-mono-lg: 700 34px/40px var(--font-mono);
+}

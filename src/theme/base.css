@@ -1,0 +1,108 @@
+/* Page-wide basics, from the tokens. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--paper);
+  color: var(--ink);
+  font: var(--type-body);
+}
+
+h1,
+h2,
+h3,
+p,
+ul,
+ol,
+dl,
+dd,
+figure,
+blockquote {
+  margin: 0;
+}
+
+ul,
+ol {
+  padding: 0;
+  list-style: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+/* Focus: 3 px ink, 3 px offset; paper on dark (camera) screens. */
+:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 3px;
+}
+
+.on-night :focus-visible {
+  outline-color: var(--paper);
+}
+
+.mono {
+  font: var(--type-mono);
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.skip-link {
+  position: absolute;
+  left: var(--space-4);
+  top: -100px;
+  z-index: 100;
+  padding: var(--space-3) var(--space-4);
+  background: var(--ink);
+  color: var(--surface);
+  font: var(--type-caption);
+  border-radius: var(--r-md);
+}
+
+.skip-link:focus {
+  top: var(--space-4);
+}
+
+/* Under reduced motion: no slides or fades. .motion-safe opts a component
+   out, for its own reduced-motion version (the progress bar's pulse). */
+@media (prefers-reduced-motion: reduce) {
+  *:not(.motion-safe),
+  *:not(.motion-safe)::before,
+  *:not(.motion-safe)::after {
+    transition-duration: 0s !important;
+    animation-duration: 0s !important;
+    animation-iteration-count: 1 !important;
+  }
+}

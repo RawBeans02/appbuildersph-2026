@@ -20,16 +20,21 @@ export default defineConfig({
       // The new service worker takes over as soon as it installs, so every
       // deploy to main reaches the next load without a prompt.
       registerType: 'autoUpdate',
-      // Placeholder manifest: the name, colors and icons come from design/.
+      // The manifest values from design/README.md ("App icon and manifest").
       manifest: {
-        name: 'appbuildersph-2026',
-        short_name: 'appbuildersph-2026',
+        name: 'Agapay',
+        short_name: 'Agapay',
+        description: 'Offline health checks for barangay health workers after a typhoon.',
         start_url: '/',
         scope: '/',
         display: 'standalone',
-        theme_color: '#ffffff',
-        background_color: '#ffffff',
-        icons: [],
+        theme_color: '#F7F4ED',
+        background_color: '#F7F4ED',
+        icons: [
+          { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
+          { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png' },
+          { src: '/icons/icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+        ],
       },
       workbox: {
         // The precache is the app shell only. Models and runtime .wasm files are

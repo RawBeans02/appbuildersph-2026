@@ -113,7 +113,10 @@ React + TypeScript, built with Vite as an installable web app (PWA: vite-plugin-
 - **Other products:** the team has built other products before this event; no code, data, prompts, designs or assets from them are used here.
 - **Designs:** the screens, tokens, copy, components and app icons in `design/` were made with Claude Design during the event (pass 1 landed in `7397da7`). The photos in `design/assets/` are mockup placeholders made with OpenAI gpt-image-2; they never ship in the app.
 - **Algorithms we reimplemented:** the OCR pre- and post-processing (`src/inference/ocr/`: DB box extraction and CTC decoding) follows PaddleOCR's published reference algorithms (Apache-2.0), written fresh in TypeScript. The seed's random generator is mulberry32, a public-domain algorithm by Tommy Ettinger (`src/data/seed/generate.ts`).
-- **Fonts, icons, images and other third-party assets,** with their licenses: _TBD (listed as they are added)_.
+- **Fonts, icons, images and other third-party assets,** with their licenses:
+  - Fonts: Atkinson Hyperlegible Next and Atkinson Hyperlegible Mono (Braille Institute of America), SIL Open Font License 1.1. The woff2 files were downloaded from Google Fonts and are self-hosted in `public/fonts/` with their license texts, so they work offline.
+  - Icons in the UI: Phosphor Icons (`@phosphor-icons/react`, MIT; see Open-source libraries).
+  - App icons (`public/icons/`): made with Claude Design during the event (`design/icons/`).
   - The synthetic test label `src/inference/ocr/fixtures/label.ppm` was rendered during the event with Pillow's bundled font, Aileron Regular (CC0). Its text is invented.
   - The synthetic demo label `docs/demo/label-doxy-24A.png` (the box scanned in the demo's stock step) was rendered during the event by `scripts/demo-label/make_label.py` with the same font, Aileron Regular (CC0). Its text is invented, with no brand, logo or company, and it is marked "DEMO · NOT A REAL MEDICINE · SAMPLE DATA".
 
@@ -132,6 +135,7 @@ A cloud "Jr. Builder" agent named in early commits was planned but never used.
 | Library | Used for | License |
 |---|---|---|
 | [React](https://react.dev) and React DOM | UI | MIT |
+| [Phosphor Icons](https://phosphoricons.com) (`@phosphor-icons/react`) | The UI's icons (Bold; Fill for the active tab) | MIT |
 | [Vite](https://vite.dev) | Dev server and production build | MIT |
 | [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react) | React support in Vite | MIT |
 | [vite-plugin-pwa](https://github.com/vite-pwa/vite-plugin-pwa) | Web app manifest and service worker (offline app shell) | MIT |
