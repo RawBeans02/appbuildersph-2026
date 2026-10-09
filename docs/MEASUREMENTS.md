@@ -34,6 +34,9 @@ Vitest (Node 20) in CI. In `src/qr/codec.test.ts`, the realistic sample payload 
 ### 5. Hinga accuracy
 The trial protocol, kill criterion and results tables are in `docs/SPIKE-HINGA.md` (Lead).
 
+### 6. Accessibility (automated)
+`e2e/a11y.spec.ts` runs axe-core 4.13.0 (the WCAG 2.0/2.1 A and AA rules) in headless Chromium in CI on every screen with the sample data loaded: the phone screens at 375 × 812, the municipal laptop at 1280 × 800. A serious or critical violation fails the test. Each screen logs `a11y <path>: N rules passed, N violated, N to check by hand`. axe checks what a machine can (contrast, names, roles, labels); the rules it can't decide are listed for a person to check, and it doesn't replace testing with a screen reader.
+
 ## Results from real devices
 
 Fill in from method 1 ("Copy as a table row"). One row per device and run.
@@ -49,6 +52,7 @@ Fill in from method 1 ("Copy as a table row"). One row per device and run.
 
 | When | Number | Where it came from | Device |
 |---|---|---|---|
+| Oct 9, CI run 37914040890 | Accessibility: 14 screens, 0 axe violations of any impact (WCAG 2.0/2.1 A and AA rules). Rules passed per screen: / 20, /prepare 20, /watch 22, /stock 23, /compare 23, /send 23, /privacy 22, /hinga (2a) 24, /device 25, 404 18; /municipal 23, /municipal/merged 22, /municipal/plan 26, /municipal/log 20. Left to check by hand: color contrast on /compare, /device and the four laptop screens; video captions on /device (the live camera preview, no sound) | `e2e/a11y.spec.ts` log | GitHub Actions runner, headless Chromium |
 | Oct 9, CI run 37909522376 | Demo label read offline on the designed stock screens: "Read on this phone in 0.7 s, after 0.5 s getting the AI ready." | `e2e/ocr-offline.spec.ts` log | GitHub Actions runner (not a phone) |
 | Oct 9, CI run 37905772594 | "Measure this device" offline: OCR load 588 ms, first read 1155 ms, later reads 1092 ms (median), label read right; pose start 368 / 448 ms in a worker; 47.3 fps on the fake camera, 17 ms per detection (median); cry check start 207 ms | `e2e/measure.spec.ts` log (the copied table row) | GitHub Actions runner, headless Chromium 156, fake camera (not a phone) |
 | Oct 9, CI run 37905165994 | Demo label read offline: "Read on this phone in 1.2 s, after 0.6 s loading the reader for the first time" | `e2e/ocr-offline.spec.ts` log | GitHub Actions runner (not a phone) |
