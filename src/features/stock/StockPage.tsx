@@ -3,6 +3,7 @@ import { Link } from '../../app/Link'
 import { getDb } from '../../data/db/appDb'
 import type { AgapayDb } from '../../data/db/db'
 import { useDbQuery } from '../../data/db/useDbQuery'
+import { OCR_ENGINE, OCR_ENGINE_LABEL, OCR_ENGINE_OVERRIDDEN } from '../../inference/ocr/engine'
 import { readBox } from '../../inference/ocr/ocrClient'
 import { CHECK_BELOW, parseLabel, type LabelField, type LabelReading } from '../../rules/label'
 import { draftFromReading, saveStockLot, UNITS, validateDraft, type StockDraft } from './stock'
@@ -196,6 +197,7 @@ export default function StockPage() {
           {error} <Link to="/prepare">Prepare for offline</Link>
         </p>
       )}
+      {OCR_ENGINE_OVERRIDDEN && <p>Test setting: boxes are read with {OCR_ENGINE_LABEL[OCR_ENGINE]}.</p>}
       <h2>On hand</h2>
       {stock.status === 'loading' ? (
         <p>Loading…</p>

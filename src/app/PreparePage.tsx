@@ -1,3 +1,4 @@
+import { OCR_ENGINE, OCR_ENGINE_LABEL, OCR_ENGINE_OVERRIDDEN } from '../inference/ocr/engine'
 import { modelBytes, offlineModels } from '../lib/offlineModels'
 import type { ModelDownloadState } from '../lib/modelDownload'
 import { useModelDownload } from '../lib/useModelDownload'
@@ -57,6 +58,7 @@ export default function PreparePage() {
           </li>
         ))}
       </ul>
+      {OCR_ENGINE_OVERRIDDEN && <p>Test setting: the box reader is {OCR_ENGINE_LABEL[OCR_ENGINE]}.</p>}
       <Status state={state} />
       {state.status === 'idle' && (
         <button type="button" onClick={() => void start()}>
