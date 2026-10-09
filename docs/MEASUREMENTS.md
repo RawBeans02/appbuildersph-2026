@@ -27,7 +27,7 @@ On the device being measured, with internet on, open the live URL's `/prepare` a
 Vitest (Node 20) in CI. In `src/qr/codec.test.ts`, the realistic sample payload is 282 bytes of QR text and the largest valid one 343. `src/qr/pairing.test.ts` measures the pairing QR at 173 characters for any P-256 key.
 
 ### 4. CI-runner timings (runner numbers only)
-- `e2e/ocr-offline.spec.ts` logs the stock screen's line, for example "Read on this phone in 1.2 s, after 0.6 s loading the reader for the first time", from headless Chromium on a GitHub Actions `ubuntu-latest` runner.
+- `e2e/ocr-offline.spec.ts` logs the stock screen's line, for example "Read on this phone in 0.7 s, after 0.5 s getting the AI ready." (before the designed screens: "…, after 0.6 s loading the reader for the first time"), from headless Chromium on a GitHub Actions `ubuntu-latest` runner.
 - The CI-only model tests (`*.model.test.ts`) log detection and recognition milliseconds in Node on the same runner.
 - They show the pipeline runs end to end with no network. They are not phone speed and are never quoted as such.
 
@@ -49,6 +49,7 @@ Fill in from method 1 ("Copy as a table row"). One row per device and run.
 
 | When | Number | Where it came from | Device |
 |---|---|---|---|
+| Oct 9, CI run 37909522376 | Demo label read offline on the designed stock screens: "Read on this phone in 0.7 s, after 0.5 s getting the AI ready." | `e2e/ocr-offline.spec.ts` log | GitHub Actions runner (not a phone) |
 | Oct 9, CI run 37905772594 | "Measure this device" offline: OCR load 588 ms, first read 1155 ms, later reads 1092 ms (median), label read right; pose start 368 / 448 ms in a worker; 47.3 fps on the fake camera, 17 ms per detection (median); cry check start 207 ms | `e2e/measure.spec.ts` log (the copied table row) | GitHub Actions runner, headless Chromium 156, fake camera (not a phone) |
 | Oct 9, CI run 37905165994 | Demo label read offline: "Read on this phone in 1.2 s, after 0.6 s loading the reader for the first time" | `e2e/ocr-offline.spec.ts` log | GitHub Actions runner (not a phone) |
 | Oct 9, CI run 37904919331 | The same test: 1.4 s, after 0.7 s loading | `e2e/ocr-offline.spec.ts` log | GitHub Actions runner (not a phone) |
