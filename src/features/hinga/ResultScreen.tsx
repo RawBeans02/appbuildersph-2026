@@ -101,7 +101,9 @@ export function ResultScreen(props: {
 
         {confirmation ? (
           <div role="status" className={styles.saved}>
-            <CheckCircleIcon size={24} weight="bold" aria-hidden />
+            {/* 6c: only this check stamps (saved is set by the Save tap in this visit, never
+                restored). The result's number, band and headline never animate. */}
+            <CheckCircleIcon className="stamp" size={24} weight="bold" aria-hidden />
             <div>
               <p className={styles.savedTitle}>{confirmation.title}</p>
               <p className={styles.savedDetail}>{confirmation.detail}</p>
