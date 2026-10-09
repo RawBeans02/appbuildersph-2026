@@ -170,8 +170,8 @@ The brief (from the team's phone-test feedback) goes to Claude Design. Build fro
   - One timeboxed exception until 4:45 AM: polish to the Claude Design pass 2 frames (CSS, copy and SVG on screens already built). Fixes from the owner's 3:10 phone test are audit items, so they're allowed after 4:00.
   - 4:45: QUALITY audit + self-audit #2 + Lighthouse (median of 3) on the Cloudflare URL.
   - The owner's 3:10–3:55 phone test list is in the kit (`owner-test-3am.md`): the demo loop with real cameras is the go/no-go.
-- [ ] doing · P9 (brief P1, before the 4 AM freeze, only if green by 2:45) phone: 14d QR receipt (real bytes, counts, export #, key), 14e QR `reveal-qr`, 14c/13b/6c/Prepare "Done" `stamp`, 9a new rows `land`, 8d footer count `tick` · [lead]
-- [ ] doing · P10 (brief P1, same rule) laptop: 18d doctor-team order bars (fixed weights ×3/×2/×1, ranges dashed), 20c newest log row + B25 full approved text · [lead]
+- [x] done · P9 (brief P1) phone: 14d QR receipt (real bytes, counts, export #, key), 14e QR `reveal-qr`, 14c/13b/6c/Prepare "Done" `stamp`, 9a new rows `land`, 8d footer count `tick` · [lead] · ca92d8e..4847f02, CI 37968493277 green
+- [x] done · P10 (brief P1) laptop: 18d doctor-team order bars (fixed weights ×3/×2/×1, ranges dashed), 20c newest log row + B25 full approved text · [lead] · 586d0f8, c01eccf, 7f25ba5, 1b426d0 (18d moved under the merged table: Lead override, `design/README.md`); CI 37968802870 green
 - [ ] todo · P8 I2 loop art on 0c (ordered-list fallback until then) · [sr] after P4
 
 ## Next
