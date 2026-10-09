@@ -1,7 +1,7 @@
 import { expect, test, type BrowserContext } from '@playwright/test'
 import { DEMO_SCAN_LABEL } from '../src/data/seed/demoLabel'
 import { prepareForOffline } from './prepare'
-import { openPage } from './lock'
+import { openPage, unlockIfLocked } from './lock'
 
 // The whole demo with no camera and no network, phone to laptop. The phone
 // (one browser context) runs "Prepare for offline", goes offline, then does
@@ -196,6 +196,8 @@ test('the full demo offline: phone wow flow, then pair, receive, merge and appro
     await expect(page.getByRole('region', { name: 'Approved instructions' })).toContainText('Riverside-D to Maligaya-D')
     const reloaded = await page.reload()
     expect(reloaded?.fromServiceWorker()).toBe(true)
+    // Phase 2's PIN lock locks every reload; the instructions show once unlocked.
+    await unlockIfLocked(page)
     await expect(page.getByRole('region', { name: 'Approved instructions' })).toContainText('doctor team to Maligaya-D first')
     await page.screenshot({ path: 'docs/demo/offline-saved-home.png', fullPage: true })
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight))
