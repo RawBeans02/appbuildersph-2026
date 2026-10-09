@@ -32,7 +32,8 @@ test('Hinga starts its models offline and will not count without a chest in view
   await expect(hinga).toHaveAttribute('data-hinga-cry', /^(ready|off)$/, { timeout: 120_000 })
 
   // Step 1: the age band and the readiness tick.
-  await page.getByText('12 months up to 5 years').click()
+  // Pass 1b renames the band to "1 to 4 years"; either label is the 40 cut-off.
+  await page.getByText(/^(12 months up to 5 years|1 to 4 years)$/).first().click()
   await page.getByText('The child is calm: not crying, not feeding, and the chest is visible.').click()
   await page.getByRole('button', { name: 'Next: point the camera' }).click()
 
