@@ -9,7 +9,7 @@ Every task names the files or folders it **owns**, so agents pushing straight to
 
 **Designs:** all UI comes from Claude Design: `design/` (exports, tokens, copy + `design/README.md`). Link the screen on every UI task; no UI task starts before its screen exists.
 
-**Model:** Opus 5.5 for every agent. **Effort:** Lead ultracode · Sr. max or ultracode. If an agent hits a usage limit, the Lead reassigns its open tasks here.
+**Model:** Opus 5.5 for every agent. **Effort:** Lead ultracode · Sr. ultracode. If an agent hits a usage limit, the Lead reassigns its open tasks here.
 
 **Stack (locked Fri ~2:00 PM):** Vite + React + TypeScript as an offline-first PWA (`vite-plugin-pwa`), static on Vercel, npm. The on-device model runtime (WebLLM, transformers.js / ONNX Runtime Web, MediaPipe…) is picked with the idea; don't install one before that.
 

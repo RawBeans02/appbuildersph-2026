@@ -48,12 +48,12 @@ They said so at the briefing: assume an AI reads every commit, every README clai
 - Light commands (typecheck, lint, a single unit test file) can run directly.
 - **Both agents share this one laptop**, and the guard runs one heavy job at a time across both, so expect queueing. The Sr. Builder takes the heavy local steps; the Lead keeps to light checks where it can. Don't keep a dev server running when you're not using it.
 - **Heavy checks run in the cloud wherever possible:** the hosting build on every push to `main`, and GitHub Actions CI (typecheck, lint, tests, production build, e2e). Read their results instead of re-running them locally.
-- **Running a local AI model on this laptop** (a WebGPU browser tab, Ollama, MLX) is the heaviest job of all (about 1–3 GB, estimate). Message **Account Admin** (the owner's separate Claude session that watches laptop memory; an AI that writes no code) first so it can check memory. Use the smallest quantized model that proves the point, one at a time, and close the tab or process right after. Real model checks are better done on our phones and other laptops via the live URL.
+- **Running a local AI model on this laptop** (a WebGPU browser tab, Ollama, MLX) is the heaviest job of all; it can take a large share of the laptop's memory. Message **Account Admin** (the owner's separate Claude session that watches laptop memory; an AI that writes no code) first so it can check memory. Use the smallest quantized model that proves the point, one at a time, and close the tab or process right after. Real model checks are better done on our phones and other laptops via the live URL.
 - No Docker unless the Lead approves it. Use hosted services for infrastructure (hosting, CI). The AI itself runs on the user's device (`QUALITY.md`).
-- Under ultracode, parallel subagents count too: heavy commands still go through the guard one at a time, and subagents stick to reading and reviewing.
+- Under ultracode, subagents may write code (in files their task owns), but heavy commands (installs, builds, e2e, model tests) still go through the guard one at a time across both agents.
 
 ## Effort and usage limits
-- Every agent runs **Opus 5.5**; only the effort differs, set by the owner at session start: **Lead = ultracode** · **Sr. Builder = max, or ultracode**. Use it for quality, and under ultracode for parallelism where it helps.
+- Every agent runs **Opus 5.5**; only the effort differs, set by the owner at session start: **Lead = ultracode** · **Sr. Builder = ultracode**. Use it for quality, and under ultracode for parallelism where it helps.
 - Higher effort burns quota faster, and hitting a 5-hour limit pauses an agent for hours. Push small and often so another agent can pick up your task from `main` if you're paused.
 - If any agent hits a limit, the Lead reassigns its open `TASKS.md` items (the owner does it if the Lead is paused).
 

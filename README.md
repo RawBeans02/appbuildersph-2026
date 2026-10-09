@@ -76,7 +76,7 @@ _TBD_
 Every AI session that touched this project:
 - **Claude Code** (Anthropic, Opus 5.5): the **Lead** (planning, reviews, CI, docs and parts of the app) and the **Sr. Builder** (core implementation), each a Claude Code session, plus their subagents. Their commits start with `lead:` and `sr:`. The Claude co-author line on commits is the AI tool, not a person.
 - **Review and verification subagents** (Claude Code): review only; they write no code.
-- **A separate Claude session that watches our laptop's memory** for the owner: an AI; it writes no product code.
+- **The owner's separate Claude session ("Account Admin", an AI):** drafted the pre-event process docs on Oct 8, sets up and monitors the laptop (starts the agent sessions, watches memory), relays briefing details, and runs read-only audits; it writes no product code.
 - **Claude** (chat, Research mode): research and idea selection.
 - **Claude Design**: all UI design.
 - **Devin**: _TBD (listed with its commits only if used)._
