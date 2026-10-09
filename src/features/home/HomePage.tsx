@@ -19,13 +19,15 @@ import type { HomeSummary } from './summary'
 import { TaskList } from './TaskList'
 import { breathingLine, taskRows } from './taskRows'
 import { useHomeSummary } from './useHomeSummary'
+// The first-run intro (0a–0c) is in Home's own chunk: it's the first thing a
+// new visitor sees, so a separate chunk would delay the first paint.
+import Intro from './Intro'
 import { useShowIntro } from './introSeen'
 import styles from './HomePage.module.css'
 
 // Phase 2 only (P2-C): approved messages from the municipality, its own chunk.
 const MessagesCard = lazy(() => import('../inbox/MessagesCard'))
-// The first-run intro (0a–0c), its own chunk: loaded only when it shows.
-const Intro = lazy(() => import('./Intro'))
+
 
 // Screen 1: Home (pass 2: 1e story-led, 1f without the AI yet, 1g with RHU
 // instructions; pass 1: 1b loading, 1c empty, 1d error). Every number comes
@@ -243,11 +245,7 @@ export default function HomePage() {
           </ButtonLink>
         )}
       </div>
-      {showIntro && (
-        <Suspense fallback={null}>
-          <Intro />
-        </Suspense>
-      )}
+      {showIntro && <Intro />}
     </div>
   )
 }
