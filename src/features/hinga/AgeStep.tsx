@@ -1,3 +1,4 @@
+import { CaretDownIcon } from '@phosphor-icons/react'
 import { useState } from 'react'
 import { Button, CheckRow, Field, FlowTopBar, RadioRow } from '../../components'
 import type { AgapayDb } from '../../data/db/db'
@@ -71,7 +72,7 @@ export function AgeStep({ child, onChange, onNext, onBack }: { child: Child; onC
         </div>
 
         <div className={styles.field}>
-          <Field label="Link a resident" optional>
+          <Field label="Link a resident" optional trailingIcon={<CaretDownIcon size={20} weight="bold" />}>
             {(input) => (
               <select {...input} value={child.resident?.id ?? ''} onChange={(event) => pickResident(event.target.value)}>
                 <option value="" />

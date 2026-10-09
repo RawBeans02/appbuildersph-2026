@@ -1,4 +1,4 @@
-import { CheckIcon, InfoIcon, ListNumbersIcon, ScanIcon, WarningCircleIcon } from '@phosphor-icons/react'
+import { CaretDownIcon, CheckIcon, InfoIcon, ListNumbersIcon, ScanIcon, WarningCircleIcon } from '@phosphor-icons/react'
 import { useMemo, useState, type ComponentType } from 'react'
 import { Button, ButtonLink, Field, StateBlock, useToast } from '../../components'
 import { getDb } from '../../data/db/appDb'
@@ -154,7 +154,7 @@ export function PlanBody({ plan, wordingPanel: Wording }: { plan: MunicipalPlan;
           </p>
         )}
         <div className={styles.approver}>
-          <Field label="Approved by">
+          <Field label="Approved by" trailingIcon={<CaretDownIcon size={20} weight="bold" />}>
             {(input) => (
               <select {...input} defaultValue={APPROVER}>
                 <option value={APPROVER}>{APPROVER}</option>
