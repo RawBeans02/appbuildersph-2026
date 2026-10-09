@@ -36,6 +36,7 @@ _TBD: the target user, the problem, and why it matters._
 |---|---|---|
 | App shell (HTML, JS, CSS), cached by a service worker | The user's browser | No model yet |
 | Records (residents, flood exposures, breathing checks, medicine stock, flags, approvals) | IndexedDB in the user's browser; they never leave the device except as the de-identified QR | No model |
+| De-identified export (Send screen): counts by age band, small numbers shown as "<5", signed with the phone's own key and drawn as a QR | The user's browser (Web Crypto ECDSA P-256; the private key can't be read out) | No model |
 | De-identified QR payload (`src/qr/`, not yet used by a screen): small-cell suppression ("<5"), signing on the phone, verification and merge on the laptop | The user's browser, with the built-in Web Crypto API (ECDSA P-256) | No model |
 | Medicine-box reader (Stock screen; also the `spike-ocr.html` test page): reads text from a photo of the box, then drug, lot and expiry are parsed by rules for the health worker to confirm; the photo is never stored | The user's browser, in a Web Worker, WebAssembly, single-threaded | PP-OCRv5 mobile detection + English recognition on ONNX Runtime Web 1.30 |
 | Hinga spike (`spike-hinga.html`, a test page not linked from the app): finds the torso in the rear-camera video, then counts breaths per minute from the torso's brightness and shoulder height (band-pass, FFT peak, zero crossings) and compares with the WHO IMCI 2014 cut-offs. The video is never stored or sent | The user's browser: the pose model in WebAssembly on the CPU, on the main thread (a spike shortcut); the breath counting in plain TypeScript | MediaPipe Pose Landmarker lite on MediaPipe Tasks Vision 1.0.1 |
@@ -112,6 +113,7 @@ A cloud "Jr. Builder" agent named in early commits was planned but never used.
 | [Playwright](https://playwright.dev) (`@playwright/test`) | End-to-end offline test in CI (Chromium) | Apache-2.0 |
 | [ESLint](https://eslint.org), `@eslint/js`, [typescript-eslint](https://typescript-eslint.io), `eslint-plugin-react-hooks`, `eslint-plugin-react-refresh`, `globals` | Linting | MIT |
 | `@types/react`, `@types/react-dom`, `@types/node` ([DefinitelyTyped](https://github.com/DefinitelyTyped/DefinitelyTyped)) | Type definitions | MIT |
+| [qrcode-generator](https://github.com/kazuhikoarase/qrcode-generator) | Draws the de-identified QR on the Send screen | MIT |
 | [idb](https://github.com/jakearchibald/idb) | Promise wrapper for IndexedDB, the on-device records | ISC |
 | [fake-indexeddb](https://github.com/dumbmatter/fakeIndexedDB) | In-memory IndexedDB for unit tests (development only) | Apache-2.0 |
 | [ONNX Runtime Web](https://onnxruntime.ai) (`onnxruntime-web`) | On-device model inference (WebAssembly) for the OCR spike | MIT |
