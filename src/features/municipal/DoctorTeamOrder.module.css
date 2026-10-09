@@ -114,3 +114,9 @@
 .dashed.inWatchWindow {
   border: 1px dashed var(--ink-2);
 }
+
+/* A4 rule 8, one moving region at a time: the bar fills after its table row
+   has landed (--dur-base), so both finish within --dur-draw. */
+.bar:global(.fill) {
+  animation-delay: var(--dur-base);
+}
