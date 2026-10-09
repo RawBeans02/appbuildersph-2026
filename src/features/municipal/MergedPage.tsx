@@ -129,7 +129,7 @@ export function MergedTable({ view }: { view: MergedView }) {
                 <span className={styles.name}>
                   {row.name}
                   {row.priority && (
-                    <Pill tone="warn" icon={<FlagIcon size={16} weight="bold" aria-hidden />}>
+                    <Pill tone="warn" onTint icon={<FlagIcon size={16} weight="bold" aria-hidden />}>
                       Priority
                     </Pill>
                   )}
