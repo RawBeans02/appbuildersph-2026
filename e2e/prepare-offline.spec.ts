@@ -33,5 +33,5 @@ test('prepared models and the runtime .wasm load with no network', async ({ page
     )
   })
   expect(files.find((file) => file.url.endsWith('/models/ppocr/det.onnx'))).toMatchObject({ ok: true, bytes: 4_826_518 })
-  expect(files.find((file) => file.url.endsWith('.wasm'))).toMatchObject({ ok: true, bytes: 14_239_897 })
+  expect(files.find((file) => /\/ort-wasm[^/]*\.wasm$/.test(file.url))).toMatchObject({ ok: true, bytes: 14_239_897 })
 })

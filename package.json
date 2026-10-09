@@ -17,9 +17,10 @@
     "test": "vitest run",
     "test:e2e": "playwright test",
     "seed:municipal": "node scripts/seed/run.mjs scripts/seed/municipal.ts",
-    "copy:mediapipe": "node -e \"const fs=require('node:fs');fs.mkdirSync('public/mediapipe/wasm',{recursive:true});for(const f of ['vision_wasm_internal.js','vision_wasm_internal.wasm'])fs.copyFileSync('node_modules/@mediapipe/tasks-vision/wasm/'+f,'public/mediapipe/wasm/'+f)\""
+    "copy:mediapipe": "node scripts/copy-mediapipe.mjs"
   },
   "dependencies": {
+    "@mediapipe/tasks-audio": "^1.0.1",
     "@mediapipe/tasks-vision": "^1.0.1",
     "@tesseract.js-data/eng": "^1.0.0",
     "idb": "^8.0.4",
