@@ -100,7 +100,7 @@ flowchart LR
 - **Models**: MediaPipe Pose Landmarker lite, to find the torso, and YAMNet, to hear crying, on MediaPipe Tasks Vision and Audio 1.0.1 (sizes, sources and licenses: README).
 - **Runtime**:
   - The pose model runs in a module Web Worker (`src/inference/hinga/`) on the CPU through WebAssembly; no GPU delegate, for iPhone safety. The main thread sends one video frame at a time as a transferred `ImageBitmap`, with one frame in flight.
-  - If the worker can't start, the tracker falls back to the main thread and the screen says which one runs and why (`POSE_IN_WORKER`).
+  - If the worker can't start, or fails on its first frame, the tracker falls back to the main thread and the screen says which one runs and why (`POSE_IN_WORKER`). On Safari (every iPhone browser) it starts on the main thread: in our WebKit CI run the worker's WebGL 2 canvas failed while the same model ran on the main thread.
   - YAMNet runs in its own worker. The microphone is open only during the count, and its audio is classified in pieces of about 1 s and then dropped; it's never stored or sent.
   - Both runtimes and models are read from the model cache.
 - **Counting** (`COUNT_METHOD = 'pose-torso'` in `src/inference/hinga/method.ts`; constants in `dsp.ts`):
