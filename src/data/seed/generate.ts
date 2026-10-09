@@ -96,16 +96,16 @@ function at(day: string, hour: number, minute: number): string {
 // Age bands, with the range of ages (in days on `today`) drawn for each. The
 // ranges stay clear of the band edges, so every birthday lands inside its band
 // whatever today is. The first three are Hinga's (WHO IMCI) bands.
-type Band = 'under 2 months' | '2–12 months' | '1–5 years' | '5–17 years' | '18–59 years' | '60+ years'
+type Band = 'under 2 months' | '2 to 11 months' | '1 to 4 years' | '5 to 17 years' | '18 to 59 years' | '60+ years'
 
 const years = (n: number) => Math.round(n * 365.25)
 
 const AGE_IN_DAYS: Record<Band, readonly [min: number, max: number]> = {
   'under 2 months': [20, 50],
-  '2–12 months': [75, 330],
-  '1–5 years': [400, 1750],
-  '5–17 years': [years(5.1), years(17.8)],
-  '18–59 years': [years(18.2), years(59.8)],
+  '2 to 11 months': [75, 330],
+  '1 to 4 years': [400, 1750],
+  '5 to 17 years': [years(5.1), years(17.8)],
+  '18 to 59 years': [years(18.2), years(59.8)],
   '60+ years': [years(60.2), years(84)],
 }
 
@@ -117,22 +117,22 @@ const AGE_IN_DAYS: Record<Band, readonly [min: number, max: number]> = {
 type HouseholdPlan = { purok: number; members: readonly Band[]; exposed?: true }
 
 const HOUSEHOLDS: readonly HouseholdPlan[] = [
-  { purok: 1, members: ['18–59 years', '18–59 years', '5–17 years', '5–17 years'], exposed: true },
-  { purok: 1, members: ['18–59 years', '18–59 years', '5–17 years', '5–17 years', '5–17 years', '1–5 years'] },
+  { purok: 1, members: ['18 to 59 years', '18 to 59 years', '5 to 17 years', '5 to 17 years'], exposed: true },
+  { purok: 1, members: ['18 to 59 years', '18 to 59 years', '5 to 17 years', '5 to 17 years', '5 to 17 years', '1 to 4 years'] },
   { purok: 1, members: ['60+ years'] },
-  { purok: 1, members: ['18–59 years', '18–59 years', '5–17 years', '5–17 years', 'under 2 months'] },
-  { purok: 2, members: ['60+ years', '18–59 years', '18–59 years'], exposed: true },
-  { purok: 2, members: ['18–59 years', '18–59 years', '2–12 months', '5–17 years'] },
+  { purok: 1, members: ['18 to 59 years', '18 to 59 years', '5 to 17 years', '5 to 17 years', 'under 2 months'] },
+  { purok: 2, members: ['60+ years', '18 to 59 years', '18 to 59 years'], exposed: true },
+  { purok: 2, members: ['18 to 59 years', '18 to 59 years', '2 to 11 months', '5 to 17 years'] },
   { purok: 2, members: ['60+ years'] },
-  { purok: 3, members: ['18–59 years', '5–17 years'], exposed: true },
-  { purok: 3, members: ['60+ years', '18–59 years', '18–59 years', '5–17 years', '5–17 years', 'under 2 months'] },
-  { purok: 3, members: ['18–59 years'] },
-  { purok: 3, members: ['18–59 years', '18–59 years', '5–17 years', '1–5 years'] },
-  { purok: 4, members: ['18–59 years', '18–59 years', '5–17 years', '5–17 years', '2–12 months'] },
-  { purok: 4, members: ['60+ years', '60+ years', '18–59 years'] },
-  { purok: 4, members: ['18–59 years', '18–59 years', '5–17 years', '5–17 years', '1–5 years'] },
-  { purok: 5, members: ['60+ years', '18–59 years', '18–59 years', '5–17 years', '5–17 years', '1–5 years'] },
-  { purok: 5, members: ['60+ years', '60+ years', '18–59 years', '18–59 years'] },
+  { purok: 3, members: ['18 to 59 years', '5 to 17 years'], exposed: true },
+  { purok: 3, members: ['60+ years', '18 to 59 years', '18 to 59 years', '5 to 17 years', '5 to 17 years', 'under 2 months'] },
+  { purok: 3, members: ['18 to 59 years'] },
+  { purok: 3, members: ['18 to 59 years', '18 to 59 years', '5 to 17 years', '1 to 4 years'] },
+  { purok: 4, members: ['18 to 59 years', '18 to 59 years', '5 to 17 years', '5 to 17 years', '2 to 11 months'] },
+  { purok: 4, members: ['60+ years', '60+ years', '18 to 59 years'] },
+  { purok: 4, members: ['18 to 59 years', '18 to 59 years', '5 to 17 years', '5 to 17 years', '1 to 4 years'] },
+  { purok: 5, members: ['60+ years', '18 to 59 years', '18 to 59 years', '5 to 17 years', '5 to 17 years', '1 to 4 years'] },
+  { purok: 5, members: ['60+ years', '60+ years', '18 to 59 years', '18 to 59 years'] },
 ]
 
 const FLOOD_DAYS_AGO = 6
@@ -194,11 +194,11 @@ export function generateSeed(today: Date): SeedData {
 
   // Past Hinga checks in the evacuation center, after the flood. Each draws
   // its rate from a range that sits on one side of the WHO IMCI cut-off for
-  // the child's age (60/min under 2 months, 50 at 2–12 months, 40 at 1–5 years).
+  // the child's age (60/min under 2 months, 50 at 2 to 11 months, 40 at 1 to 4 years).
   const childIn = (band: Band) => shuffled(rng, people.filter((p) => p.band === band))[0].resident
   const hingaPlan = [
-    { child: childIn('1–5 years'), daysAgo: 4, time: [9, 40], rate: [43, 50], outcome: 'fast' },
-    { child: childIn('2–12 months'), daysAgo: 3, time: [10, 15], rate: [36, 45], outcome: 'not-fast' },
+    { child: childIn('1 to 4 years'), daysAgo: 4, time: [9, 40], rate: [43, 50], outcome: 'fast' },
+    { child: childIn('2 to 11 months'), daysAgo: 3, time: [10, 15], rate: [36, 45], outcome: 'not-fast' },
     { child: childIn('under 2 months'), daysAgo: 1, time: [14, 20], rate: [42, 52], outcome: 'not-fast' },
   ] as const
   const hingaChecks: SeedHingaCheck[] = hingaPlan.map((check, i) => {
