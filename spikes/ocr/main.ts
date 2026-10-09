@@ -1,4 +1,4 @@
-import { createInferenceClient } from '../../src/inference/client'
+import { createInferenceClient, createInferenceWorker } from '../../src/inference/client'
 import { appShell, startServiceWorker } from '../../src/lib/appShell'
 import { detectPlatform, pickBackend, type Backend } from '../../src/lib/backend'
 import { checkCapabilities } from '../../src/lib/capabilities'
@@ -7,7 +7,7 @@ import { downscaleImage } from '../../src/lib/image'
 import { createModelDownload } from '../../src/lib/modelDownload'
 import { modelBytes } from '../../src/lib/offlineModels'
 import { browserModelDownloadDeps } from '../../src/lib/useModelDownload'
-import type { OcrOutput } from './ocrRuntime'
+import type { OcrOutput } from '../../src/inference/ocr/runtime'
 
 // The OCR spike page (spike-ocr.html): pick or take a photo, then see the
 // boxes, the text and the time each stage took. Plain and unstyled on purpose.
@@ -68,8 +68,7 @@ const modelsReady = new Promise<void>((resolve) => {
   void download.checkCached().then(check)
 })
 
-const worker = new Worker(new URL('./ocr.worker.ts', import.meta.url), { type: 'module' })
-const client = createInferenceClient(worker)
+const client = createInferenceClient(createInferenceWorker())
 let initMs = 0
 const ready = (async () => {
   statusEl.textContent = 'Download the models to start.'

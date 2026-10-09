@@ -1,5 +1,5 @@
-import { echoRuntime } from './echoRuntime'
 import { createWorkerHandler } from './handler'
+import { createOcrRuntime } from './ocr/runtime'
 import type { WorkerRequest, WorkerResponse } from './protocol'
 
 // The inference worker: the model runs here, off the main thread, so the UI
@@ -12,7 +12,8 @@ const ctx = self as unknown as {
   onmessage: ((event: MessageEvent<WorkerRequest>) => void) | null
 }
 
-// The real on-device runtime replaces echoRuntime (a test fake, not AI) here.
-const handle = createWorkerHandler(echoRuntime, (message) => ctx.postMessage(message))
+// The medicine-box reader (PP-OCRv5 on ONNX Runtime Web). The echo runtime
+// (echoRuntime.ts) stays as the test fake for the handler and client.
+const handle = createWorkerHandler(createOcrRuntime(), (message) => ctx.postMessage(message))
 
 ctx.onmessage = (event) => handle(event.data)

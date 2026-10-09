@@ -1,5 +1,5 @@
 # Renders the synthetic medicine-box label used by the CI model test
-# (ocr.model.test.ts). Invented text, not a real product or patient.
+# (../ocr.model.test.ts). Invented text, not a real product or patient.
 # Font: Pillow's bundled default (Aileron Regular, CC0). Run with Pillow 10.1+:
 #   python3 make_label.py  ->  label.ppm (binary PPM, read without any library)
 from pathlib import Path

@@ -1,12 +1,12 @@
 import * as ort from 'onnxruntime-web/wasm'
-import { ORT_WASM, PP_OCR } from '../../src/inference/ocr/models'
-import type { Runtime } from '../../src/inference/protocol'
-import { loadModelFile } from '../../src/lib/modelCache'
+import { loadModelFile } from '../../lib/modelCache'
+import type { Runtime } from '../protocol'
+import { ORT_WASM, PP_OCR } from './models'
 import { buildCharset } from './ctc'
 import type { RGBAImage } from './imageOps'
 import { runOcr, type OcrLine, type OcrModels, type OcrTimings } from './pipeline'
 
-// PP-OCRv5 mobile on onnxruntime-web, inside the spike's worker. WASM only and
+// PP-OCRv5 mobile on onnxruntime-web, inside the inference worker. WASM only and
 // single-threaded whatever the device check picks: no WebGPU (iPhone), and no
 // threads without cross-origin isolation. The plain wasm build keeps the
 // WebGPU/JSEP code out of the bundle. The model files and the ORT .wasm come

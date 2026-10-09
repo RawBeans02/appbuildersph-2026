@@ -38,7 +38,7 @@ describe.skipIf(!process.env.CI)('PP-OCRv5 on a synthetic medicine label (CI onl
       },
     }
 
-    const { lines, timings } = await runOcr(readPpm('spikes/ocr/fixtures/label.ppm'), models, charset)
+    const { lines, timings } = await runOcr(readPpm('src/inference/ocr/fixtures/label.ppm'), models, charset)
     const text = lines.map((line) => line.text)
     console.log('OCR lines:', text, 'timings (CI runner, ms):', timings)
 
