@@ -3,14 +3,20 @@ import { hingaOutcome, type DangerSign } from '../../rules/imci'
 import type { CountRefusal } from './countSession'
 
 // The record a finished Hinga check saves on the phone (IndexedDB). Only the
-// count, the outcome and the danger signs are kept; no video, image or audio.
+// count, how it was counted, the outcome and the danger signs are kept; no
+// video, image or audio.
+
+export type CountMethodUsed = NonNullable<HingaCheck['method']>
 
 export type CheckInput = {
   id: string
   residentId: string | null
   checkedAt: string
   ageMonths: number
-  // null when the camera could not count (after the one retry).
+  // 'camera': the camera AI counted; 'hand': the health worker tapped once per
+  // breath for 60 s (L8b).
+  method: CountMethodUsed
+  // null when the camera could not count.
   breathsPerMinute: number | null
   // Why the last count was refused; kept only when there is no count.
   refusal: CountRefusal | null
@@ -30,6 +36,7 @@ export function buildHingaCheck(input: CheckInput): HingaCheck | null {
     outcome,
     refusal: input.breathsPerMinute === null ? (input.refusal ?? 'not-counted') : null,
     dangerSigns: [...input.dangerSigns],
+    method: input.method,
     sample: false,
   }
 }

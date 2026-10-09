@@ -27,7 +27,12 @@ export type CountOutcome =
 
 export type SessionState = {
   model: { status: 'loading' } | ({ status: 'ready' } & MethodInfo) | { status: 'error'; message: string }
-  camera: { status: 'off' } | { status: 'starting' } | { status: 'on'; settings: string } | { status: 'error'; message: string }
+  // Failed loads of the count method so far (open() and reloadModel()); the
+  // flow shows L9b after one and L8a after two.
+  loadFailures: number
+  // 'blocked': the browser gave no camera (permission denied, no camera, or no
+  // camera API); the reason is for the console, not the screen.
+  camera: { status: 'off' } | { status: 'starting' } | { status: 'on'; settings: string } | { status: 'blocked'; reason: string }
   regionFound: boolean
   counting: { secondsLeft: number } | null
   cry: CryCheck
@@ -47,6 +52,7 @@ const errorText = (error: unknown) => (error instanceof Error ? error.message : 
 export function createCountSession(makeMethod: () => CountMethod = () => createCountMethod()) {
   let state: SessionState = {
     model: { status: 'loading' },
+    loadFailures: 0,
     camera: { status: 'off' },
     regionFound: false,
     counting: null,
@@ -78,25 +84,19 @@ export function createCountSession(makeMethod: () => CountMethod = () => createC
   let lastFrameAt = 0
   let last: FrameMeasure | null = null
   let count: Count | null = null
+  // Model starts run one at a time (both MediaPipe runtimes use one global
+  // factory while they start), including a reload while the cry model starts.
+  let starting: Promise<void> = Promise.resolve()
+  const oneAtATime = (job: () => Promise<void>) => (starting = starting.then(job, job))
 
-  // Models: the count method's, then the cry check's (both MediaPipe runtimes
-  // use one global factory while they start, so not at the same time).
+  // Models: the count method's, then the cry check's.
   function open() {
     const opened = ++generation
-    const current = makeMethod()
-    method = current
-    methodReady = false
-    set({ model: { status: 'loading' }, cry: { status: 'loading' } })
+    set({ loadFailures: 0, cry: { status: 'loading' } })
     document.addEventListener('visibilitychange', onVisibility)
-    void (async () => {
-      try {
-        const info = await current.start()
-        if (opened !== generation) return current.dispose()
-        methodReady = true
-        set({ model: { status: 'ready', ...info } })
-      } catch (error) {
-        if (opened === generation) set({ model: { status: 'error', message: errorText(error) } })
-      }
+    void loadMethod(opened)
+    void oneAtATime(async () => {
+      if (opened !== generation) return
       try {
         if (typeof Worker === 'undefined') throw new Error('this browser has no workers')
         const model = await startCryModel()
@@ -106,7 +106,37 @@ export function createCountSession(makeMethod: () => CountMethod = () => createC
       } catch (error) {
         if (opened === generation) set({ cry: { status: 'off', reason: `the cry model could not load (${errorText(error)})` } })
       }
-    })()
+    })
+  }
+
+  function loadMethod(opened: number) {
+    method?.dispose()
+    const current = makeMethod()
+    method = current
+    methodReady = false
+    set({ model: { status: 'loading' } })
+    return oneAtATime(async () => {
+      if (opened !== generation || method !== current) return current.dispose()
+      try {
+        const info = await current.start()
+        if (opened !== generation || method !== current) return current.dispose()
+        methodReady = true
+        set({ model: { status: 'ready', ...info } })
+      } catch (error) {
+        if (opened === generation && method === current) methodFailed(error)
+      }
+    })
+  }
+
+  function methodFailed(error: unknown) {
+    console.error('Hinga: the breathing check could not load', error)
+    methodReady = false
+    set({ model: { status: 'error', message: errorText(error) }, loadFailures: state.loadFailures + 1 })
+  }
+
+  // L9b's Try again: load the count method again (the files are cached).
+  function reloadModel() {
+    if (state.model.status === 'error') void loadMethod(generation)
   }
 
   function close() {
@@ -129,32 +159,22 @@ export function createCountSession(makeMethod: () => CountMethod = () => createC
     }
   }
 
-  async function startCamera() {
+  // withMicrophone: after 3c, ask for the camera and the microphone in one
+  // browser prompt, as 3c says; the cry check opens its own microphone stream
+  // during the count, so this audio track is stopped at once.
+  async function startCamera(withMicrophone = false) {
     if (stream || state.camera.status === 'starting') return
     if (!navigator.mediaDevices?.getUserMedia) {
-      set({ camera: { status: 'error', message: 'This browser cannot open the camera here (it needs HTTPS and camera support).' } })
+      set({ camera: { status: 'blocked', reason: 'no camera API here (it needs HTTPS and camera support)' } })
       return
     }
     const opened = generation
     set({ camera: { status: 'starting' } })
     try {
-      stream = await navigator.mediaDevices.getUserMedia({
-        audio: false,
-        video: { facingMode: { ideal: 'environment' }, width: { ideal: 640 }, height: { ideal: 480 } },
-      })
+      stream = await openCamera(withMicrophone)
     } catch (error) {
-      const name = error instanceof DOMException ? error.name : ''
-      set({
-        camera: {
-          status: 'error',
-          message:
-            name === 'NotAllowedError'
-              ? 'Camera permission was denied. Allow the camera for this site in the browser settings, then try again.'
-              : name === 'NotFoundError' || name === 'OverconstrainedError'
-                ? 'No camera found on this phone.'
-                : `Could not open the camera: ${errorText(error)}`,
-        },
-      })
+      console.error('Hinga: no camera', error)
+      set({ camera: { status: 'blocked', reason: error instanceof DOMException ? error.name : errorText(error) } })
       return
     }
     if (opened !== generation) return stopStream()
@@ -187,7 +207,8 @@ export function createCountSession(makeMethod: () => CountMethod = () => createC
     stopStream()
     last = null
     overlay?.getContext('2d')?.clearRect(0, 0, overlay.width, overlay.height)
-    set({ camera: { status: 'off' }, regionFound: false })
+    // A blocked camera stays blocked (3d) until the health worker tries again.
+    set({ camera: state.camera.status === 'blocked' ? state.camera : { status: 'off' }, regionFound: false })
   }
 
   function loop() {
@@ -225,8 +246,11 @@ export function createCountSession(makeMethod: () => CountMethod = () => createC
       },
       (error: unknown) => {
         busy = false
+        // The model broke while running: the same as a failed load (L9b, then L8a).
         stopCamera()
-        set({ camera: { status: 'error', message: `The pose model failed on a frame: ${errorText(error)}` } })
+        method?.dispose()
+        method = null
+        methodFailed(error)
       },
     )
   }
@@ -363,10 +387,33 @@ export function createCountSession(makeMethod: () => CountMethod = () => createC
     attach,
     startCamera,
     stopCamera,
+    reloadModel,
     startCount,
-    cancelCount: () => cancelCount('interrupted'),
+    // The health worker's Cancel: back to framing, no refusal to show.
+    cancelCount() {
+      cancelCount('interrupted')
+      set({ outcome: null })
+    },
     clearOutcome: () => set({ outcome: null }),
   }
+}
+
+async function openCamera(withMicrophone: boolean): Promise<MediaStream> {
+  const video = { facingMode: { ideal: 'environment' }, width: { ideal: 640 }, height: { ideal: 480 } }
+  if (withMicrophone) {
+    try {
+      const both = await navigator.mediaDevices.getUserMedia({ video, audio: true })
+      for (const track of both.getAudioTracks()) {
+        track.stop()
+        both.removeTrack(track)
+      }
+      return both
+    } catch {
+      // No microphone, or it was refused: the camera alone decides (the cry
+      // check says it is off during the count).
+    }
+  }
+  return navigator.mediaDevices.getUserMedia({ audio: false, video })
 }
 
 export type CountSession = ReturnType<typeof createCountSession>

@@ -6,6 +6,7 @@ const base: CheckInput = {
   residentId: 'res-001',
   checkedAt: '2026-10-09T08:00:00.000Z',
   ageMonths: 14,
+  method: 'camera',
   breathsPerMinute: 46,
   refusal: null,
   dangerSigns: [],
@@ -36,6 +37,11 @@ describe('Hinga check record', () => {
     expect(buildHingaCheck({ ...base, breathsPerMinute: null, refusal: 'motion' })).toMatchObject({ outcome: 'refused', refusal: 'motion' })
     expect(buildHingaCheck({ ...base, breathsPerMinute: null, refusal: null })).toMatchObject({ refusal: 'not-counted' })
     expect(buildHingaCheck({ ...base, refusal: 'motion' })).toMatchObject({ outcome: 'fast', refusal: null })
+  })
+
+  it('records how the breaths were counted', () => {
+    expect(buildHingaCheck(base)).toMatchObject({ method: 'camera' })
+    expect(buildHingaCheck({ ...base, method: 'hand', breathsPerMinute: 44 })).toMatchObject({ method: 'hand', outcome: 'fast', refusal: null })
   })
 
   it('saves nothing outside the IMCI age range', () => {

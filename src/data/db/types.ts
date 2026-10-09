@@ -48,6 +48,9 @@ export type HingaCheck = {
   // Why the check refused (motion, crying…), or null.
   refusal: string | null
   dangerSigns: string[]
+  // How the breaths were counted: the camera AI, or the health worker tapping
+  // once per breath for 60 s. Missing on records saved before it was added.
+  method?: 'camera' | 'hand'
   sample: boolean
 }
 

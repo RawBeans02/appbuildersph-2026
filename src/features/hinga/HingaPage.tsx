@@ -285,9 +285,9 @@ function Camera(props: {
         </p>
       )}
       {state.camera.status === 'starting' && <p role="status">Opening the camera…</p>}
-      {state.camera.status === 'error' && (
+      {state.camera.status === 'blocked' && (
         <p role="alert">
-          {state.camera.message}{' '}
+          The camera is blocked ({state.camera.reason}).{' '}
           <button type="button" onClick={() => void session.startCamera()}>
             Try again
           </button>
@@ -362,6 +362,7 @@ function Result(props: { child: Child; breathsPerMinute: number | null; refusal:
       residentId: child.residentId,
       checkedAt: new Date().toISOString(),
       ageMonths,
+      method: 'camera',
       breathsPerMinute,
       refusal: props.refusal,
       dangerSigns: signs,
