@@ -1,5 +1,5 @@
-import { BARANGAY_PATTERN, isPlainObject, MUNICIPALITY_PATTERN } from './schema'
-import { importPublicKey, keyFingerprint, toPublicJwk, type PublicJwk } from './sign'
+import { BARANGAY_PATTERN, isPlainObject, MUNICIPALITY_PATTERN } from './schema.js'
+import { importPublicKey, keyFingerprint, toPublicJwk, type PublicJwk } from './sign.js'
 
 // The pairing QR: how a barangay phone's public key reaches the municipal
 // laptop once, before its first counts QR.

@@ -1,4 +1,4 @@
-import { isValidCount, MAX_COUNT, suppress, type Count } from './suppress'
+import { isValidCount, MAX_COUNT, suppress, type Count } from './suppress.js'
 
 // The QR payload v1: de-identified aggregate counts for one barangay and one
 // ISO week. No names, birthdates, household IDs, puroks or exact dates: every

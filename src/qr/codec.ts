@@ -5,9 +5,9 @@ import {
   validatePayload,
   type QrPayloadV1,
   type Validation,
-} from './schema'
-import { importPublicKey, keyFingerprint, signBytes, SIGNATURE_BYTES, verifyBytes, type KeyRegistry } from './sign'
-import type { Count } from './suppress'
+} from './schema.js'
+import { importPublicKey, keyFingerprint, signBytes, SIGNATURE_BYTES, verifyBytes, type KeyRegistry } from './sign.js'
+import type { Count } from './suppress.js'
 
 // The QR text: "AGP1." + base64url(compact JSON) + "." + base64url(signature).
 // The signature covers everything before the last dot, prefix included, so
@@ -112,7 +112,7 @@ function fromWire(value: unknown): Validation<QrPayloadV1> {
   })
 }
 
-function toBase64url(bytes: Uint8Array): string {
+export function toBase64url(bytes: Uint8Array): string {
   let binary = ''
   for (const byte of bytes) binary += String.fromCharCode(byte)
   return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
@@ -120,7 +120,7 @@ function toBase64url(bytes: Uint8Array): string {
 
 // Strict: base64url alphabet, no padding, and the canonical encoding of the
 // bytes (no stray low bits), so one byte string has exactly one text form.
-function fromBase64url(text: string): Uint8Array<ArrayBuffer> | null {
+export function fromBase64url(text: string): Uint8Array<ArrayBuffer> | null {
   if (!/^[A-Za-z0-9_-]+$/.test(text) || text.length % 4 === 1) return null
   const binary = atob(text.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - (text.length % 4)) % 4))
   const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0))

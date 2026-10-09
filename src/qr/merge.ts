@@ -1,5 +1,5 @@
-import { flattenCounts, unflattenCounts, COUNT_FIELDS, type Counts, type CountsOf, type QrPayloadV1 } from './schema'
-import { sumCounts, type Count, type CountRange } from './suppress'
+import { flattenCounts, unflattenCounts, COUNT_FIELDS, type Counts, type CountsOf, type QrPayloadV1 } from './schema.js'
+import { sumCounts, type Count, type CountRange } from './suppress.js'
 
 // Merges the verified payloads of one municipality and one ISO week into a row
 // per barangay plus municipal totals. Rows keep the counts as sent ("<5"
