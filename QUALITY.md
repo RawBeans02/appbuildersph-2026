@@ -37,7 +37,7 @@ Scoped from our team's build standard (Ultimate Build Source of Truth) to a 21-h
 - Every async action has loading, success, empty and error behavior. Empty states teach the next step with one obvious action, demo data or a starter, instead of a dead end.
 - If the core flow uses the camera, scanner or file picker repeatedly, keep it in context, with a fallback and handled permission denial, cancel and retry.
 - AI suggestions are reviewable: the user confirms before anything is saved or sent.
-- Phone-first: works at 375 px wide and on mobile data.
+- Phone-first: works at 375 px wide, on mobile data, and in airplane mode after the first load.
 
 ## Local AI: the challenge theme (MUST)
 The challenge (`RULES.md`): an AI product that stays genuinely useful when the cloud disappears. Judges will check where the computation happens.
@@ -63,9 +63,9 @@ The challenge (`RULES.md`): an AI product that stays genuinely useful when the c
 
 ## Security, data and cost (MUST)
 - Secrets only in `.env.local` and the hosting dashboard; never in code, logs or commits.
-- Validate all input on the server (e.g. zod). Validate AI output against a schema before using it.
-- Database: RLS on every table, and decide **which columns** a user may change, not just which rows. Quotas, credits, roles, prices and anything else that grants authority are server-only.
-- Every query is bounded (`limit`, pagination); never load a whole table.
+- Validate all input (on the server, if there is one; e.g. zod). **Validate AI output against a schema before using it**: small on-device models drift more than cloud models, so parse defensively, repair or retry once, then show a designed error.
+- If there's a cloud database: RLS on every table, and decide **which columns** a user may change, not just which rows. Quotas, credits, roles, prices and anything else that grants authority are server-only.
+- Every query is bounded (`limit`, pagination), on the device too; never load a whole table.
 - Cloud AI and other paid APIs (only for optional cloud parts; the core inference is on-device) need:
   - a per-IP or per-user rate limit
   - max tokens
@@ -80,13 +80,14 @@ The challenge (`RULES.md`): an AI product that stays genuinely useful when the c
 ## Engineering (MUST)
 - One repo, one environment: `main` deploys straight to the live URL. Push small and often (`CLAUDE.md`).
 - Before every push: typecheck + lint + the tests you touched. A failed hosting build keeps the last good deploy live, but fix or revert within minutes.
-- Tests where they pay: unit tests for the core logic (parsing, money math, AI output handling) and one end-to-end test of the main flow (run in the cloud).
+- GitHub Actions CI runs typecheck, lint, the unit tests and the production build on every push to `main`. It's our cloud test runner, which spares the 8 GB laptop.
+- Tests where they pay: unit tests for the core logic (parsing, money math, AI output handling and validation, offline storage) and one end-to-end test of the main flow, including a run with the network off (in CI, not on the laptop).
 - Prefer established libraries and APIs over custom infrastructure. Check each license allows our use, and list it in the README.
 - `docs/ARCHITECTURE.md`: a diagram, key decisions, the AI pipeline (model, prompt, validation, fallback) and its limitations. Every presenter must be able to explain it.
-- Provenance: commit messages start with the author (`lead:`, `sr:`, `jr:`, `devin:`), and the AI co-author trailers stay. This backs the AI disclosure and "who built what".
+- Provenance: commit messages start with the author (`lead:`, `sr:`, `devin:`, or a human teammate's first name), and the AI co-author trailers stay. This backs the AI disclosure and "who built what".
 
 ## Feature-freeze audit (4:00 AM)
-The Lead, or the Jr. Builder in the cloud, audits the repo and the live URL against this file **before changing any code**:
+The Lead audits the repo and the live URL against this file **before changing any code** (PageSpeed/Lighthouse runs on pagespeed.web.dev, not on the laptop):
 1. For each item, decide whether it applies.
 2. Mark it VERIFIED (with evidence), PARTIAL, MISSING, RUNTIME CHECK or N/A (with a reason).
 3. Output: P0 blockers, P1 findings, quick wins, runtime checks still needed, and the repair order.
