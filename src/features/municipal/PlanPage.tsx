@@ -27,7 +27,7 @@ import { checkNumbers } from './numberCheck'
 import { useLaptopPlace } from './place'
 import styles from './PlanPage.module.css'
 import { planChangedSinceShown, rememberPlanShown } from './planShown'
-import { planSteps, planStepsText } from './steps'
+import { planShortSummary, planSteps, planStepsText } from './steps'
 
 // Screen 19a: the rule-based plan on the left (always there, with or without
 // the AI), the optional on-device AI's card on the right with the officer's
@@ -274,6 +274,11 @@ export function PlanBody({
         </section>
       ) : (
         <div className={styles.approveBar}>
+          {/* The wording is words only: what goes back to the barangays is the
+              plan's own actions (the return QR reads the stored plan). */}
+          <p className={styles.sends}>
+            <strong>Approving sends:</strong> {planShortSummary(plan)} The wording above is not part of the return QR.
+          </p>
           {problem && (
             <p role="alert" className={styles.problem}>
               <WarningCircleIcon size={18} weight="bold" aria-hidden />

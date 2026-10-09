@@ -194,3 +194,10 @@
   align-items: center;
   gap: var(--space-4);
 }
+
+/* What approving sends back (the plan's actions, never the wording). */
+.sends {
+  flex-basis: 100%;
+  font: var(--type-body-dense);
+  color: var(--ink-2);
+}
