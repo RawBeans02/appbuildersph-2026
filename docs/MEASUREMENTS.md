@@ -16,6 +16,7 @@ On the device being measured, with internet on, open the live URL's `/prepare` a
 | Pose start cold / warm | Starting the pose model (MediaPipe Pose Landmarker lite) for the first, then the second time on the page: the worker and the model, read from the model cache. "Pose runs" says whether it ran in the worker or fell back to the page, and why. |
 | Pose fps | Pose detections completed per second over 10 s of the live back camera, each frame awaited before the next: the rate Hinga's count can sample at. The median time per detection is shown next to it. |
 | Cry check start | Starting the cry check: its worker and the YAMNet model, read from the model cache. |
+| PIN key | One derivation of phase 2's PIN key, as each unlock (and each wrong-PIN try) does it: PBKDF2-HMAC-SHA-256 with 600,000 iterations to a non-extractable AES-GCM 256-bit key (Web Crypto, `deriveKey` in `src/data/db/vault.ts`), from a fixed test PIN (`0000`) and a fresh random 16-byte salt. Nothing real is derived; the cost is the same for any PIN. |
 
 ### 2. File and download sizes
 - Model and runtime files: `ls -l` on the files in `public/models/` and on the runtime files in `node_modules/` (`onnxruntime-web/dist/ort-wasm-simd-threaded.wasm`, the MediaPipe `.wasm` files). The exact byte counts are in each feature's `models.ts`, and `models.node.test.ts` tests fail if they don't match the files.
@@ -41,12 +42,12 @@ The trial protocol, kill criterion and results tables are in `docs/SPIKE-HINGA.m
 
 Fill in from method 1 ("Copy as a table row"). One row per device and run.
 
-| Date | Device | Browser (user agent) | Backend | OCR engine | OCR load ms | OCR first read ms | OCR warm read ms (median) | Label read right | Pose start cold ms | Pose start warm ms | Pose runs | Pose fps (10 s) | Pose infer ms (median) | Cry check start ms |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| | iPhone 14 Pro Max | | | | | | | | | | | | | |
-| | iPhone 13 Pro Max | | | | | | | | | | | | | |
-| | Samsung (model: _fill in_) | | | | | | | | | | | | | |
-| | MacBook Air M2 (municipal laptop) | | | | | | | | | | | | | |
+| Date | Device | Browser (user agent) | Backend | OCR engine | OCR load ms | OCR first read ms | OCR warm read ms (median) | Label read right | Pose start cold ms | Pose start warm ms | Pose runs | Pose fps (10 s) | Pose infer ms (median) | Cry check start ms | PIN key ms |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| | iPhone 14 Pro Max | | | | | | | | | | | | | | |
+| | iPhone 13 Pro Max | | | | | | | | | | | | | | |
+| | Samsung (model: _fill in_) | | | | | | | | | | | | | | |
+| | MacBook Air M2 (municipal laptop) | | | | | | | | | | | | | | |
 
 ## Recorded so far
 

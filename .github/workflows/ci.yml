@@ -34,9 +34,16 @@ jobs:
 
   # The offline end-to-end test: built app, real service worker, network cut
   # off in the browser. Runs here, never on the laptop.
+  # Twice: the offline core as shipped, and with phase 2 on (VITE_PHASE2: the
+  # PIN lock and encrypted records), where every spec unlocks first.
   e2e:
+    name: e2e${{ matrix.phase2 && ' (phase 2)' || '' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        phase2: ['', '1']
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -48,9 +55,10 @@ jobs:
       - run: npm run test:e2e
         env:
           CI: true
+          VITE_PHASE2: ${{ matrix.phase2 }}
       - if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-traces
+          name: playwright-traces${{ matrix.phase2 && '-phase2' || '' }}
           path: test-results/
           retention-days: 3

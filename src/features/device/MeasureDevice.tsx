@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { deriveKey, PBKDF2_ITERATIONS } from '../../data/db/vault'
 import { DEMO_SCAN_LABEL } from '../../data/seed/demoLabel'
 import { startCryModel } from '../../inference/hinga/cryChecker'
 import { startPoseTracker } from '../../inference/hinga/poseTracker'
@@ -16,6 +17,10 @@ import { EMPTY_MEASUREMENTS, median, TABLE_HEADER, tableRow, type Measurements }
 const DEMO_LABEL_URL = '/demo/label-doxy-24A.png'
 const WARM_READS = 3
 const FPS_SECONDS = 10
+// The PIN key timing uses a fixed test PIN and a fresh random salt: the cost
+// is the same for any PIN, and nothing real is derived.
+const PIN_KEY_TEST_PIN = '0000'
+const PIN_KEY_LABEL = `PIN key (PBKDF2, ${PBKDF2_ITERATIONS.toLocaleString('en-US')} iterations)`
 
 const errorText = (error: unknown) => (error instanceof Error ? error.message : String(error))
 
@@ -40,13 +45,15 @@ export function MeasureDevice() {
     void checkCapabilities().then((caps) => setBackend(describeBackend(pickBackend(caps, detectPlatform()))))
   }, [])
 
-  async function run(name: string, task: () => Promise<void>) {
+  // usesModels: the failure may just be models not downloaded yet.
+  async function run(name: string, task: () => Promise<void>, usesModels = true) {
     setBusy(name)
     setMessage(null)
     try {
       await task()
     } catch (error) {
-      setMessage(`${name}: ${errorText(error)}. If the models aren't downloaded yet, prepare for offline first.`)
+      const hint = usesModels ? " If the models aren't downloaded yet, prepare for offline first." : ''
+      setMessage(`${name}: ${errorText(error)}.${hint}`)
     } finally {
       setBusy(null)
     }
@@ -130,6 +137,16 @@ export function MeasureDevice() {
       setResults((current) => ({ ...current, cryStartMs: startMs }))
     })
 
+  // One key derivation, as unlocking (and each wrong-PIN guess) costs here.
+  const measurePinKey = () =>
+    run('PIN key', async () => {
+      const salt = crypto.getRandomValues(new Uint8Array(16))
+      const start = performance.now()
+      await deriveKey(PIN_KEY_TEST_PIN, salt, PBKDF2_ITERATIONS)
+      const keyMs = performance.now() - start
+      setResults((current) => ({ ...current, pinKeyMs: keyMs }))
+    }, false)
+
   async function copyRow() {
     const measurements: Measurements = {
       ...results,
@@ -176,6 +193,9 @@ export function MeasureDevice() {
         </button>{' '}
         <button type="button" disabled={busy !== null} onClick={() => void measureCry()}>
           Measure the cry check start
+        </button>{' '}
+        <button type="button" disabled={busy !== null} onClick={() => void measurePinKey()}>
+          Measure the PIN key
         </button>
       </p>
       {busy && <p role="status">Measuring: {busy}…</p>}
@@ -201,6 +221,8 @@ export function MeasureDevice() {
         </dd>
         <dt>Cry check start</dt>
         <dd>{show(results.cryStartMs)}</dd>
+        <dt>{PIN_KEY_LABEL}</dt>
+        <dd>{show(results.pinKeyMs)}</dd>
       </dl>
       <p>
         <button type="button" onClick={() => void copyRow()}>

@@ -1,5 +1,6 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
 import type { HingaCheck } from '../src/data/db/types'
+import { openPage } from './lock'
 
 // Hinga with no camera, counted by hand (3d, then L8b). There's no fake camera
 // here, so the runner has none and getUserMedia fails. The permission is
@@ -24,7 +25,7 @@ test('no camera: 45 breaths counted by hand are fast for 1 to 4 years and saved 
 
   // Fake timers from the first load; time runs normally until pauseAt.
   await page.clock.install()
-  await page.goto('/hinga')
+  await openPage(page, '/hinga')
   await expect(page.locator('html')).toHaveAttribute('data-shell-status', 'ready', { timeout: 30_000 })
   const hinga = page.locator('[data-hinga-screen]')
   await expect(hinga).toHaveAttribute('data-hinga-screen', 'age', { timeout: 30_000 })
@@ -95,7 +96,16 @@ test('no camera: 45 breaths counted by hand are fast for 1 to 4 years and saved 
         }
       }),
   )
-  expect(checks.filter((check) => !check.sample)).toEqual([
-    expect.objectContaining({ method: 'hand', breathsPerMinute: 45, outcome: 'fast', dangerSigns: [], refusal: null }),
-  ])
+  const saved = checks.filter((check) => !check.sample)
+  if ((await page.locator('html').getAttribute('data-lock-status')) === 'unlocked') {
+    // Phase 2: the health fields are sealed at rest (src/data/db/vault.ts), so
+    // the stored row has a sealed box and none of them in the clear.
+    expect(saved).toHaveLength(1)
+    expect(saved[0]).toHaveProperty('sealed')
+    expect(Object.keys(saved[0]).sort()).toEqual(['checkedAt', 'id', 'residentId', 'sample', 'sealed'])
+  } else {
+    expect(saved).toEqual([
+      expect.objectContaining({ method: 'hand', breathsPerMinute: 45, outcome: 'fast', dangerSigns: [], refusal: null }),
+    ])
+  }
 })

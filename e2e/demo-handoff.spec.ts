@@ -1,6 +1,7 @@
 import { expect, test, type BrowserContext } from '@playwright/test'
 import { DEMO_SCAN_LABEL } from '../src/data/seed/demoLabel'
 import { prepareForOffline } from './prepare'
+import { openPage } from './lock'
 
 // The whole demo with no camera and no network, phone to laptop. The phone
 // (one browser context) runs "Prepare for offline", goes offline, then does
@@ -42,7 +43,7 @@ test('the full demo offline: phone wow flow, then pair, receive, merge and appro
   await context.setOffline(true)
 
   // Flood exposure: the three one-person households the demo taps.
-  await page.goto('/watch')
+  await openPage(page, '/watch')
   await page.getByRole('button', { name: 'Mark more people exposed' }).click()
   for (const id of ['HH-03', 'HH-07', 'HH-10']) {
     const household = page.getByRole('button', { name: new RegExp(`^${id}.*1 person$`) })
@@ -54,7 +55,7 @@ test('the full demo offline: phone wow flow, then pair, receive, merge and appro
   await expect(page.getByText('Watch started for 3 people.')).toBeVisible()
 
   // Stock: the demo box, typed in with the label's values (no camera).
-  await page.goto('/stock')
+  await openPage(page, '/stock')
   await page.getByRole('button', { name: 'Scan a box' }).click()
   await page.getByRole('button', { name: 'Type it in' }).click()
   await page.getByLabel('Medicine', { exact: true }).fill(DEMO_SCAN_LABEL.drug)
@@ -68,7 +69,7 @@ test('the full demo offline: phone wow flow, then pair, receive, merge and appro
 
   // Exposure × stock: the demo's three numbers, then the flag.
   const metric = (label: string) => page.locator('p').filter({ hasText: label })
-  await page.goto('/compare')
+  await openPage(page, '/compare')
   await expect(metric('people exposed to floodwater')).toHaveText(/^12\D/)
   await expect(metric('doxycycline capsules on hand')).toHaveText(/^40\D/)
   await expect(metric('of them expire within 6 weeks')).toHaveText(/^30\D/)
@@ -77,7 +78,7 @@ test('the full demo offline: phone wow flow, then pair, receive, merge and appro
 
   // Send: the one-time pairing QR (with the fingerprint the officer compares),
   // then this week's counts QR. Their texts are what a camera would read.
-  await page.goto('/send')
+  await openPage(page, '/send')
   await page.getByRole('button', { name: 'Pair with the RHU laptop' }).click()
   const sheet = page.getByRole('dialog', { name: 'Pair with the RHU laptop' })
   const pairingText = await sheet.getByRole('img', { name: 'Pairing QR for SID-MAL' }).getAttribute('data-qr-text')

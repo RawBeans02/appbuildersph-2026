@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { DEMO_SCAN_LABEL } from '../src/data/seed/demoLabel'
+import { openPage } from './lock'
 
 // The phone's wow flow on the synthetic seed, as the demo runs it but without
 // the camera: tap the three demo households as exposed, add the box the
@@ -13,12 +14,12 @@ const section = (page: Page, title: string) => page.getByRole('heading', { level
 
 test('tap exposed, add the scanned box, flag for review, create the QR', async ({ page }) => {
   test.setTimeout(90_000)
-  await page.goto('/')
+  await openPage(page, '/')
   await expect(page.getByRole('heading', { level: 1, name: 'Maligaya-D' })).toBeVisible({ timeout: 30_000 })
   await expect(page.getByText('San Isidro Demo · Sample data')).toBeVisible()
 
   // Flood exposure: the three one-person households the demo taps.
-  await page.goto('/watch')
+  await openPage(page, '/watch')
   await expect(page.getByRole('heading', { level: 1, name: 'Watch list' })).toBeVisible()
   await expect(section(page, 'In the window now')).toHaveText(/ 9$/)
   await expect(section(page, 'Starts soon')).toHaveCount(0)
@@ -35,7 +36,7 @@ test('tap exposed, add the scanned box, flag for review, create the QR', async (
   await expect(section(page, 'Starts soon')).toHaveText(/ 3$/)
 
   // Stock: the demo box, typed in with the label's values (no camera here).
-  await page.goto('/stock')
+  await openPage(page, '/stock')
   await page.getByRole('button', { name: 'Scan a box' }).click()
   await page.getByRole('button', { name: 'Type it in' }).click()
   await page.getByLabel('Medicine', { exact: true }).fill(DEMO_SCAN_LABEL.drug)
@@ -49,7 +50,7 @@ test('tap exposed, add the scanned box, flag for review, create the QR', async (
 
   // Exposure × stock: the demo's three numbers, then the flag. Never a dose.
   const metric = (label: string) => page.locator('p').filter({ hasText: label })
-  await page.goto('/compare')
+  await openPage(page, '/compare')
   await expect(metric('people exposed to floodwater')).toHaveText(/^12\D/)
   await expect(metric('doxycycline capsules on hand')).toHaveText(/^40\D/)
   await expect(metric('of them expire within 6 weeks')).toHaveText(/^30\D/)
@@ -58,7 +59,7 @@ test('tap exposed, add the scanned box, flag for review, create the QR', async (
   await expect(page.getByText('Flagged for clinician review', { exact: true })).toBeVisible()
 
   // Send: the de-identified table and the QR.
-  await page.goto('/send')
+  await openPage(page, '/send')
   await expect(page.getByRole('row', { name: /Doxycycline capsules on hand/ })).toContainText('40')
   await expect(page.getByRole('row', { name: /Flags for clinician review/ })).toContainText('<5')
   await page.getByRole('button', { name: /^Show the QR/ }).click()

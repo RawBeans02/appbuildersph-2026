@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { prepareForOffline } from './prepare'
+import { openPage } from './lock'
 
 // Hinga in airplane mode with Chromium's fake camera and microphone. The fake
 // camera shows a test pattern, not a person (we use no real people), so this
@@ -23,7 +24,7 @@ test('Hinga starts its models offline and will not count without a chest in view
   await prepareForOffline(page)
 
   await context.setOffline(true)
-  await page.goto('/hinga')
+  await openPage(page, '/hinga')
   const hinga = page.locator('[data-hinga-screen]')
 
   // The torso finder starts on the device: in a worker, or on the page itself.
