@@ -12,6 +12,7 @@ import { useOnlineStatus } from '../../lib/useOnlineStatus'
 import { DemoReadiness } from './DemoReadiness'
 import { DemoTools } from './DemoTools'
 import { MeasureDevice } from './MeasureDevice'
+import styles from './DevicePage.module.css'
 
 // /device: a plain developer page, not part of the designed app and not in the
 // nav. It lists what this device supports, so we can check phones and laptops
@@ -83,7 +84,7 @@ export default function DevicePage() {
   }
 
   return (
-    <>
+    <div className={styles.page}>
       <h1>Device check</h1>
       <DemoReadiness />
       <p>Network: {online ? 'Online' : 'Offline'}</p>
@@ -123,6 +124,6 @@ export default function DevicePage() {
       )}
       <MeasureDevice />
       <DemoTools />
-    </>
+    </div>
   )
 }

@@ -1,0 +1,10 @@
+/* /device (diagnostics, not a designed screen): the app's 20 px phone gutter,
+   and room between the title and the Demo readiness card. */
+.page {
+  padding: var(--space-5) var(--space-5) var(--space-10);
+}
+
+.page > h1 {
+  margin-bottom: var(--space-4);
+  font: var(--type-title);
+}
