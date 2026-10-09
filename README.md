@@ -119,6 +119,7 @@ A cloud "Jr. Builder" agent named in early commits was planned but never used.
 | [Tesseract.js](https://github.com/naptha/tesseract.js) (`tesseract.js`, `tesseract.js-core`) | Fallback medicine-box reader for iPhone, off unless switched on (`src/inference/ocr/engine.ts`) | Apache-2.0 |
 | [`@tesseract.js-data/eng`](https://www.npmjs.com/package/@tesseract.js-data/eng) | English data for that fallback (a packaging of Tesseract's `eng` LSTM model) | MIT (package); the data is Apache-2.0 |
 | [qrcode-generator](https://github.com/kazuhikoarase/qrcode-generator) | Draws the de-identified QR on the Send screen | MIT |
+| [jsQR](https://github.com/cozmo/jsQR) (`jsqr` 1.4.0) | Reads QR codes from the municipal laptop's camera in browsers without the built-in BarcodeDetector; bundled with the app, so it works offline | Apache-2.0 |
 | [idb](https://github.com/jakearchibald/idb) | Promise wrapper for IndexedDB, the on-device records | ISC |
 | [fake-indexeddb](https://github.com/dumbmatter/fakeIndexedDB) | In-memory IndexedDB for unit tests (development only) | Apache-2.0 |
 | [ONNX Runtime Web](https://onnxruntime.ai) (`onnxruntime-web`) | On-device model inference (WebAssembly) for the OCR spike | MIT |

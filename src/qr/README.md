@@ -76,6 +76,8 @@ if (merged.ok) {
 | `bad-signature` | The signature doesn't match the barangay's registered key (tampered, or another phone) |
 | `unknown-device` | No usable key is registered for the barangay the QR names |
 
+Once the payload has parsed, a `bad-signature` or `unknown-device` failure also carries `barangay`, the code the QR names (unverified: for the message, e.g. which barangay to pair, never for counts).
+
 `mergePayloads` fails with `empty`, `mixed-epi-weeks` or `mixed-municipalities`.
 
 ## Pairing: a phone's key reaches the laptop once (`pairing.ts`)

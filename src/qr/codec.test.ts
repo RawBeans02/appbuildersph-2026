@@ -108,7 +108,9 @@ describe('tampering', () => {
 
   it("rejects a QR signed by another phone claiming the barangay's code (bad-signature)", async () => {
     const forged = await encodeQr(payload, impostor.privateKey)
-    expectError(await decodeQr(forged, registry), 'bad-signature')
+    const result = await decodeQr(forged, registry)
+    expectError(result, 'bad-signature')
+    expect(result).toMatchObject({ barangay: 'SID-MAL' })
   })
 
   it('rejects a version changed in the prefix (bad-version), and the signature covers the prefix', async () => {
@@ -120,6 +122,7 @@ describe('devices', () => {
   it('rejects a barangay with no registered key (unknown-device)', async () => {
     const result = await decodeQr(text, { 'SID-BAG': device.publicJwk })
     expectError(result, 'unknown-device')
+    expect(result).toMatchObject({ barangay: 'SID-MAL' })
     expectError(await decodeQr(text, {}), 'unknown-device')
   })
 

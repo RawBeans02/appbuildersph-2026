@@ -40,7 +40,9 @@ export class QrError extends Error {
 
 export type DecodeResult =
   | { ok: true; payload: QrPayloadV1; keyFingerprint: string }
-  | { ok: false; code: QrErrorCode; message: string }
+  // `barangay`: the code the QR names, once its payload parsed (bad-signature,
+  // unknown-device). Unverified: for the message only, never for the counts.
+  | { ok: false; code: QrErrorCode; message: string; barangay?: string }
 
 // The compact JSON: short keys, bands as arrays in AGE_BANDS / HINGA_AGE_BANDS
 // order, keys always in this order.
@@ -141,8 +143,8 @@ export async function encodeQr(payload: QrPayloadV1, privateKey: CryptoKey): Pro
   return `${signed}.${toBase64url(signature)}`
 }
 
-function fail(code: QrErrorCode, message: string): DecodeResult {
-  return { ok: false, code, message }
+function fail(code: QrErrorCode, message: string, barangay?: string): DecodeResult {
+  return barangay === undefined ? { ok: false, code, message } : { ok: false, code, message, barangay }
 }
 
 function parsePayload(part: string): Validation<QrPayloadV1> {
@@ -182,18 +184,26 @@ export async function decodeQr(text: string, registry: KeyRegistry): Promise<Dec
   const payload = parsed.value
 
   const signature = fromBase64url(signatureText)
-  if (!signature || signature.length !== SIGNATURE_BYTES) return fail('bad-signature', 'The signature is malformed.')
+  if (!signature || signature.length !== SIGNATURE_BYTES) return fail('bad-signature', 'The signature is malformed.', payload.barangay)
 
   const jwk = Object.hasOwn(registry, payload.barangay) ? registry[payload.barangay] : undefined
-  if (!jwk) return fail('unknown-device', `No device key is registered for barangay ${payload.barangay}.`)
+  if (!jwk) return fail('unknown-device', `No device key is registered for barangay ${payload.barangay}.`, payload.barangay)
   const publicKey = await importPublicKey(jwk)
   if (!publicKey) {
-    return fail('unknown-device', `The key registered for barangay ${payload.barangay} is not a usable P-256 public key.`)
+    return fail(
+      'unknown-device',
+      `The key registered for barangay ${payload.barangay} is not a usable P-256 public key.`,
+      payload.barangay,
+    )
   }
 
   const signed = encoder.encode(trimmed.slice(0, QR_PREFIX.length + payloadText.length))
   if (!(await verifyBytes(publicKey, signed, signature))) {
-    return fail('bad-signature', `The signature does not match barangay ${payload.barangay}'s registered key.`)
+    return fail(
+      'bad-signature',
+      `The signature does not match barangay ${payload.barangay}'s registered key.`,
+      payload.barangay,
+    )
   }
   return { ok: true, payload, keyFingerprint: await keyFingerprint(jwk) }
 }
