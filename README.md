@@ -47,6 +47,11 @@ _TBD: the target user, the problem, and why it matters._
 ## Why does this product benefit from running AI locally?
 _TBD: the answer, true to the code._
 
+## Related work
+Camera-based breath counting for the WHO IMCI fast-breathing check has prior art: Breathwise (Devpost, RevenueCat Shipaton 2026), the AIRR research project (Malaria Consortium), and Lucy et al. 2021 (smartphone video in children with pneumonia). We found Breathwise after choosing this idea. Agapay Hinga is our own implementation, built from scratch during the hackathon; no code from these projects was used. What's different: an ML pipeline (pose-tracked torso region, on-device cry detection, a motion-quality gate that refuses unreliable counts) and the barangay workflow around it (flood exposure → leptospirosis watch list → medicine stock → de-identified QR → municipal plan), all offline.
+
+Offline health record systems also exist (iClinicSys and SHINE OS+ have offline modes), and DOH runs eLMIS for medicine logistics and a leptospirosis and dengue case tracker. Agapay is meant to feed them, not replace them.
+
 ## Architecture
 _TBD: a summary here; the diagram, decisions, the on-device AI pipeline and its limitations will be in `docs/ARCHITECTURE.md`._
 

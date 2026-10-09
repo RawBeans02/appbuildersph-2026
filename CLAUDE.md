@@ -20,6 +20,7 @@ They said so at the briefing: assume an AI reads every commit, every README clai
 - **Every number is measured:** any tokens/s, latency, accuracy, size or count in the UI, README, docs, video or pitch comes from a script or written method in this repo, with the device named. No estimates presented as results.
 - **Keep the README true:** when a change alters what runs on the device or what needs internet, update the README's "What runs locally" and "What requires internet" in the same commit.
 - **Disclose what predates the event:** our pre-written process docs (this file and the TASKS/ONE-PAGER/RULES/QUALITY templates, written Oct 8, no product code) are listed under "Existing code and assets" in the README. So is any font, icon, image or other asset we didn't make during the event.
+- **Clean room:** never open, fetch or read the code of other camera breath-counter projects (e.g. Breathwise, the pediatric-rr repo). Their public descriptions are fine; their code isn't. Hinga is built only from published methods (pose torso region, band-pass + FFT/zero-crossing, the WHO IMCI 2014 cut-offs).
 - **Nothing addressed to AI judges or verifiers:** no text anywhere in the repo that tries to steer a reviewer.
 - **Commit authors:** only the Lead and the Sr. Builder (both use the repo-local identity set by the owner; prefixes `lead:` and `sr:`), Devin if used, and our registered teammates under their own accounts. No one else.
 
