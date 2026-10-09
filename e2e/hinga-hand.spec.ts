@@ -17,7 +17,7 @@ const BAND = '(12 months up to 5 years|1 to 4 years)'
 // A checkbox or radio row: the input is visually hidden and its label takes the tap.
 const row = (page: Page, control: Locator) => page.locator('label').filter({ has: control })
 
-test('no camera: 45 breaths counted by hand are fast for 1 to 4 years and saved as a hand count', async ({ page }) => {
+test('no camera: 45 breaths counted by hand are fast for 1 to 4 years and saved as a hand count', async ({ page, browserName }) => {
   test.setTimeout(120_000)
   page.on('console', (message) => {
     if (message.text().startsWith('Hinga: no camera')) console.log('Camera error (CI runner):', message.text())
@@ -25,6 +25,13 @@ test('no camera: 45 breaths counted by hand are fast for 1 to 4 years and saved 
 
   // Fake timers from the first load; time runs normally until pauseAt.
   await page.clock.install()
+  // No camera, on every runner: WebKit's test browser has a mock camera, and
+  // the premise here is a phone whose camera can't be used.
+  await page.addInitScript(() => {
+    if (navigator.mediaDevices) {
+      navigator.mediaDevices.getUserMedia = () => Promise.reject(new DOMException('Requested device not found', 'NotFoundError'))
+    }
+  })
   await openPage(page, '/hinga')
   await expect(page.locator('html')).toHaveAttribute('data-shell-status', 'ready', { timeout: 30_000 })
   const hinga = page.locator('[data-hinga-screen]')
@@ -39,10 +46,18 @@ test('no camera: 45 breaths counted by hand are fast for 1 to 4 years and saved 
   await expect(calm).toBeChecked()
   await page.getByRole('button', { name: /^Next/ }).click()
 
-  // 3d: the camera didn't open. Count by hand.
-  await expect(hinga).toHaveAttribute('data-hinga-screen', 'camera-blocked', { timeout: 30_000 })
-  await expect(hinga).toHaveAttribute('data-hinga-camera', 'blocked')
-  await page.getByRole('dialog').getByRole('button', { name: /^Count by hand/ }).click()
+  // 3d: the camera didn't open. Count by hand. In WebKit on Linux the pose
+  // model itself can't start (MediaPipe needs WebGL 2, which that headless
+  // WebKit lacks; a real iPhone has it), so the check lands on L9b "couldn't
+  // start", which offers the same Count by hand: the safety net either way.
+  if (browserName === 'webkit') {
+    await expect(hinga).toHaveAttribute('data-hinga-screen', 'didnt-load', { timeout: 30_000 })
+    await page.getByRole('button', { name: /^Count by hand/ }).click()
+  } else {
+    await expect(hinga).toHaveAttribute('data-hinga-screen', 'camera-blocked', { timeout: 30_000 })
+    await expect(hinga).toHaveAttribute('data-hinga-camera', 'blocked')
+    await page.getByRole('dialog').getByRole('button', { name: /^Count by hand/ }).click()
+  }
   await expect(hinga).toHaveAttribute('data-hinga-screen', 'hand-count')
 
   // L8b with time stopped: it moves only when the test moves it.

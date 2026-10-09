@@ -32,6 +32,7 @@ test('the full demo offline: phone wow flow, then pair, receive, merge and appro
   context,
   browser,
   baseURL,
+  browserName,
 }) => {
   test.setTimeout(360_000)
   const origin = new URL(baseURL!).origin
@@ -93,6 +94,15 @@ test('the full demo offline: phone wow flow, then pair, receive, merge and appro
   expect(countsText).toMatch(/^AGP1\./)
 
   // ---- The municipal laptop ---------------------------------------------------
+  // The laptop half runs in the Chromium jobs (the municipal laptop is Chrome:
+  // the wording model needs WebGPU). In the WebKit (iPhone) run the phone half
+  // above is the point; a Chromium launched beside WebKit hung on the scan
+  // screen's first click in CI (A18), so the WebKit run stops here.
+  if (browserName !== 'chromium') {
+    test.info().annotations.push({ type: 'note', description: 'WebKit run: the phone half only; the laptop half runs in the Chromium jobs.' })
+    expect(phoneElsewhere, 'phone requests to other origins').toEqual([])
+    return
+  }
   const laptop = await browser.newContext()
   const laptopElsewhere: string[] = []
   watchOrigin(laptop, origin, laptopElsewhere)

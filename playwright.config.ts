@@ -18,7 +18,27 @@ export default defineConfig({
     baseURL: deployed ?? `http://localhost:${PORT}`,
     trace: 'retain-on-failure',
   },
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+  projects: [
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] }, testIgnore: ['webkit-pose.spec.ts'] },
+    // The closest CI gets to the owner's iPhones (Safari): WebKit with an
+    // iPhone 14 Pro Max's screen, touch and user agent, on the specs that
+    // matter there. WebKit on Linux isn't iOS; where it can't stand in for
+    // the phone, the test says so (test.fixme / test.skip with the reason).
+    {
+      name: 'webkit',
+      use: { ...devices['iPhone 14 Pro Max'] },
+      testMatch: [
+        'offline.spec.ts',
+        'prepare-offline.spec.ts',
+        'ocr-offline.spec.ts',
+        'hinga-hand.spec.ts',
+        'demo-handoff.spec.ts',
+        'lock.spec.ts',
+        'a11y.spec.ts',
+        'webkit-pose.spec.ts',
+      ],
+    },
+  ],
   webServer: deployed
     ? undefined
     : {
