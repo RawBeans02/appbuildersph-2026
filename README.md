@@ -186,7 +186,7 @@ React + TypeScript, built with Vite as an installable web app (PWA: vite-plugin-
 ### AI development tools
 Every AI session that touched this project:
 - **Claude Code** (Anthropic, Opus 5.5): the **Lead** (planning, reviews, CI, docs and parts of the app) and the **Sr. Builder** (core implementation), each a Claude Code session, plus their subagents. Their commits start with `lead:` and `sr:`. The Claude co-author line on commits is the AI tool, not a person.
-- **Review and verification subagents** (Claude Code): review only; they write no code.
+- **Subagents** (Claude Code): review and verification subagents review only. From Sat ~12:30 AM, the Lead also ran building subagents, each in its own git worktree, for design pass 2 (the intro, Home, the box-reader overlay, the laptop live hub, the Receive restyle and the motion details). The Lead reviewed and merged every change, and their commits carry the `lead:` prefix.
 - **The owner's separate Claude session ("Account Admin", an AI):** drafted the pre-event process docs on Oct 8, sets up and monitors the laptop (starts the agent sessions, watches memory), relays briefing details, and runs read-only audits; it writes no product code.
 - **Claude** (chat, Research mode): research and idea selection.
 - **Claude Design**: the original UI design; the return-flow extension by Codex follows its tokens and components.
