@@ -32,6 +32,7 @@ test('the full demo offline: phone wow flow, then pair, receive, merge and appro
   context,
   browser,
   baseURL,
+  browserName,
 }) => {
   test.setTimeout(360_000)
   const origin = new URL(baseURL!).origin
@@ -104,7 +105,8 @@ test('the full demo offline: phone wow flow, then pair, receive, merge and appro
     await desk.waitForFunction(() => navigator.serviceWorker.controller !== null)
     await laptop.setOffline(true)
     const reopened = await desk.goto('/municipal')
-    expect(reopened?.fromServiceWorker()).toBe(true)
+    // Chromium-only in Playwright (see offline.spec.ts).
+    if (browserName === 'chromium') expect(reopened?.fromServiceWorker()).toBe(true)
     await expect(desk.getByRole('heading', { level: 1, name: 'Barangay reports' })).toBeVisible()
 
     // No camera on this laptop: the scan screen's fallback takes the QR text.

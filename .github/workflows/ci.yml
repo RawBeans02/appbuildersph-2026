@@ -69,12 +69,15 @@ jobs:
   # Twice: the offline core as shipped, and with phase 2 on (VITE_PHASE2: the
   # PIN lock and encrypted records), where every spec unlocks first.
   e2e:
-    name: e2e${{ matrix.phase2 && ' (phase 2)' || '' }}
+    name: e2e ${{ matrix.browser }}${{ matrix.phase2 && ' (phase 2)' || '' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
+        # WebKit (an iPhone 14 Pro Max profile) runs the specs that matter on
+        # iPhone Safari; see the webkit project in playwright.config.ts.
+        browser: [chromium, webkit]
         phase2: ['', '1']
     steps:
       - uses: actions/checkout@v4
@@ -83,14 +86,14 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
-      - run: npm run test:e2e
+      - run: npx playwright install --with-deps ${{ matrix.browser }}
+      - run: npm run test:e2e -- --project=${{ matrix.browser }}
         env:
           CI: true
           VITE_PHASE2: ${{ matrix.phase2 }}
       - if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-traces${{ matrix.phase2 && '-phase2' || '' }}
+          name: playwright-traces-${{ matrix.browser }}${{ matrix.phase2 && '-phase2' || '' }}
           path: test-results/
           retention-days: 3
