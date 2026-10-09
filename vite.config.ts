@@ -1,8 +1,17 @@
 /// <reference types="vitest/config" />
+import { readdirSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
+
+// Every spike-*.html at the root is its own page: throwaway test pages, not
+// linked from the app.
+const spikePages = Object.fromEntries(
+  readdirSync(fileURLToPath(new URL('.', import.meta.url)))
+    .filter((file) => /^spike-[\w-]+\.html$/.test(file))
+    .map((file) => [file.slice(0, -'.html'.length), fileURLToPath(new URL(`./${file}`, import.meta.url))]),
+)
 
 export default defineConfig({
   plugins: [
@@ -24,9 +33,9 @@ export default defineConfig({
       },
       workbox: {
         // Precache the whole app shell; any navigation offline gets index.html.
-        // Also the on-device AI: the ONNX Runtime .wasm/.mjs and the model files
-        // in public/models/ (the OCR spike's PP-OCRv5 files for now).
-        globPatterns: ['**/*.{js,mjs,css,html,svg,png,ico,woff2,wasm,onnx,txt}'],
+        // Also the on-device AI: runtime .wasm/.mjs files and the model files in
+        // public/models/ (ONNX, MediaPipe .task, TFLite) and their dictionaries.
+        globPatterns: ['**/*.{js,mjs,css,html,svg,png,ico,woff2,wasm,onnx,task,tflite,txt}'],
         // The ONNX Runtime .wasm is about 14 MB; Workbox skips files over 2 MiB by default.
         maximumFileSizeToCacheInBytes: 20 * 1024 * 1024,
         navigateFallback: '/index.html',
@@ -41,8 +50,7 @@ export default defineConfig({
     rolldownOptions: {
       input: {
         main: fileURLToPath(new URL('./index.html', import.meta.url)),
-        // The throwaway OCR spike page; not linked from the app.
-        'spike-ocr': fileURLToPath(new URL('./spike-ocr.html', import.meta.url)),
+        ...spikePages,
       },
     },
   },
