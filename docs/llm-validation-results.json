@@ -1,0 +1,432 @@
+{
+  "device": "Windows desktop, Intel Core i5-1155G7 / Iris Xe, Chrome154 headless, hardware WebGPU f16",
+  "worker": "webllm.worker-CiqCa1_8.js",
+  "failedRequests": [],
+  "rows": [
+    {
+      "id": "no-actions",
+      "text": "No action required.",
+      "ms": 1558.1000000238419,
+      "plan": [],
+      "moves": [],
+      "guard": {
+        "ok": false,
+        "reasons": [
+          "The draft is empty or too short."
+        ]
+      }
+    },
+    {
+      "id": "one-priority-single-score",
+      "text": "The doctor team for Maligaya-D has priority score 9.",
+      "ms": 1900.1000000238419,
+      "plan": [
+        {
+          "name": "Maligaya-D",
+          "score": {
+            "min": 9,
+            "max": 9
+          }
+        }
+      ],
+      "moves": [],
+      "guard": {
+        "ok": true
+      }
+    },
+    {
+      "id": "one-priority-suppressed-range",
+      "text": "The doctor team for San Isidro Norte-D has priority score 1–4.",
+      "ms": 2258.2999999523163,
+      "plan": [
+        {
+          "name": "San Isidro Norte-D",
+          "score": {
+            "min": 1,
+            "max": 4
+          }
+        }
+      ],
+      "moves": [],
+      "guard": {
+        "ok": true
+      }
+    },
+    {
+      "id": "two-priorities-equal-score-alphabetical",
+      "text": "The doctor team for Santa Cruz Este-D has priority score 12.\nThe doctor team for Santo Niño-D has priority score 12.",
+      "ms": 3425.899999976158,
+      "plan": [
+        {
+          "name": "Santa Cruz Este-D",
+          "score": {
+            "min": 12,
+            "max": 12
+          }
+        },
+        {
+          "name": "Santo Niño-D",
+          "score": {
+            "min": 12,
+            "max": 12
+          }
+        }
+      ],
+      "moves": [],
+      "guard": {
+        "ok": true
+      }
+    },
+    {
+      "id": "three-priorities-name-variation",
+      "text": "The doctor team for Riverside-D has priority score 18–22.\nThe doctor team for Barangay Luntian-D has priority score 11.\nThe doctor team for Santo Niño-D has priority score 6–9.",
+      "ms": 5182.700000047684,
+      "plan": [
+        {
+          "name": "Riverside-D",
+          "score": {
+            "min": 18,
+            "max": 22
+          }
+        },
+        {
+          "name": "Barangay Luntian-D",
+          "score": {
+            "min": 11,
+            "max": 11
+          }
+        },
+        {
+          "name": "Santo Niño-D",
+          "score": {
+            "min": 6,
+            "max": 9
+          }
+        }
+      ],
+      "moves": [],
+      "guard": {
+        "ok": true
+      }
+    },
+    {
+      "id": "one-priority-one-move",
+      "text": "The doctor team for Maligaya-D has priority score 12.\nConsider moving from Mabini-D to Maligaya-D: up to 30 capsules, for the MHO to decide.",
+      "ms": 4522.799999952316,
+      "plan": [
+        {
+          "name": "Maligaya-D",
+          "score": {
+            "min": 12,
+            "max": 12
+          }
+        }
+      ],
+      "moves": [
+        {
+          "fromName": "Mabini-D",
+          "toName": "Maligaya-D",
+          "capsulesUpTo": 30
+        }
+      ],
+      "guard": {
+        "ok": true
+      }
+    },
+    {
+      "id": "two-priorities-one-move",
+      "text": "The doctor team for Bagong Silang-D has priority score 14–20.\nConsider moving from Bagong Silang-D to Riverside-D: up to 30 capsules, for the MHO to decide.",
+      "ms": 4854,
+      "plan": [
+        {
+          "name": "Bagong Silang-D",
+          "score": {
+            "min": 14,
+            "max": 20
+          }
+        },
+        {
+          "name": "Riverside-D",
+          "score": {
+            "min": 8,
+            "max": 8
+          }
+        }
+      ],
+      "moves": [
+        {
+          "fromName": "Riverside-D",
+          "toName": "Bagong Silang-D",
+          "capsulesUpTo": 30
+        }
+      ],
+      "guard": {
+        "ok": false,
+        "reasons": [
+          "It doesn't give Riverside-D's score (8) next to its name.",
+          "It changes or leaves out the move of up to 30 capsules from Riverside-D to Bagong Silang-D.",
+          "It suggests a move from Bagong Silang-D to Riverside-D that the plan doesn't make."
+        ]
+      }
+    },
+    {
+      "id": "one-priority-two-moves",
+      "text": "The doctor team for Poblacion Mabuhay-D has priority score 1–4.\nConsider moving from East San Roque-D to Poblacion Mabuhay-D: up to 20 capsules, for the MHO to decide.\nConsider moving from West San Roque-D to Poblacion Mabuhay-D: up to <5 capsules, for the MHO to decide.",
+      "ms": 8289.5,
+      "plan": [
+        {
+          "name": "Poblacion Mabuhay-D",
+          "score": {
+            "min": 1,
+            "max": 4
+          }
+        }
+      ],
+      "moves": [
+        {
+          "fromName": "East San Roque-D",
+          "toName": "Poblacion Mabuhay-D",
+          "capsulesUpTo": 20
+        },
+        {
+          "fromName": "West San Roque-D",
+          "toName": "Poblacion Mabuhay-D",
+          "capsulesUpTo": "<5"
+        }
+      ],
+      "guard": {
+        "ok": true
+      }
+    },
+    {
+      "id": "three-priorities-two-moves",
+      "text": "The doctor team for Santa Cruz Este-D has priority score 20–24.\nThe doctor team for Maligaya-D has priority score 13.\nThe doctor team for Santo Niño-D has priority score 6–9.\nConsider moving from Riverside-D to Maligaya-D: up to 30 capsules, for the MHO to decide.\nConsider moving from Mabini-D to Santo Niño-D: up to 15 capsules, for the MHO to decide.",
+      "ms": 10092.700000047684,
+      "plan": [
+        {
+          "name": "Santa Cruz Este-D",
+          "score": {
+            "min": 20,
+            "max": 24
+          }
+        },
+        {
+          "name": "Maligaya-D",
+          "score": {
+            "min": 13,
+            "max": 13
+          }
+        },
+        {
+          "name": "Santo Niño-D",
+          "score": {
+            "min": 6,
+            "max": 9
+          }
+        }
+      ],
+      "moves": [
+        {
+          "fromName": "Riverside-D",
+          "toName": "Maligaya-D",
+          "capsulesUpTo": 30
+        },
+        {
+          "fromName": "Mabini-D",
+          "toName": "Santo Niño-D",
+          "capsulesUpTo": 15
+        }
+      ],
+      "guard": {
+        "ok": true
+      }
+    },
+    {
+      "id": "suppressed-priority-and-move",
+      "text": "The doctor team for San Isidro Norte-D has priority score 1–4.\nThe doctor team for Barangay Luntian-D has priority score 8–11.\nConsider moving from East San Roque-D to Barangay Luntian-D: up to <5 capsules, for the MHO to decide.",
+      "ms": 6763.5,
+      "plan": [
+        {
+          "name": "San Isidro Norte-D",
+          "score": {
+            "min": 1,
+            "max": 4
+          }
+        },
+        {
+          "name": "Barangay Luntian-D",
+          "score": {
+            "min": 8,
+            "max": 11
+          }
+        }
+      ],
+      "moves": [
+        {
+          "fromName": "East San Roque-D",
+          "toName": "Barangay Luntian-D",
+          "capsulesUpTo": "<5"
+        }
+      ],
+      "guard": {
+        "ok": true
+      }
+    },
+    {
+      "id": "complete-demo-1",
+      "text": "The doctor team for Maligaya-D has priority score 11–17.\nThe doctor team for Bagong Silang-D has priority score 6.\nThe doctor team for Mabini-D has priority score 0.\nThe doctor team for Riverside-D has priority score 0.\nThe doctor team for Santo Niño-D has priority score 0.\nConsider moving from Riverside-D to Maligaya-D: up to 30 capsules, for the MHO to decide.",
+      "ms": 10020.100000023842,
+      "plan": [
+        {
+          "name": "Maligaya-D",
+          "score": {
+            "min": 11,
+            "max": 17
+          }
+        },
+        {
+          "name": "Bagong Silang-D",
+          "score": {
+            "min": 6,
+            "max": 6
+          }
+        },
+        {
+          "name": "Mabini-D",
+          "score": {
+            "min": 0,
+            "max": 0
+          }
+        },
+        {
+          "name": "Riverside-D",
+          "score": {
+            "min": 0,
+            "max": 0
+          }
+        },
+        {
+          "name": "Santo Niño-D",
+          "score": {
+            "min": 0,
+            "max": 0
+          }
+        }
+      ],
+      "moves": [
+        {
+          "fromName": "Riverside-D",
+          "toName": "Maligaya-D",
+          "capsulesUpTo": 30
+        }
+      ],
+      "guard": {
+        "ok": true
+      }
+    },
+    {
+      "id": "complete-demo-2",
+      "text": "The doctor team for Maligaya-D has priority score 11–17.\nThe doctor team for Bagong Silang-D has priority score 6.\nThe doctor team for Mabini-D has priority score 0.\nThe doctor team for Riverside-D has priority score 0.\nThe doctor team for Santo Niño-D has priority score 0.\nConsider moving from Riverside-D to Maligaya-D: up to 30 capsules, for the MHO to decide.",
+      "ms": 9697.5,
+      "plan": [
+        {
+          "name": "Maligaya-D",
+          "score": {
+            "min": 11,
+            "max": 17
+          }
+        },
+        {
+          "name": "Bagong Silang-D",
+          "score": {
+            "min": 6,
+            "max": 6
+          }
+        },
+        {
+          "name": "Mabini-D",
+          "score": {
+            "min": 0,
+            "max": 0
+          }
+        },
+        {
+          "name": "Riverside-D",
+          "score": {
+            "min": 0,
+            "max": 0
+          }
+        },
+        {
+          "name": "Santo Niño-D",
+          "score": {
+            "min": 0,
+            "max": 0
+          }
+        }
+      ],
+      "moves": [
+        {
+          "fromName": "Riverside-D",
+          "toName": "Maligaya-D",
+          "capsulesUpTo": 30
+        }
+      ],
+      "guard": {
+        "ok": true
+      }
+    },
+    {
+      "id": "complete-demo-3",
+      "text": "The doctor team for Maligaya-D has priority score 11–17.\nThe doctor team for Bagong Silang-D has priority score 6.\nThe doctor team for Mabini-D has priority score 0.\nThe doctor team for Riverside-D has priority score 0.\nThe doctor team for Santo Niño-D has priority score 0.\nConsider moving from Riverside-D to Maligaya-D: up to 30 capsules, for the MHO to decide.",
+      "ms": 9859.699999928474,
+      "plan": [
+        {
+          "name": "Maligaya-D",
+          "score": {
+            "min": 11,
+            "max": 17
+          }
+        },
+        {
+          "name": "Bagong Silang-D",
+          "score": {
+            "min": 6,
+            "max": 6
+          }
+        },
+        {
+          "name": "Mabini-D",
+          "score": {
+            "min": 0,
+            "max": 0
+          }
+        },
+        {
+          "name": "Riverside-D",
+          "score": {
+            "min": 0,
+            "max": 0
+          }
+        },
+        {
+          "name": "Santo Niño-D",
+          "score": {
+            "min": 0,
+            "max": 0
+          }
+        }
+      ],
+      "moves": [
+        {
+          "fromName": "Riverside-D",
+          "toName": "Maligaya-D",
+          "capsulesUpTo": 30
+        }
+      ],
+      "guard": {
+        "ok": true
+      }
+    }
+  ]
+}

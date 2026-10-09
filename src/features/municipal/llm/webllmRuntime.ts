@@ -1,7 +1,7 @@
 import { CreateMLCEngine, type MLCEngine } from '@mlc-ai/web-llm'
 import type { Runtime } from '../../../inference/protocol'
-import { wordingModelId } from './model'
-import type { ChatMessage } from './prompt'
+import { wordingModelRecord } from './model'
+import { MAX_DRAFT_TOKENS, type ChatMessage } from './prompt'
 import { parseFetchedMB } from './wording'
 
 // WebLLM inside the AI wording's worker (webllm.worker.ts), behind the app's
@@ -10,14 +10,12 @@ import { parseFetchedMB } from './wording'
 
 export type WordingRequest = { messages: ChatMessage[]; maxTokens: number }
 
-const MAX_TOKENS_CAP = 400
-
 function isWordingRequest(value: unknown): value is WordingRequest {
   const request = value as Partial<WordingRequest> | null
   return (
     !!request &&
     Array.isArray(request.messages) &&
-    request.messages.every((m) => (m.role === 'system' || m.role === 'user') && typeof m.content === 'string') &&
+    request.messages.every((m) => (m.role === 'system' || m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string') &&
     Number.isInteger(request.maxTokens) &&
     (request.maxTokens ?? 0) > 0
   )
@@ -28,7 +26,9 @@ export function createWebLlmRuntime(): Runtime<WordingRequest, string> {
   return {
     async init(backend, onProgress) {
       if (backend.kind !== 'webgpu') throw new Error('The AI wording needs WebGPU.')
-      engine = await CreateMLCEngine(wordingModelId(backend.f16), {
+      const model = wordingModelRecord(backend.f16)
+      engine = await CreateMLCEngine(model.model_id, {
+        appConfig: { model_list: [model], cacheBackend: 'cache' },
         initProgressCallback: (report) => onProgress(report.progress, { fetchedMB: parseFetchedMB(report.text) }),
       })
     },
@@ -41,11 +41,11 @@ export function createWebLlmRuntime(): Runtime<WordingRequest, string> {
       signal.addEventListener('abort', interrupt)
       try {
         await llm.resetChat()
-        const maxTokens = Math.min(input.maxTokens, MAX_TOKENS_CAP)
+        const maxTokens = Math.min(input.maxTokens, MAX_DRAFT_TOKENS)
         const chunks = await llm.chat.completions.create({
           messages: input.messages,
           max_tokens: maxTokens,
-          temperature: 0.2,
+          temperature: 0,
           stream: true,
         })
         let text = ''

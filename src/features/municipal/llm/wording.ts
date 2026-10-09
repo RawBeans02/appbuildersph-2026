@@ -1,6 +1,6 @@
 import type { WebGPUSupport } from '../../../lib/capabilities'
 import { checkDraft, type DraftCheck, type PlanFacts } from './check'
-import { buildMessages, MAX_DRAFT_TOKENS, type ChatMessage } from './prompt'
+import { buildMessages, draftTokenBudget, type ChatMessage } from './prompt'
 
 // The AI panel's states (screen 19): the optional local model rewords the
 // rule-based plan. Without a usable WebGPU it's unavailable and the officer
@@ -104,8 +104,8 @@ export function createWording(deps: WordingDeps) {
       if (abort.signal.aborted) throw abort.signal.reason
       const started = now()
       update({ status: 'drafting', text: '', template })
-      const text = await untilAborted(llm.complete(buildMessages(template), {
-        maxTokens: MAX_DRAFT_TOKENS,
+      const text = await untilAborted(llm.complete(buildMessages(plan), {
+        maxTokens: draftTokenBudget(plan),
         signal: abort.signal,
         onText: (soFar) => update({ status: 'drafting', text: soFar, template }),
       }), abort.signal)

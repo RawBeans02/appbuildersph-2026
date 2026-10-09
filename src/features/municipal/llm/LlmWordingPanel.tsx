@@ -104,7 +104,7 @@ export function LlmWordingPanel({ plan, draft, onUse, children }: LlmWordingPane
     top = (
       <>
         <p className={styles.stateTitle}>{state.status === 'downloading' ? 'Downloading the writing AI' : 'Loading the writing AI'}</p>
-        <p className={styles.body}>First time only. After this it runs on this laptop with no internet.</p>
+        <p className={styles.body}>For offline use, all required model files must remain cached in this browser.</p>
         <div className={styles.progress}>
           <Progress
             value={state.status === 'downloading' ? state.progress : null}
@@ -157,6 +157,7 @@ export function LlmWordingPanel({ plan, draft, onUse, children }: LlmWordingPane
           <LaptopIcon size={16} weight="bold" aria-hidden />
           Written on this laptop · {WORDING_MODEL_NAME} · {(state.ms / 1000).toFixed(1)} s
         </p>
+        <p className={styles.body}>Check this short action summary against the full plan before approving.</p>
         {!state.check.ok && (
           <div role="alert">
             <p className={styles.checkWarn}>
@@ -185,7 +186,7 @@ export function LlmWordingPanel({ plan, draft, onUse, children }: LlmWordingPane
     top = (
       <>
         <p className={styles.body}>
-          A small language model on this laptop can reword the plan. It may not change any number, and you still check and approve.
+          Optional: the on-device AI writes a short action summary from the rule-based plan. Check each draft against the full plan before approving.
         </p>
         <div className={styles.actions}>
           <Button variant="secondary" onClick={() => void write()}>
