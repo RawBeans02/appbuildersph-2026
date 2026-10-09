@@ -99,7 +99,7 @@ export default defineConfig({
   test: {
     environment: 'node',
     // server/**/*.pg.test.ts need a real Postgres: `npm run test:api` (CI).
-    include: ['src/**/*.test.ts', 'spikes/**/*.test.ts', 'server/**/*.test.ts'],
+    include: ['src/**/*.test.ts', 'spikes/**/*.test.ts', 'server/**/*.test.ts', 'scripts/**/*.test.ts'],
     exclude: ['**/node_modules/**', '**/.git/**', 'server/**/*.pg.test.ts'],
   },
 })

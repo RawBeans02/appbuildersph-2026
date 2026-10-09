@@ -16,5 +16,5 @@
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true
   },
-  "include": ["src/**/*.model.test.ts", "src/**/*.node.test.ts"]
+  "include": ["src/**/*.model.test.ts", "src/**/*.node.test.ts", "scripts/**/*.node.test.ts"]
 }
