@@ -173,7 +173,7 @@ Until `design/` lands, build the logic plus plain, unstyled screens and write `N
 ## Phase 2 (owner decision, Fri ~8:15 PM: start now)
 Never on the offline demo path: the core works with no network, the offline e2e stays green on every push, and phase 2 sits behind `VITE_PHASE2` (off = hidden). The owner's phone tests and any device bugs they find come first. Midnight check: if phase 2 isn't solid by ~2 AM, it ships behind the flag or is cut.
 - [ ] todo · P2-A PIN lock + encrypted records: a PIN (with a design-token stand-in until Claude Design pass 2) unlocks a non-extractable AES-GCM key derived with PBKDF2-SHA-256 (time the iterations on a mid-range phone; target ≤ 1.5 s) and a random salt. Personal fields (names, birth dates, households, puroks) are encrypted at rest in IndexedDB, each with a random 96-bit IV; ids, counts and index keys stay plain. The key lives in memory only, so the app locks on reload. Sample data has a demo PIN shown on the lock screen. Every e2e unlocks first · [sr] · owns: `src/data/db/`, `src/features/lock/`
-- [ ] todo · P2-B Backend core (Vercel functions in `api/`, shared code in `server/`, Postgres via `DATABASE_URL`):
+- [ ] doing · P2-B Backend core (Vercel functions in `api/`, shared code in `server/`, Postgres via `DATABASE_URL`):
   - the laptop's device key enrolls once with `MUNICIPAL_ENROLL_CODE`
   - laptop requests are signed (ECDSA P-256), time-boxed and replay-protected
   - `POST /api/sync` uploads the received barangay QR texts plus the paired phone keys; the server re-verifies every signature with `src/qr` and keeps the newest seq per barangay and week, de-identified only
