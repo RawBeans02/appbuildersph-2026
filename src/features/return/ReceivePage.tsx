@@ -165,7 +165,7 @@ export default function ReceivePage() {
         <Instructions packet={preview.packet} />
         {preview.needsTrust && <section className={styles.trust} aria-labelledby={trustId}>
           <h2 id={trustId} className={styles.trustTitle}>Compare with the RHU laptop</h2>
-          <p>The first time, check that this fingerprint matches the one on the RHU laptop's screen.</p>
+          <p>The first time, check that this code matches the one on the RHU laptop's screen.</p>
           <code className={styles.trustKey}><FingerprintLines value={preview.fingerprint} /></code>
           <CheckRow className={styles.trustRow} label="The fingerprint matches the RHU laptop" checked={compared} onChange={setCompared} />
         </section>}
