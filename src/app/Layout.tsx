@@ -1,6 +1,7 @@
 import { useEffect, type ReactNode } from 'react'
 import { BottomNav, BOTTOM_NAV_HEIGHT } from '../components/BottomNav'
 import { cx } from '../components/cx'
+import { PHASE2 } from '../lib/phase2'
 import { useFlowActive } from './flow'
 import styles from './Layout.module.css'
 
@@ -9,7 +10,8 @@ import styles from './Layout.module.css'
 // LaptopNav.
 export function Layout({ path, notice, children }: { path: string; notice?: ReactNode; children: ReactNode }) {
   const inFlow = useFlowActive()
-  const laptop = path === '/municipal' || path.startsWith('/municipal/')
+  // Phase 2's DOH view (/doh) is a wide desktop page too, with no bottom nav.
+  const laptop = path === '/municipal' || path.startsWith('/municipal/') || (PHASE2 && path === '/doh')
   const showNav = !laptop && !inFlow
 
   // The toast sits above the nav.

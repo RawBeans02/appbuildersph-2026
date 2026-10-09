@@ -28,7 +28,9 @@ export type SyncProblem =
 
 export type ApiResult<T> = { ok: true; value: T } | { ok: false; problem: SyncProblem }
 
-async function call<T>(fetcher: Fetcher, path: string, init: RequestInit): Promise<ApiResult<T>> {
+// One API call: the parsed answer, or the problem to show. Also used by the
+// DOH view (src/features/doh/).
+export async function callApi<T>(fetcher: Fetcher, path: string, init: RequestInit): Promise<ApiResult<T>> {
   let response: Response
   let body: unknown
   try {
@@ -67,7 +69,7 @@ export async function enrollLaptop(
   fetcher: Fetcher = fetch,
 ): Promise<ApiResult<EnrollResponse>> {
   const signed = await signBody(identity.privateKey, JSON.stringify({ publicJwk: identity.publicJwk, municipality, code }))
-  return call<EnrollResponse>(fetcher, '/api/enroll', { method: 'POST', headers: jsonHeaders(signed.signature), body: signed.body })
+  return callApi<EnrollResponse>(fetcher, '/api/enroll', { method: 'POST', headers: jsonHeaders(signed.signature), body: signed.body })
 }
 
 export async function uploadSync(
@@ -77,12 +79,12 @@ export async function uploadSync(
   now = new Date(),
 ): Promise<ApiResult<SyncResponse>> {
   const signed = await signEnvelope(identity.privateKey, identity.fingerprint, data, { now })
-  return call<SyncResponse>(fetcher, '/api/sync', { method: 'POST', headers: jsonHeaders(signed.signature), body: signed.body })
+  return callApi<SyncResponse>(fetcher, '/api/sync', { method: 'POST', headers: jsonHeaders(signed.signature), body: signed.body })
 }
 
 // Whether the server has sync set up; null when it can't be reached.
 export async function readHealth(fetcher: Fetcher = fetch): Promise<HealthResponse | null> {
-  const result = await call<HealthResponse>(fetcher, '/api/health', { method: 'GET' })
+  const result = await callApi<HealthResponse>(fetcher, '/api/health', { method: 'GET' })
   return result.ok ? result.value : null
 }
 

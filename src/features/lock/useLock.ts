@@ -23,4 +23,5 @@ export function useLock(): LockView {
 
 // Phone screens only: the municipal laptop keeps no personal records (its
 // stores hold de-identified counts), so /municipal isn't behind the PIN.
-export const isLockedPath = (path: string) => !path.startsWith('/municipal')
+// Neither is phase 2's DOH view (/doh), which keeps nothing on the device.
+export const isLockedPath = (path: string) => !path.startsWith('/municipal') && path !== '/doh'

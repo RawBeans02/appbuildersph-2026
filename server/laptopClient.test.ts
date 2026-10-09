@@ -1,14 +1,15 @@
 import 'fake-indexeddb/auto'
 import { beforeEach, describe, expect, it } from 'vitest'
-import { handleEnroll, handleHealth, handleSync } from './handlers.js'
+import { handleEnroll, handleHealth, handleReports, handleSync } from './handlers.js'
 import { createMemoryStore, type MemoryStore } from './test/memoryStore.js'
-import { deps, ENROLL_CODE, makeDevice, NOW, qrText } from './test/fixtures.js'
+import { deps, ENROLL_CODE, makeDevice, NOW, qrText, VIEW_CODE } from './test/fixtures.js'
 import type { PairedDevice, ReceivedPayload } from '../src/data/db/types'
 import type { Handoff } from '../src/features/municipal/municipal'
 import { registerLaptop } from '../src/features/municipal/sync/actions'
 import { enrollLaptop, problemText, readHealth, uploadSync, type Fetcher } from '../src/features/municipal/sync/client'
 import { buildSyncData, syncRows } from '../src/features/municipal/sync/results'
 import { openSyncStore } from '../src/features/municipal/sync/syncStore'
+import { dohView, fetchReports } from '../src/features/doh/view'
 
 // The laptop's sync client against the real server handlers, wired through
 // a fetch stand-in (no network): the signatures the laptop makes are the ones
@@ -19,7 +20,8 @@ let server: MemoryStore
 function fetcherFor(store: MemoryStore, now = NOW): Fetcher {
   return async (path, init) => {
     const request = new Request(`https://agapay.test${path}`, { ...init, headers: { ...(init?.headers as object), 'x-real-ip': '192.0.2.4' } })
-    const route = { '/api/enroll': handleEnroll, '/api/sync': handleSync, '/api/health': handleHealth }[path]
+    const route = { '/api/enroll': handleEnroll, '/api/sync': handleSync, '/api/health': handleHealth }[path] ??
+      (path.startsWith('/api/reports?') ? handleReports : undefined)
     if (!route) throw new TypeError('Failed to fetch')
     return route(request, deps(store, {}, now))
   }
@@ -168,5 +170,22 @@ describe('what a sync sends', () => {
     // Only public key members leave, even if a stored JWK had more.
     const extra = { ...handoff, devices: [{ ...handoff.devices[0], publicJwk: { ...handoff.devices[0].publicJwk, ext: true, key_ops: ['verify'] } }] }
     expect(Object.keys(buildSyncData(extra).data.barangayKeys[0].publicJwk).sort()).toEqual(['crv', 'kty', 'x', 'y'])
+  })
+})
+
+describe('DOH view client', () => {
+  it('reads what the laptop synced, with the view code', async () => {
+    const store = await freshStore()
+    await registerLaptop(store, ENROLL_CODE, fetcherFor(server), NOW)
+    const identity = (await store.getIdentity())!
+    const { handoff } = await handoffOf({ barangay: 'SID-MAL', seq: 3 })
+    expect((await uploadSync(identity, buildSyncData(handoff).data, fetcherFor(server), NOW)).ok).toBe(true)
+
+    expect(await fetchReports('wrong', 'SID', fetcherFor(server))).toEqual({ ok: false, problem: { kind: 'wrong-code' } })
+    const result = await fetchReports(VIEW_CODE, 'SID', fetcherFor(server))
+    if (!result.ok) throw new Error('expected the reports')
+    const view = dohView(result.value, NOW)
+    expect(view.rows.map((row) => [row.name, row.week, row.from])).toEqual([['Maligaya-D', '2026-W41', identity.fingerprint]])
+    expect(view.totals).toMatchObject({ week: '2026-W41', barangays: 1 })
   })
 })
