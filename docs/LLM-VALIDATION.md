@@ -64,16 +64,19 @@ the named demo laptop; this target is not a measurement.
 ## Evidence and remaining gates
 
 Baseline `e63a237`, local Windows desktop preview, Chrome with hardware WebGPU:
-one online generation took 62.2 seconds and an offline full-reload generation
-took 68.1 seconds. Both were rejected. Times are generation-only from the UI,
-excluding model download/initialization. This baseline did not reproduce the
-earlier live deployment's fetch failure, so its cause remains unconfirmed.
+one online generation and one offline full-reload generation were both
+rejected. Their times aren't quoted, because the device wasn't recorded with
+them. This baseline did not reproduce the earlier live deployment's fetch
+failure, so its cause remains unconfirmed.
 
 Oct 10, 2026 PH, branch based on `e63a237`: Windows desktop, Intel Core
 i5-1155G7 / Iris Xe, headless Chrome 154, hardware WebGPU with shader-f16.
 Production worker `webllm.worker-CiqCa1_8.js`, Qwen 0.5B q4f16, temperature 0.
-Raw texts, facts, times and guard results are in
-[llm-validation-results.json](llm-validation-results.json).
+Raw texts, facts, times and guard results of the fixed ten-plan corpus are in
+[llm-validation-results.json](llm-validation-results.json). The complete-demo
+and UI trials below are ad-hoc runs on the same device, with their steps listed
+under each; their times are the panel's own measured "Written on this laptop ·
+… s" line.
 
 - Fixed ten-plan corpus: **8/10 accepted**. Manual review of all eight found
   preserved names, ordered scores/ranges, transfer directions/amounts and
@@ -86,6 +89,10 @@ Raw texts, facts, times and guard results are in
   the synthetic phone fixture from `municipal.test.ts`): **3/3 consecutive
   accepted outputs**, 10,020 / 9,698 / 9,860 ms generation-only. All matched the
   supplied facts, including the Maligaya-D score range and Riverside-D transfer.
+  Steps (ad-hoc): production preview build; laptop reset to the sample data;
+  the four committed signed sample reports plus the synthetic phone fixture from
+  `municipal.test.ts` received; `/municipal/plan`; "Write the wording with AI"
+  three times in a row, model already cached; times from the panel.
 - Separate UI trial: one online preparation then three full offline reloads,
   each with real inference and no failed dependency requests. Offline generation
   took 9.6 / 8.9 / 9.1 seconds. This trial used the incomplete four-barangay
@@ -95,7 +102,11 @@ Raw texts, facts, times and guard results are in
   signed counts received through the actual laptop UI. One online draft and
   three full offline-reload drafts were **4/4 accepted**, with the fixed
   reminder in the officer's wording box. Offline generation took
-  **12.4 / 12.6 / 12.0 seconds**, with no failed dependency requests. Integrated
+  **12.4 / 12.6 / 12.0 seconds**, with no failed dependency requests.
+  Steps (ad-hoc): production preview build; on the laptop UI, pair the phone
+  fixture and receive its signed counts (five barangays); one online draft on
+  `/municipal/plan`; then three times: network off in DevTools, full reload,
+  draft again; times from the panel, dependency requests from DevTools. Integrated
   UI texts and hardware/browser details are also in the results JSON. Build,
   lint, app/E2E typechecks and the clean **950-test** unit run passed.
 - Integrated Chromium production suite: 27 passed, 7 skipped (opt-in real-model and

@@ -37,6 +37,14 @@ models; reset samples; set brightness; verify clock and camera permissions;
 turn Wi-Fi and data off; reload. Have the synthetic printed label and fallback
 QR text/images ready. App data must visibly be labelled Sample data.
 
+Laptop AI wording, after the final deploy (the worker's file changes with each
+deploy, and offline drafting needs the current one cached): on the demo laptop,
+online, do a normal reload, run one draft on `/municipal/plan`, and check that
+the panel and the `/device` row are green before turning the network off.
+Rehearse the five-barangay plan three times on that laptop; use the AI only
+after the fifth report. Ship nothing under `src/features/municipal/llm/` or
+`src/inference/` after that preparation.
+
 1. **0:00–0:35 — User and problem.** “The barangay health worker after a typhoon
    needs an approved response even without signal.” Show offline Home. State
    synthetic prototype and no diagnosis/doses.

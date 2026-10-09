@@ -112,7 +112,7 @@ One offline-first web app (Vite, React, TypeScript, a service worker), static on
   - The models are downloaded once into Cache Storage and run in Web Workers: MediaPipe Pose and YAMNet for Hinga, PP-OCRv5 on ONNX Runtime Web (WebAssembly) for the medicine-box reader.
   - Fixed, unit-tested rules make every decision: the WHO IMCI cut-offs, the day-5–15 watch window, and the exposure × stock flag.
 - **The handoff:** the phone shows a QR with de-identified counts, signed with its own ECDSA P-256 key, and the laptop scans it.
-- **Laptop screens:** they verify each QR, merge the barangays and compute the plan by rules. An optional small language model (Qwen2.5-0.5B on WebLLM, WebGPU) only rewords the plan, under a check that rejects any new number, dose or barangay. The officer approves.
+- **Laptop screens:** they verify each QR, merge the barangays and compute the plan by rules. An optional small language model (Qwen2.5-0.5B on WebLLM, WebGPU) only writes a short action summary of the plan the rules computed, under a check that rejects any new number, dose or barangay. The officer approves.
 
 The diagram, the pipelines, the key decisions and the limitations are in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
@@ -123,7 +123,7 @@ The diagram, the pipelines, the key decisions and the limitations are in [`docs/
 - **People decide; the AI suggests:**
   - The health worker confirms every field the box reader reads before anything is saved.
   - The officer edits and approves every plan.
-  - The language model only rewords a plan that fixed rules already computed.
+  - The language model only summarizes a plan that fixed rules already computed.
 - **Privacy by design:**
   - Records stay on the device. The core sends nothing to a server; the optional phase 2 sync sends only the laptop's de-identified QR counts and public keys.
   - The QR carries counts only: no names, birth dates, households, puroks or exact dates. Counts from 1 to 4 show as "<5", and the fields don't overlap, so a hidden cell can't be worked out by subtraction.
@@ -191,7 +191,7 @@ Every AI session that touched this project:
 - **Claude** (chat, Research mode): research and idea selection.
 - **Claude Design**: the original UI design; the return-flow extension by Codex follows its tokens and components.
 - **OpenAI Codex (GPT-6)**: repository review and the `codex/offline-return-qr` implementation: signed offline return packets, municipal trust and receipt screens extending the existing design, persistence/reset rules, loading cancellation/timeout and pagination fixes, Windows test portability, synthetic fixture updates, browser verification and submission materials. See `design/Offline Return QR.md` for the new screen specification. No additional model is added to the app.
-- **OpenAI Codex with three GPT-6 Luna agents at max reasoning**: the `codex/bugfix-local-llm` work: complete active-model cache readiness, offline preparation errors, compact fact-copying prompts, regression tests and real local-model trials. Results and rejected cases are disclosed in `docs/LLM-VALIDATION.md`. The app still uses the existing Qwen model.
+- **OpenAI Codex with three GPT-6 Luna agents at max reasoning**: the [PR #8](https://github.com/RawBeans02/appbuildersph-2026/pull/8) work: complete active-model cache readiness, offline preparation errors, compact fact-copying prompts, regression tests and real local-model trials. Results and rejected cases are disclosed in `docs/LLM-VALIDATION.md`. The app still uses the existing Qwen model.
 - **OpenAI gpt-image-2** (development only, not shipped in the app): placeholder photos inside the Claude Design mockups (a chest in a camera view, a hand holding a synthetic "SAMPLE" medicine box, a phone held up to a webcam), and one illustration of a flooded street for the video and pitch, labeled "AI illustration" wherever it appears. Prompts, model and dates are kept with the files; every image was checked by a person. Screenshots of the product in this README are real screenshots of the working app.
 
 A cloud "Jr. Builder" agent named in early commits was planned but never used.
@@ -246,6 +246,6 @@ Human rows stay pending until each member's actual work is confirmed.
 | Rovince Eduvane | RawBeans02 | Build lead | _TBD_ |
 | Vicente Seumal | ThirdyThirdy | Support: idea creation and design | _TBD_ |
 | Adam Arous | takashii18 | Support: idea creation and design | _TBD_ |
-| Gabriel Syd Paguio | Syd7 | Co-builder | The signed offline return QR from the laptop's approval to the barangay phone ([PR #7](https://github.com/RawBeans02/appbuildersph-2026/pull/7), with OpenAI Codex), and local LLM cache/prompt validation on `codex/bugfix-local-llm`; more _TBD_ |
+| Gabriel Syd Paguio | Syd7 | Co-builder | The signed offline return QR from the laptop's approval to the barangay phone ([PR #7](https://github.com/RawBeans02/appbuildersph-2026/pull/7), with OpenAI Codex), and the local LLM cache and prompt fixes and their validation ([PR #8](https://github.com/RawBeans02/appbuildersph-2026/pull/8), with OpenAI Codex); more _TBD_ |
 
-The original core was built with the Lead and Sr. Builder AI sessions under the owner's direction. The offline-return branch adds the Codex work disclosed above. AI tools and Git authorship do not establish a person's actual contribution; the human contribution rows remain pending confirmation in `docs/FINAL-VALIDATION.md`.
+The original core was built with the Lead and Sr. Builder AI sessions under the owner's direction. The offline return QR (PR #7) and the local LLM fixes (PR #8) add the Codex work disclosed above; PR #8's commit b015507 has no AI co-author line but is Codex work too. AI tools and Git authorship do not establish a person's actual contribution; the human contribution rows remain pending confirmation in `docs/FINAL-VALIDATION.md`.

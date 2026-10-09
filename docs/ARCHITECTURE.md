@@ -93,8 +93,8 @@ in [Offline return](OFFLINE-RETURN.md).
 
 - **Model**: Qwen2.5-0.5B-Instruct, WebLLM's 4-bit build `q4f16_1`, or `q4f32_1` when the GPU lacks `shader-f16` (`src/features/municipal/llm/model.ts`). License and download size: README.
 - **Runtime**: WebLLM in its own Web Worker (`webllm.worker.ts`) behind the app's inference protocol, on WebGPU only. The main thread never loads the library.
-- **Input**: the rule-based plan's template text (`planTemplateText` in `src/rules/plan.ts`). The rules already decided every number, priority and stock move; the model only rewords them. The prompt forbids adding numbers, doses, diagnoses or actions.
-- **Bounds**: at most 250 tokens, temperature 0.2, a 90 s timeout, and a Stop button.
+- **Input**: the plan's facts (`PlanFacts`) written as short ordered sentences, one per doctor-team priority with its score and one per stock move ("… for the MHO to decide"), plus one sample exchange with placeholder facts (`buildMessages` in `src/features/municipal/llm/prompt.ts`). The rules already decided every number, priority and stock move; the model copies them into a short action summary and may not add numbers, doses, diagnoses or actions.
+- **Bounds**: min(224, 24 + 20 per priority + 40 per move) tokens (`draftTokenBudget`), temperature 0, a 90 s timeout, and a Stop button. A used draft gets the plan's rule notes back under it (`withPlanNotes`: the no-move reason, the basis, an older week, what "<5" means), then the fixed no-dose reminder.
 - **Output check** (`checkDraft`, pure and unit-tested): the draft is offered only if:
   - every number in it, digits or number words, appears in the template;
   - it uses no dose, mg, tablet, per-person, schedule, "take", diagnosis or prescription wording beyond the template's own reminder;
@@ -227,7 +227,7 @@ Optional, after a sync. The DOH or regional officer drafts alerts on `/doh`; a p
 - **A PWA, not a native app**: one codebase for the phone and the laptop, nothing to install from a store, and offline through a service worker. The cost is the browser's limits on iPhone (memory, no share target).
 - **WebAssembly, single-threaded, for OCR on every device**: ONNX Runtime's WebGPU path is reported to run away on memory on iOS Safari and is listed as unsupported there. WASM threads would need cross-origin isolation headers. One CPU path behaves the same everywhere.
 - **Models on demand, not precached**: the first visit stays small for every visitor (including judges on mobile data), and the big download happens once, on purpose, with progress, a storage check and persistent storage.
-- **Rules decide, AI reads and rewords**: counts, the watch window, flags, priorities and stock moves are deterministic, explainable rules with unit tests. The OCR reads labels for a human to confirm. The language model only rewords, and its output is checked against the rules' numbers.
+- **Rules decide, AI reads and summarizes**: counts, the watch window, flags, priorities and stock moves are deterministic, explainable rules with unit tests. The OCR reads labels for a human to confirm. The language model only summarizes what the rules decided, and its output is checked against the rules' numbers.
 - **Open-source models only**: Qwen2.5-0.5B-Instruct (Apache-2.0) rather than Llama 3.2 1B, whose community license is not an open-source license.
 - **No cloud in the core**: no backend, no accounts, no API keys. Static hosting delivers the app; the phone-to-laptop handoff is a QR, not a sync. Phase 2's sync is optional, off by default, and carries the same de-identified counts.
 - **A closed cloud model, once, by the owner's decision**: GPT-6 Luna words phase 2's alerts only. It runs on OpenAI's servers, so it's off by default, never on the offline path, sees only de-identified facts, and never decides anything: the rules make the facts, the check guards the wording, and a person approves.
