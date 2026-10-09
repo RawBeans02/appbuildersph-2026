@@ -2,7 +2,7 @@ import { expect, type Page } from '@playwright/test'
 import { openPage } from './lock'
 
 // "Prepare for offline" to the end, as a person does it on /prepare: Download,
-// Continue on the "keep Agapay's files" sheet, then the box reader warms up
+// Continue on the "keep AgapayMo's files" sheet, then the box reader warms up
 // and the screen goes to Home.
 export async function prepareForOffline(page: Page) {
   await openPage(page, '/prepare')

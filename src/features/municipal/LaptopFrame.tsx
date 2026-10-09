@@ -40,7 +40,7 @@ export function LaptopNav({ active }: { active: LaptopSection }) {
           a
         </span>
         <div>
-          <p className={styles.name}>Agapay</p>
+          <p className={styles.name}>AgapayMo</p>
           <p className={styles.role}>Municipal view</p>
         </div>
       </div>

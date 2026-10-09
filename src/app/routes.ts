@@ -16,7 +16,7 @@ export type AppRoute = {
 export type PlannedRoute = { path: string; title: string; device: 'phone' | 'laptop' | 'dev' }
 
 export const PLANNED_ROUTES: PlannedRoute[] = [
-  { path: '/', title: 'Agapay', device: 'phone' },
+  { path: '/', title: 'AgapayMo', device: 'phone' },
   { path: '/prepare', title: 'Prepare for offline', device: 'phone' },
   { path: '/hinga', title: 'Hinga breathing check', device: 'phone' },
   { path: '/watch', title: 'Flood exposure watch', device: 'phone' },

@@ -44,7 +44,7 @@ export function RecordsError({ onRetry, children }: { onRetry?: () => void; chil
       icon={WarningCircleIcon}
       title="Couldn't open the records"
       body="Nothing was lost. Your records are still saved on this phone."
-      footnote="Still stuck? Close Agapay and open it again."
+      footnote="Still stuck? Close AgapayMo and open it again."
     >
       <Button
         tagalog="Subukan ulit"

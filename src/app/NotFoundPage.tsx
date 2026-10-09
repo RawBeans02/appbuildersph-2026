@@ -6,7 +6,7 @@ import { useFlowMode } from './flow'
 import styles from './NotFoundPage.module.css'
 import { usePath } from './router'
 
-// The designed 404 (design: Agapay Phone 4 Send and Privacy, 404). Served
+// The designed 404 (design: AgapayMo Phone 4 Send and Privacy, 404). Served
 // offline by the app shell. No bottom nav: one way back. On the municipal
 // laptop's paths, the same block sits centered and leads to the municipal home.
 export function NotFoundPage() {
@@ -19,7 +19,7 @@ export function NotFoundPage() {
       <div className={styles.block}>
         <p className={styles.code}>404</p>
         <h1 className={styles.title}>Walang ganitong page.</h1>
-        <p className={styles.body}>This page isn't part of Agapay. Your records are safe on this phone.</p>
+        <p className={styles.body}>This page isn't part of AgapayMo. Your records are safe on this phone.</p>
         <div className={styles.status}>
           <LocalStatus device={laptop ? 'laptop' : 'phone'} />
         </div>

@@ -186,7 +186,7 @@ export default function PreparePage() {
           <h1 className={styles.title}>Not enough space on this phone</h1>
           <div className={styles.stats}>
             <div className={styles.stat}>
-              <div className={styles.statLabel}>Agapay needs</div>
+              <div className={styles.statLabel}>AgapayMo needs</div>
               <div className={styles.statValue}>{formatMB(needed)}</div>
             </div>
             <div className={styles.stat}>
@@ -207,7 +207,7 @@ export default function PreparePage() {
           </Button>
           <div className={styles.later}>
             <Button variant="text" onClick={() => navigate('/')}>
-              Use Agapay without the AI for now
+              Use AgapayMo without the AI for now
             </Button>
           </div>
         </div>
@@ -255,7 +255,7 @@ export default function PreparePage() {
       <>
         <div className={styles.content}>
           <h1 className={styles.title}>Downloading the AI</h1>
-          <p className={styles.lead}>So Agapay works without internet. Keep this screen open.</p>
+          <p className={styles.lead}>So AgapayMo works without internet. Keep this screen open.</p>
           <div className={styles.progress}>
             <Progress
               value={total ? loaded / total : null}
@@ -281,8 +281,8 @@ export default function PreparePage() {
   return root(
     <>
       <div className={styles.content}>
-        <h1 className={styles.title}>Get Agapay ready for no signal</h1>
-        <p className={styles.lead}>Download the AI once, so Agapay works without internet. After this, nothing you do needs a signal.</p>
+        <h1 className={styles.title}>Get AgapayMo ready for no signal</h1>
+        <p className={styles.lead}>Download the AI once, so AgapayMo works without internet. After this, nothing you do needs a signal.</p>
         <div className={styles.list}>
           {phoneParts.map((part) => (
             <div key={part.key} className={styles.part}>
@@ -312,7 +312,7 @@ export default function PreparePage() {
           </Button>
         </div>
       </div>
-      <BottomSheet open={askKeep} onClose={() => setAskKeep(false)} title="Next, your browser may ask to keep Agapay's files">
+      <BottomSheet open={askKeep} onClose={() => setAskKeep(false)} title="Next, your browser may ask to keep AgapayMo's files">
         <p className={styles.body}>Tap Allow, so the AI isn't deleted when the phone runs low on space.</p>
         <Button onClick={begin}>Continue</Button>
       </BottomSheet>

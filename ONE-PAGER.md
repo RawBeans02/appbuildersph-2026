@@ -1,4 +1,4 @@
-# ONE-PAGER — Agapay
+# ONE-PAGER — AgapayMo
 
 **Challenge (official wording):** "Build an AI product that remains genuinely useful when the cloud disappears." (Theme: Local AI.)
 
@@ -10,7 +10,7 @@
 
 Context: DOH reported 11,965 leptospirosis cases as of Sept 9, 2026, 46% higher than the same period last year ([Daily Tribune, Sept 29, 2026](https://tribune.net.ph/2026/09/29/leptospirosis-cases-dip-slightly-but-2026-total-still-up-46)), and a DOH memorandum asks for regular monitoring of doxycycline stocks in barangay health units ([Philstar, Sept 16, 2026](https://www.philstar.com/nation/2026/09/16/2556541/more-doxycycline-capsules-distributed-curb-leptospirosis-cases)).
 
-**Our solution (one sentence):** Agapay is an offline web app. On the BHW's phone, it checks a child's breathing rate with the camera (Hinga), turns a logged flood event into a leptospirosis watch list, and reads medicine-box lot and expiry dates to compare stock against need. It then passes only de-identified counts to the MHO's laptop by QR code, where a rule-based plan, optionally drafted by a local language model, waits for the officer's approval.
+**Our solution (one sentence):** AgapayMo is an offline web app. On the BHW's phone, it checks a child's breathing rate with the camera (Hinga), turns a logged flood event into a leptospirosis watch list, and reads medicine-box lot and expiry dates to compare stock against need. It then passes only de-identified counts to the MHO's laptop by QR code, where a rule-based plan, optionally drafted by a local language model, waits for the officer's approval.
 
 **The wow flow, step by step (the ~1-minute video and the 5-minute live demo; airplane mode on from second one, "Runs on this phone" visible):**
 1. **Hinga:** the presenter breathes to a 45/min metronome as a "2-year-old"; the result is "Fast breathing for age: refer to the midwife or RHU now". Moving the phone makes it refuse to count.

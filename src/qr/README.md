@@ -70,8 +70,8 @@ if (merged.ok) {
 
 | `decodeQr` error code | Meaning |
 |---|---|
-| `not-agapay` | Not an Agapay QR (a URL, a product barcode...) |
-| `bad-version` | An Agapay QR of a version other than 1 |
+| `not-agapay` | Not an AgapayMo QR (a URL, a product barcode...) |
+| `bad-version` | An AgapayMo QR of a version other than 1 |
 | `invalid-payload` | Malformed, or breaks the schema (unknown keys, free text, unsuppressed counts, a date...) |
 | `bad-signature` | The signature doesn't match the barangay's registered key (tampered, or another phone) |
 | `unknown-device` | No usable key is registered for the barangay the QR names |

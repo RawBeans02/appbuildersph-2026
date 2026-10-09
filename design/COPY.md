@@ -1,4 +1,4 @@
-# Agapay copy deck, pass 1
+# AgapayMo copy deck, pass 1
 
 Every string, by screen. Use word for word. `{x}` = filled by the app. Sample values are in brackets after the placeholder. Tagalog on main actions and results is part of the label, after a middle dot (·), in a lighter color. No em dashes; ranges use an en dash (–).
 
@@ -14,8 +14,8 @@ Every string, by screen. Use word for word. `{x}` = filled by the app. Sample va
 - Toast actions: `Undo`
 - Retry: `Try again · Subukan ulit`
 - Note on results: `Screening aid only. Not a diagnosis.`
-- Dose note: `Agapay never suggests a dose. Doxycycline is given only after consultation with a health professional (DOH guideline).`
-- Records error (any screen): `Couldn't open the records` / `Nothing was lost. Your records are still saved on this phone.` / `Still stuck? Close Agapay and open it again.`
+- Dose note: `AgapayMo never suggests a dose. Doxycycline is given only after consultation with a health professional (DOH guideline).`
+- Records error (any screen): `Couldn't open the records` / `Nothing was lost. Your records are still saved on this phone.` / `Still stuck? Close AgapayMo and open it again.`
 - Loading records: `Opening the records on this phone…`
 
 ## 1 · Home
@@ -183,18 +183,18 @@ Every string, by screen. Use word for word. `{x}` = filled by the app. Sample va
   - `It can miscount breaths if the child moves or cries, or the light is poor. When it can tell, it stops and says why.`
   - `It can misread a lot number or expiry. You check every field before anything is saved.`
   - `On the municipal laptop, AI drafts the plan's wording. The officer checks it before approving.`
-- `Agapay never diagnoses and never suggests a dose. It counts, flags and refers.`
+- `AgapayMo never diagnoses and never suggests a dose. It counts, flags and refers.`
 - Footer: `Research prototype, not a registered medical device. San Isidro Demo and every record in it are invented sample data.`
 
 ## Local AI states
 
-- L1a: `Get Agapay ready for no signal` / `Download the AI once, so Agapay works without internet. After this, nothing you do needs a signal.`
+- L1a: `Get AgapayMo ready for no signal` / `Download the AI once, so AgapayMo works without internet. After this, nothing you do needs a signal.`
   - Parts: `Breathing check (Hinga)` `Counts breaths with the camera` · `Crying check` `Hears if the child is crying` · `Medicine-box reader` `Reads the lot and expiry` · sizes `{15.2} MB`
   - `Total, one time` `{55.1} MB` · `Use Wi-Fi if you can. This phone has {2.1 GB} free.`
   - Primary `Download {55.1} MB · I-download` · link `Later`
-- L1b: `Downloading the AI` / `So Agapay works without internet. Keep this screen open.` · `{1} of 3: {Breathing check}` · `{9.8} / {55.1} MB` · `{17}%` · row states `Downloading` `Waiting` `Done` · secondary `Cancel`
-- L2: `Not enough space on this phone` · `Agapay needs` `{55.1} MB` · `Free now` `{21.4} MB` · `Free up about {34} MB, then check again. Deleting old videos or an app you don't use is usually enough.` · primary `Check again` · link `Use Agapay without the AI for now`
-- L3: `Next, your browser may ask to keep Agapay's files` / `Tap Allow, so the AI isn't deleted when the phone runs low on space.` / `Continue`
+- L1b: `Downloading the AI` / `So AgapayMo works without internet. Keep this screen open.` · `{1} of 3: {Breathing check}` · `{9.8} / {55.1} MB` · `{17}%` · row states `Downloading` `Waiting` `Done` · secondary `Cancel`
+- L2: `Not enough space on this phone` · `AgapayMo needs` `{55.1} MB` · `Free now` `{21.4} MB` · `Free up about {34} MB, then check again. Deleting old videos or an app you don't use is usually enough.` · primary `Check again` · link `Use AgapayMo without the AI for now`
+- L3: `Next, your browser may ask to keep AgapayMo's files` / `Tap Allow, so the AI isn't deleted when the phone runs low on space.` / `Continue`
 - L4: `Getting the AI ready` / `Loading it into this phone's memory. This takes a few seconds.`
 - L5: `Runs on this phone` / `The AI is saved on this phone and works with no signal. Your records stay here. Only counts leave, in the QR.` · rows + `Ready` · link `What stays on this phone`
 - L6a/b: `Reading the box` · `Finding the text` `step 1 of 2` · `Reading the text` `step 2 of 2` · `Reading on this phone. The photo is deleted after.` · `Cancel`
@@ -207,7 +207,7 @@ Every string, by screen. Use word for word. `{x}` = filled by the app. Sample va
 
 ## 16 · Municipal home (laptop)
 
-- Nav: `Agapay` `Municipal view` · `San Isidro Demo · Sample data` · `Scan QR codes` · `Merged view` · `Plan` · `Approval log` · `Privacy & AI`
+- Nav: `AgapayMo` `Municipal view` · `San Isidro Demo · Sample data` · `Scan QR codes` · `Merged view` · `Plan` · `Approval log` · `Privacy & AI`
 - Title: `Barangay reports` · `Week {2026-W41} · {Oct 5 to 11}`
 - Panel: `Scan a barangay QR` · `The health worker shows the QR on their phone. Only counts come in: no names, birthdays or addresses.` · `The camera is off` · primary `Scan a barangay QR`
 - List: `Received this week` `{2} of 5` · `{9:05 AM} · export #{3}` · pills `Received` `Waiting`
@@ -219,7 +219,7 @@ Every string, by screen. Use word for word. `{x}` = filled by the app. Sample va
 - `Looking for a QR` · `Hold the phone's QR inside the square, about a hand's length from the camera.` · secondary `Stop the camera`
 - Success: `{Santo Niño-D} received` · `Week {2026-W41} · export #{4} · signed by the paired {Santo Niño-D} phone.` · `Ready for the next barangay.` · list `Just now` · secondary (narrow column) `Merged view ({3} of 5)`
 - Already: `Already received` · `{Maligaya-D} export #{3} came in at {9:05 AM}. Nothing changed.`
-- Invalid: `Not a valid Agapay QR` · `It isn't from a paired Agapay phone, so nothing was saved. Ask the health worker to open Send on Agapay.`
+- Invalid: `Not a valid AgapayMo QR` · `It isn't from a paired AgapayMo phone, so nothing was saved. Ask the health worker to open Send on AgapayMo.`
 - Newer: `{Maligaya-D} updated` · `Export #{4} is newer, so it replaces #{3}.`
 - Camera blocked: `The camera is blocked` · `Allow the camera for this site in the browser settings, then try again.` · `Try again`
 
@@ -255,5 +255,5 @@ Every string, by screen. Use word for word. `{x}` = filled by the app. Sample va
 
 ## 404
 
-- `404` · `Walang ganitong page.` · `This page isn't part of Agapay. Your records are safe on this phone.` · primary `Go to Home · Pumunta sa Home` (laptop: `Go to the municipal home`)
-- Page title: `Page not found · Agapay`
+- `404` · `Walang ganitong page.` · `This page isn't part of AgapayMo. Your records are safe on this phone.` · primary `Go to Home · Pumunta sa Home` (laptop: `Go to the municipal home`)
+- Page title: `Page not found · AgapayMo`

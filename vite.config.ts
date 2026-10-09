@@ -22,8 +22,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       // The manifest values from design/README.md ("App icon and manifest").
       manifest: {
-        name: 'Agapay',
-        short_name: 'Agapay',
+        name: 'AgapayMo',
+        short_name: 'AgapayMo',
         description: 'Offline health checks for barangay health workers after a typhoon.',
         start_url: '/',
         scope: '/',

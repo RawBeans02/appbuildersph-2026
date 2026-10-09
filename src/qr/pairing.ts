@@ -90,9 +90,9 @@ function fail(code: PairingErrorCode, message: string): PairingResult {
 export async function decodePairing(text: string): Promise<PairingResult> {
   const trimmed = text.trim()
   const prefix = /^AGPK(\d{1,3})\./.exec(trimmed)
-  if (!prefix) return fail('not-pairing', 'This is not an Agapay pairing QR code.')
+  if (!prefix) return fail('not-pairing', 'This is not an AgapayMo pairing QR code.')
   if (prefix[1] !== '1') {
-    return fail('bad-version', `Agapay pairing QR version ${prefix[1]} can't be read here; this app reads version 1.`)
+    return fail('bad-version', `AgapayMo pairing QR version ${prefix[1]} can't be read here; this app reads version 1.`)
   }
   const body = trimmed.slice(PAIRING_PREFIX.length)
   const bytes = fromBase64url(body)

@@ -47,7 +47,7 @@ Every task names the files or folders it **owns**, so agents pushing straight to
 - [x] done · Inference worker scaffold, runtime-agnostic: module Worker, typed message protocol (init with the backend pick, run with progress, cancel, coded errors) and a fake echo runtime so it's testable now · [sr] · owns: `src/inference/` · 4ebaf08
 - [x] done · Offline e2e test with Playwright, CI only (never on the laptop): `@playwright/test`, `test:e2e`, `playwright.config.ts`, `e2e/offline.spec.ts` (load, shell ready, go offline, reload, shell still renders) · [sr] · owns: `playwright.config.ts`, `e2e/`, `package.json`, the lockfile · c308f81 (passed on its first CI run, 37894243208: Chromium, 1 test, 7.3 s)
 
-### Agapay build (idea locked Fri ~3:30 PM; see `ONE-PAGER.md`)
+### AgapayMo build (idea locked Fri ~3:30 PM; see `ONE-PAGER.md`)
 Until `design/` lands, build the logic plus plain, unstyled screens and write `NEEDS DESIGN:` under the task. Synthetic data only. Never claim "first" (see README "Related work"). Hinga never diagnoses; nothing ever recommends a dose.
 
 **Sr. Builder**

@@ -71,8 +71,8 @@ describe('scan banners', () => {
       expect(banner).toEqual({
         kind: 'not-valid',
         tone: 'bad',
-        title: 'Not a valid Agapay QR',
-        body: "It isn't from a paired Agapay phone, so nothing was saved. Ask the health worker to open Send on Agapay.",
+        title: 'Not a valid AgapayMo QR',
+        body: "It isn't from a paired AgapayMo phone, so nothing was saved. Ask the health worker to open Send on AgapayMo.",
       })
     }
     expect((await readHandoff(db)).received).toEqual([])

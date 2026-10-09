@@ -144,7 +144,7 @@ function RegisterCard({ onDone }: { onDone: () => void }) {
         Register this laptop
       </h2>
       <p className={styles.lead}>
-        Once, with the enroll code from whoever set up Agapay. This laptop makes its own key, which never leaves it; the code
+        Once, with the enroll code from whoever set up AgapayMo. This laptop makes its own key, which never leaves it; the code
         isn't kept here.
       </p>
       <form className={styles.form} onSubmit={(event) => void submit(event)}>

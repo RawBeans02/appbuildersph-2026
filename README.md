@@ -1,8 +1,8 @@
-# Agapay
+# AgapayMo
 
 An offline web app for barangay health workers after a typhoon: an on-device camera breathing check for children, a leptospirosis watch list and medicine-box reading on the phone, handed to the municipal health officer as de-identified counts by QR code, with no internet needed.
 
-Built for the **AppBuildersPH Hackathon 2026** (Oct 9–10, 2026). Theme: **Local AI**. The challenge: "Build an AI product that remains genuinely useful when the cloud disappears."
+Named Agapay until Oct 9, 9 PM, when the team renamed it AgapayMo (internal identifiers such as the database name keep "agapay"). Built for the **AppBuildersPH Hackathon 2026** (Oct 9–10, 2026). Theme: **Local AI**. The challenge: "Build an AI product that remains genuinely useful when the cloud disappears."
 
 | | |
 |---|---|
@@ -20,7 +20,7 @@ After a typhoon, a flooded barangay can be without signal for days. That is exac
 - **Children in the evacuation center:** which ones are breathing fast for their age, the WHO IMCI warning sign for pneumonia.
 - **Doxycycline on hand:** how much there is, and how much expires soon.
 
-The **municipal health officer** (MHO) decides where doctor teams and medicine go, but with paper records and no signal that picture arrives late. Agapay keeps all of it on the BHW's phone with no internet, and hands the MHO only the counts, by QR code.
+The **municipal health officer** (MHO) decides where doctor teams and medicine go, but with paper records and no signal that picture arrives late. AgapayMo keeps all of it on the BHW's phone with no internet, and hands the MHO only the counts, by QR code.
 
 ## Try it
 - **Live URL:** https://appbuildersph-2026.vercel.app
@@ -80,13 +80,13 @@ The **municipal health officer** (MHO) decides where doctor teams and medicine g
 - **No cost per use.** There are no API bills for a municipality, and it runs on the phones health workers already have.
 
 ## Related work
-Camera-based breath counting for the WHO IMCI fast-breathing check has prior art: [Breathwise](https://devpost.com/software/breathwise-j9pfb4) (Devpost, RevenueCat Shipaton 2026), an open-source pediatric respiratory-rate project on GitHub ([tthitima53-del/pediatric-rr-](https://github.com/tthitima53-del/pediatric-rr-)), the AIRR research project (Malaria Consortium), and [Lucy et al. 2021](https://pubmed.ncbi.nlm.nih.gov/34715683/) (smartphone video in children with pneumonia). We found Breathwise after choosing this idea. Agapay Hinga is our own implementation, built from scratch during the hackathon; no code from these projects was used. What's different: an ML pipeline (pose-tracked torso region, on-device cry detection, a motion-quality gate that refuses unreliable counts) and the barangay workflow around it (flood exposure → leptospirosis watch list → medicine stock → de-identified QR → municipal plan), all offline.
+Camera-based breath counting for the WHO IMCI fast-breathing check has prior art: [Breathwise](https://devpost.com/software/breathwise-j9pfb4) (Devpost, RevenueCat Shipaton 2026), an open-source pediatric respiratory-rate project on GitHub ([tthitima53-del/pediatric-rr-](https://github.com/tthitima53-del/pediatric-rr-)), the AIRR research project (Malaria Consortium), and [Lucy et al. 2021](https://pubmed.ncbi.nlm.nih.gov/34715683/) (smartphone video in children with pneumonia). We found Breathwise after choosing this idea. AgapayMo Hinga is our own implementation, built from scratch during the hackathon; no code from these projects was used. What's different: an ML pipeline (pose-tracked torso region, on-device cry detection, a motion-quality gate that refuses unreliable counts) and the barangay workflow around it (flood exposure → leptospirosis watch list → medicine stock → de-identified QR → municipal plan), all offline.
 
-Offline health record systems also exist (iClinicSys and SHINE OS+ have offline modes), and DOH runs eLMIS for medicine logistics and a leptospirosis and dengue case tracker. Agapay is meant to feed them, not replace them.
+Offline health record systems also exist (iClinicSys and SHINE OS+ have offline modes), and DOH runs eLMIS for medicine logistics and a leptospirosis and dengue case tracker. AgapayMo is meant to feed them, not replace them.
 
 ## Medical sources
 - WHO IMCI fast-breathing cut-offs (≥60/min under 2 months, ≥50/min from 2 up to 12 months, ≥40/min from 12 months to 5 years) and danger signs: [WHO IMCI Chart Booklet, March 2014](https://cdn.who.int/media/docs/default-source/mca-documents/child/imci-integrated-management-of-childhood-illness/imci-in-service-training/imci-chart-booklet.pdf).
-- Leptospirosis: symptoms 5 to 15 days after flood exposure, and doxycycline "may be given as prophylaxis to people exposed to floodwaters, but only after consultation with a health professional" (DOH Usec. Balboa, [Manila Times, Sept 3, 2026](https://www.manilatimes.net/2026/09/03/news/doh-leptospirosis-cases-in-ph-12-lower-than-last-year/2418017)). Agapay's watch window and its never-a-dose rule follow this.
+- Leptospirosis: symptoms 5 to 15 days after flood exposure, and doxycycline "may be given as prophylaxis to people exposed to floodwaters, but only after consultation with a health professional" (DOH Usec. Balboa, [Manila Times, Sept 3, 2026](https://www.manilatimes.net/2026/09/03/news/doh-leptospirosis-cases-in-ph-12-lower-than-last-year/2418017)). AgapayMo's watch window and its never-a-dose rule follow this.
 
 ## Architecture
 One offline-first web app (Vite, React, TypeScript, a service worker), static on Vercel.

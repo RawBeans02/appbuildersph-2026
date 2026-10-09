@@ -13,7 +13,7 @@ type Screen = { path: string; ready: (page: Page) => Locator }
 
 const PHONE: Screen[] = [
   { path: '/', ready: (page) => page.getByText('On the watch list', { exact: true }) },
-  { path: '/prepare', ready: (page) => page.getByRole('heading', { level: 1, name: 'Get Agapay ready for no signal' }) },
+  { path: '/prepare', ready: (page) => page.getByRole('heading', { level: 1, name: 'Get AgapayMo ready for no signal' }) },
   { path: '/watch', ready: (page) => page.getByRole('heading', { level: 2, name: /^In the window now/ }) },
   { path: '/stock', ready: (page) => page.getByRole('heading', { level: 2, name: 'All stock' }) },
   { path: '/compare', ready: (page) => page.getByText('people exposed to floodwater') },

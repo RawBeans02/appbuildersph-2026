@@ -6,7 +6,7 @@ import { FlowTopBar } from '../../components'
 import styles from './PrivacyPage.module.css'
 
 // Screen 15 / L10, Privacy & AI: what runs on this phone, what leaves it, and
-// what the AI can get wrong (design: Agapay Local AI States, L10).
+// what the AI can get wrong (design: AgapayMo Local AI States, L10).
 
 const ON_THIS_PHONE: { icon: Icon; title: string; text: string }[] = [
   {
@@ -84,7 +84,7 @@ export default function PrivacyPage() {
           ))}
         </ul>
 
-        <p className={styles.never}>Agapay never diagnoses and never suggests a dose. It counts, flags and refers.</p>
+        <p className={styles.never}>AgapayMo never diagnoses and never suggests a dose. It counts, flags and refers.</p>
         <p className={styles.footer}>
           Research prototype, not a registered medical device. San Isidro Demo and every record in it are invented sample
           data.

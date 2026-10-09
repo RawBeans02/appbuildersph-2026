@@ -47,7 +47,7 @@ export default function App() {
   const title = resolved.kind === 'not-found' ? 'Page not found' : resolved.route.title
 
   useEffect(() => {
-    document.title = title === 'Agapay' ? 'Agapay' : `${title} · Agapay`
+    document.title = title === 'AgapayMo' ? 'AgapayMo' : `${title} · AgapayMo`
   }, [title])
 
   return (

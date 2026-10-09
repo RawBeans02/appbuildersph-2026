@@ -20,8 +20,8 @@ export type ScanBanner = {
 const NOT_VALID: ScanBanner = {
   kind: 'not-valid',
   tone: 'bad',
-  title: 'Not a valid Agapay QR',
-  body: "It isn't from a paired Agapay phone, so nothing was saved. Ask the health worker to open Send on Agapay.",
+  title: 'Not a valid AgapayMo QR',
+  body: "It isn't from a paired AgapayMo phone, so nothing was saved. Ask the health worker to open Send on AgapayMo.",
 }
 
 // null for a pairing QR: the officer confirms that one (see ScanPage).

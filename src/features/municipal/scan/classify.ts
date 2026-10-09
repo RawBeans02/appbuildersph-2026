@@ -91,10 +91,10 @@ const nameOf = (code: string) => barangayName(code) ?? code
 const exportOf = (item: { epiWeek: string; seq: number }) => `export ${item.seq}, week ${item.epiWeek}`
 
 const INVALID_COUNTS: Record<QrErrorCode, (barangay: string) => string> = {
-  'not-agapay': () => "This is not an Agapay QR code. Scan the QR on the barangay phone's Send screen.",
-  'bad-version': () => 'This QR is from a different version of Agapay. Update the app on the phone, then send again.',
+  'not-agapay': () => "This is not an AgapayMo QR code. Scan the QR on the barangay phone's Send screen.",
+  'bad-version': () => 'This QR is from a different version of AgapayMo. Update the app on the phone, then send again.',
   'invalid-payload': () =>
-    'This QR could not be read as Agapay counts: it is damaged or was changed. Ask the health worker to show it again.',
+    'This QR could not be read as AgapayMo counts: it is damaged or was changed. Ask the health worker to show it again.',
   'bad-signature': (barangay) =>
     `Not added: the signature does not match the phone paired for ${barangay}. The QR was changed, or it comes from another phone. If ${barangay} has a new phone, pair it first.`,
   'unknown-device': (barangay) =>
@@ -102,8 +102,8 @@ const INVALID_COUNTS: Record<QrErrorCode, (barangay: string) => string> = {
 }
 
 const INVALID_PAIRING: Record<PairingErrorCode, string> = {
-  'not-pairing': 'This is not an Agapay pairing QR code.',
-  'bad-version': 'This pairing QR is from a different version of Agapay. Update the app on the phone, then pair again.',
+  'not-pairing': 'This is not an AgapayMo pairing QR code.',
+  'bad-version': 'This pairing QR is from a different version of AgapayMo. Update the app on the phone, then pair again.',
   'invalid-pairing': 'This pairing QR is damaged or was changed. Ask the health worker to show it again.',
 }
 

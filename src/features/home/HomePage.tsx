@@ -141,7 +141,7 @@ export default function HomePage() {
     <div className={styles.page}>
       <div className={styles.content}>
         <ScreenHeader
-          title={place.barangay ?? 'Agapay'}
+          title={place.barangay ?? 'AgapayMo'}
           place={placeLine([place.municipality], place.sample) || undefined}
           privacyButton
         />

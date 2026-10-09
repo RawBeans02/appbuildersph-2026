@@ -6,7 +6,7 @@ import styles from './Hinga.module.css'
 const NO_STATUS = false
 
 // L8a: no WebAssembly, or the breathing check failed to load twice. Counting
-// by hand still works, and so does the rest of Agapay.
+// by hand still works, and so does the rest of AgapayMo.
 export function CantRunScreen({ onHandCount, onBack }: { onHandCount(): void; onBack(): void }) {
   return (
     <div className={styles.screen}>

@@ -1,4 +1,4 @@
-// The records Agapay keeps on the device (IndexedDB). Synthetic data only.
+// The records AgapayMo keeps on the device (IndexedDB). Synthetic data only.
 // Dates are ISO strings: YYYY-MM-DD for days, full ISO for moments.
 // `sample: true` marks seeded demo records, which the UI labels "Sample data".
 

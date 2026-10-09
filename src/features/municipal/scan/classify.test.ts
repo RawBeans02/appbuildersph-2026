@@ -132,8 +132,8 @@ describe('counts QRs', () => {
   it('has a clear message for every other decode error', async () => {
     const text = await countsQr()
     const cases: [string, string, string][] = [
-      ['https://example.com', 'not-agapay', "This is not an Agapay QR code. Scan the QR on the barangay phone's Send screen."],
-      [text.replace(/^AGP1\./, 'AGP2.'), 'bad-version', 'This QR is from a different version of Agapay.'],
+      ['https://example.com', 'not-agapay', "This is not an AgapayMo QR code. Scan the QR on the barangay phone's Send screen."],
+      [text.replace(/^AGP1\./, 'AGP2.'), 'bad-version', 'This QR is from a different version of AgapayMo.'],
       [`AGP1.e30.${text.split('.')[2]}`, 'invalid-payload', 'it is damaged or was changed'],
     ]
     for (const [input, code, message] of cases) {

@@ -81,7 +81,7 @@ export function ReaderFailedScreen({
         </Button>
         {prepared === false && (
           <ButtonLink to="/prepare" variant="secondary">
-            Get Agapay ready for no signal
+            Get AgapayMo ready for no signal
           </ButtonLink>
         )}
       </div>

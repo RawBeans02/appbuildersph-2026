@@ -1,4 +1,6 @@
-# Agapay design, pass 1 (Claude Design)
+# AgapayMo design, pass 1 (Claude Design)
+
+The product was renamed from Agapay to AgapayMo on Oct 9 (owner decision); the `.dc.html` canvases still show the old name, and COPY.md and this README use the new one.
 
 Handoff for Claude Code. Drop this folder into the repo as `design/`. Made with Claude Design during the event (Oct 9–10, 2026); list it in the repo README's "Designs" disclosure.
 
@@ -16,13 +18,13 @@ The `.dc.html` files are **design references built in HTML**, not production cod
 
 | File | Screens |
 |---|---|
-| `Agapay Design System.dc.html` | Tokens, contrast pairs, type scale, spacing, radius, elevation, focus and touch rules, icon list, components, app icon, manifest |
-| `Agapay Local AI States.dc.html` | L1a–L1b first-run download, L2 not enough space, L3 keep files, L4 getting ready, L5 ready sheet, L6a–L6b working, L7 offline sheet, L8a can't run, L8b count by hand, L9a–L9c errors, L10 Privacy & AI (brief screen 15) |
-| `Agapay Phone 1 Home and Hinga.dc.html` | 1a–1d Home (default, loading, empty, error), 2a age, 3a–3d framing and camera permission, 4a counting, 5a–5e refusals, 6a–6c fast / URGENT / saved, 7a not fast |
-| `Agapay Phone 2 Flood and Watch.dc.html` | 8a–8c log a flood, mark exposed, confirm · 9a–9c watch list, row sheet, empty |
-| `Agapay Phone 3 Stock.dc.html` | 10a scan · 11a review (L11, the AI result review) · 12a–12b stock list, empty · 13a–13b exposure and stock, flagged |
-| `Agapay Phone 4 Send and Privacy.dc.html` | 14a–14c what leaves, QR, shared · 404 |
-| `Agapay Laptop.dc.html` | 16 home · 17a–17f scan and its results · 18–18b merged view · 19a–19e plan and AI panel states · 20–20b approval log |
+| `AgapayMo Design System.dc.html` | Tokens, contrast pairs, type scale, spacing, radius, elevation, focus and touch rules, icon list, components, app icon, manifest |
+| `AgapayMo Local AI States.dc.html` | L1a–L1b first-run download, L2 not enough space, L3 keep files, L4 getting ready, L5 ready sheet, L6a–L6b working, L7 offline sheet, L8a can't run, L8b count by hand, L9a–L9c errors, L10 Privacy & AI (brief screen 15) |
+| `AgapayMo Phone 1 Home and Hinga.dc.html` | 1a–1d Home (default, loading, empty, error), 2a age, 3a–3d framing and camera permission, 4a counting, 5a–5e refusals, 6a–6c fast / URGENT / saved, 7a not fast |
+| `AgapayMo Phone 2 Flood and Watch.dc.html` | 8a–8c log a flood, mark exposed, confirm · 9a–9c watch list, row sheet, empty |
+| `AgapayMo Phone 3 Stock.dc.html` | 10a scan · 11a review (L11, the AI result review) · 12a–12b stock list, empty · 13a–13b exposure and stock, flagged |
+| `AgapayMo Phone 4 Send and Privacy.dc.html` | 14a–14c what leaves, QR, shared · 404 |
+| `AgapayMo Laptop.dc.html` | 16 home · 17a–17f scan and its results · 18–18b merged view · 19a–19e plan and AI panel states · 20–20b approval log |
 | `StatusBar`, `BottomNav`, `LocalStatus`, `LaptopNav` `.dc.html` | Shared pieces the screens import. They map to app components (see below) |
 | `support.js` | Preview runtime only. Not part of the app |
 | `COPY.md` | Every string, by screen |
@@ -55,7 +57,7 @@ L5, L7, 8c and 9b are sheets over their screen, not routes. Loading and error st
 - **LocalStatus**: one quiet text line, icon + word, no pill and no border. Two buttons: `Runs on this phone` (laptop: `Runs on this laptop`) in --device with `device-mobile` / `laptop`, and `Offline` in --ink-2 with `cloud-slash`. 14/20 600, icons 16, 16 px apart, dotted underline (1 px, offset 4 px) because each opens a sheet (L5 / L7). Each has a 48 px tap area: the 20 px line plus 14 px of invisible padding above and below (negative margin, so the layout doesn't move). Shown only once the AI is ready. When online, only the device part shows. On camera screens: --device-on-night and --on-night-2.
 - **BottomNav**: 78 px tall, --surface, 1 px --line top border, 5 equal flat tabs: Home (`house`), Watch list (`users-three`), Hinga (`wind`), Stock (`package`), Send (`qr-code`). Labels 14 px. Active: ink, Fill icon, 700, a 32 × 4 ink bar at the top. Inactive: --ink-3, Bold icon, 600. Nothing is raised: Home's Check breathing button is the big way into Hinga. Hidden inside the Hinga, scan and send flows.
 - **Camera screens**: the status bar and top bar sit on a solid --night band (96 px; 132 px on the counting screen, which has the timer). Never put text or the indicator straight over the camera image.
-- **LaptopNav**: 248 px sidebar, --surface, 1 px --line right border. Brand block (36 px ink "a" tile + "Agapay" / "Municipal view"), then items (48 px tall, radius 10): Scan QR codes (`scan`), Merged view (`table`), Plan (`list-numbers`), Approval log (`clock-counter-clockwise`). Active item gets a --sunken fill and 700. LocalStatus and a Privacy & AI link at the bottom.
+- **LaptopNav**: 248 px sidebar, --surface, 1 px --line right border. Brand block (36 px ink "a" tile + "AgapayMo" / "Municipal view"), then items (48 px tall, radius 10): Scan QR codes (`scan`), Merged view (`table`), Plan (`list-numbers`), Approval log (`clock-counter-clockwise`). Active item gets a --sunken fill and 700. LocalStatus and a Privacy & AI link at the bottom.
 - **Screen header (main phone screens)**: title 26/32 700, then a place line 16/24 --ink-2 (`San Isidro Demo · Sample data`), then LocalStatus 8 px below. 20 px side padding. Home adds a 48 px shield button (`shield-check`) on the right that opens Privacy & AI.
 - **Flow top bar**: 56 px. A 48 px back or close button on the left, LocalStatus on the right. Step text under it, 15 px 700 --ink-2, with a small segmented step bar (28 × 6 segments).
 - **Buttons**: 56 px tall, radius 12, 18/24 700, full width on phone.
@@ -191,8 +193,8 @@ Manifest values (the `manifest` block in `vite.config.ts`):
 
 ```json
 {
-  "name": "Agapay",
-  "short_name": "Agapay",
+  "name": "AgapayMo",
+  "short_name": "AgapayMo",
   "description": "Offline health checks for barangay health workers after a typhoon.",
   "start_url": "/",
   "scope": "/",
@@ -211,7 +213,7 @@ Manifest values (the `manifest` block in `vite.config.ts`):
 - `<meta name="theme-color" content="#F7F4ED">`
 - `<link rel="icon" href="/icons/favicon-32.png" sizes="32x32">`
 - `<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">`
-- Page titles: "Agapay", then "Screen · Agapay"; the 404 is "Page not found · Agapay".
+- Page titles: "AgapayMo", then "Screen · AgapayMo"; the 404 is "Page not found · AgapayMo".
 
 ## Rules that are easy to get wrong
 

@@ -17,9 +17,9 @@ import type { Count } from './suppress.js'
 export const QR_PREFIX = 'AGP1.'
 
 export type QrErrorCode =
-  // Not an Agapay QR at all (a URL, a product code...).
+  // Not an AgapayMo QR at all (a URL, a product code...).
   | 'not-agapay'
-  // An Agapay QR of a version this app can't read.
+  // An AgapayMo QR of a version this app can't read.
   | 'bad-version'
   // The signature doesn't match the payload and the barangay's registered key.
   | 'bad-signature'
@@ -173,8 +173,8 @@ function parsePayload(part: string): Validation<QrPayloadV1> {
 export async function decodeQr(text: string, registry: KeyRegistry): Promise<DecodeResult> {
   const trimmed = text.trim()
   const prefix = /^AGP(\d{1,3})\./.exec(trimmed)
-  if (!prefix) return fail('not-agapay', 'This is not an Agapay QR code.')
-  if (prefix[1] !== '1') return fail('bad-version', `Agapay QR version ${prefix[1]} can't be read here; this app reads version 1.`)
+  if (!prefix) return fail('not-agapay', 'This is not an AgapayMo QR code.')
+  if (prefix[1] !== '1') return fail('bad-version', `AgapayMo QR version ${prefix[1]} can't be read here; this app reads version 1.`)
 
   const parts = trimmed.slice(QR_PREFIX.length).split('.')
   if (parts.length !== 2) return fail('invalid-payload', 'Expected AGP1.<payload>.<signature>.')
