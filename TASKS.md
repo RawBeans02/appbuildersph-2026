@@ -193,6 +193,7 @@ Never on the offline demo path: the core works with no network, the offline e2e 
   - a human approves every alert, with an audit log; approved alerts reach the barangay's inbox on its next sync (laptop and phone pull, signed)
   - disclosed under "What requires internet" and "APIs and cloud services"
   · [lead] · owns: `server/luna/`, `api/alerts*`, `api/inbox*`, `src/features/doh/`, the inbox UI
+  - NEEDS DESIGN: the DOH view's "Draft alerts with GPT-6 Luna" panel: the AI line (on with today's calls, or "AI off" and why), "Draft alerts", the role field (a role, not a name), each draft's card (kind and barangay, the facts, the source tag "Written by GPT-6 Luna" / "Template", the wording to edit, the check line, Approve and Reject, the check's reasons when an edit is refused), the decided list and the audit log. Built on tokens and shared components meanwhile
 - [ ] todo · Owner: provision Neon via Vercel Storage and set the env vars (steps sent via Account Admin) · [human:Rovs]
 
 ## Scope (locked by the owner, Fri ~3:45 PM)

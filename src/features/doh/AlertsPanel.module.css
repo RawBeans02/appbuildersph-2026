@@ -1,0 +1,189 @@
+/* Phase 2 alerts panel on the DOH view (NEEDS DESIGN: TASKS.md P2-C).
+   Tokens only, on the patterns of the laptop's cards and tables. */
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 960px;
+  padding: var(--space-6);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-1);
+}
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.head > button {
+  width: auto;
+}
+
+.heading {
+  font: var(--type-heading);
+}
+
+.lead {
+  max-width: 640px;
+  margin-top: 6px;
+  font: var(--type-body);
+  color: var(--ink-2);
+}
+
+.ai {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--r-sm);
+  background: var(--sunken);
+  color: var(--ink-2);
+  font: var(--type-body-dense);
+  font-weight: 600;
+}
+
+.aiOn {
+  background: var(--device-tint);
+  color: var(--device);
+}
+
+.problem {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--r-md);
+  background: var(--bad-tint);
+  color: var(--bad);
+  font: var(--type-body);
+}
+
+.problem svg {
+  flex: none;
+  margin-top: 2px;
+}
+
+.note {
+  font: var(--type-body);
+  color: var(--ink-2);
+}
+
+.role {
+  max-width: 420px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: 0;
+  list-style: none;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--paper);
+}
+
+.cardHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.cardTitle {
+  font: var(--type-body-lg);
+  font-weight: 700;
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--space-2) var(--space-4);
+}
+
+.facts dt {
+  font: var(--type-caption);
+  color: var(--ink-2);
+}
+
+.facts dd {
+  margin: 0;
+  font: var(--type-mono);
+}
+
+.textLabel {
+  font: var(--type-caption);
+  font-weight: 700;
+}
+
+.text {
+  width: 100%;
+  min-height: 112px;
+  padding: var(--space-3);
+  border: 2px solid var(--line-strong);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--ink);
+  font: var(--type-body);
+  resize: vertical;
+}
+
+.check {
+  font: var(--type-body-dense);
+  color: var(--ink-2);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.actions > button {
+  width: auto;
+}
+
+.hint {
+  font: var(--type-body-dense);
+  color: var(--ink-2);
+}
+
+.subheading {
+  margin-top: var(--space-2);
+  font: var(--type-body-lg);
+  font-weight: 700;
+}
+
+.decided,
+.audit {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: 0;
+  list-style: none;
+  font: var(--type-body);
+}
+
+.meta {
+  display: block;
+  font: var(--type-caption);
+  color: var(--ink-2);
+}
+
+.audit {
+  gap: var(--space-1);
+  font: var(--type-body-dense);
+  color: var(--ink-2);
+}

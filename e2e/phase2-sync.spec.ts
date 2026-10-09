@@ -74,6 +74,12 @@ test('phase 2 on: the DOH view asks for its code online and needs internet offli
   await page.getByRole('button', { name: 'Open the reports' }).click()
   await expect(page.getByRole('heading', { name: "Couldn't reach the sync server" })).toBeVisible({ timeout: 30_000 })
 
+  // P2-C: the alerts panel renders, and with no server it says the AI is off.
+  await expect(page.getByRole('heading', { level: 2, name: 'Draft alerts with GPT-6 Luna' })).toBeVisible({ timeout: 30_000 })
+  await expect(page.locator('[data-ai="off"]')).toContainText('AI off', { timeout: 30_000 })
+  await expect(page.getByRole('button', { name: 'Draft alerts' })).toBeDisabled()
+  await noSeriousViolations(page, '/doh (alerts panel)')
+
   await page.waitForFunction(() => navigator.serviceWorker.controller !== null)
   await context.setOffline(true)
   await page.reload()
