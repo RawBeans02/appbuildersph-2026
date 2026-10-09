@@ -111,7 +111,7 @@ React + TypeScript, built with Vite as an installable web app (PWA: vite-plugin-
 - **Prepared beforehand and kept outside this repo, no product code:** planning notes, the instructions for our research chat and agents, and a laptop memory-guard script (not needed to build or run the product). The research itself ran after the 1:00 PM reveal.
 - **First product code:** commits before `3f00b06` are process docs only; the first product code is `3f00b06` (Oct 9, 2:00:40 PM PH).
 - **Other products:** the team has built other products before this event; no code, data, prompts, designs or assets from them are used here.
-- **Designs:** the UI designs, tokens and images in `design/` are generated with Claude Design during the event (pending: the first exports haven't landed yet).
+- **Designs:** the screens, tokens, copy, components and app icons in `design/` were made with Claude Design during the event (pass 1 landed in `7397da7`). The photos in `design/assets/` are mockup placeholders made with OpenAI gpt-image-2; they never ship in the app.
 - **Algorithms we reimplemented:** the OCR pre- and post-processing (`src/inference/ocr/`: DB box extraction and CTC decoding) follows PaddleOCR's published reference algorithms (Apache-2.0), written fresh in TypeScript. The seed's random generator is mulberry32, a public-domain algorithm by Tommy Ettinger (`src/data/seed/generate.ts`).
 - **Fonts, icons, images and other third-party assets,** with their licenses: _TBD (listed as they are added)_.
   - The synthetic test label `src/inference/ocr/fixtures/label.ppm` was rendered during the event with Pillow's bundled font, Aileron Regular (CC0). Its text is invented.
