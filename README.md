@@ -110,7 +110,7 @@ Camera-based breath counting for the WHO IMCI fast-breathing check has prior art
 Offline health record systems also exist (iClinicSys and SHINE OS+ have offline modes), and DOH runs eLMIS for medicine logistics and a leptospirosis and dengue case tracker. AgapayMo is meant to feed them, not replace them.
 
 ## Medical sources
-- WHO IMCI fast-breathing cut-offs (≥60/min under 2 months, ≥50/min from 2 up to 12 months, ≥40/min from 12 months to 5 years) and danger signs: [WHO IMCI Chart Booklet, March 2014](https://cdn.who.int/media/docs/default-source/mca-documents/child/imci-integrated-management-of-childhood-illness/imci-in-service-training/imci-chart-booklet.pdf).
+- WHO IMCI fast-breathing cut-offs (≥60/min under 2 months, ≥50/min from 2 up to 12 months, ≥40/min from 12 months to 5 years) and danger signs. In a young infant (under 2 months), fast breathing alone means very severe disease and urgent referral (the booklet's young-infant section, printed p. 41), so AgapayMo refers every under-2-months count of 60 or more URGENTLY, and any ticked danger sign is URGENT even when the camera couldn't count: [WHO IMCI Chart Booklet, March 2014](https://cdn.who.int/media/docs/default-source/mca-documents/child/imci-integrated-management-of-childhood-illness/imci-in-service-training/imci-chart-booklet.pdf).
 - Leptospirosis: symptoms 5 to 15 days after flood exposure, and doxycycline "may be given as prophylaxis to people exposed to floodwaters, but only after consultation with a health professional" (DOH Usec. Balboa, [Manila Times, Sept 3, 2026](https://www.manilatimes.net/2026/09/03/news/doh-leptospirosis-cases-in-ph-12-lower-than-last-year/2418017)). AgapayMo's watch window and its never-a-dose rule follow this.
 
 ## Architecture
