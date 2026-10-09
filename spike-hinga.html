@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>Hinga spike</title>
+  </head>
+  <body>
+    <main>
+      <h1>Hinga spike: camera breathing-rate check (throwaway test page)</h1>
+      <p>
+        Point the rear camera at a calm person's chest, with the head, shoulders and chest in view, and hold still for
+        60 s. Everything runs on this device; the video is not saved or sent. Test on ourselves only. This is a
+        breathing-rate check against the WHO IMCI 2014 fast-breathing cut-offs, not a diagnosis.
+      </p>
+      <p id="shell">Offline app shell: checking…</p>
+      <p><button id="prepare" type="button" hidden>Download for offline</button> <span id="prepare-status">Checking for the offline files…</span></p>
+      <p id="model" role="status">Waiting for the offline files…</p>
+
+      <p>
+        <button id="camera" type="button">Start camera</button>
+        <button id="stop" type="button" disabled>Stop camera</button>
+      </p>
+      <p>
+        <label>Age in months (under 60) <input id="age" type="number" inputmode="decimal" min="0" max="59.9" step="0.1" value="24" /></label>
+      </p>
+      <p>
+        <button id="count" type="button" disabled>Start 60 s count</button>
+        <button id="cancel" type="button" disabled>Cancel count</button>
+      </p>
+      <p id="status" role="status" aria-live="polite"></p>
+
+      <div style="position: relative; max-width: 640px">
+        <video id="video" playsinline muted autoplay style="display: block; width: 100%; height: auto"></video>
+        <canvas id="overlay" width="0" height="0" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%"></canvas>
+      </div>
+      <p>Overlay: green box = torso found this frame, blue box = region locked for the count; the lines at the bottom are the last 10 s of the two signals (upper: chest brightness, lower: shoulder height).</p>
+
+      <h2>Metronome</h2>
+      <p>For the trials: breathe in on the high beep and out on the low beep. The person being measured faces the back of the phone, so they follow the sound.</p>
+      <p>
+        <label>Breaths per minute <input id="metro-rate" type="number" inputmode="numeric" min="6" max="100" step="1" value="45" /></label>
+        <label><input id="metro-sound" type="checkbox" checked /> Sound</label>
+        <button id="metro" type="button">Start metronome</button>
+      </p>
+      <p><span id="metro-cue">Metronome off</span></p>
+      <div style="border: 1px solid; height: 16px; max-width: 320px">
+        <div id="metro-bar" style="height: 100%; width: 0; background: currentColor"></div>
+      </div>
+
+      <h2>Result</h2>
+      <p id="result">No count yet.</p>
+      <ul id="details"></ul>
+
+      <h2>Measured on this device</h2>
+      <ul id="timings">
+        <li>Nothing measured yet.</li>
+      </ul>
+
+      <h2>Report (copy this into docs/SPIKE-HINGA.md)</h2>
+      <pre id="report" style="white-space: pre-wrap"></pre>
+    </main>
+    <script type="module" src="/src/spikes/hinga/main.ts"></script>
+  </body>
+</html>

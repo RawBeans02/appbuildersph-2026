@@ -38,13 +38,15 @@ _TBD: the target user, the problem, and why it matters._
 | Records (residents, flood exposures, breathing checks, medicine stock, flags, approvals) | IndexedDB in the user's browser; they never leave the device except as the de-identified QR | No model |
 | De-identified QR payload (`src/qr/`, not yet used by a screen): small-cell suppression ("<5"), signing on the phone, verification and merge on the laptop | The user's browser, with the built-in Web Crypto API (ECDSA P-256) | No model |
 | Medicine-box reader (Stock screen; also the `spike-ocr.html` test page): reads text from a photo of the box, then drug, lot and expiry are parsed by rules for the health worker to confirm; the photo is never stored | The user's browser, in a Web Worker, WebAssembly, single-threaded | PP-OCRv5 mobile detection + English recognition on ONNX Runtime Web 1.30 |
+| Hinga spike (`spike-hinga.html`, a test page not linked from the app): finds the torso in the rear-camera video, then counts breaths per minute from the torso's brightness and shoulder height (band-pass, FFT peak, zero crossings) and compares with the WHO IMCI 2014 cut-offs. The video is never stored or sent | The user's browser: the pose model in WebAssembly on the CPU, on the main thread (a spike shortcut); the breath counting in plain TypeScript | MediaPipe Pose Landmarker lite on MediaPipe Tasks Vision 1.0.1 |
 | _TBD: the on-device AI_ | | |
 
 ## What requires internet
 | Part | Why it needs internet | What happens offline |
 |---|---|---|
-| First visit to the live URL | Downloads the app shell (HTML, JS, CSS: 333 KiB, Workbox's precache figure in the build), which the service worker caches | After the first visit, the app opens offline |
+| First visit to the live URL | Downloads the app shell (HTML, JS, CSS: 821.18 KiB, Workbox's precache figure in the build), which the service worker caches. 485.88 KiB of it is the Hinga spike page and its MediaPipe loader script (`ls -l` on the build output) | After the first visit, the app opens offline |
 | "Prepare for offline" (one tap, once) | Downloads the on-device AI into the browser's Cache Storage: the ONNX Runtime WebAssembly file (14,239,897 bytes) and the PP-OCRv5 models with their dictionary (12,658,822 bytes), 26,898,719 bytes in all | After it, the models load from the device; without it, AI features need the network |
+| Hinga spike, "Download for offline" (one tap on `spike-hinga.html`) | Downloads the MediaPipe WebAssembly file (11,756,954 bytes) and the pose model (5,777,746 bytes), 17,534,700 bytes in all, into the browser's Cache Storage | After it, the spike page works in airplane mode; without it, the pose model needs the network |
 | _TBD_ | | |
 
 ## Why does this product benefit from running AI locally?
@@ -68,8 +70,9 @@ _TBD: what stays on the device, human review of AI output, limitations, how the 
 |---|---|---|---|---|
 | PP-OCRv5_mobile_det (text detection), ONNX export, used by the OCR spike | Not stated by the source | 4,826,518 bytes | ONNX: [ilaylow/PP_OCRv5_mobile_onnx](https://huggingface.co/ilaylow/PP_OCRv5_mobile_onnx) `ppocrv5_det.onnx` @ `f97b337`; original: [PaddlePaddle/PP-OCRv5_mobile_det](https://huggingface.co/PaddlePaddle/PP-OCRv5_mobile_det) | Apache-2.0 |
 | en_PP-OCRv5_mobile_rec (English text recognition), ONNX export, used by the OCR spike | Parameters not stated; FP32, ONNX opset 11 (per the export's README and `config.json`) | 7,830,888 bytes, plus a 1,416-byte dictionary | ONNX: [monkt/paddleocr-onnx](https://huggingface.co/monkt/paddleocr-onnx) `languages/english/` @ `7b02d0a`; original: [PaddlePaddle/en_PP-OCRv5_mobile_rec](https://huggingface.co/PaddlePaddle/en_PP-OCRv5_mobile_rec) | Apache-2.0 |
+| MediaPipe Pose Landmarker lite (BlazePose GHUM 3D lite: a pose detector and a 33-point landmark model), used by the Hinga spike to find the torso | float16 (per the download path); parameters not stated by the source | 5,777,746 bytes | [Google MediaPipe model storage](https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task), listed in the [Pose Landmarker docs](https://developers.google.com/edge/mediapipe/solutions/vision/pose_landmarker); [model card](https://storage.googleapis.com/mediapipe-assets/Model%20Card%20BlazePose%20GHUM%203D.pdf) | Apache-2.0 (per the model card) |
 
-Self-hosted, unmodified, in `public/models/ppocr/` with their checksums, sources and the license text (`public/models/ppocr/README.md`).
+Self-hosted, unmodified: the OCR models in `public/models/ppocr/` and the pose model in `public/models/mediapipe/`, each with checksums, sources and the license text in a README there.
 
 ### Technologies and frameworks
 _TBD_
@@ -113,6 +116,7 @@ A cloud "Jr. Builder" agent named in early commits was planned but never used.
 | [idb](https://github.com/jakearchibald/idb) | Promise wrapper for IndexedDB, the on-device records | ISC |
 | [fake-indexeddb](https://github.com/dumbmatter/fakeIndexedDB) | In-memory IndexedDB for unit tests (development only) | Apache-2.0 |
 | [ONNX Runtime Web](https://onnxruntime.ai) (`onnxruntime-web`) | On-device model inference (WebAssembly) for the OCR spike | MIT |
+| [MediaPipe Tasks Vision](https://github.com/google-ai-edge/mediapipe) (`@mediapipe/tasks-vision` 1.0.1) | On-device pose landmarks (WebAssembly, CPU) for the Hinga spike; its SIMD WebAssembly build is copied into the site at build time (`npm run copy:mediapipe`), never loaded from a CDN | Apache-2.0 |
 | [Pillow](https://python-pillow.org) | Renders the synthetic test label (`src/inference/ocr/fixtures/make_label.py`); a development tool, not shipped | MIT-CMU |
 
 ## Lighthouse (mobile, measured at feature freeze)
