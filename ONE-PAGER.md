@@ -8,7 +8,7 @@
 - the **barangay health worker (BHW)** or barangay health station midwife, using their own mid-range phone;
 - the **municipal health officer (MHO)** at the rural health unit, who decides which barangay gets doctor teams and stock.
 
-Context: DOH reported 11,965 leptospirosis cases as of Sept 9, 2026, 46% higher than the same period last year ([Daily Tribune, Sept 29, 2026](https://tribune.net.ph/2026/09/29/leptospirosis-cases-dip-slightly-but-2026-total-still-up-46)), and a DOH memorandum asks for regular monitoring of doxycycline stocks in barangay health units ([Philstar, Sept 16, 2026](https://www.philstar.com/nation/2026/09/16/2556541/more-doxycycline-capsules-distributed-curb-leptospirosis-cases)).
+Context: DOH reported 12,654 leptospirosis cases as of Sept 30, 2026, 49% higher than the 8,511 in the same period of 2025 ([Manila Bulletin, Oct 6, 2026](https://mb.com.ph/2026/10/06/leptospirosis-cases-fall-36-areas-above-epidemic-thresholds-drop-to-18doh)), and a DOH memorandum asks for regular monitoring of doxycycline stocks in barangay health units ([Philstar, Sept 16, 2026](https://www.philstar.com/nation/2026/09/16/2556541/more-doxycycline-capsules-distributed-curb-leptospirosis-cases)).
 
 **Our solution (one sentence):** AgapayMo is an offline web app. On the BHW's phone, it checks a child's breathing rate with the camera (Hinga), turns a logged flood event into a leptospirosis watch list, and reads medicine-box lot and expiry dates to compare stock against need. It then passes only de-identified counts to the MHO's laptop by QR code, where a rule-based plan, optionally drafted by a local language model, waits for the officer's approval.
 

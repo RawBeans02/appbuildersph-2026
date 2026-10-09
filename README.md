@@ -15,7 +15,7 @@ Named Agapay until Oct 9, 9 PM, when the team renamed it AgapayMo (internal iden
 
 ## The problem
 After a typhoon, a flooded barangay can be without signal for days. That is exactly when its **barangay health workers** (BHWs, volunteers using their own phones) have the most to track:
-- **Leptospirosis:** who waded through floodwater, so they can be watched for symptoms 5 to 15 days later. DOH counted 11,965 leptospirosis cases as of Sept 9, 2026, 46% more than the same period last year ([Daily Tribune, Sept 29, 2026](https://tribune.net.ph/2026/09/29/leptospirosis-cases-dip-slightly-but-2026-total-still-up-46)).
+- **Leptospirosis:** who waded through floodwater, so they can be watched for symptoms 5 to 15 days later. DOH reported 12,654 leptospirosis cases as of Sept 30, 2026, 49% higher than the 8,511 in the same period of 2025 ([Manila Bulletin, Oct 6, 2026](https://mb.com.ph/2026/10/06/leptospirosis-cases-fall-36-areas-above-epidemic-thresholds-drop-to-18doh)).
 - **Children in the evacuation center:** which ones are breathing fast for their age, the WHO IMCI warning sign for pneumonia.
 - **Doxycycline on hand:** how much there is, and how much expires soon.
 
