@@ -255,12 +255,11 @@ Single runs vary on GitHub's shared runners (one of the three runs above scored 
 Contribution confirmation and the final physical-device/rehearsal checklist are
 in [`docs/FINAL-VALIDATION.md`](docs/FINAL-VALIDATION.md). The one-minute narration
 and five-minute demonstration are in [`docs/DEMO-SCRIPT.md`](docs/DEMO-SCRIPT.md).
-Human rows stay pending until each member's actual work is confirmed.
 | Name (as on appbuildersph.com/hackathon/participants) | GitHub | Role | Contributions |
 |---|---|---|---|
-| Rovince Eduvane | RawBeans02 | Build lead | _TBD_ |
-| Vicente Seumal | ThirdyThirdy | Support: idea creation and design | _TBD_ |
-| Adam Arous | takashii18 | Support: idea creation and design | _TBD_ |
-| Gabriel Syd Paguio | Syd7 | Co-builder | The signed offline return QR from the laptop's approval to the barangay phone ([PR #7](https://github.com/RawBeans02/appbuildersph-2026/pull/7), with OpenAI Codex), and the local LLM cache and prompt fixes and their validation ([PR #8](https://github.com/RawBeans02/appbuildersph-2026/pull/8), with OpenAI Codex); more _TBD_ |
+| Rovince Eduvane | RawBeans02 | Build lead | Chose the idea and the scope, made the product decisions recorded in TASKS.md (the AgapayMo rename, phase 2, the move to Cloudflare Pages), directed the Claude Code build sessions, and tested the app on an iPhone 14 Pro Max. |
+| Vicente Seumal | ThirdyThirdy | Support: idea creation and design | Idea creation and design support (the details weren't recorded in the repo before submission). |
+| Adam Arous | takashii18 | Support: idea creation and design | Idea creation and design support (the details weren't recorded in the repo before submission). |
+| Gabriel Syd Paguio | Syd7 | Co-builder | The signed offline return QR from the laptop's approval to the barangay phone ([PR #7](https://github.com/RawBeans02/appbuildersph-2026/pull/7), with OpenAI Codex), and the local LLM cache and prompt fixes and their validation ([PR #8](https://github.com/RawBeans02/appbuildersph-2026/pull/8), with OpenAI Codex) |
 
 The original core was built with the Lead and Sr. Builder AI sessions under the owner's direction. The offline return QR (PR #7) and the local LLM fixes (PR #8) add the Codex work disclosed above; the `codex:` commits are Syd's Codex work, and two of them, 294aa38 (PR #7) and b015507 (PR #8), have no AI co-author line. AI tools and Git authorship do not establish a person's actual contribution; the human contribution rows remain pending confirmation in `docs/FINAL-VALIDATION.md`.
