@@ -6,10 +6,10 @@ Named Agapay until Oct 9, 9 PM, when the team renamed it AgapayMo (internal iden
 
 | | |
 |---|---|
-| **Team name** | Banana cue |
+| **Team name** | Banana Cue |
 | **Live URL** | https://agapaymo.pages.dev |
 | **Repository** | https://github.com/RawBeans02/appbuildersph-2026 |
-| **Demo video** | https://x.com/Rovs_26/status/2108713202116923637 (the video is attached to the X post; 40 s, screenshots of the live app offline, two from our automated offline test, each tagged on screen) |
+| **Demo video** | https://youtu.be/_GFwXuQkxZk (the same 40 s video is attached to the X post below: screenshots of the live app offline, two from our automated offline test, each tagged on screen) |
 | **X / LinkedIn post (video)** | https://x.com/Rovs_26/status/2108713202116923637 |
 
 

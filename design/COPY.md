@@ -432,7 +432,7 @@ Sample values follow the demo timeline: four barangays in by 9:20 AM, Maligaya-D
 ## Video, pitch and link previews
 
 - og-image: `AgapayMo` · `Offline health checks for barangay health workers after a typhoon`
-- Title card: `AgapayMo` · `When the typhoon takes the signal` · `Team Banana cue · AppBuildersPH Hackathon 2026`
+- Title card: `AgapayMo` · `When the typhoon takes the signal` · `Team Banana Cue · AppBuildersPH Hackathon 2026`
 - End card: `{live URL}` · `QR to the live app` (placeholder label) · `Works offline after one visit` · `The AI downloads once, inside the app.`
 
 ## Every live-region line (role="status")
